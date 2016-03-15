@@ -140,12 +140,16 @@ elif fileloc=='j':
 print ""
 os.chdir("../../")
 os.chdir(fadir+"/Tokens/")
+try:
+    print "Your picas user is "+os.environ["PICAS_USR"]+" and you're in db "+os.environ["PICAS_DB"]
+except KeyError:
+    print " You haven't set $PICAS_DB!! \n\n Exiting"
+    sys.exit()
 
-
-subprocess.call(['python','removeObsIDTokens.py',obsid,'spectroscopy_alex','user','paswd'])
-subprocess.call(['python','createTokens.py',obsid,'spectroscopy_alex','user','paswd'])
-subprocess.call(['python','createViews.py','spectroscopy_alex','user','paswd'])
-subprocess.call(['python','createObsIDView.py',obsid,'spectroscopy_alex','user','paswd'])
+subprocess.call(['python','removeObsIDTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+subprocess.call(['python','createTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+subprocess.call(['python','createViews.py',os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+subprocess.call(['python','createObsIDView.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
 os.chdir("../../")
 
 os.remove('srmlist')
@@ -169,4 +173,4 @@ if os.path.exists(fadir+"/Application/jobIDs"):
 	os.remove(fadir+"/Application/jobIDs")
 
 os.chdir(fadir+"/Application")
-subprocess.call(['glite-wms-job-submit','-d',os.environ["$USER"],'-o','jobIDs','avg_dmx.jdl'])
+subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs','avg_dmx.jdl'])
