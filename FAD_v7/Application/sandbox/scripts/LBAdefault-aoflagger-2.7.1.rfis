@@ -10,10 +10,10 @@ Created by AOFlagger 2.7.2 (2015-09-27)
         <new-flagging>0</new-flagging>
       </action>
       <action type="ForEachPolarisationBlock">
-        <on-xx>0</on-xx>
+        <on-xx>1</on-xx>
         <on-xy>1</on-xy>
         <on-yx>1</on-yx>
-        <on-yy>0</on-yy>
+        <on-yy>1</on-yy>
         <on-stokes-i>0</on-stokes-i>
         <on-stokes-q>0</on-stokes-q>
         <on-stokes-u>0</on-stokes-u>
@@ -84,6 +84,9 @@ Created by AOFlagger 2.7.2 (2015-09-27)
         <max-contaminated-times-ratio>0.5</max-contaminated-times-ratio>
         <minimum-good-frequency-ratio>0.2</minimum-good-frequency-ratio>
         <minimum-good-time-ratio>0.2</minimum-good-time-ratio>
+      </action>
+      <action type="TimeSelectionAction">
+        <threshold>3.5</threshold>
       </action>
     </children>
   </action>
