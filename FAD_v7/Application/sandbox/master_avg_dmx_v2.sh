@@ -143,6 +143,16 @@ echo "--------------------------------------------------------------------------
 
 #NEED TO EXTRACT MS NAME FROM SURL
 full_surl=${SURL_SUBBAND}
+#CHECKING FREE DISKSPACE AND FREE MEMORY AT CURRENT TIME
+echo ""
+echo "current data and time"
+date
+echo "free disk space"
+df -h .
+echo "free memory"
+free -h
+
+
 
 
 
