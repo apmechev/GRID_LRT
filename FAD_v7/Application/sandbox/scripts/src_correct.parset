@@ -1,0 +1,36 @@
+Strategy.InputColumn = DATA
+Strategy.TimeRange = []
+Strategy.Baselines = *&
+Strategy.ChunkSize = 300
+#Strategy.ChunkSize = 0
+Strategy.UseSolver = F
+Strategy.Steps = [correct]
+
+
+Step.correct.Operation = CORRECT
+Step.correct.Model.Sources = []
+Step.correct.Model.Gain.Enable = T
+Step.correct.Model.Beam.Enable = T #F
+Step.correct.Input.Column = DATA
+Step.correct.Output.Column = CORRECTED_DATA
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
