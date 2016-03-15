@@ -45,7 +45,8 @@ def loadTokens(db):
                   print subband_num, SURL_SB
 
          token = {
-            '_id': 'token_' + OBSID + '_' + str(subband_num)+"FAD_master",
+
+            '_id': 'token_' + OBSID + '_' + str(subband_num)+"FAD_TS",
             'type': 'token',
 	    'OBSID': config.get('OBSERVATION','OBSID'),
 	    'SURL_SUBBAND': SURL_SB,

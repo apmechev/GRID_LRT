@@ -135,6 +135,7 @@ TURL_SUBBAND=$( SURLtoTURL ${SURL_SUBBAND} )
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/scripts.tar $RUNDIR
+
 cp $PWD/parsets.tar $RUNDIR
 cd ${RUNDIR}
 echo "untar scripts, parsets!!"
@@ -144,6 +145,7 @@ mkdir parsets
 tar -xvf parsets.tar  
 ls -lat 
 pwd
+
 echo ""
 echo "---------------------------------------------------------------------------"
 echo "START PROCESSING" $OBSID "SUBBAND:" $SURL_SUBBAND
@@ -151,6 +153,7 @@ echo "--------------------------------------------------------------------------
 
 #NEED TO EXTRACT MS NAME FROM SURL
 full_surl=${SURL_SUBBAND}
+
 #CHECKING FREE DISKSPACE AND FREE MEMORY AT CURRENT TIME
 echo ""
 echo "current data and time"
@@ -159,8 +162,6 @@ echo "free disk space"
 df -h .
 echo "free memory"
 free -h
-
-
 
 
 
@@ -199,6 +200,7 @@ du -hs $PWD/*
 # STEP3 PYTHON PROCESSING PART
 #
 # get filename to be processed from surl
+
 #snt=`echo ${SURL_SUBBAND} | cut -d'/' -f 12`
 #sn1=`echo ${snt} | cut -d'_' -f 1` #obsid
 #sn2=`echo ${snt} | cut -d'_' -f 2` #subband
@@ -262,18 +264,22 @@ demix_freq_step=${DEMIX_FREQ_STEP}
 demix_time_step=${DEMIX_TIME_STEP}
 demix_sources=${DEMIX_SOURCES}
 select_nl=${SELECT_NL}
+
 parset=${PARSET}
 sbn=${SUBBAND_NUM}
+
 echo $path
 
 
 # EXECUTE PYTHON PROCESSING
 echo ""
 echo "execute avg_dmx.py"
+
 echo "parset is" $parset
 #time python avg_dmx.py $path $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl > log_$name
 #time python avg_dmx_v2.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl > log_$name
 time python avg_dmx_v2.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
+
 echo "Done Command: "
 echo "time python avg_dmx_v2.py", $name, $avg_freq_step, $avg_time_step, $do_demix, $demix_freq_step, $demix_time_step, $demix_sources, $select_nl
 #
@@ -282,11 +288,13 @@ echo "step3 finished, list contents"
 ls -l $PWD
 du -hs $PWD
 du -hs $PWD/*
+
 echo "::::parsetfile run:::::"
 more *.parset
 #python log contents
 echo "python run log contents"
 more log_$name
+
 
 # read -p "Press [Enter] key to continue..."
 
@@ -310,6 +318,7 @@ if [[ `ls -d *.fa | wc -l` < 1 ]]; then
    echo ".FA FILES do not exist. Clean up and Exit now..."
    cp log_$name ${JOBDIR}
    cd ${JOBDIR}
+
    if [[ $(hostname -s) != 'loui' ]]; then
       echo "removing RunDir"
       rm -rf ${RUNDIR} 
@@ -322,6 +331,7 @@ echo "Tarring .fa files: "${name}".fa"
 tar -czvf ${name}.fa.tgz *.fa *.parset log_* > logtar_${name}.fa
 echo "Copy output to the Grid SE"
 echo ${OBSID}_${sbn}
+
 if echo ${SURL_SUBBAND} | grep SAP
 OBSID=$(echo $SURL_SUBBAND |sed 's/\(L[0-9]*\)_\(SAP[0-9][0-9][0-9]\)_\(SB[0-9][0-9][0-9]\)_uv\.MS_[a-z0-9]*.tar/\1_\2_\3_uv\.MS\.tar/'| cat $OBSID -)
 fi
@@ -344,6 +354,7 @@ if [[ "$?" != "0" ]]; then
    echo "Problem copying final files to the Grid. Clean up and Exit now..."
    cp log_$name logtar_$name.fa ${JOBDIR}
    cd ${JOBDIR}
+
    if [[ $(hostname -s) != 'loui' ]]; then
     echo "removing RunDir"
     rm -rf ${RUNDIR} 
@@ -367,6 +378,7 @@ echo ""
 echo "copy logs to the Job home directory and clean temp files in scratch"
 cp log_$name logtar_$name.fa ${JOBDIR}
 cd ${JOBDIR}
+
 if [[ $(hostname -s) != 'loui' ]]; then
     echo "removing RunDir"
     rm -rf ${RUNDIR} 
