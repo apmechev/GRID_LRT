@@ -16,6 +16,8 @@ import sys
 import re
 import subprocess
 
+print 'hi'
+
 if len(sys.argv)<3:
 	print ""
 	print "You need to input the SRM file and the master config file"
