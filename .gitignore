@@ -1,0 +1,12 @@
+#ignore the config and srm lists to minimize clobbering
+
+master_setup.cfg
+srm*
+
+#ignore dataset folders to minimize clobbering there
+FAD_v7/Tokens/datasets/*
+FAD_v7/Staging/datasets/*
+
+#do not overwrite logs
+FAD_v7/Application/sandbox/log*
+FAD_v7/Application/jobIDs
