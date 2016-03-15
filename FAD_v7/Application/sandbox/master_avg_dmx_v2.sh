@@ -76,7 +76,6 @@ echo "Setting up the LOFAR environment; release current:"
 
 #LOFARROOT=${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release
 LOFARROOT=${VO_LOFAR_SW_DIR}/current/lofar/release
-export LOFARROOT
 
 echo "source lofarinit.sh"
 #. ${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release/lofarinit.sh || exit 1
@@ -141,16 +140,6 @@ echo ""
 echo "---------------------------------------------------------------------------"
 echo "START PROCESSING" $OBSID "SUBBAND:" $SURL_SUBBAND
 echo "---------------------------------------------------------------------------"
-
-#CHECKING FREE DISKSPACE AND FREE MEMORY AT CURRENT TIME
-echo ""
-echo "current data and time"
-date
-echo "free disk space"
-df -h .
-echo "free memory"
-free -h
-
 
 #NEED TO EXTRACT MS NAME FROM SURL
 full_surl=${SURL_SUBBAND}
@@ -330,7 +319,7 @@ echo ""
 echo "copy logs to the Job home directory and clean temp files in scratch"
 cp log_$name logtar_$name.fa ${JOBDIR}
 cd ${JOBDIR}
-rm -rf ${RUNDIR} #uncommend for Grid
+rm -rf ${RUNDIR} 
 ls -l ${RUNDIR}
 echo ""
 echo "listing final files in Job directory"
