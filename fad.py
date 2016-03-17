@@ -97,11 +97,11 @@ for dir in ['Tokens','Staging']:
 
 	#append srms to the staging/files, reformat and add to files 
 with open(fadir+"/Staging/"+obsid+"_files","a") as Stagefile:
-	print("Pre-staging observation "+obsid)
+	print("Pre-staging observation "+obsid+ " inside file " + Stagefile.name)
 	if "fz-juelich.de" in open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r').read():
 		with open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r') as srms:
 			for i,line in enumerate(srms):
-				Stagefile.write(re.sub('srm:\/\/lofar-srm.fz-juelich.de:8443/','',line.split()[0])+'\n') #take first entry (srm://) ignoring file://
+				Stagefile.write(re.sub('srm:\/\/lofar-srm.fz-juelich.de:8443','',line.split()[0])+'\n') #take first entry (srm://) ignoring file://
 		Stagefile.close()
 		fileloc='j'
 	elif "srm.grid.sara.nl" in open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r').read():
@@ -112,7 +112,7 @@ with open(fadir+"/Staging/"+obsid+"_files","a") as Stagefile:
 		fileloc='s'
 
 
-print ""
+print "--"
 
 os.chdir(fadir+"/Staging/")
 for oldfile in glob.glob("files"):
