@@ -4,7 +4,8 @@
 #Usage python fad.py srm_L229587.txt master_setup.cfg
 # fad_v7- 	Add Y/N
 #		Added check for proper input and srm filename
-#version 1.0- 1-Feb2016
+#		Added check for staging and if staging succeeded
+#version 1.1- 17-Mar-2016
 #
 ##########################
 
@@ -16,8 +17,9 @@ import sys
 import re
 import subprocess
 
-print 'hi'
-
+############
+# Some checks on imput arguments
+############
 if len(sys.argv)<3:
 	print ""
 	print "You need to input the SRM file and the master config file"
@@ -34,7 +36,7 @@ else:
 	print "there may be a typo in your filenames"
 	sys.exit()
 
-if srmfile== 'srm.txt': #If there's no obsid in the filename (ie pulled from LTA)
+if srmfile== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other filenames
 	with open(srmfile,'r') as f:
 		line=f.readline()
 		obs_name='L'+str(re.search("L(.+?)_",line).group(1))
@@ -42,7 +44,10 @@ if srmfile== 'srm.txt': #If there's no obsid in the filename (ie pulled from LTA
 	shutil.copyfile('srm.txt','srm_'+obs_name+'.txt')
 	srmfile='srm_'+obs_name+'.txt'
 
-#re-extracts the FAD tarfile but only if not already there and sets up fadir
+
+###########
+#re-extracts the FAD tarfile if needed and sets up fadir
+###########
 latest_tar=glob.glob('FAD_*[0-9]*.tar')[-1]
 if not latest_tar:
 	fadir=glob.glob('FAD_*[0-9]*')[-1]
@@ -58,25 +63,25 @@ if latest_tar:
 sys.path.append(str(fadir+'/gsurl'))
 import gsurl_v3
 
-
-#Clean Tokens 
+###########
+#Clean Directories
+###########
 for stuff in glob.glob(fadir+'/Tokens/datasets/*'):
 	shutil.rmtree(stuff)
 
-#Clean Staging
 for stuff in glob.glob(fadir+'/Staging/datasets/*'):
        shutil.rmtree(stuff)
 
 for oldstagefile in glob.glob(fadir+"/Staging/*files*"):
      os.remove(oldstagefile)
 
-#Maybe check if srm_L****.txt file in proper format?
+	#TODO Maybe check if srm_L****.txt file in proper format?
 
 obsid=srmfile.split("srm_")[1].split(".txt")[0]
 
 os.makedirs(fadir+'/Tokens/datasets/'+obsid)
 os.makedirs(fadir+'/Staging/datasets/'+obsid)
-gsurl_v3.main(srmfile)
+gsurl_v3.main(srmfile)	#creates srmlist and subbandlist files
 
 shutil.copy("srmlist",fadir+"/Tokens/datasets/"+obsid)
 shutil.copy("subbandlist",fadir+"/Tokens/datasets/"+obsid)
@@ -84,8 +89,9 @@ shutil.copy("srmlist",fadir+"/Staging/datasets/"+obsid)
 shutil.copy("subbandlist",fadir+"/Staging/datasets/"+obsid)
 
 
-
-	#Adds OBSID to the master_setup.cfg and sends it to Staging and Tokens
+################
+#Adds OBSID to the master_setup.cfg and sends it to Staging/ and Tokens/
+################
 for dir in ['Tokens','Staging']:
 	with open(fadir+"/"+dir+"/datasets/"+obsid+"/setup.cfg","a") as cfgfile:
 		cfgfile.write("[OBSERVATION]\n")
@@ -95,7 +101,9 @@ for dir in ['Tokens','Staging']:
 				cfgfile.write(line)
 
 
-	#append srms to the staging/files, reformat and add to files 
+#################
+#append srms to the staging/obsid_files, reformat and add to /Staging/files 
+#################
 with open(fadir+"/Staging/"+obsid+"_files","a") as Stagefile:
 	print("Pre-staging observation "+obsid+ " inside file " + Stagefile.name)
 	if "fz-juelich.de" in open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r').read():
@@ -110,11 +118,15 @@ with open(fadir+"/Staging/"+obsid+"_files","a") as Stagefile:
 				Stagefile.write(re.sub('srm:\/\/srm.grid.sara.nl:8443','',line.split()[0])+'\n')
 		Stagefile.close()
 		fileloc='s'
-
-
 print "--"
 
+
+####################
+#Check state of files, if NEARLINE stage them
+#If they're staged here, check if ONLINE_AND_NEARLINE and if not, abort
+####################
 os.chdir(fadir+"/Staging/")
+
 for oldfile in glob.glob("files"):
        os.remove(oldfile)
 sys.path.append(os.path.abspath("."))
@@ -131,6 +143,15 @@ if fileloc=='s':
 	for sublist in locs:
 		if 'NEARLINE' in sublist :
 			os.system("python stage.py")
+			print "Staging your file."
+	##TODO Would be nice not to check this twice if staged
+	locs=state.main('files')
+	for sublist in locs:
+		if 'NEARLINE' in sublist :
+			print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+			print "I've staged the file but it's not ONLINE yet. I'll exit so bad things don't happen"
+			print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m" 
+			sys.exit()
 		
 elif fileloc=='j':
 	import state_fzj
@@ -138,15 +159,29 @@ elif fileloc=='j':
 	for subs in locs:
 		if 'NEARLINE' in subs :
         	        os.system("python stage_fzj.py")
+                        print "Staging your file"
+
+	locs=state_fzj.main('files')
+	for subs in locs:
+		if 'NEARLINE' in subs :
+			print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+                        print "I've staged the file but it's not ONLINE yet. I'll exit so bad things don't happen"
+                        print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
+			sys.exit()
+
 
 print ""
 os.chdir("../../")
 os.chdir(fadir+"/Tokens/")
 
+
+####################
+#PICAS Database Submission
+#####################
 try:
     print "Your picas user is "+os.environ["PICAS_USR"]+" and the DB is "+os.environ["PICAS_DB"]
 except KeyError:
-    print " You haven't set $PICAS_DB!! \n\n Exiting"
+    print "\033[31m You haven't set $PICAS_DB!! \n\n Exiting\033[0m"
     sys.exit()
 
 
@@ -159,7 +194,10 @@ os.chdir("../../")
 os.remove('srmlist')
 os.remove('subbandlist')
 
+
+####################
 ##Wait for keystroke
+###################
 yes = set(['yes','y', 'ye', ''])
 no = set(['no','n'])
 print "Do you want to continue? Y/N (Enter continues)"
@@ -172,7 +210,9 @@ elif choice in no:
 else:
    sys.exit()
 
-
+####################
+#Submit job using glite-wms-job-submit
+#####################
 if os.path.exists(fadir+"/Application/jobIDs"):
 	os.remove(fadir+"/Application/jobIDs")
 
