@@ -5,7 +5,7 @@
   Parameters=3;
 
   Executable = "/bin/sh";
-  Arguments = "startpilot.sh spectroscopy_alex $picasuser $picaspasswd";
+  Arguments = "startpilot.sh $PICAS_DB $PICAS_USR $PICAS_USR_PWD";
   Stdoutput = "parametricjob.out";
   StdError = "parametricjob.err";
   InputSandbox = {"sandbox/picas.tar","sandbox/couchdb.tar","sandbox/scripts.tar","sandbox/startpilot.sh","sandbox/pilot.py","sandbox/master_avg_dmx_v2.sh"};
