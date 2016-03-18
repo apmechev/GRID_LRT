@@ -181,7 +181,7 @@ os.chdir(fadir+"/Tokens/")
 try:
     print "Your picas user is "+os.environ["PICAS_USR"]+" and the DB is "+os.environ["PICAS_DB"]
 except KeyError:
-    print "\033[31m You haven't set $PICAS_DB!! \n\n Exiting\033[0m"
+    print "\033[31m You haven't set $PICAS_USR or $PICAS_DB or $PICAS_USR_PWD! \n\n Exiting\033[0m"
     sys.exit()
 
 
@@ -212,9 +212,25 @@ else:
 
 ####################
 #Submit job using glite-wms-job-submit
+#As it turns out, in avg_dmx.jdl, the PICAS variables are not evaluated (new environment)
+#to make this truly portable, (and safe), they are evaluated and replaced in the script
+#and after the file is restored 
 #####################
 if os.path.exists(fadir+"/Application/jobIDs"):
 	os.remove(fadir+"/Application/jobIDs")
 
 os.chdir(fadir+"/Application")
+
+shutil.copyfile('avg_dmx.jdl','avg_dmx_with_variables.jdl')
+filedata=None
+with open('avg_dmx.jdl','r') as file:
+    filedata = file.read()
+filedata = filedata.replace('$PICAS_DB $PICAS_USR $PICAS_USR_PWD', os.environ["PICAS_DB"]+" "+os.environ["PICAS_USR"]+" "+os.environ["PICAS_USR_PWD"])
+with open('avg_dmx.jdl','w') as file:
+    file.write(filedata)
+
+
 subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs','avg_dmx.jdl'])
+
+shutil.move('avg_dmx_with_variables.jdl','avg_dmx.jdl')
+
