@@ -246,7 +246,7 @@ echo ""
 echo "execute avg_dmx.py"
 #time python avg_dmx.py $path $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl > log_$name
 #time python avg_dmx_v2.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl > log_$name
-time python avg_dmx_v2.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl > log_$name 2>&1
+time python avg_dmx_v2C.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl > log_$name 2>&1
 echo "Done Command: "
 echo "time python avg_dmx_v2.py", $name, $avg_freq_step, $avg_time_step, $do_demix, $demix_freq_step, $demix_time_step, $demix_sources, $select_nl
 #
