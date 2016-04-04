@@ -18,23 +18,29 @@ import re
 import subprocess
 
 ############
-# Some checks on imput arguments
+# Some checks on input arguments
 ############
+
 if len(sys.argv)<3:
 	print ""
 	print "You need to input the SRM file and the master config file"
 	print "ex.  python fad.py srm_L229587.txt master_setup.cfg"
 	sys.exit()
 
-if ("srm" in sys.argv[1]) and ("master_setup.cfg" in sys.argv[2]):
-	srmfile=sys.argv[1]
-	mastercfg=sys.argv[2]
-elif ("srm" in sys.argv[2]) and ("master_setup.cfg" in sys.argv[1]):
-        srmfile=sys.argv[2]
-        mastercfg=sys.argv[1]
+if ("srm" in sys.argv[-2]) and ("master_setup.cfg" in sys.argv[-1]):
+	srmfile=sys.argv[-2]
+	mastercfg=sys.argv[-1]
+elif ("srm" in sys.argv[-1]) and ("master_setup.cfg" in sys.argv[-2]):
+        srmfile=sys.argv[-1]
+        mastercfg=sys.argv[-2]
 else: 
 	print "there may be a typo in your filenames"
 	sys.exit()
+
+if ("-r" in sys.argv[:-2] or ("--resub-error-only" in sys.argv[:-2])):
+	print "\033[226mFlag set to resubmit only error tokens\033[0m"
+	resuberr=True
+
 
 if srmfile== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other filenames
 	with open(srmfile,'r') as f:
@@ -184,9 +190,11 @@ except KeyError:
     print "\033[31m You haven't set $PICAS_USR or $PICAS_DB or $PICAS_USR_PWD! \n\n Exiting\033[0m"
     sys.exit()
 
-
-subprocess.call(['python','removeObsIDTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
-subprocess.call(['python','createTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+if resuberr:
+	subprocess.call(['python','resetErrorTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])     
+else:
+	subprocess.call(['python','removeObsIDTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+	subprocess.call(['python','createTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
 subprocess.call(['python','createViews.py',os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
 subprocess.call(['python','createObsIDView.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
 os.chdir("../../")
