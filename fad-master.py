@@ -28,24 +28,21 @@ if len(sys.argv)<3:
 	print "ex.  python fad.py srm_L229587.txt master_setup.cfg"
 	sys.exit()
 
-if ("srm" in sys.argv[-2]) and (("master_setup.cfg" in sys.argv[-1]) or ("parset" in sys.argv[-1])):
+if ("srm" in sys.argv[-2]) and (".cfg" in sys.argv[-1]):
 	srmfile=sys.argv[-2]
-	if ("parset" in sys.argv[-1]):
-		parsetfile=sys.argv[-1]
-	else:
-		mastercfg=sys.argv[-1]
-elif ("srm" in sys.argv[-1]) and (("master_setup.cfg" in sys.argv[-2]) or ("parset" in sys.argv[-2])):
+	mastercfg=sys.argv[-1]
+
+elif ("srm" in sys.argv[-1]) and (".cfg" in sys.argv[-2]):
         srmfile=sys.argv[-1]
-        if ("parset" in sys.argv[-2]):
-                parsetfile=sys.argv[-2]
-	else:
-		mastercfg=sys.argv[-2]
+	mastercfg=sys.argv[-2]
+
 else: 
 	print "there may be a typo in your filenames"
 	sys.exit()
 resuberr=False
+
 if ("-r" in sys.argv[:-2] or ("--resub-error-only" in sys.argv[:-2])):
-	print "\033[226mFlag set to resubmit only error tokens\033[0m"
+	print "\033[33mFlag set to resubmit only error tokens\033[0m"
 	resuberr=True
 
 
@@ -56,6 +53,12 @@ if srmfile== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other fil
 		print "copying srm.txt into srm_L"+obs_name+".txt "
 	shutil.copyfile('srm.txt','srm_'+obs_name+'.txt')
 	srmfile='srm_'+obs_name+'.txt'
+
+with open(mastercfg,'r') as readparset:
+	for line in readparset:
+		if "PARSET" in line:
+			parsetfile=line.split("PARSET",1)[1].split("= ")[1].split('\n')[0]
+			 
 
 
 ###########
@@ -77,7 +80,7 @@ sys.path.append(str(fadir+'/gsurl'))
 import gsurl_v3
 
 ###########
-#Clean Directories
+#Clean Directories and old parset
 ###########
 for stuff in glob.glob(fadir+'/Tokens/datasets/*'):
 	shutil.rmtree(stuff)
@@ -88,9 +91,24 @@ for stuff in glob.glob(fadir+'/Staging/datasets/*'):
 for oldstagefile in glob.glob(fadir+"/Staging/*files*"):
      os.remove(oldstagefile)
 
+for oldparset in glob.glob(fadir+"/Application/sandbox/parsets/*.parset"):
+	if not parsetfile=="":
+		os.remove(oldparset)
 	#TODO Maybe check if srm_L****.txt file in proper format?
 
+
 obsid=srmfile.split("srm_")[1].split(".txt")[0]
+#check if obsid exists in srm file
+found=False
+with open(srmfile,'rt') as f:
+	for line in f:
+		if obsid in line:
+			found=True
+	if not found:
+		print "\033[31mOBSID not found in SRM file!\033[0m"
+		sys.exit()
+	
+
 
 os.makedirs(fadir+'/Tokens/datasets/'+obsid)
 os.makedirs(fadir+'/Staging/datasets/'+obsid)
@@ -100,13 +118,19 @@ shutil.copy("srmlist",fadir+"/Tokens/datasets/"+obsid)
 shutil.copy("subbandlist",fadir+"/Tokens/datasets/"+obsid)
 shutil.copy("srmlist",fadir+"/Staging/datasets/"+obsid)
 shutil.copy("subbandlist",fadir+"/Staging/datasets/"+obsid)
-try:
-	parsetfile
-except NameError:
-	pass
-else:
-	shutil.copy(fadir+"parsets"+parsetfile,fadir+"/Tokens/datasets/"+obsid)
-	shutil.copy(fadir+"parsets"+parsetfile,fadir+"/Staging/datasets/"+obsid)
+if not ((parsetfile=="") or ("fault" in parsetfile) or parsetfile=="DEFAULT"):	
+	shutil.copy(fadir+"/parsets/"+parsetfile,fadir+"/Application/sandbox/parsets/"+obsid+"_"+parsetfile)	
+
+#Add tarring of parset files which will be untarred on the node
+
+subprocess.call(['cp','-r',fadir+"/parsets/",fadir+"/Application/sandbox/parsets/"])
+os.chdir(fadir+"/Application/sandbox")
+subprocess.call(["tar","-cvf", "parsets.tar","parsets/"])
+os.chdir("../../../")
+
+
+
+
 
 
 
@@ -117,8 +141,8 @@ for dir in ['Tokens','Staging']:
 	with open(fadir+"/"+dir+"/datasets/"+obsid+"/setup.cfg","a") as cfgfile:
 		cfgfile.write("[OBSERVATION]\n")
 		cfgfile.write("OBSID           = "+obsid+"\n")
-		with open('master_setup.cfg','r') as mastercfg:
-			for i, line in enumerate(mastercfg):
+		with open(mastercfg,'r') as cfg:
+			for i, line in enumerate(cfg):
 				cfgfile.write(line)
 
 
@@ -130,13 +154,13 @@ with open(fadir+"/Staging/"+obsid+"_files","a") as Stagefile:
 	if "fz-juelich.de" in open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r').read():
 		with open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r') as srms:
 			for i,line in enumerate(srms):
-				Stagefile.write(re.sub('srm:\/\/lofar-srm.fz-juelich.de:8443','',line.split()[0])+'\n') #take first entry (srm://) ignoring file://
+				Stagefile.write(re.sub('srm:\/\/lofar-srm.fz-juelich.de:8443\/','',line.split()[0])+'\n') #take first entry (srm://) ignoring file://
 		Stagefile.close()
 		fileloc='j'
 	elif "srm.grid.sara.nl" in open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r').read():
 		with open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r') as srms:
 			for i,line in enumerate(srms):
-				Stagefile.write(re.sub('srm:\/\/srm.grid.sara.nl:8443','',line.split()[0])+'\n')
+				Stagefile.write(re.sub('srm:\/\/srm.grid.sara.nl:844\/','',line.split()[0])+'\n')
 		Stagefile.close()
 		fileloc='s'
 print "--"
@@ -243,6 +267,8 @@ if os.path.exists(fadir+"/Application/jobIDs"):
 	os.remove(fadir+"/Application/jobIDs")
 
 os.chdir(fadir+"/Application")
+
+#TODO: Change avg_dmx's number of jobs to number of subbands
 
 shutil.copyfile('avg_dmx.jdl','avg_dmx_with_variables.jdl')
 filedata=None

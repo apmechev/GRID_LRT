@@ -22,4 +22,4 @@ chmod u+x master_avg_dmx_v2.sh
 ls -l
 
 # Start the pilot jobs by contacting PiCaS tokens
-python pilot.py $1 $2 $3
+python pilot.py $1 $2 $3 > pilot.log

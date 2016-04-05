@@ -109,6 +109,10 @@ DEMIX_TIME_STEP=${7}
 DEMIX_SOURCES=${8}
 SELECT_NL=${9}
 SUBBAND_NUM=${10}
+PARSET=${11}
+echo "++++++++++++++++++++++++++++++"
+echo $PARSET
+echo "++++++++++++++++++++++++++++++"
 
 echo "INITIALIZATION OF JOB ARGUMENTS"
 echo ${JOBDIR}
@@ -131,11 +135,15 @@ TURL_SUBBAND=$( SURLtoTURL ${SURL_SUBBAND} )
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/scripts.tar $RUNDIR
+cp $PWD/parsets.tar $RUNDIR
 cd ${RUNDIR}
-echo "untar scripts"
+echo "untar scripts, parsets!!"
 tar -xf scripts.tar
 cp -r scripts/* .
-
+mkdir parsets
+tar -xvf parsets.tar  
+ls -lat 
+pwd
 echo ""
 echo "---------------------------------------------------------------------------"
 echo "START PROCESSING" $OBSID "SUBBAND:" $SURL_SUBBAND
@@ -237,16 +245,18 @@ demix_freq_step=${DEMIX_FREQ_STEP}
 demix_time_step=${DEMIX_TIME_STEP}
 demix_sources=${DEMIX_SOURCES}
 select_nl=${SELECT_NL}
-#sbn=${SUBBAND_NUM}
+parset=${PARSET}
+sbn=${SUBBAND_NUM}
 echo $path
 
 
 # EXECUTE PYTHON PROCESSING
 echo ""
 echo "execute avg_dmx.py"
+echo "parset is" $parset
 #time python avg_dmx.py $path $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl > log_$name
 #time python avg_dmx_v2.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl > log_$name
-time python avg_dmx_v2.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl > log_$name 2>&1
+time python avg_dmx_v2.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
 echo "Done Command: "
 echo "time python avg_dmx_v2.py", $name, $avg_freq_step, $avg_time_step, $do_demix, $demix_freq_step, $demix_time_step, $demix_sources, $select_nl
 #
@@ -282,7 +292,7 @@ if [[ `ls -d *.fa | wc -l` < 1 ]]; then
    echo ".FA FILES do not exist. Clean up and Exit now..."
    cp log_$name ${JOBDIR}
    cd ${JOBDIR}
-   rm -rf ${RUNDIR}
+#   rm -rf ${RUNDIR}
    exit 1
 fi
 
@@ -309,7 +319,7 @@ if [[ "$?" != "0" ]]; then
    echo "Problem copying final files to the Grid. Clean up and Exit now..."
    cp log_$name logtar_$name.fa ${JOBDIR}
    cd ${JOBDIR}
-   rm -rf ${RUNDIR}
+#   rm -rf ${RUNDIR}
    exit 1
 fi
 
@@ -329,7 +339,7 @@ echo ""
 echo "copy logs to the Job home directory and clean temp files in scratch"
 cp log_$name logtar_$name.fa ${JOBDIR}
 cd ${JOBDIR}
-rm -rf ${RUNDIR} 
+#rm -rf ${RUNDIR} 
 ls -l ${RUNDIR}
 echo ""
 echo "listing final files in Job directory"
