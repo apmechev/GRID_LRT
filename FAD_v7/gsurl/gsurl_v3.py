@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import glob
 
@@ -39,6 +40,7 @@ def main(infile):
 	for line in f:
 	    #surl=line
 	    if not line in ['\n','\r\n','\r']:
+		line=re.sub('//pnfs','/pnfs',line)
 	    	surl=line.split()[0]
 	    #print surl
 	    	srm.write('%s\n' % surl)

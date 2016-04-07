@@ -40,6 +40,7 @@ print 'dmxfrq: ', demix_freq_step
 print 'dmxtim: ', demix_time_step
 print 'dmxsrc: ', demix_sources
 print 'sel nl: ', select_nl
+print 'parset: ',parset
 #sys.exit()
 
 # example of expected input
@@ -79,10 +80,16 @@ os.system('rm ' + ndppp_fa_parset)
 
 obsid=infile.split("_")[0]
 print "OBSID is "+ obsid
-if parset =="":
+if len(parset)<4:
 	shutil.copy("parsets/scripts/default.parset",ndppp_fa_parset)
 else:
 	shutil.copy("parsets/"+obsid+"_"+parset,ndppp_fa_parset)
+
+print "Processing parset:", ndppp_fa_parset
+
+import infile_script
+infile_script.main(ndppp_fa_parset,infile)
+
 #f=open(ndppp_fa_parset, 'w')
 #f.write('msin                    = %s\n' % infile)
 #f.write('msin.datacolumn         = DATA\n')

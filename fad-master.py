@@ -5,9 +5,13 @@
 # fad_v7- 	Add Y/N
 #		Added check for proper input and srm filename
 #		Added check for staging and if staging succeeded
-#version 1.1- 17-Mar-2016
-#version 1.2 - 3-Apr-2015
+#version 1.1-   17-Mar-2016
+#version 1.2 -  3-Apr-2016
 #		Now accepts a default parset with no master_setup
+#		7-Apr-2016
+#		Now accepts user defined parset in FAD_v#/parsets in custom_setup
+#		Can Invoke scripts to modify parset on the node
+#		--resubmit errors only implemented 
 ##########################
 
 import glob
@@ -25,7 +29,8 @@ import subprocess
 if len(sys.argv)<3:
 	print ""
 	print "You need to input the SRM file and the master config file"
-	print "ex.  python fad.py srm_L229587.txt master_setup.cfg"
+	print "ex.  python fad-master.py srm_L229587.txt master_setup.cfg"
+	print "optional flags ( -r or --resub-error-only) come after fad-master.py "
 	sys.exit()
 
 if ("srm" in sys.argv[-2]) and (".cfg" in sys.argv[-1]):
@@ -53,12 +58,12 @@ if srmfile== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other fil
 		print "copying srm.txt into srm_L"+obs_name+".txt "
 	shutil.copyfile('srm.txt','srm_'+obs_name+'.txt')
 	srmfile='srm_'+obs_name+'.txt'
-
+parsetfile=""
 with open(mastercfg,'r') as readparset:
 	for line in readparset:
 		if "PARSET" in line:
 			parsetfile=line.split("PARSET",1)[1].split("= ")[1].split('\n')[0]
-			 
+
 
 
 ###########
@@ -118,13 +123,17 @@ shutil.copy("srmlist",fadir+"/Tokens/datasets/"+obsid)
 shutil.copy("subbandlist",fadir+"/Tokens/datasets/"+obsid)
 shutil.copy("srmlist",fadir+"/Staging/datasets/"+obsid)
 shutil.copy("subbandlist",fadir+"/Staging/datasets/"+obsid)
-if not ((parsetfile=="") or ("fault" in parsetfile) or parsetfile=="DEFAULT"):	
-	shutil.copy(fadir+"/parsets/"+parsetfile,fadir+"/Application/sandbox/parsets/"+obsid+"_"+parsetfile)	
+
+if not ((len(parsetfile)<4) or ("fault" in parsetfile) or parsetfile=="DEFAULT"):	
+	shutil.copy(fadir+"/parsets/"+parsetfile,fadir+"/Application/sandbox/parsets/"+obsid+"_"+parsetfile)
+
+	
 
 #Add tarring of parset files which will be untarred on the node
 
 subprocess.call(['cp','-r',fadir+"/parsets/",fadir+"/Application/sandbox/parsets/"])
 os.chdir(fadir+"/Application/sandbox")
+os.remove("parsets.tar")
 subprocess.call(["tar","-cvf", "parsets.tar","parsets/"])
 os.chdir("../../../")
 
@@ -142,8 +151,12 @@ for dir in ['Tokens','Staging']:
 		cfgfile.write("[OBSERVATION]\n")
 		cfgfile.write("OBSID           = "+obsid+"\n")
 		with open(mastercfg,'r') as cfg:
-			for i, line in enumerate(cfg):
+			for i, line in enumerate(cfg): 
+				if 'PARSET' in line and len(parsetfile)<4:# if a parset is not defined
+					continue  #don't write PARSET= "", will be handled below
 				cfgfile.write(line)
+		if len(parsetfile)<4:
+			cfgfile.write('PARSET     = "-"\n')
 
 
 #################
@@ -154,13 +167,15 @@ with open(fadir+"/Staging/"+obsid+"_files","a") as Stagefile:
 	if "fz-juelich.de" in open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r').read():
 		with open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r') as srms:
 			for i,line in enumerate(srms):
-				Stagefile.write(re.sub('srm:\/\/lofar-srm.fz-juelich.de:8443\/','',line.split()[0])+'\n') #take first entry (srm://) ignoring file://
+				line=re.sub("//pnfs","/pnfs",line)
+				Stagefile.write(re.sub('srm:\/\/lofar-srm.fz-juelich.de:8443','',line.split()[0])+'\n') #take first entry (srm://) ignoring file://
 		Stagefile.close()
 		fileloc='j'
 	elif "srm.grid.sara.nl" in open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r').read():
 		with open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r') as srms:
 			for i,line in enumerate(srms):
-				Stagefile.write(re.sub('srm:\/\/srm.grid.sara.nl:844\/','',line.split()[0])+'\n')
+                                line=re.sub("//pnfs","/pnfs",line)
+				Stagefile.write(re.sub('srm:\/\/srm.grid.sara.nl:8443','',line.split()[0])+'\n')
 		Stagefile.close()
 		fileloc='s'
 print "--"
