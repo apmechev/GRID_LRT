@@ -245,7 +245,7 @@ except KeyError:
     sys.exit()
 
 if resuberr:
-	subprocess.call(['python','resetErrorTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])     
+	subprocess.call(['python','resetErrorTokens.py',os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])     
 else:
 	subprocess.call(['python','removeObsIDTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
 	subprocess.call(['python','createTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
