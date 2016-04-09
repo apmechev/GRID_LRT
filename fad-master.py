@@ -133,7 +133,10 @@ if not ((len(parsetfile)<4) or ("fault" in parsetfile) or parsetfile=="DEFAULT")
 
 subprocess.call(['cp','-r',fadir+"/parsets/",fadir+"/Application/sandbox/parsets/"])
 os.chdir(fadir+"/Application/sandbox")
-os.remove("parsets.tar")
+try:
+	os.remove("parsets.tar")
+except OSError:
+	pass
 subprocess.call(["tar","-cvf", "parsets.tar","parsets/"])
 os.chdir("../../../")
 
