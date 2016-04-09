@@ -199,18 +199,35 @@ du -hs $PWD/*
 # STEP3 PYTHON PROCESSING PART
 #
 # get filename to be processed from surl
-snt=`echo ${SURL_SUBBAND} | cut -d'/' -f 12`
-sn1=`echo ${snt} | cut -d'_' -f 1` #obsid
-sn2=`echo ${snt} | cut -d'_' -f 2` #subband
-sn3=`echo ${snt} | cut -d'_' -f 3` #uv extension (uv.dppp.MS)
-sn4=`echo ${snt} | cut -d'_' -f 4` #uniq srm extension
-untarred_name=${sn1}_${sn2}_${sn3}_${sn4}
+#snt=`echo ${SURL_SUBBAND} | cut -d'/' -f 12`
+#sn1=`echo ${snt} | cut -d'_' -f 1` #obsid
+#sn2=`echo ${snt} | cut -d'_' -f 2` #subband
+#sn3=`echo ${snt} | cut -d'_' -f 3` #uv extension (uv.dppp.MS)
+#sn4=`echo ${snt} | cut -d'_' -f 4` #uniq srm extension
+echo "Surl subband is"
+echo {$SURL_SUBBAND}
+SURL_SUBBAND=` ls -lat |grep L[0-9]* | awk '{print $(NF)}'`
+if echo ${SURL_SUBBAND} | grep SAP
+then
+new_name=$(echo $SURL_SUBBAND |sed 's/\(L[0-9]*\)_\(SAP[0-9][0-9][0-9]\)_\(SB[0-9][0-9][0-9]\)_uv\.MS_[a-z0-9]*.tar/\1_\2_\3_uv\.MS\.tar/') 
+echo "raw data"
+elif echo $SURL_SUBBAND | grep dppp
+then
+new_name=$(echo $SURL_SUBBAND |sed 's/.*\(L[0-9]*\)_\(SB[0-9][0-9][0-9]\)_uv\.dppp\.MS_[a-z0-9]*.tar/\1_\2_uv\.MS\.tar/')
+echo "dppp data"
+else
+echo "Can't process filename!!"
+fi
+
+
+untarred_name=${SURL_SUBBAND} #${sn1}_${sn2}_${sn3}_${sn4}
+#untarred_name= ` ls -lat |grep L[0-9]* | awk '{print $(NF)}'`
 echo "untarred surl file: ", $untarred_name
-new_name=${sn1}_${sn2}_${sn3}
+#new_name=${sn1}_${sn2}_${sn3}
 echo "desired file name : ", $new_name
 #
 #use also the subband number for srm storage of output .fa files
-sbn=${sn2}
+sbn=$(echo $new_name | sed 's/.*_\(SB[0-9][0-9][0-9]\)_.*/\1/')
 echo "sbn from sn2 : ", $sbn 
 
 # NOT SURE IF RENAMING IS NECESSARY (WILL THE ABOVE COPY JOB REMOVE THE UNIQ SRM EXTENSION ?)
@@ -265,7 +282,8 @@ echo "step3 finished, list contents"
 ls -l $PWD
 du -hs $PWD
 du -hs $PWD/*
-
+echo "::::parsetfile run:::::"
+more *.parset
 #python log contents
 echo "python run log contents"
 more log_$name
@@ -292,7 +310,10 @@ if [[ `ls -d *.fa | wc -l` < 1 ]]; then
    echo ".FA FILES do not exist. Clean up and Exit now..."
    cp log_$name ${JOBDIR}
    cd ${JOBDIR}
-#   rm -rf ${RUNDIR}
+   if [[ $(hostname -s) != 'loui' ]]; then
+      echo "removing RunDir"
+      rm -rf ${RUNDIR} 
+   fi
    exit 1
 fi
 
@@ -300,6 +321,10 @@ echo "Tarring .fa files: "${name}".fa"
 #tar -cvf ${name}.fa.tar *.fa > logtar_${name}.fa
 tar -czvf ${name}.fa.tgz *.fa *.parset log_* > logtar_${name}.fa
 echo "Copy output to the Grid SE"
+echo ${OBSID}_${sbn}
+if echo ${SURL_SUBBAND} | grep SAP
+OBSID=$(echo $SURL_SUBBAND |sed 's/\(L[0-9]*\)_\(SAP[0-9][0-9][0-9]\)_\(SB[0-9][0-9][0-9]\)_uv\.MS_[a-z0-9]*.tar/\1_\2_\3_uv\.MS\.tar/'| cat $OBSID -)
+fi
 echo ${OBSID}_${sbn}
 #
 #srmrm srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tar
@@ -319,7 +344,10 @@ if [[ "$?" != "0" ]]; then
    echo "Problem copying final files to the Grid. Clean up and Exit now..."
    cp log_$name logtar_$name.fa ${JOBDIR}
    cd ${JOBDIR}
-#   rm -rf ${RUNDIR}
+   if [[ $(hostname -s) != 'loui' ]]; then
+    echo "removing RunDir"
+    rm -rf ${RUNDIR} 
+   fi
    exit 1
 fi
 
@@ -339,7 +367,10 @@ echo ""
 echo "copy logs to the Job home directory and clean temp files in scratch"
 cp log_$name logtar_$name.fa ${JOBDIR}
 cd ${JOBDIR}
-#rm -rf ${RUNDIR} 
+if [[ $(hostname -s) != 'loui' ]]; then
+    echo "removing RunDir"
+    rm -rf ${RUNDIR} 
+fi
 ls -l ${RUNDIR}
 echo ""
 echo "listing final files in Job directory"

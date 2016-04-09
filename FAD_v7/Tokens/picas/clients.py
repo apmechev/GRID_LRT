@@ -9,8 +9,8 @@ import random
 
 # CouchDB imports
 import sys
-if not 'couchdb' in sys.modules:
-        import couchdb
+
+import couchdb
 from couchdb import Server
 
 class CouchClient(object):

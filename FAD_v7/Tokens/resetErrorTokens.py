@@ -12,8 +12,7 @@
 #python imports
 import sys
 import time
-if not 'couchdb' in sys.modules: 
-	import couchdb
+import couchdb
 
 #picas imports
 from picas.actors import RunActor
