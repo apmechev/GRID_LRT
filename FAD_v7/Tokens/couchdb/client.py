@@ -32,7 +32,7 @@ from textwrap import dedent
 import re
 import warnings
 
-import couchdb
+
 from couchdb import http, json
 
 __all__ = ['Server', 'Database', 'Document', 'ViewResults', 'Row']

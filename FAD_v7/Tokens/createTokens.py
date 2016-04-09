@@ -56,6 +56,7 @@ def loadTokens(db):
 	    'DEMIX_TIME_STEP': config.get('OBSERVATION','DEMIX_TIME_STEP'),
 	    'DEMIX_SOURCES': config.get('OBSERVATION','DEMIX_SOURCES'),
 	    'SELECT_NL': config.get('OBSERVATION','SELECT_NL'),
+	    'PARSET':  config.get('OBSERVATION','PARSET'),
             'SUBBAND_NUM': subband_num,
             'lock': 0,
             'done': 0,

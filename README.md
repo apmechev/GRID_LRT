@@ -19,4 +19,4 @@ Next:
 losoto integration
 selecting LOFAR Stack version
 improved error reporting
-
+RemoveTokens based on branch as well
