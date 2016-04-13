@@ -80,7 +80,7 @@ os.system('rm ' + ndppp_fa_parset)
 
 obsid=infile.split("_")[0]
 print "OBSID is "+ obsid
-if len(parset)<4:
+if not ".parset" in parset:
 	shutil.copy("parsets/scripts/default.parset",ndppp_fa_parset)
 else:
 	shutil.copy("parsets/"+obsid+"_"+parset,ndppp_fa_parset)
