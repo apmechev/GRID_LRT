@@ -219,7 +219,6 @@ else
 echo "Can't process filename!!"
 fi
 
-
 untarred_name=${SURL_SUBBAND} #${sn1}_${sn2}_${sn3}_${sn4}
 #untarred_name= ` ls -lat |grep L[0-9]* | awk '{print $(NF)}'`
 echo "untarred surl file: ", $untarred_name
