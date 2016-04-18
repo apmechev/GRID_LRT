@@ -221,7 +221,6 @@ else
 echo "Can't process filename!!"
 fi
 
-
 untarred_name=${SURL_SUBBAND} #${sn1}_${sn2}_${sn3}_${sn4}
 #untarred_name= ` ls -lat |grep L[0-9]* | awk '{print $(NF)}'`
 echo "untarred surl file: ", $untarred_name
@@ -331,8 +330,13 @@ echo "Tarring .fa files: "${name}".fa"
 tar -czvf ${name}.fa.tgz *.fa *.parset log_* > logtar_${name}.fa
 echo "Copy output to the Grid SE"
 echo ${OBSID}_${sbn}
+<<<<<<< HEAD
 
 if echo ${SURL_SUBBAND} | grep SAP; then
+=======
+if echo ${SURL_SUBBAND} | grep SAP
+then
+>>>>>>> master
 OBSID=$(echo $SURL_SUBBAND |sed 's/\(L[0-9]*\)_\(SAP[0-9][0-9][0-9]\)_\(SB[0-9][0-9][0-9]\)_uv\.MS_[a-z0-9]*.tar/\1_\2_\3_uv\.MS\.tar/'| cat $OBSID -)
 fi
 echo ${OBSID}_${sbn}
