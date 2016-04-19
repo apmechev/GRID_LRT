@@ -6,17 +6,25 @@ For minimal setup, the user only needs to specify a list of surls where the data
 
 Currently Implemented:
 user defined parsets in /FADv7/parsets
+
 .cfg file can specify parset to run
+
 scripts to modify the parset on the node (inputfile_script.py)
 
 In Development:
 gaincal
+
 profiling CPU/MEM/IO usage
+
 aoflag crash (??)
+
 more parset modification scripts
 
 Next:
 losoto integration
+
 selecting LOFAR Stack version
+
 improved error reporting
+
 RemoveTokens based on branch as well
