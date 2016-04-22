@@ -330,7 +330,7 @@ echo "Tarring .fa files: "${name}".fa"
 tar -czvf ${name}.fa.tgz *.fa *.parset log_* > logtar_${name}.fa
 echo "Copy output to the Grid SE"
 echo ${OBSID}_${sbn}
-<<<<<<< HEAD
+
 
 if echo ${SURL_SUBBAND} | grep SAP; then
 OBSID=$(echo $SURL_SUBBAND |sed 's/\(L[0-9]*\)_\(SAP[0-9][0-9][0-9]\)_\(SB[0-9][0-9][0-9]\)_uv\.MS_[a-z0-9]*.tar/\1_\2_\3_uv\.MS\.tar/'| cat $OBSID -)
