@@ -306,6 +306,7 @@ du -hs $PWD/*
 
 # ADD A CHECK TO SEE IF *.fa FILES EXIST FIRST --> this ensures that we have the output available)
 if [[ `ls -d *.fa | wc -l` < 1 ]]; then
+   cat log_$name 
    echo ".FA FILES do not exist. Clean up and Exit now..."
    cp log_$name ${JOBDIR}
    cd ${JOBDIR}
