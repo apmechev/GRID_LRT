@@ -69,6 +69,10 @@ with open(mastercfg,'r') as readparset:
 ###########
 #re-extracts the FAD tarfile if needed and sets up fadir
 ###########
+print ""
+print "You're running the \033[33m FAD_TimeSplit \033[0m branch!"
+print ""
+
 latest_tar=glob.glob('FAD_*[0-9]*.tar')[-1]
 if not latest_tar:
 	fadir=glob.glob('FAD_*[0-9]*')[-1]
