@@ -48,6 +48,11 @@ if srmfile== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other fil
 ###########
 #re-extracts the FAD tarfile if needed and sets up fadir
 ###########
+
+print ""
+print "You're running the \033[33m FADCalibration \033[0m branch!"
+print ""
+
 latest_tar=glob.glob('FAD_*[0-9]*.tar')[-1]
 if not latest_tar:
 	fadir=glob.glob('FAD_*[0-9]*')[-1]
