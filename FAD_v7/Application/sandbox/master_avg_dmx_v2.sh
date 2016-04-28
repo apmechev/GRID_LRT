@@ -201,11 +201,6 @@ du -hs $PWD/*
 #
 # get filename to be processed from surl
 
-#snt=`echo ${SURL_SUBBAND} | cut -d'/' -f 12`
-#sn1=`echo ${snt} | cut -d'_' -f 1` #obsid
-#sn2=`echo ${snt} | cut -d'_' -f 2` #subband
-#sn3=`echo ${snt} | cut -d'_' -f 3` #uv extension (uv.dppp.MS)
-#sn4=`echo ${snt} | cut -d'_' -f 4` #uniq srm extension
 echo "Surl subband is"
 echo {$SURL_SUBBAND}
 SURL_SUBBAND=` ls -lat |grep L[0-9]* | awk '{print $(NF)}'`
@@ -275,8 +270,6 @@ echo ""
 echo "execute avg_dmx.py"
 
 echo "parset is" $parset
-#time python avg_dmx.py $path $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl > log_$name
-#time python avg_dmx_v2.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl > log_$name
 time python avg_dmx_v2.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
 
 echo "Done Command: "
@@ -289,7 +282,7 @@ du -hs $PWD
 du -hs $PWD/*
 
 echo "::::parsetfile run:::::"
-more *.parset
+more *.parset*
 #python log contents
 echo "python run log contents"
 more log_$name
@@ -315,6 +308,8 @@ du -hs $PWD/*
 # ADD A CHECK TO SEE IF *.fa FILES EXIST FIRST --> this ensures that we have the output available)
 if [[ `ls -d *.fa | wc -l` < 1 ]]; then
    echo ".FA FILES do not exist. Clean up and Exit now..."
+   more *.parset*
+   more log_$name
    cp log_$name ${JOBDIR}
    cd ${JOBDIR}
 

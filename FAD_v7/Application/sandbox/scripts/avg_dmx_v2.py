@@ -79,9 +79,6 @@ os.system('rm -rf ' + outfin)
 #
 #
 #--------------------------------------------------
-#tms=['22Jan2015/18:32:00.0','22Jan2015/19:00:00.0','22Jan2015/20:00:00.0','22Jan2015/21:00:00.0','22Jan2015/22:00:00.0']
-#tme=['22Jan2015/19:00:00.0','22Jan2015/20:00:00.0','22Jan2015/21:00:00.0','22Jan2015/22:00:00.0','22Jan2015/22:48:00.0']
-#cnt=['_t1','_t2','_t3','_t4','_t5']
 #
 print '+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+='
 print 'Starting Chunking'
@@ -97,7 +94,7 @@ os.chdir(infile)
 fsize=sum(os.path.getsize(f) for f in os.listdir('.') if os.path.isfile(f))
 os.chdir("../")
 
-ramsize=int(subprocess.Popen(['free'],stdout=subprocess.PIPE).communicate()[0].split()[7])#ram in kb
+ramsize=int(subprocess.Popen(['free'],stdout=subprocess.PIPE).communicate()[0].split()[9])#ram in kb
 print("Chunking so that each chunk is less than 1/4 of "+str(ramsize)+" kb which is the RAM size as reported by free")
 chsize=math.ceil(fsize/(ramsize*1000/4.))
 tms=[]
@@ -162,14 +159,14 @@ for (ts,te,ct) in zip(tms, tme, cnt):
 
   if do_demix == 'False' or do_demix == 'false' or do_demix == 'FALSE':
   #if do_demix == 0:
-     #f.write('steps                   = [rficonsole,flag,flagamp,avg1,rficonsole2]\n')
-     f.write('steps                   = [rficonsole,avg1,rficonsole2]\n')
+     f.write('steps                   = [rficonsole,flag,flagamp,avg1,rficonsole2]\n')
+     #f.write('steps                   = [rficonsole,avg1,rficonsole2]\n')
      f.write('avg1.type               = squash\n')
      f.write('avg1.freqstep           = %s\n' % avg_freq_step)
      f.write('avg1.timestep           = %s\n' % avg_time_step)
   else:
-     #f.write('steps                   = [rficonsole,flag,flagamp,demixer,rficonsole2]\n')
-     f.write('steps                   = [rficonsole,demixer,rficonsole2]\n')
+     f.write('steps                   = [rficonsole,flag,flagamp,demixer,rficonsole2]\n')
+     #f.write('steps                   = [rficonsole,demixer,rficonsole2]\n')
      f.write('demixer.type            = demixer\n')
      f.write('demixer.corrtype        = cross\n')
      f.write('demixer.demixfreqstep   = %s\n' % demix_freq_step)
@@ -190,14 +187,16 @@ for (ts,te,ct) in zip(tms, tme, cnt):
    
   f.write('rficonsole.type         = aoflagger\n')
   f.write('rficonsole2.type        = aoflagger\n')
-  f.write('rficonsole.strategy     = LBAdefault.rfis\n')
-  f.write('rficonsole2.strategy    = LBAdefault.rfis\n')
+  f.write('rficonsole2.memorymax   = 8\n')
+  f.write('rficonsole.memorymax    = 8\n')
+  f.write('rficonsole.strategy     = HBAdefault-aoflagger-2.7.1.rfis\n')
+  f.write('rficonsole2.strategy    = HBAdefault-aoflagger-2.7.1.rfis\n')
 
-  #f.write('flag.type               = preflagger\n')
-  #f.write('flag.baseline           = [[CS001HBA0*,CS001HBA1*],[CS002HBA0*,CS002HBA1*],[CS003HBA0*,CS003HBA1*],[CS004HBA0*,CS004HBA1*],[CS005HBA0*,CS005HBA1*],[CS006HBA0*,CS006HBA1*],[CS007HBA0*,CS007HBA1*],[CS011HBA0*,CS011HBA1*],[CS013HBA0*,CS013HBA1*],[CS017HBA0*,CS017HBA1*],[CS021HBA0*,CS021HBA1*],[CS024HBA0*,CS024HBA1*],[CS026HBA0*,CS026HBA1*],[CS028HBA0*,CS028HBA1*],[CS030HBA0*,CS030HBA1*],[CS031HBA0*,CS031HBA1*],[CS032HBA0*,CS032HBA1*],[CS101HBA0*,CS101HBA1*],[CS103HBA0*,CS103HBA1*],[CS201HBA0*,CS201HBA1*],[CS301HBA0*,CS301HBA1*],[CS302HBA0*,CS302HBA1*],[CS401HBA0*,CS401HBA1*],[CS501HBA0*,CS501HBA1*]]\n')
+  f.write('flag.type               = preflagger\n')
+  f.write('flag.baseline           = [[CS001HBA0*,CS001HBA1*],[CS002HBA0*,CS002HBA1*],[CS003HBA0*,CS003HBA1*],[CS004HBA0*,CS004HBA1*],[CS005HBA0*,CS005HBA1*],[CS006HBA0*,CS006HBA1*],[CS007HBA0*,CS007HBA1*],[CS011HBA0*,CS011HBA1*],[CS013HBA0*,CS013HBA1*],[CS017HBA0*,CS017HBA1*],[CS021HBA0*,CS021HBA1*],[CS024HBA0*,CS024HBA1*],[CS026HBA0*,CS026HBA1*],[CS028HBA0*,CS028HBA1*],[CS030HBA0*,CS030HBA1*],[CS031HBA0*,CS031HBA1*],[CS032HBA0*,CS032HBA1*],[CS101HBA0*,CS101HBA1*],[CS103HBA0*,CS103HBA1*],[CS201HBA0*,CS201HBA1*],[CS301HBA0*,CS301HBA1*],[CS302HBA0*,CS302HBA1*],[CS401HBA0*,CS401HBA1*],[CS501HBA0*,CS501HBA1*]]\n')
 
-  #f.write('flagamp.type            = preflagger\n')
-  #f.write('flagamp.amplmin         = 1e-30\n')
+  f.write('flagamp.type            = preflagger\n')
+  f.write('flagamp.amplmin         = 1e-30\n')
 
   f.close()
   os.system('NDPPP ' + ndppp_fa_parset)

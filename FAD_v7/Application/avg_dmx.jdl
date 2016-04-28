@@ -2,7 +2,7 @@
   JobType="Parametric";
   ParameterStart=0;
   ParameterStep=1;
-  Parameters=3;
+  Parameters=50;
 
   Executable = "/bin/sh";
 
