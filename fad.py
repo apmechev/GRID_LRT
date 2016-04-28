@@ -100,13 +100,14 @@ for stuff in glob.glob(fadir+'/Staging/datasets/*'):
 for oldstagefile in glob.glob(fadir+"/Staging/*files*"):
      os.remove(oldstagefile)
 
-for oldparset in glob.glob(fadir+"/Application/sandbox/parsets/*.parset"):
-	if not parsetfile=="":
+for oldparset in glob.glob(fadir+"/Application/sandbox/scripts/parsets/*.parset"):
+	if (not parsetfile=="") and (not "default" in  oldparset ): ##Remove old parsets but not the default.parset
 		os.remove(oldparset)
 	#TODO Maybe check if srm_L****.txt file in proper format?
 
+with open(srmfile, 'r') as f:
+	 obsid=re.search('L[0-9]*',f.readline()).group(0)
 
-obsid=srmfile.split("srm_")[1].split(".txt")[0]
 #check if obsid exists in srm file
 found=False
 with open(srmfile,'rt') as f:
@@ -129,19 +130,19 @@ shutil.copy("srmlist",fadir+"/Staging/datasets/"+obsid)
 shutil.copy("subbandlist",fadir+"/Staging/datasets/"+obsid)
 
 if not ((len(parsetfile)<4) or ("fault" in parsetfile) or parsetfile=="DEFAULT"):	
-	shutil.copy(fadir+"/parsets/"+parsetfile,fadir+"/Application/sandbox/parsets/"+obsid+"_"+parsetfile)
+	shutil.copy(fadir+"/parsets/"+parsetfile,fadir+"/Application/sandbox/scripts/parsets/"+obsid+"_"+parsetfile)
 
 	
 
 #Add tarring of parset files which will be untarred on the node
 
-subprocess.call(['cp','-r',fadir+"/parsets/",fadir+"/Application/sandbox/parsets/"])
+subprocess.call(['cp','-r',fadir+"/parsets/*",fadir+"/Application/sandbox/scripts/parsets"])
 os.chdir(fadir+"/Application/sandbox")
 try:
-	os.remove("parsets.tar")
+	os.remove("scripts.tar")
 except OSError:
 	pass
-subprocess.call(["tar","-cvf", "parsets.tar","parsets/"])
+subprocess.call(["tar","-cvf", "scripts.tar","scripts/"])
 os.chdir("../../../")
 
 

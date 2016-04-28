@@ -135,14 +135,11 @@ TURL_SUBBAND=$( SURLtoTURL ${SURL_SUBBAND} )
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/scripts.tar $RUNDIR
-
-cp $PWD/parsets.tar $RUNDIR
 cd ${RUNDIR}
 echo "untar scripts, parsets!!"
 tar -xf scripts.tar
 cp -r scripts/* .
-mkdir parsets
-tar -xvf parsets.tar  
+ls -lat parsets/
 ls -lat 
 pwd
 
@@ -307,6 +304,7 @@ du -hs $PWD/*
 
 # ADD A CHECK TO SEE IF *.fa FILES EXIST FIRST --> this ensures that we have the output available)
 if [[ `ls -d *.fa | wc -l` < 1 ]]; then
+   cat log_$name 
    echo ".FA FILES do not exist. Clean up and Exit now..."
    more *.parset*
    more log_$name

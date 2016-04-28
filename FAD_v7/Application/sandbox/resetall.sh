@@ -1,6 +1,6 @@
 #!/bin/bash
-export PATH=/cvmfs/softdrive.nl/apmechev/igprof/bin:$PATH
-export LD_LIBRARY_PATH=/cvmfs/softdrive.nl/apmechev/igprof/lib
+#export PATH=/cvmfs/softdrive.nl/apmechev/igprof/bin:$PATH
+#export LD_LIBRARY_PATH=/cvmfs/softdrive.nl/apmechev/igprof/lib
 
 
 cd ../../Tokens
