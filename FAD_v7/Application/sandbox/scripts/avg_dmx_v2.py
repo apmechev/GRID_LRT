@@ -94,9 +94,9 @@ fsize=sum(os.path.getsize(f) for f in os.listdir('.') if os.path.isfile(f))
 os.chdir("../")
 
 ramsize=int(subprocess.Popen(['free'],stdout=subprocess.PIPE).communicate()[0].split()[9])#ram in kb
-print("Chunking so that each chunk is less than 1/4 of "+str(ramsize)+" kb which is the RAM size as reported by free")
+print("Chunking so that each chunk is less than 1/2 of "+str(ramsize)+" kb which is the RAM size as reported by free")
 chsize=math.ceil(fsize/(ramsize*1000/2.))
-if chsize<8000000000:
+if (fsize/chsize)<8000000000:
 	print "\033[31m Chunks will be smaller than 8GB!! Aborting to avoid issues with AOFlag/Demix"
 	sys.exit()
 tms=[]
