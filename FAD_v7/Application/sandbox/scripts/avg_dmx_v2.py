@@ -136,6 +136,7 @@ print "OBSID is "+ obsid
 
 import infile_script
 print "Processing parset:", ndppp_fa_parset
+
 if not ".parset" in parset:
 	shutil.copy("parsets/default.parset",ndppp_fa_parset)
 	infile_script.msinmsout(ndppp_fa_parset,infile)
@@ -160,10 +161,9 @@ for (ts,te,ct) in zip(tms, tme, cnt):
   output=infile+ct
 
   print 'Flag/Avg of: ', output, ts, te, ct
-  ndppp_fa_parset_ch = infile + '_fa.parset' 
-  os.system('rm ' + ndppp_fa_parset_ch)
-  shutil.copy(ndppp_fa_parset,infile ndppp_fa_parset_ch)
-  infile_script.msinmsout(ndppp_fa_parset_ch,infile,outfile)
+  ndppp_fa_parset_ch=ndppp_fa_parset+"_chunk"+ct
+  shutil.copy(ndppp_fa_parset,ndppp_fa_parset_ch)
+  infile_script.msinmsout(ndppp_fa_parset_ch,infile,output)
   infile_script.timesteps(ndppp_fa_parset_ch,ts,te)
 
   os.system('NDPPP ' + ndppp_fa_parset_ch)
