@@ -19,8 +19,10 @@ def main(parsetfile,inMS):
 			pfile.write(line)
 	
 
-def msinmsout(parsetfile,inMS):
+def msinmsout(parsetfile,inMS,outMS=""):
         print "Adding appropriate MS-filenames"
+	if outMS=="":
+		outMS=inMS+".fa"
         with open(parsetfile,'rb') as pfile:
                 lines=[]
                 for line in pfile:
@@ -28,8 +30,8 @@ def msinmsout(parsetfile,inMS):
                                 lines.append("msin                    = "+inMS+'\n')
                                 print "replaced ",inMS, " in ", line.split()[0]
                         elif line.split()[0]=="msout":
-                                lines.append("msout                   = "+inMS+'.fa\n')
-                                print "replaced ",inMS, ".fa in ", line.split()[0]
+                                lines.append("msout                   = "+outMS+'\n')
+                                print "replaced ",outMS, " in ", line.split()[0]
                         else:
                                 lines.append(line)
         with open(parsetfile,'wb') as pfile:
@@ -130,6 +132,24 @@ def selectnl(parsetfile,sel_nl):
         with open(parsetfile,'wb') as pfile:
                 for line in lines:
                         pfile.write(line)
+
+def timesteps(parsetfile,st,en):
+        print "Adding timesplit timesteps"
+        with open(parsetfile,'rb') as pfile:
+                lines=[]
+                for line in pfile:
+                        if line.split()[0]=="msin":
+				lines.append(line)
+				lines.append("msin.starttime          = "+st+"\n")
+				lines.append("msin.endtime            = "+en+"\n")
+				print "Current chunk start/end times are "+st+en 
+                        else:
+                                lines.append(line)
+        with open(parsetfile,'wb') as pfile:
+                for line in lines:
+                        pfile.write(line)
+
+
 
 if __name__ == "__main__":
    print "adding ", sys.argv[2], " to ",sys.argv[1]

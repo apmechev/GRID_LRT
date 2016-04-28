@@ -160,9 +160,13 @@ for (ts,te,ct) in zip(tms, tme, cnt):
   output=infile+ct
 
   print 'Flag/Avg of: ', output, ts, te, ct
-  ndppp_fa_parset = infile + '_fa.parset' 
-  os.system('rm ' + ndppp_fa_parset)
+  ndppp_fa_parset_ch = infile + '_fa.parset' 
+  os.system('rm ' + ndppp_fa_parset_ch)
+  shutil.copy(ndppp_fa_parset,infile ndppp_fa_parset_ch)
+  infile_script.msinmsout(ndppp_fa_parset_ch,infile,outfile)
+  infile_script.timesteps(ndppp_fa_parset_ch,ts,te)
 
+  os.system('NDPPP ' + ndppp_fa_parset_ch)
   #-------------------------------------------------
   #print 'Cleanup of:', infile
   #os.system('rm -rf ' + infile)
