@@ -104,8 +104,9 @@ for oldparset in glob.glob(fadir+"/Application/sandbox/scripts/parsets/*.parset"
 		os.remove(oldparset)
 	#TODO Maybe check if srm_L****.txt file in proper format?
 
+with open(srmfile, 'r') as f:
+	 obsid=re.search('L[0-9]*',f.readline()).group(0)
 
-obsid=srmfile.split("srm_")[1].split(".txt")[0]
 #check if obsid exists in srm file
 found=False
 with open(srmfile,'rt') as f:
