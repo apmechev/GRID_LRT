@@ -135,13 +135,11 @@ TURL_SUBBAND=$( SURLtoTURL ${SURL_SUBBAND} )
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/scripts.tar $RUNDIR
-cp $PWD/parsets.tar $RUNDIR
 cd ${RUNDIR}
 echo "untar scripts, parsets!!"
 tar -xf scripts.tar
 cp -r scripts/* .
-mkdir parsets
-tar -xvf parsets.tar  
+ls -lat parsets/
 ls -lat 
 pwd
 echo ""

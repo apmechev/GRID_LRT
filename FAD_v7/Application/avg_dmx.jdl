@@ -8,7 +8,7 @@
   Arguments = "startpilot.sh $PICAS_DB $PICAS_USR $PICAS_USR_PWD";
   Stdoutput = "parametricjob.out";
   StdError = "parametricjob.err";
-  InputSandbox = {"sandbox/picas.tar","sandbox/couchdb.tar","sandbox/scripts.tar","sandbox/startpilot.sh","sandbox/pilot.py","sandbox/master_avg_dmx_v2.sh","sandbox/parsets.tar"};
+  InputSandbox = {"sandbox/picas.tar","sandbox/couchdb.tar","sandbox/scripts.tar","sandbox/startpilot.sh","sandbox/pilot.py","sandbox/master_avg_dmx_v2.sh"};
   OutputSandbox = {"parametricjob.out", "parametricjob.err"};
   DataAccessProtocol = {"gsiftp"};
   ShallowRetryCount = 3;
