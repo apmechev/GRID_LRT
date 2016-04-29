@@ -102,17 +102,28 @@ def dmxsources(parsetfile,dmx_src):
 def dodmx(parsetfile,do_dmx):
 	print do_dmx
 	if do_dmx=="False" or do_dmx=="FALSE" or do_dmx=='false':
-		return
-        with open(parsetfile,'rb') as pfile:
-	        print "Turning on demixer"
-                lines=[]
-                for line in pfile:
-                        if line.split()[0]=="steps":
-                                lines.append(line.replace("avg1","demixer"))
-                                print "replaced ",lines[-1], " instead of ", line
-                        else:
-                                lines.append(line)
-        with open(parsetfile,'wb') as pfile:
+		with open(parsetfile,'rb') as pfile:
+			print "Turning off demixer"
+			lines=[]
+			for line in pfile:
+				if line.split()[0]=="steps":
+					lines.append(line.replace("demixer","avg1"))
+					print "replaced",lines[-1], "instead of", line
+				else:
+					lines.append(line)
+
+	else:
+	        with open(parsetfile,'rb') as pfile:
+		        print "Turning on demixer"
+	                lines=[]
+	                for line in pfile:
+	                        if line.split()[0]=="steps":
+	                                lines.append(line.replace("avg1","demixer"))
+	                                print "replaced ",lines[-1], " instead of ", line
+	                        else:
+	                                lines.append(line)
+        
+	with open(parsetfile,'wb') as pfile:
                 for line in lines:
                         pfile.write(line)
 
