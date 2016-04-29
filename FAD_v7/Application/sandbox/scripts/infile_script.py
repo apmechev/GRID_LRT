@@ -99,8 +99,9 @@ def dmxsources(parsetfile,dmx_src):
                 for line in lines:
                         pfile.write(line)
 
-def dodmx(parsetfile,dodmx):
-	if not dodmx:
+def dodmx(parsetfile,do_dmx):
+	print do_dmx
+	if do_dmx=="False" or do_dmx=="FALSE" or do_dmx=='false':
 		return
         with open(parsetfile,'rb') as pfile:
 	        print "Turning on demixer"

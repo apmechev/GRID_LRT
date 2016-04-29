@@ -93,11 +93,15 @@ os.chdir(infile)
 fsize=sum(os.path.getsize(f) for f in os.listdir('.') if os.path.isfile(f))
 os.chdir("../")
 
-ramsize=int(subprocess.Popen(['free'],stdout=subprocess.PIPE).communicate()[0].split()[9])#ram in kb
+ramsize=int(subprocess.Popen(['free'],stdout=subprocess.PIPE).communicate()[0].split()[15])#ram in kb
 print("Chunking so that each chunk is less than 1/2 of "+str(ramsize)+" kb which is the RAM size as reported by free")
 chsize=math.ceil(fsize/(ramsize*1000/2.))
-if (fsize/chsize)<8000000000:
-	print "\033[31m Chunks will be smaller than 8GB!! Aborting to avoid issues with AOFlag/Demix"
+print chsize
+print fsize
+print ramsize*1000
+print "))))))))))))"
+if (fsize/chsize)<8000000000 and chsize>1:
+	print "\033[31m Chunks will be smaller than 8GB!! Aborting to avoid issues with AOFlag/Demix\033[00m"
 	sys.exit()
 tms=[]
 tme=[]
@@ -157,38 +161,35 @@ else:
 #
 #-------------------------------------------------
 #START LOOP TIME SPLIT
+if chsize==1:
+	infile_script.msinmsout(ndppp_fa_parset,infile,outfin)
+	os.system('NDPPP ' + ndppp_fa_parset)
+	print 'finished chunk: ', outfin
 
-count=0
-for (ts,te,ct) in zip(tms, tme, cnt):
-
-  output=infile+ct
-
-  print 'Flag/Avg of: ', output, ts, te, ct
-  ndppp_fa_parset_ch=ndppp_fa_parset+"_chunk"+ct
-  shutil.copy(ndppp_fa_parset,ndppp_fa_parset_ch)
-  infile_script.msinmsout(ndppp_fa_parset_ch,infile,output)
-  infile_script.timesteps(ndppp_fa_parset_ch,ts,te)
-
-  os.system('NDPPP ' + ndppp_fa_parset_ch)
-  #-------------------------------------------------
-  #print 'Cleanup of:', infile
-  #os.system('rm -rf ' + infile)
-  #-------------------------------------------------
-
-  print 'finished chunk: ', output, ts, te
+if chsize>1:
+	count=0
+	for (ts,te,ct) in zip(tms, tme, cnt):
+		output=infile+ct
+		print 'Flag/Avg of: ', output, ts, te, ct
+		ndppp_fa_parset_ch=ndppp_fa_parset+"_chunk"+ct
+		shutil.copy(ndppp_fa_parset,ndppp_fa_parset_ch)
+		infile_script.msinmsout(ndppp_fa_parset_ch,infile,output)
+		infile_script.timesteps(ndppp_fa_parset_ch,ts,te)
+		os.system('NDPPP ' + ndppp_fa_parset_ch)
+		print 'finished chunk: ', output, ts, te
 
 
 #COLLECT ALL CHUNKS
 cac=sorted(glob.glob('./*MS_t*'))
 fls=cac
 print 'Collect all time chunks: ', fls
-
-#use pyrap tables for concat in time
-t = pt.table(sorted(fls))
-print 'Sorting the data on time'
-t1= t.sort('TIME')
-print 'Creating deep copy', outfin
-t1.copy(outfin, deep = True)
+if chsize>1:
+	#use pyrap tables for concat in time
+	t = pt.table(sorted(fls))
+	print 'Sorting the data on time'
+	t1= t.sort('TIME')
+	print 'Creating deep copy', outfin
+	t1.copy(outfin, deep = True)
 
 #ndppp can not concat ms' in time
 #cac=glob.glob('./*MS_t*')

@@ -158,7 +158,7 @@ date
 echo "free disk space"
 df -h .
 echo "free memory"
-free -h
+free 
 
 
 
