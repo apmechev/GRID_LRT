@@ -50,7 +50,11 @@ def main(filename):
 	    a,b,c=gfal.gfal_ls(b)
 	    a,b,c=gfal.gfal_get_results(b)
 	    for j in range(0,len(c)):
-	       print c[j]['surl']+" "+c[j]['locality']
+               if c[j]['locality']=='NEARLINE':
+                        colour="\033[31m"
+               else:
+                        colour="\033[32m"
+               print c[j]['surl']+colour+c[j]['locality']+"\033[0m"
 	       locality.append([c[j]['surl'],c[j]['locality']])
 	    i=i+nf
 	    time.sleep(1)

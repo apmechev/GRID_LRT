@@ -87,10 +87,8 @@ echo "correct PATH and LD_LIBRARY_PATH for incomplete settings in lofarinit.sh"
 #export LD_LIBRARY_PATH=$VO_LOFAR_SW_DIR/LTA_2_1/lofar/release/lib:$VO_LOFAR_SW_DIR/LTA_2_1/lofar/release/lib64:$VO_LOFAR_SW_DIR/LTA_2_1/local/release/lib:$VO_LOFAR_SW_DIR/LTA_2_1/local/release/lib64:$LD_LIBRARY_PATH
 #export PYTHONPATH=$VO_LOFAR_SW_DIR/LTA_2_1/lofar/release/lib/python2.7/site-packages:$VO_LOFAR_SW_DIR/LTA_2_1/local/release/lib/python2.7/site-packages:$PYTHONPATH
 export PATH=$VO_LOFAR_SW_DIR/current/lofar/release/bin:$VO_LOFAR_SW_DIR/current/lofar/release/sbin:$VO_LOFAR_SW_DIR/current/local/release/bin:$PATH
-export LD_LIBRARY_PATH=$VO_LOFAR_SW_DIR/current/lofar/release/lib:$VO_LOFAR_SW_DIR/current/lofar/release/lib64:$VO_LOFAR_SW_DIR/current/local/release/lib:$VO_LOFA
-R_SW_DIR/current/local/release/lib64:$LD_LIBRARY_PATH
-export PYTHONPATH=$VO_LOFAR_SW_DIR/current/lofar/release/lib/python2.7/site-packages:$VO_LOFAR_SW_DIR/current/local/release/lib/python2.7/site-packages:$PYTHONPAT
-H
+export LD_LIBRARY_PATH=$VO_LOFAR_SW_DIR/current/lofar/release/lib:$VO_LOFAR_SW_DIR/current/lofar/release/lib64:$VO_LOFAR_SW_DIR/current/local/release/lib:$VO_LOFAR_SW_DIR/current/local/release/lib64:$LD_LIBRARY_PATH
+export PYTHONPATH=$VO_LOFAR_SW_DIR/current/lofar/release/lib/python2.7/site-packages:$VO_LOFAR_SW_DIR/current/local/release/lib/python2.7/site-packages:$PYTHONPATH
 
 # NB we can't assume the home dir is shared across all Grid nodes.
 echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
@@ -137,7 +135,7 @@ RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/scripts.tar $RUNDIR
 cd ${RUNDIR}
 echo "untar scripts, parsets!!"
-tar -xf scripts.tar
+tar -xvf scripts.tar
 cp -r scripts/* .
 ls -lat parsets/
 ls -lat 

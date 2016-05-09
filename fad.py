@@ -70,7 +70,7 @@ with open(mastercfg,'r') as readparset:
 #re-extracts the FAD tarfile if needed and sets up fadir
 ###########
 print ""
-print "You're running the \033[33m FAD_TimeSplit \033[0m branch!"
+print "You're running the \033[33m FAD1.0 \033[0m Time-Splitting is \033[33mON\033[0m by Default!"
 print ""
 
 latest_tar=glob.glob('FAD_*[0-9]*.tar')[-1]
@@ -114,6 +114,7 @@ with open(srmfile,'rt') as f:
 	for line in f:
 		if obsid in line:
 			found=True
+			print obsid
 	if not found:
 		print "\033[31mOBSID not found in SRM file!\033[0m"
 		sys.exit()
@@ -136,7 +137,7 @@ if not ((len(parsetfile)<4) or ("fault" in parsetfile) or parsetfile=="DEFAULT")
 
 #Add tarring of parset files which will be untarred on the node
 
-subprocess.call(['cp','-r',fadir+"/parsets/*",fadir+"/Application/sandbox/scripts/parsets"])
+#subprocess.call(['cp','-r',fadir+"/parsets/*",fadir+"/Application/sandbox/scripts/parsets"])
 os.chdir(fadir+"/Application/sandbox")
 try:
 	os.remove("scripts.tar")
@@ -290,7 +291,7 @@ if os.path.exists(fadir+"/Application/jobIDs"):
 	os.remove(fadir+"/Application/jobIDs")
 
 os.chdir(fadir+"/Application")
-
+subprocess.call(["ls","-lat","sandbox/scripts/parsets"])
 #TODO: Change avg_dmx's number of jobs to number of subbands
 
 shutil.copyfile('avg_dmx.jdl','avg_dmx_with_variables.jdl')

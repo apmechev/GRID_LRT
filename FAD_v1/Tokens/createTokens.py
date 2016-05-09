@@ -46,7 +46,7 @@ def loadTokens(db):
 
          token = {
 
-            '_id': 'token_' + OBSID + '_' + str(subband_num)+"FAD_TS",
+            '_id': 'token_' + OBSID + '_' + str(subband_num)+"v1.0",
             'type': 'token',
 	    'OBSID': config.get('OBSERVATION','OBSID'),
 	    'SURL_SUBBAND': SURL_SB,
