@@ -138,11 +138,12 @@ print 'Flag/Avg of:', infile
 ndppp_fa_parset = infile + '_fa.parset' 
 os.system('rm ' + ndppp_fa_parset)
 
+
 obsid=infile.split("_")[0]
 print "OBSID is "+ obsid
 
 import infile_script
-print "Processing parset:", ndppp_fa_parset
+print "Processing parset:", parset, "into ",ndppp_fa_parset
 
 if not ".parset" in parset:
 	shutil.copy("parsets/default.parset",ndppp_fa_parset)
@@ -153,7 +154,7 @@ if not ".parset" in parset:
 	infile_script.dodmx(ndppp_fa_parset,do_demix)
 	infile_script.selectnl(ndppp_fa_parset,select_nl)
 else:
-	shutil.copy("parsets/"+obsid+"_"+parset,ndppp_fa_parset)
+	shutil.copy("parsets/"+parset,ndppp_fa_parset)
 	infile_script.msinmsout(ndppp_fa_parset,infile)
 
 #--------------------------------------------------
