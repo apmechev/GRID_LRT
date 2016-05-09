@@ -1,4 +1,0 @@
-Updates 15-03-2016
-
-1) Added a check for free diskspace (df -h .) and free memory (free -h) at run time (date) to master_avg_dmx_v2.sh.
-
