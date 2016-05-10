@@ -17,7 +17,7 @@ tar -xf picas.tar
 tar -xf couchdb.tar
 
 # Set permissions for the master script
-chmod u+x master_avg_dmx_v2.sh
+chmod u+x master*.sh
 
 ls -l
 
