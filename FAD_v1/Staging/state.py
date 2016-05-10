@@ -56,7 +56,7 @@ def main(filename):
 			colour="\033[31m"
 	       else:
 			colour="\033[32m"
-	       print c[j]['surl']+colour+c[j]['locality']+"\033[0m"
+	       print c[j]['surl']+" "+colour+c[j]['locality']+"\033[0m"
 	       locality.append([c[j]['surl'],c[j]['locality']])
 	    i=i+nf
 	    time.sleep(1)
