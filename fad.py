@@ -31,6 +31,7 @@ if len(sys.argv)<3:
 	print "You need to input the SRM file and the master config file"
 	print "ex.  python fad-master.py srm_L229587.txt master_setup.cfg"
 	print "optional flags ( -r or --resub-error-only) come after fad-master.py "
+	print "optional turn off Time Splitting (-noTS or --no-time-splitting) as well"
 	sys.exit()
 
 if ("srm" in sys.argv[-2]) and (".cfg" in sys.argv[-1]):
@@ -45,11 +46,14 @@ else:
 	print "there may be a typo in your filenames"
 	sys.exit()
 resuberr=False
-
+TSplit=True
 if ("-r" in sys.argv[:-2] or ("--resub-error-only" in sys.argv[:-2])):
 	print "\033[33mFlag set to resubmit only error tokens\033[0m"
 	resuberr=True
 
+if ("-noTS" in sys.argv[:-2] or ("--no-time-splitting" in sys.argv[:-2])):
+        print "\033[33mTurning Off Timesplitting\033[0m"
+        TSplit=False
 
 if srmfile== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other filenames
 	with open(srmfile,'r') as f:
@@ -70,8 +74,9 @@ with open(mastercfg,'r') as readparset:
 #re-extracts the FAD tarfile if needed and sets up fadir
 ###########
 print ""
-print "You're running the \033[33m master \033[0m branch!"
+print "You're running the \033[33m FAD1.0 \033[0m Time-Splitting is \033[33m"+["OFF","ON"][TSplit]+"\033[0m"+[" By User Request"," By Default"][TSplit]+"!"
 print ""
+
 latest_tar=glob.glob('FAD_*[0-9]*.tar')[-1]
 if not latest_tar:
 	fadir=glob.glob('FAD_*[0-9]*')[-1]
@@ -113,6 +118,7 @@ with open(srmfile,'rt') as f:
 	for line in f:
 		if obsid in line:
 			found=True
+			print obsid
 	if not found:
 		print "\033[31mOBSID not found in SRM file!\033[0m"
 		sys.exit()
@@ -129,13 +135,13 @@ shutil.copy("srmlist",fadir+"/Staging/datasets/"+obsid)
 shutil.copy("subbandlist",fadir+"/Staging/datasets/"+obsid)
 
 if not ((len(parsetfile)<4) or ("fault" in parsetfile) or parsetfile=="DEFAULT"):	
-	shutil.copy(fadir+"/parsets/"+parsetfile,fadir+"/Application/sandbox/scripts/parsets/"+obsid+"_"+parsetfile)
+	shutil.copy(fadir+"/parsets/"+parsetfile,fadir+"/Application/sandbox/scripts/parsets/")
 
 	
 
 #Add tarring of parset files which will be untarred on the node
 
-subprocess.call(['cp','-r',fadir+"/parsets/*",fadir+"/Application/sandbox/scripts/parsets"])
+#subprocess.call(['cp','-r',fadir+"/parsets/*",fadir+"/Application/sandbox/scripts/parsets"])
 os.chdir(fadir+"/Application/sandbox")
 try:
 	os.remove("scripts.tar")
@@ -289,19 +295,25 @@ if os.path.exists(fadir+"/Application/jobIDs"):
 	os.remove(fadir+"/Application/jobIDs")
 
 os.chdir(fadir+"/Application")
-
+subprocess.call(["ls","-lat","sandbox/scripts/parsets"])
 #TODO: Change avg_dmx's number of jobs to number of subbands
 
-shutil.copyfile('avg_dmx.jdl','avg_dmx_with_variables.jdl')
+dmx_jdl=['avg_dmx_no-TS.jdl','avg_dmx.jdl'][TSplit] #If Tsplit=True (Default), file is avg_dmx.jdl else the other one
+shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')
 filedata=None
-with open('avg_dmx.jdl','r') as file:
+with open(dmx_jdl,'r') as file:
     filedata = file.read()
 filedata = filedata.replace('$PICAS_DB $PICAS_USR $PICAS_USR_PWD', os.environ["PICAS_DB"]+" "+os.environ["PICAS_USR"]+" "+os.environ["PICAS_USR_PWD"])
-with open('avg_dmx.jdl','w') as file:
+
+
+os.remove(dmx_jdl)
+numprocess=sum(1 for line in open("../../"+srmfile,'rt'))
+filedata=filedata.replace("Parameters=50","Parameters="+str(numprocess))
+with open(dmx_jdl,'w+') as file:
     file.write(filedata)
 
 
-subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs','avg_dmx.jdl'])
+subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs',dmx_jdl])
 
-shutil.move('avg_dmx_with_variables.jdl','avg_dmx.jdl')
+shutil.move('avg_dmx_with_variables.jdl',dmx_jdl)
 
