@@ -299,13 +299,19 @@ subprocess.call(["ls","-lat","sandbox/scripts/parsets"])
 #TODO: Change avg_dmx's number of jobs to number of subbands
 
 dmx_jdl=['avg_dmx_no-TS.jdl','avg_dmx.jdl'][TSplit] #If Tsplit=True (Default), file is avg_dmx.jdl else the other one
-shutil.copyfile(dmx_jdl,'avg_dmx_with_variables.jdl')
+shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')
 filedata=None
 with open(dmx_jdl,'r') as file:
     filedata = file.read()
 filedata = filedata.replace('$PICAS_DB $PICAS_USR $PICAS_USR_PWD', os.environ["PICAS_DB"]+" "+os.environ["PICAS_USR"]+" "+os.environ["PICAS_USR_PWD"])
-with open(dmx_jdl,'w') as file:
+
+
+os.remove(dmx_jdl)
+numprocess=sum(1 for line in open("../../"+srmfile,'rt'))
+filedata=filedata.replace("Parameters=50","Parameters="+str(numprocess))
+with open(dmx_jdl,'w+') as file:
     file.write(filedata)
+
 
 subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs',dmx_jdl])
 
