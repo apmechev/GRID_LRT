@@ -150,9 +150,14 @@ except OSError:
 subprocess.call(["tar","-cvf", "scripts.tar","scripts/"])
 os.chdir("../../../")
 
-
-
-
+devnl=open(os.devnull, 'w')
+greproc=subprocess.Popen(['glite-wms-job-status','-i',"FAD_v1/Application/jobIDs"],stdout=subprocess.PIPE,stderr=devnl)
+grep=greproc.communicate()[0]
+greproc.wait()
+if (grep.find("    Current Status:     Running")>1) or (grep.find("    Current Status:     Scheduled")>1):
+	print grep
+	print "\033[31mYour Job Is Still Running.\033[0m Please wait until it's set as 'Completed'. This should happen <15 mins after all tokens complete\nThis program will continue when all jobs are set to completed so that the correct parameters are sent to the node."
+	sys.exit()
 
 
 
@@ -222,7 +227,7 @@ if fileloc=='s':
 	for sublist in locs:
 		if 'NEARLINE' in sublist :
 			print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-			print "I've staged the file but it's not ONLINE yet. I'll exit so bad things don't happen"
+			print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
 			print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m" 
 			sys.exit()
 		
@@ -238,7 +243,7 @@ elif fileloc=='j':
 	for subs in locs:
 		if 'NEARLINE' in subs :
 			print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-                        print "I've staged the file but it's not ONLINE yet. I'll exit so bad things don't happen"
+                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
                         print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
 			sys.exit()
 
