@@ -51,6 +51,15 @@ pipeline.steps=[createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal,
 # set this to True if you want the pipeline run to continue if single bands fail
 ! error_tolerance           =  False
 
+
+copy the diagnostic plots to the results_directory
+getfiles.control.kind               =  recipe
+getfiles.control.type               =  executable_args
+getfiles.control.executable         =  bin/getfiles.sh
+getfiles.control.arguments          =  [srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc3_008/342934/L342934_SB000_uv.dppp.MS_31642b30.tar]
+#
+
+
 # generate a mapfile of all the calibrator data
 createmap_cal.control.kind            =   plugin
 createmap_cal.control.type            =   createMapfile
