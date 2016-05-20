@@ -11,7 +11,7 @@
 #   doesn't work on multiple nodes on CEP-2 or CEP3.)
 
 ### First run this and check the generated plots! Modify and re-run if neccessary.
-pipeline.steps=[createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal, fitclock, ampl, plots, phase]
+pipeline.steps=[getdata,createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal, fitclock, ampl, plots, phase]
 ### When calibrator processing is done, you can do the processing of the target data.
 ### Either by using the same pipeline and running this:
 # pipeline.steps=[ createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal, fitclock, ampl, plots, phase, createmap_target, ndppp_prep_target, trans, parmmap, calibtarget, dpppaverage, ateamtarget, ateamcliptar, sortmap_tar, dpppconcat, gsmcalibtarget, gsmcal_parmmap, plot_gsm_phases, make_results_mapfile, move_results, createmap_plots, copy_plots]
@@ -22,8 +22,9 @@ pipeline.steps=[createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal,
 # parameters you will need to adjust.
 ! avg_timestep         = 2   # averaging step needed to average the data to 4 seconds time resolution
 ! avg_freqstep         = 2   # averaging step needed to average the data to 4 ch/SB frequency resolution
-! cal_input_path       = /data/scratch/username/PathToYourCalibratorData/
-! cal_input_pattern    = L*.MS
+! uberftp_path	       = gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/
+! cal_input_path       = 
+! cal_input_pattern    = L*MS
 ! calibrator_skymodel  = /cep3home/username/Pre-Facet-Cal/skymodels/PleaseProvideCalibrator.skymodel
 ! target_input_path    = /data/scratch/username/PathToYourTargetData/
 ! target_input_pattern = L*.MS
@@ -50,6 +51,13 @@ pipeline.steps=[createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal,
 
 # set this to True if you want the pipeline run to continue if single bands fail
 ! error_tolerance           =  False
+
+# script to copy files from the 
+getdata.control.kind               =  recipe
+getdata.control.type               =  executable_args
+getdata.control.executable         =  ./bin/get_data_to_node.sh
+getdata.control.uberftpath         =  {{ uberftp_path }} 
+
 
 # generate a mapfile of all the calibrator data
 createmap_cal.control.kind            =   plugin

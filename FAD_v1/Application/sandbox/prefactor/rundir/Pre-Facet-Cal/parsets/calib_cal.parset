@@ -1,0 +1,4 @@
+catalog=/cep3home/username/Pre-Facet-Cal/skymodels/PleaseProvideCalibrator.skymodel
+force=True
+observation=ndppp_prep_cal.output.mapfile
+parset=/cep3home/horneffer/Pre-Facet-Cal/parsets/calibcal.parset

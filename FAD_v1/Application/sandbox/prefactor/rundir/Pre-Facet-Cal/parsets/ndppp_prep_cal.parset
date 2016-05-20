@@ -1,0 +1,16 @@
+avg.freqstep=2
+avg.timestep=2
+avg.type=average
+filter.baseline=CS*, RS*&&
+filter.remove=true
+filter.type=filter
+flag.baseline=[ CS013HBA* ]
+flag.type=preflagger
+flagamp.amplmin=1e-30
+flagamp.type=preflagger
+msin=createmap_cal.output.mapfile
+msin.baseline=CS*&; RS*&; CS*&RS*
+msin.datacolumn=DATA
+msout.datacolumn=DATA
+msout.writefullresflag=False
+steps=[flag,filter,avg,flagamp]
