@@ -25,28 +25,28 @@ pipeline.steps=[createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal,
 ! cal_input_path       = PREFACTOR_SCRATCH_DIR
 ! cal_input_pattern    = L*.MS
 ! calibrator_skymodel  = PREFACTOR_SCRATCH_DIR/prefactor/skymodels/3C196-pandey.skymodel
-! target_input_path    = /data/scratch/username/PathToYourTargetData/
+! target_input_path    = /data/scratch/username/PathToYourTargetData/ 			#TODO: ADD THIS
 ! target_input_pattern = L*.MS
-! target_skymodel      = /cep3home/username/Pre-Facet-Cal/skymodels/PleaseProvideTarget.skymodel
+! target_skymodel      = /cep3home/username/Pre-Facet-Cal/skymodels/PleaseProvideTarget.skymodel  #TODO: ADD THIS
 ! num_SBs_per_group    = 10 # make concatenated measurement-sets with that many subbands
-! results_directory    = /media/scratch/test/username/WhereYouWantYourProcessedData/
+! results_directory    = /media/scratch/test/username/WhereYouWantYourProcessedData/		  #TODO: ADD THIS
 
 # pathes to the scripts etc.
 # #### ToDo: get the scripts onto CEP3 and adjust the pathes here!
 ! calib_cal_parset     = PREFACTOR_SCRATCH_DIR/prefactor/parsets/calibcal.parset
 ! cal_transfer_parset  = PREFACTOR_SCRATCH_DIR/prefactor/parsets/applyparmdb.parset
-! ATeam_predict_parset = /cep3home/horneffer/Pre-Facet-Cal/parsets/ateamclip.parset
-! gsm_cal_parset       = /cep3home/horneffer/Pre-Facet-Cal/parsets/gsmcal.parset
-! ATeam_skymodel       = /cep3home/horneffer/Pre-Facet-Cal/skymodels/Ateam_LBA_CC.skymodel
+! ATeam_predict_parset = PREFACTOR_SCRATCH_DIR/prefactor/parsets/ateamclip.parset
+! gsm_cal_parset       = PREFACTOR_SCRATCH_DIR/prefactor/parsets/gsmcal.parset
+! ATeam_skymodel       = PREFACTOR_SCRATCH_DIR/prefactor/skymodels/Ateam_LBA_CC.skymodel
 ! losoto_importer      = PREFACTOR_SCRATCH_DIR/prefactor/bin/losotoImporter.py
 ! fitclock_script      = PREFACTOR_SCRATCH_DIR/prefactor/bin/fit_clocktec_initialguess_losoto.py
-! fitamps_script       = /scratch/tmp.YzwHfgL41f/prefactor/bin/amplitudes_losoto_3.py
-! plotsols_script      = /scratch/tmp.YzwHfgL41f/prefactor/bin/examine_npys.py
-! fit_XYoffset_script  = /scratch/tmp.YzwHfgL41f/prefactor/bin/find_cal_global_phaseoffset_losoto.py
-! transfer_script      = /cep3home/horneffer/Pre-Facet-Cal/bin/transfer_amplitudes+clock+offset_toMS.py
-! ATeam_Clipper        = /cep3home/horneffer/Pre-Facet-Cal/bin/Ateamclipper.py
-! plotphases_script    = /cep3home/horneffer/Pre-Facet-Cal/bin/plot_solutions_all_stations.py
-! flagging_strategy    = /opt/cep/lofar/lofar_versions/LOFAR-Release-2_12_0/lofar_build/install/gnu_opt/share/rfistrategies/HBAdefault
+! fitamps_script       = PREFACTOR_SCRATCH_DIR/prefactor/bin/amplitudes_losoto_3.py
+! plotsols_script      = PREFACTOR_SCRATCH_DIR/prefactor/bin/examine_npys.py
+! fit_XYoffset_script  = PREFACTOR_SCRATCH_DIR/prefactor/bin/find_cal_global_phaseoffset_losoto.py
+! transfer_script      = PREFACTOR_SCRATCH_DIR/prefactor/bin/transfer_amplitudes+clock+offset_toMS.py
+! ATeam_Clipper        = PREFACTOR_SCRATCH_DIR/prefactor/bin/Ateamclipper.py
+! plotphases_script    = PREFACTOR_SCRATCH_DIR/prefactor/bin/plot_solutions_all_stations.py
+! flagging_strategy    = /opt/cep/lofar/lofar_versions/LOFAR-Release-2_12_0/lofar_build/install/gnu_opt/share/rfistrategies/HBAdefault #TODO: ADD THIS
 
 # set this to True if you want the pipeline run to continue if single bands fail
 ! error_tolerance           =  False

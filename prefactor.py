@@ -1,5 +1,5 @@
 ##########################
-#Python script to check SURLS, stage files, create and run tokens
+#Python script to send prefactor to GRID nodes 
 #
 #Usage python fad.py srm_L229587.txt master_setup.cfg
 # fad_v7- 	Add Y/N
@@ -28,53 +28,27 @@ import subprocess
 
 if len(sys.argv)<3:
 	print ""
-	print "You need to input the SRM file and the master config file"
-	print "ex.  python fad-master.py srm_L229587.txt master_setup.cfg"
-	print "optional flags ( -r or --resub-error-only) come after fad-master.py "
-	print "optional turn off Time Splitting (-noTS or --no-time-splitting) as well"
+	print "You need to input the prefactor Parset and the srm list"
+	print "ex.  python prefactor.py Pre-Facet-Cal.parset srm-files.txt -b bands-per-node (default 41)" 
 	sys.exit()
 
-if ("srm" in sys.argv[-2]) and (".cfg" in sys.argv[-1]):
+if ("srm" in sys.argv[-2]) and (".parset" in sys.argv[-1]):
 	srmfile=sys.argv[-2]
-	mastercfg=sys.argv[-1]
+	prefactorparset=sys.argv[-1]
 
-elif ("srm" in sys.argv[-1]) and (".cfg" in sys.argv[-2]):
+elif ("srm" in sys.argv[-1]) and (".parset" in sys.argv[-2]):
         srmfile=sys.argv[-1]
-	mastercfg=sys.argv[-2]
+	prefactorparset=sys.argv[-2]
 
 else: 
 	print "there may be a typo in your filenames"
 	sys.exit()
-resuberr=False
-TSplit=True
-if ("-r" in sys.argv[:-2] or ("--resub-error-only" in sys.argv[:-2])):
-	print "\033[33mFlag set to resubmit only error tokens\033[0m"
-	resuberr=True
-
-if ("-noTS" in sys.argv[:-2] or ("--no-time-splitting" in sys.argv[:-2])):
-        print "\033[33mTurning Off Timesplitting\033[0m"
-        TSplit=False
-
-if srmfile== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other filenames
-	with open(srmfile,'r') as f:
-		line=f.readline()
-		obs_name='L'+str(re.search("L(.+?)_",line).group(1))
-		print "copying srm.txt into srm_L"+obs_name+".txt "
-	shutil.copyfile('srm.txt','srm_'+obs_name+'.txt')
-	srmfile='srm_'+obs_name+'.txt'
-parsetfile=""
-with open(mastercfg,'r') as readparset:
-	for line in readparset:
-		if "PARSET" in line:
-			parsetfile=line.split("PARSET",1)[1].split("= ")[1].split('\n')[0]
-
-
 
 ###########
 #re-extracts the FAD tarfile if needed and sets up fadir
 ###########
 print ""
-print "You're running the \033[33m FAD1.0 \033[0m Time-Splitting is \033[33m"+["OFF","ON"][TSplit]+"\033[0m"+[" By User Request"," By Default"][TSplit]+"!"
+print "You're running the GRID Prefactor Pipeline, dev version"  
 print ""
 
 latest_tar=glob.glob('FAD_*[0-9]*.tar')[-1]
@@ -168,7 +142,7 @@ for dir in ['Tokens','Staging']:
 	with open(fadir+"/"+dir+"/datasets/"+obsid+"/setup.cfg","a") as cfgfile:
 		cfgfile.write("[OBSERVATION]\n")
 		cfgfile.write("OBSID           = "+obsid+"\n")
-		with open(mastercfg,'r') as cfg:
+		with open(prefactorparset,'r') as cfg:
 			for i, line in enumerate(cfg): 
 				if 'PARSET' in line and len(parsetfile)<4:# if a parset is not defined
 					continue  #don't write PARSET= "", will be handled below
