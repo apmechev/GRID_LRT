@@ -22,9 +22,9 @@ pipeline.steps=[createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal,
 # parameters you will need to adjust.
 ! avg_timestep         = 2   # averaging step needed to average the data to 4 seconds time resolution
 ! avg_freqstep         = 2   # averaging step needed to average the data to 4 ch/SB frequency resolution
-! cal_input_path       = /scratch/tmp.YzwHfgL41f
+! cal_input_path       = PREFACTOR_SCRATCH_DIR
 ! cal_input_pattern    = L*.MS
-! calibrator_skymodel  = /scratch/tmp.YzwHfgL41f/prefactor/skymodels/3C196-pandey.skymodel
+! calibrator_skymodel  = PREFACTOR_SCRATCH_DIR/prefactor/skymodels/3C196-pandey.skymodel
 ! target_input_path    = /data/scratch/username/PathToYourTargetData/
 ! target_input_pattern = L*.MS
 ! target_skymodel      = /cep3home/username/Pre-Facet-Cal/skymodels/PleaseProvideTarget.skymodel
@@ -33,16 +33,16 @@ pipeline.steps=[createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal,
 
 # pathes to the scripts etc.
 # #### ToDo: get the scripts onto CEP3 and adjust the pathes here!
-! calib_cal_parset     = /cep3home/horneffer/Pre-Facet-Cal/parsets/calibcal.parset
-! cal_transfer_parset  = /cep3home/horneffer/Pre-Facet-Cal/parsets/applyparmdb.parset
+! calib_cal_parset     = PREFACTOR_SCRATCH_DIR/prefactor/parsets/calibcal.parset
+! cal_transfer_parset  = PREFACTOR_SCRATCH_DIR/prefactor/parsets/applyparmdb.parset
 ! ATeam_predict_parset = /cep3home/horneffer/Pre-Facet-Cal/parsets/ateamclip.parset
 ! gsm_cal_parset       = /cep3home/horneffer/Pre-Facet-Cal/parsets/gsmcal.parset
 ! ATeam_skymodel       = /cep3home/horneffer/Pre-Facet-Cal/skymodels/Ateam_LBA_CC.skymodel
-! losoto_importer      = /cep3home/horneffer/Pre-Facet-Cal/bin/losotoImporter.py
-! fitclock_script      = /cep3home/horneffer/Pre-Facet-Cal/bin/fit_clocktec_initialguess_losoto.py
-! fitamps_script       = /cep3home/horneffer/Pre-Facet-Cal/bin/amplitudes_losoto_3.py
-! plotsols_script      = /cep3home/horneffer/Pre-Facet-Cal/bin/examine_npys.py
-! fit_XYoffset_script  = /cep3home/horneffer/Pre-Facet-Cal/bin/find_cal_global_phaseoffset_losoto.py
+! losoto_importer      = PREFACTOR_SCRATCH_DIR/prefactor/bin/losotoImporter.py
+! fitclock_script      = PREFACTOR_SCRATCH_DIR/prefactor/bin/fit_clocktec_initialguess_losoto.py
+! fitamps_script       = /scratch/tmp.YzwHfgL41f/prefactor/bin/amplitudes_losoto_3.py
+! plotsols_script      = /scratch/tmp.YzwHfgL41f/prefactor/bin/examine_npys.py
+! fit_XYoffset_script  = /scratch/tmp.YzwHfgL41f/prefactor/bin/find_cal_global_phaseoffset_losoto.py
 ! transfer_script      = /cep3home/horneffer/Pre-Facet-Cal/bin/transfer_amplitudes+clock+offset_toMS.py
 ! ATeam_Clipper        = /cep3home/horneffer/Pre-Facet-Cal/bin/Ateamclipper.py
 ! plotphases_script    = /cep3home/horneffer/Pre-Facet-Cal/bin/plot_solutions_all_stations.py

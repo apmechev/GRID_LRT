@@ -15,7 +15,7 @@ import lofar.parmdb as pdb
 from losoto.h5parm import h5parm, solWriter
 
 import logging
-
+import pdb as pydb
 # mandatory arguments:
 # options: mapfile_in, mapfile-dir, filename 
 
@@ -37,7 +37,7 @@ def plugin_main(args, **kwargs):
         solsetName = kwargs['solset']
     else:
         solsetName = None
-
+    
 
     # Check is all the necessary files are available
     antennaFile = os.path.join(datamap[0].file,'ANTENNA')
@@ -52,15 +52,17 @@ def plugin_main(args, **kwargs):
     if not os.path.isdir(skydbFile):
         logging.critical('Missing sky table.')
         sys.exit(1)
-        
+    
     #generate list of parmDB-filenames
     parmDBnames = [ MS.file+instrument for MS in datamap ]
-
+    print "main"
     #create and fill the hdf5-file:
+    
     solset = parmDBs2h5parm(hdf5File, parmDBnames, antennaFile, fieldFile, skydbFile, compression=compression, solsetName=solsetName)
 
     # Add CREATE entry to history 
     h5parmDB = h5parm(hdf5File, readonly = False)
+    
     soltabs = h5parmDB.getSoltabs(solset=solset)
     for st in soltabs:
         sw = solWriter(soltabs[st])
@@ -138,7 +140,7 @@ def parmDBs2h5parm(h5parmName,parmDBs,antennaFile,fieldFile,skydbFile,compressio
     # open/create the h5parm file and the solution-set
     h5parmDB = h5parm(h5parmName, readonly = False, complevel = compression)
     solset = h5parmDB.makeSolset(solsetName)
-
+#    pydb.set_trace()
     #open the first instrument table, so that we know where to look for names and stuff
     firstInst = pdb.parmdb(parmDBs[0])
 
@@ -448,7 +450,7 @@ if __name__=='__main__':
     instrument = options.Instrument
     compression = options.complevel
     solsetName = options.solset
-
+#    pydb.set_trace()
     # Check is all the necessary files are available
     antennaFile = os.path.join(inMSs[0],'ANTENNA')
     if not os.path.isdir(antennaFile):
@@ -465,13 +467,14 @@ if __name__=='__main__':
         
     #generate list of parmDB-filenames
     parmDBnames = [ MS.rstrip('/')+instrument for MS in inMSs ]
-
+    
     #create and fill the hdf5-file:
     solset = parmDBs2h5parm(hdf5File, parmDBnames, antennaFile, fieldFile, skydbFile, compression=compression, solsetName=solsetName)
 
     # Add CREATE entry to history 
     h5parmDB = h5parm(hdf5File, readonly = False)
     soltabs = h5parmDB.getSoltabs(solset=solset)
+
     for st in soltabs:
         sw = solWriter(soltabs[st])
         sw.addHistory('CREATE (by PipelineStep_losotoImporter from %s / %s - %s)' % (os.path.abspath(''), 
