@@ -91,47 +91,29 @@ cat /proc/cpuinfo | grep "model name"
 # initialize job arguments
 # - note, obsid is only used to store the data
 JOBDIR=${PWD}
-OBSID=${1}
-SURL_SUBBAND=${2}
-AVG_FREQ_STEP=${3}
-AVG_TIME_STEP=${4}
-DO_DEMIX=${5}
-DEMIX_FREQ_STEP=${6}
-DEMIX_TIME_STEP=${7}
-DEMIX_SOURCES=${8}
-SELECT_NL=${9}
-SUBBAND_NUM=${10}
-PARSET=${11}
+STARTSB=${1}
+ENDSB=${2}
+SRMFILE=${3}
+
 echo "++++++++++++++++++++++++++++++"
 echo "++++++++++++++++++++++++++++++"
 
 echo "INITIALIZATION OF JOB ARGUMENTS"
 echo ${JOBDIR}
-echo ${OBSID}
-echo ${SURL_SUBBAND}
-echo ${AVG_FREQ_STEP}
-echo ${AVG_TIME_STEP}
-echo ${DO_DEMIX}
-echo ${DEMIX_FREQ_STEP}
-echo ${DEMIX_TIME_STEP}
-echo ${DEMIX_SOURCES}
-echo ${SELECT_NL}
-echo ${SUBBAND_NUM}
+echo ${STARTSB}
+echo ${ENDSB}
+echo ${SRMFILE}
 echo ""
 
 
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
-cp $PWD/scripts.tar $RUNDIR
 cp $PWD/prefactor.tar $RUNDIR
 cd ${RUNDIR}
 echo "untarring Prefactor" 
-tar -xf scripts.tar
 tar -xf prefactor.tar
 cp prefactor/srm.txt $RUNDIR
 cp -r scripts/* .
-ls -lat prefactor/
-ls -lat 
 pwd
 
 echo ""
