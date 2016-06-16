@@ -138,21 +138,28 @@ echo "---------------------------"
 echo "Starting Data Retrieval"
 echo "---------------------------"
 echo "Get subbands "
-./prefactor/bin/download_num_files.sh 1 10 srm.txt  &
 
-sleep 20
+for i in `seq 1 26`; do 
+let init=" ($i - 1) * 10 + 1"
+let fin=" $i * 10"
+./prefactor/bin/download_num_files.sh $init $fin srm.txt  &
+
+#DL_PID=$!
+#cat /proc/$DL_PID/net/dev
+
 
 `expr $(ps -aux|grep globus |wc -l) - 1`
-while [[ $(ps -aux|grep globus |wc -l)>2 ]] #Should be greater than 1+num_of_fails (1+0.1*$(NUM_SB) for 10% failure rate)
+while [[ $(ps -aux|grep globus |wc -l)>3 ]] #Should be greater than 1+num_of_fails (1+0.1*$(NUM_SB) for 10% failure rate)
 do
    NUMJOBS=$(ps -aux|grep globus |wc -l)
    echo `expr $NUMJOBS - 1`" Subbands remaining"
-   sleep 30
+   sleep 60
 done
 
-sleep 30
-echo "slept for 10000 sec, killing all latent jobs"
-for i in $(seq 1 10); do kill %$i; done
+sleep 15
+echo "slept for 15 sec, killing all latent jobs"
+for i in $(seq 1 255); do kill %$i; done
+done
 
 # - step2 finished check contents
 echo "step2 finished, list contents"
@@ -208,20 +215,23 @@ ls -l ${PWD}
 du -hs $PWD
 du -hs $PWD/*
 
-# ADD A CHECK TO SEE IF *.fa FILES EXIST FIRST --> this ensures that we have the output available)
+
 
 
 echo "Tarring instrument tables (TODO):"
+find . -name "instrument" | xargs tar -cvf instruments.tar
 echo "Copy output to the Grid SE"
-echo ${OBSID}_${sbn}
-
+du -hs instruments.tar
+more out-test-1
 
 # remove any old existing directory from the Grid storage
 uberftp -rm -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
 # create the output directory on the Grid storage
-uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
+uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/
 # copy the output tarball to the Grid storage
-globus-url-copy file:`pwd`/${name}.fa.tgz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tgz
+OBSID=$(echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
+echo "copying the instrument tables into <storage>/spectroscopy/prefactor/instr_"$OBSID.tar
+globus-url-copy file:`pwd`/instruments.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/instr_$OBSID.tar
 # Exit loop on non-zero exit status:
 if [[ "$?" != "0" ]]; then
    echo "Problem copying final files to the Grid. Clean up and Exit now..."
@@ -241,11 +251,6 @@ echo "List the files copied to the SE lofar/user/disk:"
 uberftp -ls gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
 #
 echo ""
-echo "listing final files in scratch"
-ls -allh $PWD
-echo ""
-du -hs $PWD
-du -hs $PWD/*
 
 echo ""
 echo "copy logs to the Job home directory and clean temp files in scratch"

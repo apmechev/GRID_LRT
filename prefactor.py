@@ -78,11 +78,6 @@ for stuff in glob.glob(fadir+'/Staging/datasets/*'):
 for oldstagefile in glob.glob(fadir+"/Staging/*files*"):
      os.remove(oldstagefile)
 
-for oldparset in glob.glob(fadir+"/Application/sandbox/scripts/parsets/*.parset"):
-	if (not parsetfile=="") and (not "default" in  oldparset ): ##Remove old parsets but not the default.parset
-		os.remove(oldparset)
-	#TODO Maybe check if srm_L****.txt file in proper format?
-
 with open(srmfile, 'r') as f:
 	 obsid=re.search('L[0-9]*',f.readline()).group(0)
 
@@ -108,10 +103,7 @@ shutil.copy("subbandlist",fadir+"/Tokens/datasets/"+obsid)
 shutil.copy("srmlist",fadir+"/Staging/datasets/"+obsid)
 shutil.copy("subbandlist",fadir+"/Staging/datasets/"+obsid)
 
-if not ((len(parsetfile)<4) or ("fault" in parsetfile) or parsetfile=="DEFAULT"):	
-	shutil.copy(fadir+"/parsets/"+parsetfile,fadir+"/Application/sandbox/scripts/parsets/")
 
-	
 
 #Add tarring of parset files which will be untarred on the node
 
@@ -142,14 +134,6 @@ for dir in ['Tokens','Staging']:
 	with open(fadir+"/"+dir+"/datasets/"+obsid+"/setup.cfg","a") as cfgfile:
 		cfgfile.write("[OBSERVATION]\n")
 		cfgfile.write("OBSID           = "+obsid+"\n")
-		with open(prefactorparset,'r') as cfg:
-			for i, line in enumerate(cfg): 
-				if 'PARSET' in line and len(parsetfile)<4:# if a parset is not defined
-					continue  #don't write PARSET= "", will be handled below
-				cfgfile.write(line)
-		if len(parsetfile)<4:
-			cfgfile.write('PARSET     = "-"\n')
-
 
 #################
 #append srms to the staging/obsid_files, reformat and add to /Staging/files 
@@ -186,56 +170,18 @@ shutil.copy(obsid+"_files","files")
 
 
 #Maybe check if grid storage is online??
-if fileloc=='s':
-	import state
-	locs=state.main('files')
-	if len(locs)==0: 
-		print "No files found!! State error"
-		sys.exit()
-	for sublist in locs:
-		if 'NEARLINE' in sublist :
-			os.system("python stage.py")
-			print "Staging your file."
-	##TODO Would be nice not to check this twice if staged
-	locs=state.main('files')
-	for sublist in locs:
-		if 'NEARLINE' in sublist :
-			print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-			print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-			print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m" 
-			sys.exit()
-		
-elif fileloc=='j':
-	import state_fzj
-	locs=state_fzj.main('files')
-	for subs in locs:
-		if 'NEARLINE' in subs :
-        	        os.system("python stage_fzj.py")
-                        print "Staging your file"
-
-	locs=state_fzj.main('files')
-	for subs in locs:
-		if 'NEARLINE' in subs :
-			print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-                        print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
-			sys.exit()
-
-
-print ""
-os.chdir("../../")
-os.chdir(fadir+"/Tokens/")
-
 
 ####################
 #PICAS Database Submission
 #####################
+os.chdir("../Tokens/")
+
 try:
     print "Your picas user is "+os.environ["PICAS_USR"]+" and the DB is "+os.environ["PICAS_DB"]
 except KeyError:
     print "\033[31m You haven't set $PICAS_USR or $PICAS_DB or $PICAS_USR_PWD! \n\n Exiting\033[0m"
     sys.exit()
-
+resuberr=False
 if resuberr:
 	subprocess.call(['python','resetErrorTokens.py',os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])     
 else:
@@ -277,7 +223,7 @@ os.chdir(fadir+"/Application")
 subprocess.call(["ls","-lat","sandbox/scripts/parsets"])
 #TODO: Change avg_dmx's number of jobs to number of subbands
 
-dmx_jdl=['avg_dmx_no-TS.jdl','avg_dmx.jdl'][TSplit] #If Tsplit=True (Default), file is avg_dmx.jdl else the other one
+dmx_jdl='avg_dmx_prefactor.jdl'
 shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')
 filedata=None
 with open(dmx_jdl,'r') as file:
@@ -286,8 +232,6 @@ filedata = filedata.replace('$PICAS_DB $PICAS_USR $PICAS_USR_PWD', os.environ["P
 
 
 os.remove(dmx_jdl)
-numprocess=sum(1 for line in open("../../"+srmfile,'rt'))
-filedata=filedata.replace("Parameters=50","Parameters="+str(numprocess))
 with open(dmx_jdl,'w+') as file:
     file.write(filedata)
 
