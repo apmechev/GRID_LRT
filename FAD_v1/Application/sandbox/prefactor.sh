@@ -29,6 +29,24 @@
 #       finally copy the output to a (temporary) Grid Storage           #
 # ===================================================================== #
 
+
+function clean_dl_pids() {
+iter=0
+while [[ $iter < 100 ]]
+ do
+ iter+=1
+ for line in `seq 1 $(wc -l activejobs|awk '{print $1}')`
+  do
+   dlprocess=$(cat activejobs|head -$line |tail -1 |awk '{print $1}')
+   dlSB=$(cat activejobs|head -$line |tail -1 |awk '{print $2}')
+   download=$(cat /proc/$dlprocess/net/dev | grep eth | awk '{print $2}')
+   echo "Process "$dlprocess" has downloaded "$download" in Subband "$dlSB
+  done
+ sleep 4
+done
+}
+
+
 #--- NEW SD ---
 
 echo "START LOFAR FROM SOFTDRIVE"
@@ -115,7 +133,7 @@ tar -xf prefactor.tar
 cp prefactor/srm.txt $RUNDIR
 cp -r scripts/* .
 pwd
-
+touch activejobs
 echo ""
 echo "---------------------------------------------------------------------------"
 echo "START PROCESSING" $OBSID "SUBBAND:" $SURL_SUBBAND
@@ -147,7 +165,8 @@ let fin=" $i * 10"
 #DL_PID=$!
 #cat /proc/$DL_PID/net/dev
 
-
+clean_dl_pids
+quit
 `expr $(ps -aux|grep globus |wc -l) - 1`
 while [[ $(ps -aux|grep globus |wc -l)>3 ]] #Should be greater than 1+num_of_fails (1+0.1*$(NUM_SB) for 10% failure rate)
 do
