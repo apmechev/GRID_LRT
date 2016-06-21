@@ -31,19 +31,25 @@
 
 
 function clean_dl_pids() {
-iter=0
-while [[ $iter < 100 ]]
- do
- iter+=1
+
  for line in `seq 1 $(wc -l activejobs|awk '{print $1}')`
   do
    dlprocess=$(cat activejobs|head -$line |tail -1 |awk '{print $1}')
    dlSB=$(cat activejobs|head -$line |tail -1 |awk '{print $2}')
-   download=$(cat /proc/$dlprocess/net/dev | grep eth | awk '{print $2}')
-   echo "Process "$dlprocess" has downloaded "$download" in Subband "$dlSB
-  done
- sleep 4
+   if [[ ! -f /proc/$dlprocess/net/dev ]]; then
+       if [[ $(du -s $dlSB 2>/dev/null |awk '{print $1}') != '000000' ]]; then
+         sed -i $line's/.*/done '$dlSB'/' activejobs
+         continue
+       fi
+   fi  ##use du hs on the directory for download or find pid of globus
+   download=$(du -s $dlSB 2>/dev/null |awk '{print $1}') 
+   if [[ $download == "" ]]; then
+       download=000000
+   fi 
+   sed -i $line's/.*/'$dlprocess' '$dlSB' '$download'/' activejobs
+      echo "Process "$dlprocess" has untarred "$download"b in "$dlSB
 done
+
 }
 
 
@@ -79,7 +85,7 @@ echo "Exporting LoSoTo path"
 export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
 
 
-set -x
+##set -x
 #Detect segmentation violation and exit
 trap '{ echo "Trap detected segmentation fault... status=$?"; exit 1; }' SIGSEGV
 
@@ -131,7 +137,7 @@ cd ${RUNDIR}
 echo "untarring Prefactor" 
 tar -xf prefactor.tar
 cp prefactor/srm.txt $RUNDIR
-cp -r scripts/* .
+
 pwd
 touch activejobs
 echo ""
@@ -150,36 +156,74 @@ free
 
 
 
-#STEP2
+#STEP2 
+####
+# Download the data on the node 10 subbands at a time while ignoring subbands that 
+# cannot be downloaded (so that the job doesn't hang)
+####
 echo ""
 echo "---------------------------"
 echo "Starting Data Retrieval"
 echo "---------------------------"
 echo "Get subbands "
 
-for i in `seq 1 26`; do 
-let init=" ($i - 1) * 10 + 1"
-let fin=" $i * 10"
-./prefactor/bin/download_num_files.sh $init $fin srm.txt  &
+for block in `seq 1 5`; do 
+ let init=" ($block - 1) * 10 + 1"
+ let fin=" $block * 10"
+ ./prefactor/bin/download_num_files.sh $init $fin srm.txt  &
 
-#DL_PID=$!
-#cat /proc/$DL_PID/net/dev
+ #DL_PID=$!
+ #cat /proc/$DL_PID/net/dev
 
-clean_dl_pids
-quit
-`expr $(ps -aux|grep globus |wc -l) - 1`
-while [[ $(ps -aux|grep globus |wc -l)>3 ]] #Should be greater than 1+num_of_fails (1+0.1*$(NUM_SB) for 10% failure rate)
-do
-   NUMJOBS=$(ps -aux|grep globus |wc -l)
-   echo `expr $NUMJOBS - 1`" Subbands remaining"
-   sleep 60
+sleep 10
+ 
+ STALLED=0
+ NUMJOBS=244
+set +x
+ while [ $NUMJOBS -ge 2 ]
+  do
+     echo $NUMJOBS
+     clean_dl_pids 
+
+     LENJOBS=$(wc -l activejobs | awk '{print $1}')
+     NUMDONE=$(grep 'done' activejobs |wc -l |awk '{print $1}' )
+     STALLED=$(grep '000000' activejobs |wc -l|awk '{print $1}')
+      if [[ $NUMDONE == "" ]]; then 
+        NUMDONE=0
+      fi
+      if [[ $STALLED == "" ]]; then 
+        STALLED=0
+      fi
+     NUMJOBS=$(( $LENJOBS - $NUMDONE ))
+     echo $NUMJOBS" Subbands remaining "$STALLED" have stalled"
+     sleep 60
+     if [[ $(( $NUMDONE + $STALLED )) -eq $LENJOBS ]]; then
+       break
+     fi
+  done
+set -x
+ echo "Done downloading, killing stalled jobs"
+ sleep 15
+  
+ for line in `seq 1 $(wc -l activejobs|awk '{print $1}')`
+  do
+    killPID=$(cat activejobs |head -$line |tail -1 |awk '{print $1}')
+    if [[ ! $killPID == "-" ]]; then
+    kill $killPID
+    echo "Killed stalled download process "$killPID
+      fi
+  done
+  echo "" > activejobs
 done
 
-sleep 15
-echo "slept for 15 sec, killing all latent jobs"
-for i in $(seq 1 255); do kill %$i; done
-done
 
+#while [[ $(ps -aux |grep tar| wc -l |awk '{print $1}') > 1 ]]
+#do
+#sleep 120
+#done
+
+
+##TODO:Wait for all tarfiles!
 # - step2 finished check contents
 echo "step2 finished, list contents"
 ls -l $PWD
@@ -273,7 +317,7 @@ echo ""
 
 echo ""
 echo "copy logs to the Job home directory and clean temp files in scratch"
-cp log_$name logtar_$name.fa ${JOBDIR}
+cp out* ${JOBDIR}
 cd ${JOBDIR}
 
 if [[ $(hostname -s) != 'loui' ]]; then
