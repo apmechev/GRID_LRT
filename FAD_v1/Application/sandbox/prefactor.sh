@@ -167,7 +167,7 @@ echo "Starting Data Retrieval"
 echo "---------------------------"
 echo "Get subbands "
 
-for block in `seq 1 5`; do 
+for block in `seq 1 2`; do 
  let init=" ($block - 1) * 10 + 1"
  let fin=" $block * 10"
  ./prefactor/bin/download_num_files.sh $init $fin srm.txt  &

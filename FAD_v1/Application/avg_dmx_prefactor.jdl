@@ -2,7 +2,7 @@
   JobType="Parametric";
   ParameterStart=0;
   ParameterStep=1;
-  Parameters=6;
+  Parameters=1;
 
   Executable = "/bin/sh";
 
@@ -19,8 +19,8 @@
   #Requirements = (RegExp("mediummc",other.GlueCEUniqueID) || RegExp("nikhef.nl:8443/cream-pbs-medium",other.GlueCEUniqueID) || RegExp("rug.nl:8443/cream-pbs-medium",other.GlueCEUniqueID));
 
   # Just 4 cores on a single node
-  SmpGranularity = 4;
-  CPUNumber = 4;
+  SmpGranularity = 12;
+  CPUNumber = 12;
 
   #requirement for Nikhef high memory jobs
   #CERequirements = "other.GlueHostMainMemoryRAMSize >= 8192";
