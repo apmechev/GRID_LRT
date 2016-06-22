@@ -265,10 +265,15 @@ echo ""
 echo "execute avg_dmx.py"
 
 echo "parset is" $parset
-time python avg_dmx_v2_TS.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
+if [[ -e "customscript.py" ]]; then
+	echo "Executing custom avg_dmx script"
+	time python customscript.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
+else
+	time python avg_dmx_v2_TS.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
+fi
 
 echo "Done Command: "
-echo "time python avg_dmx_v2.py", $name, $avg_freq_step, $avg_time_step, $do_demix, $demix_freq_step, $demix_time_step, $demix_sources, $select_nl
+echo "time python ---.py", $name, $avg_freq_step, $avg_time_step, $do_demix, $demix_freq_step, $demix_time_step, $demix_sources, $select_nl
 #
 # - step3 finished check contents
 echo "step3 finished, list contents"
