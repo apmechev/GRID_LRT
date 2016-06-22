@@ -22,10 +22,17 @@ import sys
 import re
 import subprocess
 
+
+###########
+#Dictionary of input variables to make keeping track of values easier
+###########
+
+d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"$VO_LOFAR_SW_DIR","sw_ver":"current","parsetfile":"-","jdl_file":"avg_dmx.jdl","customscript":""}
+
+
 ############
 # Some checks on input arguments
 ############
-
 
 def parse_arguments(args):
 	if len(args)<3:
@@ -37,68 +44,93 @@ def parse_arguments(args):
 		sys.exit()
 	
 	if ("srm" in args[-2]) and (".cfg" in args[-1]):
-		srmfile=sys.argv[-2]
-		mastercfg=sys.argv[-1]
+		d_vars['srmfile']=sys.argv[-2]
+		d_vars['cfgfile']=sys.argv[-1]
 	
 	elif ("srm" in args[-1]) and (".cfg" in args[-2]):
-	        srmfile=args[-1]
-		mastercfg=args[-2]
+	        d_vars['srmfile']=args[-1]
+		d_vars['cfgfile']=args[-2]
 	
 	else: 
 		print "there may be a typo in your filenames"
 		sys.exit()
-	resuberr=False
-	TSplit=True
+	d_vars['resuberr']=False
+	d_vars['TSplit']=True
 
 	if ("-r" in args[:-2] or ("--resub-error-only" in args[:-2])):
 		print "\033[33mFlag set to resubmit only error tokens\033[0m"
-		resuberr=True
+		d_vars['resuberr']=True
 	
 	if ("-noTS" in args[:-2] or ("--no-time-splitting" in args[:-2])):
 	        print "\033[33mTurning Off Timesplitting\033[0m"
-	        TSplit=False
+	        d_vars['TSplit']=False
+	if ("-d" in args[:-2] or ("--software-dir" in args[:-2])):
+		try:
+			idx=args.index("-d")
+		except:
+			idx=args.index("--software-dir")
+		print "Using Software dir="+args[idx+1]
+		d_vars['sw_dir']=args[idx+1]
 
-	if srmfile== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other filenames
-		with open(srmfile,'r') as f:
+	if ("-v" in args[:-2] or ("--software-version" in args[:-2])):
+		try:
+                        idxv=args.index("-v")
+                except:
+                        idxv=args.index("--software-version")
+                print "Using Software version="+args[idxv+1]
+                d_vars['sw_ver']=args[idxv+1]
+
+	if ("-s" in args[:-2] or ("--script" in args[:-2])):
+		try:
+                        idxv=args.index("-s")
+                except:
+                        idxv=args.index("--script")
+                print "Using Custom script="+args[idxv+1]
+                d_vars['customscript']=args[idxv+1]
+
+	
+	if d_vars['srmfile']== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other filenames
+		with open(d_vars['srmfile'],'r') as f:
 			line=f.readline()
-			obsid='L'+str(re.search("L(.+?)_",line).group(1))
+			d_vars['OBSID']='L'+str(re.search("L(.+?)_",line).group(1))
 			print "copying srm.txt into srm_L"+obs_name+".txt "
 		shutil.copyfile('srm.txt','srm_'+obs_name+'.txt')
-		srmfile='srm_'+obsid+'.txt'
-	parsetfile=""
-	with open(mastercfg,'r') as readparset:
+		d_vars['srmfile']='srm_'+d_vars['OBSID']+'.txt'
+	d_vars['parsetfile']=""
+	with open(d_vars['cfgfile'],'r') as readparset:
 		for line in readparset:
 			if "PARSET" in line:
-				parsetfile=line.split("PARSET",1)[1].split("= ")[1].split('\n')[0]
+				d_vars['parsetfile']=line.split("PARSET",1)[1].split("= ")[1].split('\n')[0]
 
-	with open(srmfile, 'r') as f:
-	         obsid=re.search('L[0-9]*',f.readline()).group(0)
+	with open(d_vars['srmfile'], 'r') as f:
+	         d_vars['OBSID']=re.search('L[0-9]*',f.readline()).group(0)
 	
 	#check if obsid exists in srm file\033[0m
 	found=False
-	with open(srmfile,'rt') as f:
+	with open(d_vars['srmfile'],'rt') as f:
 	        for line in f:
-	                if obsid in line:
+	                if d_vars['OBSID'] in line:
 	                        found=True
-	                        print("Processing OBSID=\033[32m"+obsid+"\033[0m")
+	                        print("Processing OBSID=\033[32m"+d_vars['OBSID']+"\033[0m")
 	        if not found:
 	                print "\033[31mOBSID not found in SRM file!\033[0m"
 	                sys.exit()
-	
-	return(resuberr,TSplit,parsetfile,obsid,srmfile)	
+
+	return()	
 	
 	
 ###########
-#re-extracts the FAD tarfile if needed and sets up fadir
+#re-extracts the FAD tarfile if needed and sets up fad-dir
 ###########
-def setup_dirs(TSplit):
+def setup_dirs():
+
 	print ""
-	print "You're running \033[33m FAD1.0\033[0m Time-Splitting is \033[33m"+["OFF","ON"][TSplit]+"\033[0m"+[" By User Request"," By Default"][TSplit]+"!"
+	print "You're running \033[33m FAD1.0\033[0m Time-Splitting is \033[33m"+["OFF","ON"][d_vars['TSplit']]+"\033[0m"+[" By User Request"," By Default"][d_vars['TSplit']]+"!"
 	print ""
 	
 	latest_tar=glob.glob('FAD_*[0-9]*.tar')[-1]
 	if not latest_tar:
-		fadir=glob.glob('FAD_*[0-9]*')[-1]
+		d_vars['fadir']=glob.glob('FAD_*[0-9]*')[-1]
 	if not os.path.isdir(os.path.splitext(latest_tar)[0]):
 		print "Extracting "+ latest_tar
 		tar=tarfile.open(latest_tar)
@@ -106,30 +138,143 @@ def setup_dirs(TSplit):
 		tar.close()
 	
 	if latest_tar:
-		fadir=os.path.splitext(latest_tar)[0]
+		d_vars['fadir']=os.path.splitext(latest_tar)[0]
 		
-	sys.path.append(str(fadir+'/gsurl'))
+	sys.path.append(str(d_vars['fadir']+'/gsurl'))
 	import gsurl_v3
-	return fadir
 
+	for stuff in glob.glob(d_vars['fadir']+'/Tokens/datasets/*'):
+	        shutil.rmtree(stuff)
+	
+	for stuff in glob.glob(d_vars['fadir']+'/Staging/datasets/*'):
+	       shutil.rmtree(stuff)
+	
+	for oldstagefile in glob.glob(d_vars['fadir']+"/Staging/*files*"):
+	     os.remove(oldstagefile)
+	
+	for oldparset in glob.glob(d_vars['fadir']+"/Application/sandbox/scripts/parsets/*.parset"):
+	        if (not d_vars['parsetfile']=="") and (not "default" in  oldparset ): ##Remove old parsets but not the default.parset
+	                os.remove(oldparset)
+	        #TODO Maybe check if srm_L****.txt file in proper format?
+	
+	os.makedirs(d_vars['fadir']+'/Tokens/datasets/'+d_vars['OBSID'])
+	os.makedirs(d_vars['fadir']+'/Staging/datasets/'+d_vars['OBSID'])
+	gsurl_v3.main(d_vars['srmfile'])  #creates srmlist and subbandlist files
+	
+	shutil.copy("srmlist",d_vars['fadir']+"/Tokens/datasets/"+d_vars['OBSID'])
+	shutil.copy("subbandlist",d_vars['fadir']+"/Tokens/datasets/"+d_vars['OBSID'])
+	shutil.copy("srmlist",d_vars['fadir']+"/Staging/datasets/"+d_vars['OBSID'])
+	shutil.copy("subbandlist",d_vars['fadir']+"/Staging/datasets/"+d_vars['OBSID'])
+	
+	if not ((len(d_vars['parsetfile'])<4) or ("fault" in d_vars['parsetfile']) or d_vars['parsetfile']=="DEFAULT"):
+	        shutil.copy(d_vars['fadir']+"/parsets/"+d_vars['parsetfile'],d_vars['fadir']+"/Application/sandbox/scripts/parsets/")
+	
+	for dir in ['Tokens','Staging']:
+        	with open(d_vars['fadir']+"/"+dir+"/datasets/"+d_vars['OBSID']+"/setup.cfg","a") as cfgfile:
+        	        cfgfile.write("[OBSERVATION]\n")
+        	        cfgfile.write("OBSID           = "+d_vars['OBSID']+"\n")
+        	        with open(d_vars['cfgfile'],'r') as cfg:
+        	                for i, line in enumerate(cfg):
+        	                        if 'PARSET' in line and len(d_vars['parsetfile'])<4:# if a parset is not defined
+        	                                continue  #don't write PARSET= "", will be handled below
+        	                        cfgfile.write(line)
+        	        if len(d_vars['parsetfile'])<4:
+        	                cfgfile.write('PARSET     = "-"\n')
+	
+	return 
+
+####################
+#Check state of files, if NEARLINE stage them
+#If they're staged here, check if ONLINE_AND_NEARLINE and if not, abort
+####################
+def check_state_and_stage():
+
+	with open(d_vars['fadir']+"/Staging/"+d_vars['OBSID']+"_files","a") as Stagefile:
+	        print("Pre-staging observation "+d_vars['OBSID']+ " inside file " + Stagefile.name)
+	        if "fz-juelich.de" in open(d_vars['fadir']+"/Tokens/datasets/"+d_vars['OBSID']+"/srmlist",'r').read():
+	                with open(d_vars['fadir']+"/Tokens/datasets/"+d_vars['OBSID']+"/srmlist",'r') as srms:
+	                        for i,line in enumerate(srms):
+	                                line=re.sub("//pnfs","/pnfs",line)
+	                                Stagefile.write(re.sub('srm:\/\/lofar-srm.fz-juelich.de:8443','',line.split()[0])+'\n') #take first entry (srm://) ignoring file://
+	                Stagefile.close()
+	                fileloc='j'
+	        elif "srm.grid.sara.nl" in open(d_vars['fadir']+"/Tokens/datasets/"+d_vars['OBSID']+"/srmlist",'r').read():
+	                with open(d_vars['fadir']+"/Tokens/datasets/"+d_vars['OBSID']+"/srmlist",'r') as srms:
+	                        for i,line in enumerate(srms):
+	                                line=re.sub("//pnfs","/pnfs",line)
+	                                Stagefile.write(re.sub('srm:\/\/srm.grid.sara.nl:8443','',line.split()[0])+'\n')
+	                Stagefile.close()
+	                fileloc='s'
+	print "--"
+	
+	os.chdir(d_vars['fadir']+"/Staging/")
+	
+	for oldfile in glob.glob("files"):
+	       os.remove(oldfile)
+	sys.path.append(os.path.abspath("."))
+	shutil.copy(d_vars['OBSID']+"_files","files")
+	
+	
+	#Maybe check if grid storage is online??
+	if fileloc=='s':
+	        import state
+	        locs=state.main('files')
+	        if len(locs)==0:
+	                print "No files found!! State error"
+	                sys.exit()
+	        for sublist in locs:
+	                if 'NEARLINE' in sublist :
+	                        os.system("python stage.py")
+	                        print "Staging your file."
+	        ##TODO Would be nice not to check this twice if staged
+	        locs=state.main('files')
+	        for sublist in locs:
+	                if 'NEARLINE' in sublist :
+	                        print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+	                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
+	                        print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m"
+	                        sys.exit()
+	
+	elif fileloc=='j':
+	        import state_fzj
+	        locs=state_fzj.main('files')
+	        for subs in locs:
+	                if 'NEARLINE' in subs :
+	                        os.system("python stage_fzj.py")
+	                        print "Staging your file"
+	
+	        locs=state_fzj.main('files')
+	        for subs in locs:
+	                if 'NEARLINE' in subs :
+	                        print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+	                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
+	                        print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
+	                        sys.exit()
+                                                                                                            
+	print ""
+	os.chdir("../../")
+	os.chdir(d_vars['fadir']+"/Tokens/")
+	return 
 
 ####################
 #PICAS Database Submission
 #####################
-def submit_to_picas(resuberr):
-        try:
+def submit_to_picas():
+
+        os.chdir(d_vars['fadir']+"/Tokens")
+	try:
             print "Your picas user is "+os.environ["PICAS_USR"]+" and the DB is "+os.environ["PICAS_DB"]
         except KeyError:
             print "\033[31m You haven't set $PICAS_USR or $PICAS_DB or $PICAS_USR_PWD! \n\n Exiting\033[0m"
             sys.exit()
 
-        if resuberr:
+        if d_vars['resuberr']:
                 subprocess.call(['python','resetErrorTokens.py',os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
         else:
-                subprocess.call(['python','removeObsIDTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
-                subprocess.call(['python','createTokens.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+                subprocess.call(['python','removeObsIDTokens.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+                subprocess.call(['python','createTokens.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
         subprocess.call(['python','createViews.py',os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
-        subprocess.call(['python','createObsIDView.py',obsid,os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+        subprocess.call(['python','createObsIDView.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
         os.chdir("../../")
 
         os.remove('srmlist')
@@ -142,15 +287,16 @@ def submit_to_picas(resuberr):
 #and after the file is restored 
 #####################
 
-def start_jdl(jdl_file):
-        if os.path.exists(fadir+"/Application/jobIDs"):
-                os.remove(fadir+"/Application/jobIDs")
+def start_jdl():
 
-        os.chdir(fadir+"/Application")
+        if os.path.exists(d_vars['fadir']+"/Application/jobIDs"):
+                os.remove(d_vars['fadir']+"/Application/jobIDs")
+
+        os.chdir(d_vars['fadir']+"/Application")
         subprocess.call(["ls","-lat","sandbox/scripts/parsets"])
         #TODO: Change avg_dmx's number of jobs to number of subbands
 
-        dmx_jdl=['avg_dmx_no-TS.jdl','avg_dmx.jdl'][TSplit] #If Tsplit=True (Default), file is avg_dmx.jdl else the other one
+        dmx_jdl=['avg_dmx_no-TS.jdl','avg_dmx.jdl'][d_vars['TSplit']] #If Tsplit=True (Default), file is avg_dmx.jdl else the other one
         shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')
         filedata=None
         with open(dmx_jdl,'r') as file:
@@ -159,7 +305,7 @@ def start_jdl(jdl_file):
 
 
         os.remove(dmx_jdl)
-        numprocess=sum(1 for line in open("../../"+srmfile,'rt'))
+        numprocess=sum(1 for line in open("../../"+d_vars['srmfile'],'rt'))
         filedata=filedata.replace("Parameters=50","Parameters="+str(numprocess))
         with open(dmx_jdl,'w+') as file:
             file.write(filedata)
@@ -174,18 +320,23 @@ def start_jdl(jdl_file):
 #This will be pulled by the job on the node
 #while a variable with the path will be passed to the token
 ##############
-def prepare_sandbox(fadir,obsid,customscript=""):
-	os.chdir(fadir+"/Application/sandbox")
+def prepare_sandbox():
+
+	os.chdir(d_vars['fadir']+"/Application/sandbox")
 	try:
 	        os.remove("scripts.tar")
 	except OSError:
 	        pass
-	if customscript!="":
-		shutil.copy("../../../../"+customscript, "scripts/avg_dmx2.py")	
+	if d_vars['customscript']!="":
+		os.remove("scripts/custom_script.py")
+		shutil.copy("../../../"+d_vars['customscript'], "scripts/customscript.py")	
+	os.remove("scripts.tar")
 	print("tarring everything")
-	subprocess.call(["tar","-cf", "scripts.tar","scripts/"])
-	
-
+	subprocess.call(["tar","-cf", "scripts.tar","scripts/"])	
+	try:
+		os.remove("scripts/custom_script.py")
+	except OSError:
+                pass
 
 	
 	os.chdir("../")
@@ -194,16 +345,16 @@ def prepare_sandbox(fadir,obsid,customscript=""):
         print "uploading sandbox to storage for pull by nodes"
 
 	subprocess.call(["uberftp", "-rm",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+".tar"])
-	subprocess.call(['globus-url-copy', "file:"+os.environ["PWD"]+"/"+fadir+"/Application/sandbox.tar",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+".tar"])	
+	subprocess.call(['globus-url-copy', "file:"+os.environ["PWD"]+"/"+d_vars['fadir']+"/Application/sandbox.tar",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+".tar"])	
 
         os.chdir("../../")
 	return
 
 
 if __name__ == "__main__":
-        [resuberr,Tsplit,parsetfile,obsid,srm_file]=parse_arguments(sys.argv)
-	fadir=setup_dirs(Tsplit)
-        prepare_sandbox(fadir,obsid)
+        parse_arguments(sys.argv)
+	setup_dirs()
+        prepare_sandbox()
 	
 	####################
 	##Wait for keystroke
@@ -225,62 +376,16 @@ if __name__ == "__main__":
 	else:
 	   sys.exit()
 
-	submit_to_picas(resuberr)
+	submit_to_picas()
+	start_jdl()
 	sys.exit()
-
-
-
-
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#WALL OF OLD CODE BELOW
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-
-
-
-
 
 
 
 ###########
 #Clean Directories and old parset
 ###########
-for stuff in glob.glob(fadir+'/Tokens/datasets/*'):
-	shutil.rmtree(stuff)
 
-for stuff in glob.glob(fadir+'/Staging/datasets/*'):
-       shutil.rmtree(stuff)
-
-for oldstagefile in glob.glob(fadir+"/Staging/*files*"):
-     os.remove(oldstagefile)
-
-for oldparset in glob.glob(fadir+"/Application/sandbox/scripts/parsets/*.parset"):
-	if (not parsetfile=="") and (not "default" in  oldparset ): ##Remove old parsets but not the default.parset
-		os.remove(oldparset)
-	#TODO Maybe check if srm_L****.txt file in proper format?
-
-with open(srmfile, 'r') as f:
-	 obsid=re.search('L[0-9]*',f.readline()).group(0)
-
-#check if obsid exists in srm file
-
-
-os.makedirs(fadir+'/Tokens/datasets/'+obsid)
-os.makedirs(fadir+'/Staging/datasets/'+obsid)
-gsurl_v3.main(srmfile)	#creates srmlist and subbandlist files
-
-shutil.copy("srmlist",fadir+"/Tokens/datasets/"+obsid)
-shutil.copy("subbandlist",fadir+"/Tokens/datasets/"+obsid)
-shutil.copy("srmlist",fadir+"/Staging/datasets/"+obsid)
-shutil.copy("subbandlist",fadir+"/Staging/datasets/"+obsid)
-
-if not ((len(parsetfile)<4) or ("fault" in parsetfile) or parsetfile=="DEFAULT"):	
-	shutil.copy(fadir+"/parsets/"+parsetfile,fadir+"/Application/sandbox/scripts/parsets/")
-
-	
-
-#Add tarring of parset files which will be untarred on the node
 
 devnl=open(os.devnull, 'w')
 greproc=subprocess.Popen(['glite-wms-job-status','-i',"FAD_v1/Application/jobIDs"],stdout=subprocess.PIPE,stderr=devnl)
@@ -290,97 +395,4 @@ if (grep.find("    Current Status:     Running")>1) or (grep.find("    Current S
 	print grep
 	print "\033[31mYour Job Is Still Running.\033[0m Please wait until it's set as 'Completed'. This should happen <15 mins after all tokens complete\nThis program will continue when all jobs are set to completed so that the correct parameters are sent to the node."
 	sys.exit()
-
-
-
-################
-#Adds OBSID to the master_setup.cfg and sends it to Staging/ and Tokens/
-################
-for dir in ['Tokens','Staging']:
-	with open(fadir+"/"+dir+"/datasets/"+obsid+"/setup.cfg","a") as cfgfile:
-		cfgfile.write("[OBSERVATION]\n")
-		cfgfile.write("OBSID           = "+obsid+"\n")
-		with open(mastercfg,'r') as cfg:
-			for i, line in enumerate(cfg): 
-				if 'PARSET' in line and len(parsetfile)<4:# if a parset is not defined
-					continue  #don't write PARSET= "", will be handled below
-				cfgfile.write(line)
-		if len(parsetfile)<4:
-			cfgfile.write('PARSET     = "-"\n')
-
-
-#################
-#append srms to the staging/obsid_files, reformat and add to /Staging/files 
-#################
-with open(fadir+"/Staging/"+obsid+"_files","a") as Stagefile:
-	print("Pre-staging observation "+obsid+ " inside file " + Stagefile.name)
-	if "fz-juelich.de" in open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r').read():
-		with open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r') as srms:
-			for i,line in enumerate(srms):
-				line=re.sub("//pnfs","/pnfs",line)
-				Stagefile.write(re.sub('srm:\/\/lofar-srm.fz-juelich.de:8443','',line.split()[0])+'\n') #take first entry (srm://) ignoring file://
-		Stagefile.close()
-		fileloc='j'
-	elif "srm.grid.sara.nl" in open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r').read():
-		with open(fadir+"/Tokens/datasets/"+obsid+"/srmlist",'r') as srms:
-			for i,line in enumerate(srms):
-                                line=re.sub("//pnfs","/pnfs",line)
-				Stagefile.write(re.sub('srm:\/\/srm.grid.sara.nl:8443','',line.split()[0])+'\n')
-		Stagefile.close()
-		fileloc='s'
-print "--"
-
-
-####################
-#Check state of files, if NEARLINE stage them
-#If they're staged here, check if ONLINE_AND_NEARLINE and if not, abort
-####################
-os.chdir(fadir+"/Staging/")
-
-for oldfile in glob.glob("files"):
-       os.remove(oldfile)
-sys.path.append(os.path.abspath("."))
-shutil.copy(obsid+"_files","files")
-
-
-#Maybe check if grid storage is online??
-if fileloc=='s':
-	import state
-	locs=state.main('files')
-	if len(locs)==0: 
-		print "No files found!! State error"
-		sys.exit()
-	for sublist in locs:
-		if 'NEARLINE' in sublist :
-			os.system("python stage.py")
-			print "Staging your file."
-	##TODO Would be nice not to check this twice if staged
-	locs=state.main('files')
-	for sublist in locs:
-		if 'NEARLINE' in sublist :
-			print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-			print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-			print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m" 
-			sys.exit()
-		
-elif fileloc=='j':
-	import state_fzj
-	locs=state_fzj.main('files')
-	for subs in locs:
-		if 'NEARLINE' in subs :
-        	        os.system("python stage_fzj.py")
-                        print "Staging your file"
-
-	locs=state_fzj.main('files')
-	for subs in locs:
-		if 'NEARLINE' in subs :
-			print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-                        print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
-			sys.exit()
-
-
-print ""
-os.chdir("../../")
-os.chdir(fadir+"/Tokens/")
 

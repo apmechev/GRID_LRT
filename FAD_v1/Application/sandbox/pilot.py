@@ -41,7 +41,7 @@ class ExampleActor(RunActor):
         #
         # !!!! should try to get SB number from SURL to get unique OBSID+SB combination for logs (to replace SURL_SUBBAND here) TBD !!!!
         #
-	# /usr/bin/time -v ./master_avg_dmx_v2.sh [OBSID] [SURL_SUBBAND] [AVG_FREQ_STEP] [AVG_TIME_STEP] [DO_DEMIX] [DEMIX_FREQ_STEP] [DEMIX_TIME_STEP] [DEMIX_SOURCES] [SELECT_NL] [SUBBAND_NUM] 2> logs_[OBSID]_[SUBBAND_NUM].err 1> logs_[OBSID]_[SUBBAND_NUM].out
+	
 #        command = "valgrind --tool=memcheck --track-fds=yes --trace-children=yes --log-file=CACHEgrind%p  ./master_avg_dmx_v2.sh "+ str(token['OBSID']) + " " + str(token['SURL_SUBBAND']) + " " + str(token['AVG_FREQ_STEP']) + " " + str(token['AVG_TIME_STEP']) + " " + str(token['DO_DEMIX']) + " " + str(token['DEMIX_FREQ_STEP']) + " " + str(token['DEMIX_TIME_STEP']) + " " + str(token['DEMIX_SOURCES']) + " " + str(token['SELECT_NL']) + " " + str(token['SUBBAND_NUM']) + " 2> logs_" + str(token['OBSID']) + "_" + str(token['SUBBAND_NUM']) + ".err 1> logs_" + str(token['OBSID']) + "_" + str(token['SUBBAND_NUM']) + ".out" ##CACHEGRIND VERSION
 
 	print "++++++++++++++++++++"+str(token['PARSET'])
