@@ -240,41 +240,23 @@ def check_state_and_stage():
 	shutil.copy(d_vars['OBSID']+"_files","files")
 	
 	import state_all
-
+	import stage_all
 	locs=state_all.main('files')
 	if len(locs)==0:
 		print "No files found!! State error"
 	for sublist in locs:
 		if 'NEARLINE' in sublist :
 			print "Nearline, add stage-all.py"	
-#                        os.system("python stage.py")
-#                        print "Staging your file."
-#			 #Sleep 5 minutes?
-
-
-
-
-	#Maybe check if grid storage is online??
-#	if fileloc=='s':
-#	        import state
-#	        locs=state.main('files')
-#	        if len(locs)==0:
-#	                print "No files found!! State error"
-#	                sys.exit()
-#	        for sublist in locs:
-#	                if 'NEARLINE' in sublist :
-#	                        os.system("python stage.py")
-#	                        print "Staging your file."
-#	        ##TODO Would be nice not to check this twice if staged
-#	        locs=state.main('files')
-#	        for sublist in locs:
-#	                if 'NEARLINE' in sublist :
-#	                        print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-#	                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-#	                        print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m"
-#	                        sys.exit()
-#	
-#                                                                                                            
+                        stage_all.main('files')
+                        print "Staging your file."
+			
+	locs=state_all.main('files')
+	for sublist in locs:
+               if 'NEARLINE' in sublist :
+                               print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+                               print "I've requested staging but srms are not ONLINE yet. I'll exit so the tokens don't crash. Re-run in a few (or tens of) minutes"
+                               print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m"
+                               sys.exit()
 	print ""
 	os.chdir("../../")
 	#os.chdir(d_vars['fadir']+"/Tokens/")
