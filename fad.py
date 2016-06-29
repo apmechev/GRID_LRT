@@ -35,12 +35,20 @@ d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"
 ############
 
 def parse_arguments(args):
-	if len(args)<3:
+	if len(args)<3 or ("-h" in args[:-2] or ("--help" in args[:-2])):
 		print ""
 		print "You need to input the SRM file and the master config file"
-		print "ex.  python fad-master.py srm_L229587.txt master_setup.cfg"
-		print "optional flags ( -r or --resub-error-only) come after fad-master.py "
-		print "optional turn off Time Splitting (-noTS or --no-time-splitting) as well"
+		print "ex.  python fad-master.py [OPTIONS] srm_L229587.txt master_setup.cfg"
+		print "optional flags ( -r, -j, -s, -noTS, -d, -v) come before srm and config file "
+		print ""
+		print "+=+=+=+= Current Options +=+=+=+="
+		print "(-noTS or --no-time-splitting)	- turn off Time Splitting "
+                print "(-r or --resub-error-only)   	- resubmit only error tokens "
+                print "(-j or --jdl)		        - specify .jdl file to run  "
+                print "(-s or --script)		        - path to the custom script you want "
+                print "(-d or --software-dir)           - path to custom LOFAR software dir "
+                print "(-v or --software-version)       - software version (subfolder of software-dir)"
+                print "(-h or --help) 		        - prints this message (obv)"
 		sys.exit()
 	
 	if ("srm" in args[-2]) and (".cfg" in args[-1]):
@@ -386,10 +394,9 @@ def prepare_sandbox():
 	except OSError:
                 pass
 
-	#resub = subprocess.call(['sed','-i', 's/\/'+d_vars["sw_ver"]+'\//\/current\//g', "sandbox/master.sh"]) #reverting
 	os.chdir("../")
 	subprocess.call(["tar","-cf", "sandbox.tar","sandbox/"])
-	os.remove("sandbox/master.sh")
+	resub = subprocess.call(['sed','-i', 's/\/'+d_vars["sw_ver"]+'\//\/current\//g', "sandbox/master.sh"]) #reverting
 	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox"
         print "uploading sandbox to storage for pull by nodes"
 
