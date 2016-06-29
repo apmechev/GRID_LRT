@@ -239,58 +239,65 @@ def check_state_and_stage():
 	sys.path.append(os.path.abspath("."))
 	shutil.copy(d_vars['OBSID']+"_files","files")
 	
-	
-	#Maybe check if grid storage is online??
-	if fileloc=='s':
-	        import state
-	        locs=state.main('files')
-	        if len(locs)==0:
-	                print "No files found!! State error"
-	                sys.exit()
-	        for sublist in locs:
-	                if 'NEARLINE' in sublist :
-	                        os.system("python stage.py")
-	                        print "Staging your file."
-	        ##TODO Would be nice not to check this twice if staged
-	        locs=state.main('files')
-	        for sublist in locs:
-	                if 'NEARLINE' in sublist :
-	                        print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-	                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-	                        print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m"
-	                        sys.exit()
-	
-	elif fileloc=='j':
-	        import state_fzj
-	        locs=state_fzj.main('files')
-	        for subs in locs:
-	                if 'NEARLINE' in subs :
-	                        os.system("python stage_fzj.py")
-	                        print "Staging your file"
-	
-	        locs=state_fzj.main('files')
-	        for subs in locs:
-	                if 'NEARLINE' in subs :
-	                        print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-	                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-	                        print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
-	                        sys.exit()
-        elif fileloc=='p':
-                import state_psnc
-                locs=state_psnc.main('files')
-                for subs in locs:
-                        if 'NEARLINE' in subs :
-                                os.system("python stage_psnc.py")
-                                print "Staging your file"
+	import state_all
 
-                locs=state_psnc.main('files')
-                for subs in locs:
-                        if 'NEARLINE' in subs :
-                                print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-                                print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-                                print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
-                                sys.exit()
-                                                                                                            
+	locs=state_all.main('files')
+	if len(locs)==0:
+		print "No files found!! State error"
+	for sublist in locs:
+		if 'NEARLINE' in sublist :
+			print "Nearline, add stage-all.py"	
+	#Maybe check if grid storage is online??
+#	if fileloc=='s':
+#	        import state
+#	        locs=state.main('files')
+#	        if len(locs)==0:
+#	                print "No files found!! State error"
+#	                sys.exit()
+#	        for sublist in locs:
+#	                if 'NEARLINE' in sublist :
+#	                        os.system("python stage.py")
+#	                        print "Staging your file."
+#	        ##TODO Would be nice not to check this twice if staged
+#	        locs=state.main('files')
+#	        for sublist in locs:
+#	                if 'NEARLINE' in sublist :
+#	                        print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+#	                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
+#	                        print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m"
+#	                        sys.exit()
+#	
+#	elif fileloc=='j':
+#	        import state_fzj
+#	        locs=state_fzj.main('files')
+#	        for subs in locs:
+#	                if 'NEARLINE' in subs :
+#	                        os.system("python stage_fzj.py")
+#	                        print "Staging your file"
+#	
+#	        locs=state_fzj.main('files')
+#	        for subs in locs:
+#	                if 'NEARLINE' in subs :
+#	                        print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+#	                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
+#	                        print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
+#	                        sys.exit()
+#        elif fileloc=='p':
+#                import state_psnc
+#                locs=state_psnc.main('files')
+#                for subs in locs:
+#                        if 'NEARLINE' in subs :
+#                                os.system("python stage_psnc.py")
+#                                print "Staging your file"
+#
+#                locs=state_psnc.main('files')
+#                for subs in locs:
+#                        if 'NEARLINE' in subs :
+#                                print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+#                                print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
+#                                print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
+#                                sys.exit()
+#                                                                                                            
 	print ""
 	os.chdir("../../")
 	#os.chdir(d_vars['fadir']+"/Tokens/")

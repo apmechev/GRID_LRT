@@ -40,7 +40,6 @@ import re
 import sys
 from string import strip
 def main(filename):
-	#m=re.compile('/pnfs') #SARA/JUELICH
 	m=re.compile('/lofar') #POZNAN
 	nf=100
 	
@@ -80,9 +79,6 @@ def main(filename):
 	    a,b,c=gfal.gfal_init(req)
 	    a,b,c=gfal.gfal_ls(b)
 	    a,b,c=gfal.gfal_get_results(b)
-	    #print "a: ", a
-	    #print "b: ", b
-	    #print "c: ", c
             for j in range(0,len(c)):
                if c[j]['locality']=='NEARLINE':
                         colour="\033[31m"
