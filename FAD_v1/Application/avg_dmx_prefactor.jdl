@@ -9,7 +9,7 @@
   Arguments = "startpilot.sh spectroscopy_alex apmechev prQn98rQA";
   Stdoutput = "parametricjob.out";
   StdError = "parametricjob.err";
-  InputSandbox = {"sandbox/picas.tar","sandbox/couchdb.tar","sandbox/startpilot.sh","sandbox/pilot.py","sandbox/prefactor.sh","sandbox/prefactor.tar","sandbox/srm.txt"};
+  InputSandbox = {"prefactor-sandbox/picas.tar","prefactor-sandbox/couchdb.tar","prefactor-sandbox/startpilot.sh","prefactor-sandbox/pilot.py","prefactor-sandbox/prefactor.sh","prefactor-sandbox/prefactor.tar"};
   OutputSandbox = {"parametricjob.out", "parametricjob.err"};
   DataAccessProtocol = {"gsiftp"};
   ShallowRetryCount = 3;
