@@ -247,6 +247,13 @@ def check_state_and_stage():
 	for sublist in locs:
 		if 'NEARLINE' in sublist :
 			print "Nearline, add stage-all.py"	
+#                        os.system("python stage.py")
+#                        print "Staging your file."
+#			 #Sleep 5 minutes?
+
+
+
+
 	#Maybe check if grid storage is online??
 #	if fileloc=='s':
 #	        import state
@@ -267,36 +274,6 @@ def check_state_and_stage():
 #	                        print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m"
 #	                        sys.exit()
 #	
-#	elif fileloc=='j':
-#	        import state_fzj
-#	        locs=state_fzj.main('files')
-#	        for subs in locs:
-#	                if 'NEARLINE' in subs :
-#	                        os.system("python stage_fzj.py")
-#	                        print "Staging your file"
-#	
-#	        locs=state_fzj.main('files')
-#	        for subs in locs:
-#	                if 'NEARLINE' in subs :
-#	                        print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-#	                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-#	                        print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
-#	                        sys.exit()
-#        elif fileloc=='p':
-#                import state_psnc
-#                locs=state_psnc.main('files')
-#                for subs in locs:
-#                        if 'NEARLINE' in subs :
-#                                os.system("python stage_psnc.py")
-#                                print "Staging your file"
-#
-#                locs=state_psnc.main('files')
-#                for subs in locs:
-#                        if 'NEARLINE' in subs :
-#                                print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-#                                print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-#                                print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
-#                                sys.exit()
 #                                                                                                            
 	print ""
 	os.chdir("../../")
