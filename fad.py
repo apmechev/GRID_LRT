@@ -27,7 +27,7 @@ import subprocess
 #Dictionary of input variables to make keeping track of values easier
 ###########
 
-d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"$VO_LOFAR_SW_DIR","sw_ver":"current","parsetfile":"-","jdl_file":"avg_dmx.jdl","customscript":""}
+d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"$VO_LOFAR_SW_DIR","sw_ver":"current","parsetfile":"-","jdl_file":"","customscript":""}
 
 
 ############
@@ -54,6 +54,7 @@ def parse_arguments(args):
 	else: 
 		print "there may be a typo in your filenames"
 		sys.exit()
+	
 	d_vars['resuberr']=False
 	d_vars['TSplit']=True
 
@@ -87,6 +88,13 @@ def parse_arguments(args):
                         idxv=args.index("--script")
                 print "Using Custom script="+args[idxv+1]
                 d_vars['customscript']=args[idxv+1]
+        if ("-j" in args[:-2] or ("--jdl" in args[:-2])):
+                try:
+                        idxv=args.index("-j")
+                except:
+                        idxv=args.index("--jdl")
+                print "Using jdl_file="+args[idxv+1]
+                d_vars['jdl_file']=args[idxv+1]
 
 	
 	if d_vars['srmfile']== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other filenames
@@ -205,6 +213,15 @@ def check_state_and_stage():
 	                                Stagefile.write(re.sub('srm:\/\/srm.grid.sara.nl:8443','',line.split()[0])+'\n')
 	                Stagefile.close()
 	                fileloc='s'
+                elif "lofar.psnc.pl" in open(d_vars['fadir']+"/Tokens/datasets/"+d_vars['OBSID']+"/srmlist",'r').read():
+                        with open(d_vars['fadir']+"/Tokens/datasets/"+d_vars['OBSID']+"/srmlist",'r') as srms:
+                                for i,line in enumerate(srms):
+                                        line=re.sub("//pnfs","/pnfs",line)
+                                        line=re.sub("//lofar","/lofar",line)
+                                        Stagefile.write(re.sub('srm:\/\/lta-head.lofar.psnc.pl:8443','',line.split()[0])+'\n')
+                        Stagefile.close()
+                        fileloc='p'
+
 	print "--"
 	
 	os.chdir(d_vars['fadir']+"/Staging/")
@@ -250,10 +267,25 @@ def check_state_and_stage():
 	                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
 	                        print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
 	                        sys.exit()
+        elif fileloc=='p':
+                import state_psnc
+                locs=state_psnc.main('files')
+                for subs in locs:
+                        if 'NEARLINE' in subs :
+                                os.system("python stage_psnc.py")
+                                print "Staging your file"
+
+                locs=state_psnc.main('files')
+                for subs in locs:
+                        if 'NEARLINE' in subs :
+                                print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+                                print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
+                                print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
+                                sys.exit()
                                                                                                             
 	print ""
 	os.chdir("../../")
-	os.chdir(d_vars['fadir']+"/Tokens/")
+	#os.chdir(d_vars['fadir']+"/Tokens/")
 	return 
 
 ####################
@@ -295,8 +327,10 @@ def start_jdl():
         os.chdir(d_vars['fadir']+"/Application")
         subprocess.call(["ls","-lat","sandbox/scripts/parsets"])
         #TODO: Change avg_dmx's number of jobs to number of subbands
-
-        dmx_jdl=['avg_dmx_no-TS.jdl','avg_dmx.jdl'][d_vars['TSplit']] #If Tsplit=True (Default), file is avg_dmx.jdl else the other one
+	if d_vars['jdl_file']=="": 
+        	dmx_jdl=['avg_dmx_no-TS.jdl','avg_dmx.jdl'][d_vars['TSplit']] #If Tsplit=True (Default), file is avg_dmx.jdl else the other one
+	else:
+		dmx_jdl=d_vars['jdl_file']
         shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')
         filedata=None
         with open(dmx_jdl,'r') as file:
@@ -325,12 +359,26 @@ def prepare_sandbox():
 	os.chdir(d_vars['fadir']+"/Application/sandbox")
 	try:
 	        os.remove("scripts.tar")
+                os.remove("scripts/custom_script.py")
+
 	except OSError:
 	        pass
 	if d_vars['customscript']!="":
-		os.remove("scripts/custom_script.py")
 		shutil.copy("../../../"+d_vars['customscript'], "scripts/customscript.py")	
-	os.remove("scripts.tar")
+	if "$" in d_vars["sw_dir"]:
+		testdir=os.environ[d_vars["sw_dir"][1:]]
+	else:
+		testdir=d_vars["sw_dir"]
+	if os.path.isdir(testdir) and os.path.isdir(testdir+"/"+d_vars["sw_ver"]):
+		pass
+	else:
+		print "directory "+testdir+"/"+d_vars["sw_ver"]+" doesn't exist Exiting"
+		sys.exit()
+	## move the appropriate .sh file to master.sh
+	shutil.copy(["master_no_TS.sh","master_with_TS.sh"][d_vars['TSplit']],"master.sh")
+ 
+	sub = subprocess.call(['sed','-i', 's/^SW_DIR=.*/SW_DIR='+d_vars["sw_dir"]+'/g', "master.sh"])
+        sub = subprocess.call(['sed','-i', 's/\/current\//\/'+d_vars["sw_ver"]+'\//g', "master.sh"])	
 	print("tarring everything")
 	subprocess.call(["tar","-cf", "scripts.tar","scripts/"])	
 	try:
@@ -338,9 +386,10 @@ def prepare_sandbox():
 	except OSError:
                 pass
 
-	
+	#resub = subprocess.call(['sed','-i', 's/\/'+d_vars["sw_ver"]+'\//\/current\//g', "sandbox/master.sh"]) #reverting
 	os.chdir("../")
 	subprocess.call(["tar","-cf", "sandbox.tar","sandbox/"])
+	os.remove("sandbox/master.sh")
 	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox"
         print "uploading sandbox to storage for pull by nodes"
 
@@ -355,6 +404,8 @@ if __name__ == "__main__":
         parse_arguments(sys.argv)
 	setup_dirs()
         prepare_sandbox()
+
+        check_state_and_stage()
 	
 	####################
 	##Wait for keystroke
