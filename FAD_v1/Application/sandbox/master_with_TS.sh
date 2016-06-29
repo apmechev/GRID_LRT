@@ -35,11 +35,17 @@ SURLtoTURL()
    sara_SURL_string="srm://srm.grid.sara.nl:8443"
    juelich_TURL_string="gsiftp://dcachepool12.fz-juelich.de:2811"
    juelich_SURL_string="srm://lofar-srm.fz-juelich.de:8443"
+   #poznan_TURL_string="gsiftp://door01.lofar.psnc.pl:2811"
+   poznan_TURL_string="gsiftp://door02.lofar.psnc.pl:2811"
+   poznan_SURL_string="srm://lta-head.lofar.psnc.pl:8443"
 
    if [[ $SURL == *sara* ]]; then
       TURL=`echo $SURL | sed -e "s%${sara_SURL_string}%${sara_TURL_string}%g"`
    elif [[ $SURL == *juelich* ]]; then
       TURL=`echo $SURL | sed -e "s%${juelich_SURL_string}%${juelich_TURL_string}%g"`
+   elif [[ $SURL == *psnc* ]]; then 
+      TURL=`echo $SURL | sed -e "s%${poznan_SURL_string}%${poznan_TURL_string}%g"`
+      export GLOBUS_TCP_PORT_RANGE=20000,25000
    fi
 
    echo $TURL
@@ -61,6 +67,7 @@ echo $HOME
 echo $VO_LOFAR_SW_DIR
 ls -l $VO_LOFAR_SW_DIR
 
+
 echo ""
 echo "Job directory is:"
 echo $PWD
@@ -74,25 +81,23 @@ cat /proc/cpuinfo | grep "model name"
 echo ""
 echo "Setting up the LOFAR environment; release current:"
 
+SW_DIR=$VO_LOFAR_SW_DIR
 #LOFARROOT=${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release
-LOFARROOT=${VO_LOFAR_SW_DIR}/current/lofar/release
+LOFARROOT=${SW_DIR}/current/lofar/release
 
 echo "source lofarinit.sh"
 #. ${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release/lofarinit.sh || exit 1
-. ${VO_LOFAR_SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
+. ${SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
 
 echo "correct PATH and LD_LIBRARY_PATH for incomplete settings in lofarinit.sh"
 # initialize the Lofar LTA environment; release LTA_2_1
-#export PATH=$VO_LOFAR_SW_DIR/LTA_2_1/lofar/release/bin:$VO_LOFAR_SW_DIR/LTA_2_1/lofar/release/sbin:$VO_LOFAR_SW_DIR/LTA_2_1/local/release/bin:$PATH
-#export LD_LIBRARY_PATH=$VO_LOFAR_SW_DIR/LTA_2_1/lofar/release/lib:$VO_LOFAR_SW_DIR/LTA_2_1/lofar/release/lib64:$VO_LOFAR_SW_DIR/LTA_2_1/local/release/lib:$VO_LOFAR_SW_DIR/LTA_2_1/local/release/lib64:$LD_LIBRARY_PATH
-#export PYTHONPATH=$VO_LOFAR_SW_DIR/LTA_2_1/lofar/release/lib/python2.7/site-packages:$VO_LOFAR_SW_DIR/LTA_2_1/local/release/lib/python2.7/site-packages:$PYTHONPATH
-export PATH=$VO_LOFAR_SW_DIR/current/lofar/release/bin:$VO_LOFAR_SW_DIR/current/lofar/release/sbin:$VO_LOFAR_SW_DIR/current/local/release/bin:$PATH
-export LD_LIBRARY_PATH=$VO_LOFAR_SW_DIR/current/lofar/release/lib:$VO_LOFAR_SW_DIR/current/lofar/release/lib64:$VO_LOFAR_SW_DIR/current/local/release/lib:$VO_LOFAR_SW_DIR/current/local/release/lib64:$LD_LIBRARY_PATH
-export PYTHONPATH=$VO_LOFAR_SW_DIR/current/lofar/release/lib/python2.7/site-packages:$VO_LOFAR_SW_DIR/current/local/release/lib/python2.7/site-packages:$PYTHONPATH
+export PATH=$SW_DIR/current/lofar/release/bin:$SW_DIR/current/lofar/release/sbin:$SW_DIR/current/local/release/bin:$PATH
+export LD_LIBRARY_PATH=$SW_DIR/current/lofar/release/lib:$SW_DIR/current/lofar/release/lib64:$SW_DIR/current/local/release/lib:$SW_DIR/current/local/release/lib64:$LD_LIBRARY_PATH
+export PYTHONPATH=$SW_DIR/current/lofar/release/lib/python2.7/site-packages:$SW_DIR/current/local/release/lib/python2.7/site-packages:$PYTHONPATH
 
 # NB we can't assume the home dir is shared across all Grid nodes.
 echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
-ln -s $VO_LOFAR_SW_DIR/data ~/
+ln -s test/data ~/
 
 # initialize job arguments
 # - note, obsid is only used to store the data
@@ -265,15 +270,10 @@ echo ""
 echo "execute avg_dmx.py"
 
 echo "parset is" $parset
-if [[ -e "customscript.py" ]]; then
-	echo "Executing custom avg_dmx script"
-	time python customscript.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
-else
-	time python avg_dmx_v2_TS.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
-fi
+time python avg_dmx_v2_TS.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
 
 echo "Done Command: "
-echo "time python ---.py", $name, $avg_freq_step, $avg_time_step, $do_demix, $demix_freq_step, $demix_time_step, $demix_sources, $select_nl
+echo "time python avg_dmx_v2.py", $name, $avg_freq_step, $avg_time_step, $do_demix, $demix_freq_step, $demix_time_step, $demix_sources, $select_nl
 #
 # - step3 finished check contents
 echo "step3 finished, list contents"
