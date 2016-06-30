@@ -53,6 +53,8 @@ done
 }
 
 
+
+
 #--- NEW SD ---
 
 
@@ -144,7 +146,7 @@ cat /proc/cpuinfo | grep "model name"
 # - note, obsid is only used to store the data
 JOBDIR=${PWD}
 STARTSB=${1}
-ENDSB=${2}
+NUMSB=${2}
 SRMFILE=${3}
 
 echo "++++++++++++++++++++++++++++++"
@@ -196,23 +198,23 @@ echo "Starting Data Retrieval"
 echo "---------------------------"
 echo "Get subbands "
 
-#INPUT_FIFO="test"
-#mkfifo ${INPUT_FIFO}
-# Extract input data from input file (fifo) and catch PID
-#tar -Bxf ${INPUT_FIFO} & TAR_PID=$!
-# The untar from fifo has started, so now start download into fifo
-#globus-url-copy gsiftp://dcachepool12.fz-juelich.de:2811/pnfs/fz-juelich.de/data/lofar/ops/projects/lc3_008/342934/L342934_SB000_uv.dppp.MS_31642b30.tar file:///`pwd`/${INPUT_FIFO} && wait $TAR_PID
+
 
 sleep 6
 
+
+sed -n -e '/SB'$STARTSB'/,$p' srm.txt > srm-stripped.txt
+head -n $NUMSB srm-stripped.txt > srm-final.txt
+echo "Final srm"
+cat srm-final.txt
+
 NUMLINES=$(( $(wc -l prefactor/srm.txt |awk '{print $1}' )/10 + 1 )) #WHAT USE IS THIS?
-for block in `seq 1 2`; do 
+
+for block in `seq 1 $(( NUMSB / 10 - 1 ))`; do 
  let init=" ($block - 1) * 10 + 1"
  let fin=" $block * 10"
- ./prefactor/bin/download_num_files.sh $init $fin srm.txt  &
+ ./prefactor/bin/download_num_files.sh $init $fin srm-final.txt  &
 
- #DL_PID=$!
- #cat /proc/$DL_PID/net/dev
 
 sleep 10
  
@@ -273,13 +275,6 @@ du -hs $PWD/*
 dirc=${RUNDIR}
 name=${new_name}
 path=${dirc}/${name}
-avg_freq_step=${AVG_FREQ_STEP}
-avg_time_step=${AVG_TIME_STEP}
-do_demix=${DO_DEMIX}
-demix_freq_step=${DEMIX_FREQ_STEP}
-demix_time_step=${DEMIX_TIME_STEP}
-demix_sources=${DEMIX_SOURCES}
-select_nl=${SELECT_NL}
 
 parset=${PARSET}
 sbn=${SUBBAND_NUM}
@@ -289,10 +284,20 @@ echo "Replacing "$PWD" in the prefactor parset"
 
 sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" prefactor/Pre-Facet-Cal.parset 
 sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" prefactor/pipeline.cfg
-globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy-1.tar file:`pwd`/numpys.tar
-if [[ -e numpys.tar ]]
- then
-   tar -xvf numpys.tar
+
+
+#Check if any files match the target, if so, download the calibration tables matching the calibrator OBSID. If no tables are downloaded, xit with an error message.
+if [[ $( grep " target_input_pattern =" Pre-Facet-Cal.parset |awk '{print $NF}' |xargs find . -name )> 0 ]]
+then
+ $CAL_OBSID=$( grep "cal_input_pattern" Pre-Facet-Cal.parset| grep -v "}" |awk '{print $NF}' | awk -F "*" '{print $1}')
+ echo "Getting solutions from obsid "$CAL_OBSID
+ globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$CAL_OBSID.tar file:`pwd`/numpys.tar
+ if [[ -e numpys.tar ]]
+  then
+    tar -xvf numpys.tar
+ else
+    exit 1
+ fi
 fi
 
 echo ""

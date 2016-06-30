@@ -140,6 +140,8 @@ def setup_dirs():
                         for i, line in enumerate(lines):
                                 if d_vars["OBSID"] in line:
                                         f2.write(line)
+
+
 	num_lines = sum(1 for line in open(d_vars["fadir"]+'/Application/prefactor-sandbox/prefactor/srm.txt'))
 	print("Total number of subbands: "+str(num_lines)+" split into "+str(num_lines/d_vars["numpernode"]+[0,1][num_lines%d_vars["numpernode"]>0])+" tokens")
 
@@ -185,7 +187,7 @@ def setup_dirs():
         	with open(d_vars['fadir']+"/"+dir+"/datasets/"+d_vars['OBSID']+"/setup.cfg","a") as cfgfile:
         	        cfgfile.write("[OBSERVATION]\n")
         	        cfgfile.write("OBSID           = "+d_vars['OBSID']+"\n")
-			cfgfile.write("AVG_FREQ_STEP   = 2 \nAVG_TIME_STEP   = 2\nDO_DEMIX        = False\nDEMIX_FREQ_STEP = 2\nDEMIX_TIME_STEP = 2\nDEMIX_SOURCES   = CasA\nSELECT_NL       = True\n")
+			cfgfile.write("AVG_FREQ_STEP   ="+str(d_vars["numpernode"])+"\nAVG_TIME_STEP   = 2\nDO_DEMIX        = False\nDEMIX_FREQ_STEP = 2\nDEMIX_TIME_STEP = 2\nDEMIX_SOURCES   = CasA\nSELECT_NL       = True\n")
         	        if len(d_vars['parsetfile'])<4:
         	                cfgfile.write('PARSET     = "-"\n')
 
