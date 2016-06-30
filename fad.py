@@ -141,7 +141,7 @@ def parse_arguments(args):
 def setup_dirs():
 
 	print ""
-	print "You're running \033[33m FAD1.0\033[0m Time-Splitting is \033[33m"+["OFF","ON"][d_vars['TSplit']]+"\033[0m"+[" By User Request"," By Default"][d_vars['TSplit']]+"!"
+	print "You're running \033[33m SARA_LRT 1.5\033[0m Time-Splitting is \033[33m"+["OFF","ON"][d_vars['TSplit']]+"\033[0m"+[" By User Request"," By Default"][d_vars['TSplit']]+"!"
 	print ""
 	
 	latest_tar=glob.glob('FAD_*[0-9]*.tar')[-1]
@@ -302,7 +302,7 @@ def start_jdl():
         subprocess.call(["ls","-lat","sandbox/scripts/parsets"])
         #TODO: Change avg_dmx's number of jobs to number of subbands
 	if d_vars['jdl_file']=="": 
-        	dmx_jdl=['avg_dmx_no-TS.jdl','avg_dmx.jdl'][d_vars['TSplit']] #If Tsplit=True (Default), file is avg_dmx.jdl else the other one
+        	dmx_jdl='avg_dmx.jdl'
 	else:
 		dmx_jdl=d_vars['jdl_file']
         shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')
