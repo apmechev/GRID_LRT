@@ -2,11 +2,11 @@
   JobType="Parametric";
   ParameterStart=0;
   ParameterStep=1;
-  Parameters=1;
+  Parameters=50;
 
   Executable = "/bin/sh";
 
-  Arguments = "startpilot.sh spectroscopy_alex apmechev prQn98rQA";
+  Arguments = "startpilot.sh $PICAS_DB $PICAS_USR $PICAS_USR_PWD";
   Stdoutput = "parametricjob.out";
   StdError = "parametricjob.err";
   InputSandbox = {"prefactor-sandbox/picas.tar","prefactor-sandbox/couchdb.tar","prefactor-sandbox/startpilot.sh","prefactor-sandbox/pilot.py","prefactor-sandbox/prefactor.sh","prefactor-sandbox/prefactor.tar"};
