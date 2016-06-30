@@ -204,13 +204,14 @@ sleep 6
 
 
 sed -n -e '/SB'$STARTSB'/,$p' srm.txt > srm-stripped.txt
-head -n $NUMSB srm-stripped.txt > srm-final.txt
+OBSID=$(echo $(head -1 srm-stripped.txt) |grep -Po "L[0-9]*" | head -1 )
+head -n $NUMSB srm-stripped.txt |grep $OBSID > srm-final.txt
 echo "Final srm"
 cat srm-final.txt
 
 NUMLINES=$(( $(wc -l prefactor/srm.txt |awk '{print $1}' )/10 + 1 )) #WHAT USE IS THIS?
 
-for block in `seq 1 $(( NUMSB / 10 - 1 ))`; do 
+for block in `seq 1 $(( NUMSB / 10 ))`; do
  let init=" ($block - 1) * 10 + 1"
  let fin=" $block * 10"
  ./prefactor/bin/download_num_files.sh $init $fin srm-final.txt  &

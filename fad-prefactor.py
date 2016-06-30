@@ -53,11 +53,11 @@ def parse_arguments(args):
 	
 	if ("srm" in args[-2]) and (".parset" in args[-1]):
 		d_vars['srmfile']=sys.argv[-2]
-		d_vars['parset']=sys.argv[-1]
+		d_vars['parsetfile']=sys.argv[-1]
 	
 	elif ("srm" in args[-1]) and (".parset" in args[-2]):
 	        d_vars['srmfile']=args[-1]
-		d_vars['parset']=args[-2]
+		d_vars['parsetfile']=args[-2]
 	
 	else: 
 		print "there may be a typo in your filenames"
@@ -188,8 +188,7 @@ def setup_dirs():
         	        cfgfile.write("[OBSERVATION]\n")
         	        cfgfile.write("OBSID           = "+d_vars['OBSID']+"\n")
 			cfgfile.write("AVG_FREQ_STEP   ="+str(d_vars["numpernode"])+"\nAVG_TIME_STEP   = 2\nDO_DEMIX        = False\nDEMIX_FREQ_STEP = 2\nDEMIX_TIME_STEP = 2\nDEMIX_SOURCES   = CasA\nSELECT_NL       = True\n")
-        	        if len(d_vars['parsetfile'])<4:
-        	                cfgfile.write('PARSET     = "-"\n')
+        	        cfgfile.write('PARSET     = '+d_vars["parsetfile"]+'\n')
 
 	return 
 
@@ -328,6 +327,7 @@ def prepare_sandbox():
 	os.chdir(d_vars['fadir']+"/Application/prefactor-sandbox")
 	try:
                 os.remove("prefactor.tar")
+		os.remove("prefactor/Pre-Facet-Cal.parset")
         except OSError:
                 pass
 	
@@ -344,6 +344,7 @@ def prepare_sandbox():
  
 	sub = subprocess.call(['sed','-i', 's/^SW_DIR=.*/SW_DIR='+d_vars["sw_dir"]+'/g', "prefactor.sh"])
         sub = subprocess.call(['sed','-i', 's/\/current\//\/'+d_vars["sw_ver"]+'\//g', "prefactor.sh"])	
+	shutil.copy("../../../"+d_vars["parsetfile"],"prefactor/Pre-Facet-Cal.parset")
 	print("tarring everything")
 	subprocess.call(["tar","-cf", "prefactor.tar","prefactor/"])	
 
