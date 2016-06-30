@@ -246,9 +246,9 @@ def check_state_and_stage():
 		print "No files found!! State error"
 	for sublist in locs:
 		if 'NEARLINE' in sublist :
-			print "Nearline, add stage-all.py"	
                         stage_all.main('files')
                         print "Staging your file."
+			break
 			
 	locs=state_all.main('files')
 	for sublist in locs:
