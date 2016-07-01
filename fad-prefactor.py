@@ -317,6 +317,41 @@ def start_jdl():
 
         shutil.move('avg_dmx_with_variables.jdl',dmx_jdl)
 
+
+def splitsrms():
+	OBSIDS=[]
+	srmfiles=[]
+	with open(d_vars["srmfile"],'r') as txtfile:
+		lines=txtfile.readlines()
+		for line in lines:
+			obsid='L'+str(re.search("L(.+?)_",line).group(1))
+			if not obsid in OBSIDS:
+				OBSIDS.append(obsid)
+		print "Found "+str(len(OBSIDS))+" different OBSIDS. Splitting into files"
+		for obsid in OBSIDS:
+			print "What should I call the srmfile with OBSID ",obsid," (Default is srm_"+obsid+")"
+			srmfile="srm_"+obsid
+			from termios import tcflush, TCIOFLUSH
+			tcflush(sys.stdin, TCIOFLUSH) #Flush input buffer to stop enter-spammers
+			userfile = raw_input().lower()
+			if userfile != "":
+				srmfile=userfile
+			srmfiles.append(srmfile)
+			with open(srmfile,'w') as file1:
+				[file1.write(x) for x in lines if obsid in x]
+	if len(OBSIDS)>1:
+		print "enter which file to process"
+		for i in range(len(srmfiles)):
+			print(str(i)+" "+srmfiles[i])
+		userchoice = raw_input().lower()
+		if int(userchoice) in range(len(srmfiles)):
+			userchoice=int(userchoice)
+		else:
+			sys.exit()
+		d_vars["srmfile"]=srmfiles[userchoice] 
+
+	return
+
 ##############
 #Prepares the sandbox and zips and uploads to storage
 #This will be pulled by the job on the node
@@ -363,6 +398,7 @@ def prepare_sandbox():
 
 if __name__ == "__main__":
         parse_arguments(sys.argv)
+	splitsrms()
 	setup_dirs()
         prepare_sandbox()
 
