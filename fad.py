@@ -334,9 +334,9 @@ def prepare_sandbox():
 	try:
 	        os.remove("scripts.tar")
                 os.remove("scripts/custom_script.py")
-
 	except OSError:
 	        pass
+	
 	if d_vars['customscript']!="":
 		shutil.copy("../../../"+d_vars['customscript'], "scripts/customscript.py")	
 	if "$" in d_vars["sw_dir"]:
@@ -350,7 +350,7 @@ def prepare_sandbox():
 		sys.exit()
 	## move the appropriate .sh file to master.sh
 	shutil.copy(["master_no_TS.sh","master_with_TS.sh"][d_vars['TSplit']],"master.sh")
- 
+	print "" 
 	sub = subprocess.call(['sed','-i', 's/^SW_DIR=.*/SW_DIR='+d_vars["sw_dir"]+'/g', "master.sh"])
         sub = subprocess.call(['sed','-i', 's/\/current\//\/'+d_vars["sw_ver"]+'\//g', "master.sh"])	
 	print("tarring everything")
