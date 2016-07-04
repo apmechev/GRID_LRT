@@ -319,7 +319,7 @@ def start_jdl():
             file.write(filedata)
 
 
-        subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs',dmx_jdl])
+        subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs'+d_vars["OBSID"],dmx_jdl])
 
         shutil.move('avg_dmx_with_variables.jdl',dmx_jdl)
 
@@ -358,7 +358,7 @@ def prepare_sandbox():
 	print("tarring everything")
 	subprocess.call(["tar","-cf", "scripts.tar","scripts/"])	
 	try:
-		os.remove("scripts/custom_script.py")
+		os.remove("scripts/customscript.py")
 	except OSError:
                 pass
 
