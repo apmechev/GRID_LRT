@@ -27,7 +27,7 @@ import subprocess
 #Dictionary of input variables to make keeping track of values easier
 ###########
 
-d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"$VO_LOFAR_SW_DIR","sw_ver":"current","parsetfile":"-","jdl_file":"","customscript":""}
+d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack","sw_ver":"2.16","parsetfile":"-","jdl_file":"","customscript":""}
 
 
 ############
@@ -349,10 +349,12 @@ def prepare_sandbox():
 		print "directory "+testdir+"/"+d_vars["sw_ver"]+" doesn't exist Exiting"
 		sys.exit()
 	## move the appropriate .sh file to master.sh
-	shutil.copy(["master_no_TS.sh","master_with_TS.sh"][d_vars['TSplit']],"master.sh")
-	print "" 
-	sub = subprocess.call(['sed','-i', 's/^SW_DIR=.*/SW_DIR='+d_vars["sw_dir"]+'/g', "master.sh"])
-        sub = subprocess.call(['sed','-i', 's/\/current\//\/'+d_vars["sw_ver"]+'\//g', "master.sh"])	
+	infile=["master_no_TS.sh","master_with_TS.sh"][d_vars['TSplit']]
+	print "adding "+d_vars["sw_dir"]+"/"+d_vars["sw_ver"]+" to the file" 
+	outfile=open("master.sh","w")
+	sub = subprocess.call(['sed', "s=/cvmfs/softdrive.nl/wjvriend/lofar_stack="+d_vars["sw_dir"]+"=g",infile],stdout=outfile)
+	print ""
+        sub = subprocess.call(['sed',"s/\/current\//\/"+d_vars["sw_ver"]+"\//g", infile],stdout=outfile)	
 	print("tarring everything")
 	subprocess.call(["tar","-cf", "scripts.tar","scripts/"])	
 	try:
@@ -362,7 +364,6 @@ def prepare_sandbox():
 
 	os.chdir("../")
 	subprocess.call(["tar","-cf", "sandbox.tar","sandbox/"])
-	resub = subprocess.call(['sed','-i', 's/\/'+d_vars["sw_ver"]+'\//\/current\//g', "sandbox/master.sh"]) #reverting
 	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox"
         print "uploading sandbox to storage for pull by nodes"
 
@@ -402,6 +403,7 @@ if __name__ == "__main__":
 
 	submit_to_picas()
 	start_jdl()
+	print("https://goo.gl/CtHlbP")
 	sys.exit()
 
 
