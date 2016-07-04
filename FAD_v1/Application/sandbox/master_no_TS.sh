@@ -80,23 +80,32 @@ cat /proc/cpuinfo | grep "model name"
 
 echo ""
 
-SW_DIR=$VO_LOFAR_SW_DIR
-echo "Setting up the LOFAR environment from folder "$SW_DIR
-LOFARROOT=${SW_DIR}/current/lofar/release
+SW_BASE_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack/
+#LOFARROOT=${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release
+LOFARROOT=${SW_BASE_DIR}/2.16/lofar/release
 
 echo "source lofarinit.sh"
 #. ${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release/lofarinit.sh || exit 1
-. ${SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
+#. ${SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
+. $SW_BASE_DIR/2.16/init_env_release.sh
+
+# NEW NB we can't assume the home dir is shared across all Grid nodes.
+echo ""
+echo "LOFARDATAROOT: ", ${LOFARDATAROOT}
+echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
+
 
 echo "correct PATH and LD_LIBRARY_PATH for incomplete settings in lofarinit.sh"
 # initialize the Lofar LTA environment; release LTA_2_1
-export PATH=$SW_DIR/current/lofar/release/bin:$SW_DIR/current/lofar/release/sbin:$SW_DIR/current/local/release/bin:$PATH
-export LD_LIBRARY_PATH=$SW_DIR/current/lofar/release/lib:$SW_DIR/current/lofar/release/lib64:$SW_DIR/current/local/release/lib:$SW_DIR/current/local/release/lib64:$LD_LIBRARY_PATH
-export PYTHONPATH=$SW_DIR/current/lofar/release/lib/python2.7/site-packages:$SW_DIR/current/local/release/lib/python2.7/site-packages:$PYTHONPATH
+#export PATH=$SW_DIR/current/lofar/release/bin:$SW_DIR/current/lofar/release/sbin:$SW_DIR/current/local/release/bin:$PATH
+#export LD_LIBRARY_PATH=$SW_DIR/current/lofar/release/lib:$SW_DIR/current/lofar/release/lib64:$SW_DIR/current/local/release/lib:$SW_DIR/current/local/release/lib64:$LD_LIBRARY_PATH
+#export PYTHONPATH=$SW_DIR/current/lofar/release/lib/python2.7/site-packages:$SW_DIR/current/local/release/lib/python2.7/site-packages:$PYTHONPATH
 
 # NB we can't assume the home dir is shared across all Grid nodes.
-echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
+#echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
 ln -s $VO_LOFAR_SW_DIR/data ~/
+
+
 
 # initialize job arguments
 # - note, obsid is only used to store the data
