@@ -83,18 +83,18 @@ echo "Setting up the LOFAR environment; release current:"
 
 SW_BASE_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack/
 #LOFARROOT=${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release
-LOFARROOT=${SW_BASE_DIR}/current/lofar/release
+LOFARROOT=${SW_BASE_DIR}/2.16/current/lofar/release
 
 echo "source lofarinit.sh"
 #. ${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release/lofarinit.sh || exit 1
 #. ${SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
-. $SW_BASE_DIR/current/init_env_release.sh
+. $SW_BASE_DIR/2.16/init_env_release.sh
 
 # NEW NB we can't assume the home dir is shared across all Grid nodes.
 echo ""
 echo "LOFARDATAROOT: ", ${LOFARDATAROOT}
 echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
-ln -s ${LOFARDATAROOT} ~/
+
 
 echo "correct PATH and LD_LIBRARY_PATH for incomplete settings in lofarinit.sh"
 # initialize the Lofar LTA environment; release LTA_2_1
