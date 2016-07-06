@@ -394,7 +394,7 @@ def prepare_sandbox():
 	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox"
         print "uploading sandbox to storage for pull by nodes"
 
-	subprocess.call(["uberftp", "-rm",sandbox_base_dir+"/prefactor-sandbox_"+os.environ["PICAS_USR"]+"_"+d_vars["OBSID"]+".tar"])
+	subprocess.call(["uberftp", "-rm", sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+d_vars["OBSID"]+".tar"])
 	subprocess.call(['globus-url-copy', "file:"+os.environ["PWD"]+"/"+d_vars['fadir']+"/Application/prefactor-sandbox.tar",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+d_vars["OBSID"]+".tar"])	
 
         os.chdir("../../")
@@ -434,17 +434,3 @@ if __name__ == "__main__":
 	sys.exit()
 
 
-
-###########
-#Clean Directories and old parset
-###########
-
-def replace_in_file(filename="",istring="",ostring=""):
-	filedata=None
-	with open(filename,'r') as file:
-        	filedata = file.read()
-	filedata = filedata.replace(istring,ostring)
-	os.remove(filename)
-        with open(filename,'w') as file:
-        	file.write(filedata)
-	

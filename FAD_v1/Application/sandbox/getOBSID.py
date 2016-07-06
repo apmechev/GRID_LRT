@@ -15,6 +15,9 @@
 import sys
 import time
 import couchdb
+import subprocess
+import shutil
+import glob
 
 #picas imports
 from picas.actors import RunActor
@@ -31,7 +34,18 @@ class ExampleActor(RunActor):
 
     def process_token(self, key, token):
 	# Print token information
-	print str(token['OBSID'])
+	location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_"+str(sys.argv[2])+"_"+str(token['OBSID'])+".tar"
+	print "Getting the sanbox from "+location
+	subprocess.call(["globus-url-copy", location, "sandbox.tar"])
+	print "Untarring Sandbox" 
+	subprocess.call(["tar", "-xf", "sandbox.tar","-C",".","--strip-components=1"])
+	for exefile in glob.glob("*.sh"):
+		subprocess.call(["chmod","u+x",exefile])
+	
+	print "Running the pilot that came with the sandbox!"
+	from  pilot import ExampleActor as Actor2
+	newactor= Actor2(self.iterator,self.modifier)
+	newactor.process_token(key,token)
 	return
 
  	   
