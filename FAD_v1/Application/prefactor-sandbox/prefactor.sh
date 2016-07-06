@@ -90,11 +90,11 @@ echo "Setting up the LOFAR environment; setting release"
 
 LOF_SW_DIR=$VO_LOFAR_SW_DIR
 #LOFARROOT=${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release
-LOFARROOT=${SW_DIR}/current/lofar/release
+LOFARROOT=${LOF_SW_DIR}/current/lofar/release
 
 echo "source lofarinit.sh"
 #. ${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release/lofarinit.sh || exit 1
-. ${SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
+. ${LOF_SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
 
 echo "correct PATH and LD_LIBRARY_PATH for incomplete settings in lofarinit.sh"
 # initialize the Lofar LTA environment; release LTA_2_1
