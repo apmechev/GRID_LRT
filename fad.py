@@ -414,7 +414,7 @@ if __name__ == "__main__":
 	else:
 	   sys.exit()
 
-	submit_to_picas()
+	submit_to_picas()	
 	start_jdl()
 	print("https://goo.gl/CtHlbP")
 	sys.exit()

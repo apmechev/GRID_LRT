@@ -15,7 +15,8 @@
 import sys
 import time
 import couchdb
-
+import subprocess
+import shutil
 #picas imports
 from picas.actors import RunActor
 from picas.clients import CouchClient
@@ -31,7 +32,17 @@ class ExampleActor(RunActor):
 
     def process_token(self, key, token):
 	# Print token information
-	print str(token['OBSID'])
+	location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_"+str(sys.argv[2])+"_"+str(token['OBSID'])+".tar"
+	print location
+	subprocess.call(["globus-url-copy", location, "sandbox.tar"])
+	subprocess.call(["tar", "-xf", "sandbox.tar","-C",".","--strip-components=1"])
+	subprocess.call(["chmod","u+x","master.sh"])
+        subprocess.call(["chmod","u+x","prefactor.sh"])
+
+	#This will process the token from the DOWNLOADED pilot.py (The timelines diverge at this point)
+	from  pilot import ExampleActor as Actor2
+	newactor= Actor2(self.iterator,self.modifier)
+	newactor.process_token(key,token)
 	return
 
  	   
