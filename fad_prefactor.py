@@ -27,7 +27,20 @@ import subprocess
 #Dictionary of input variables to make keeping track of values easier
 ###########
 
-d_vars = {"srmfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"$VO_LOFAR_SW_DIR","sw_ver":"current","parsetfile":"-","jdl_file":"avg_dmx_prefactor.jdl","numpernode":10}
+d_vars = {"srmfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"$VO_LOFAR_SW_DIR","sw_ver":"current","parsetfile":"-","jdl_file":"remote-prefactor.jdl","numpernode":10}
+
+
+###################
+#Helper function to do a replace in file
+##################
+def replace_in_file(filename="",istring="",ostring=""):
+        filedata=None
+        with open(filename,'r') as file:
+                filedata = file.read()
+        filedata = filedata.replace(istring,ostring)
+        os.remove(filename)
+        with open(filename,'w') as file:
+                file.write(filedata)
 
 
 ############
@@ -37,7 +50,7 @@ d_vars = {"srmfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw
 def parse_arguments(args):
 	if len(args)<3 or ("-h" in args[:-2] or ("--help" in args[:-2])):
 		print ""
-		print "You need to input the SRM file and the master config file"
+		print "You need to input the SRM file and the parset file"
 		print "ex.  python fad-master.py [OPTIONS] srm_L229587.txt master_setup.cfg"
 		print "optional flags ( -r, -j, -s, -noTS, -d, -v) come before srm and config file "
 		print ""
@@ -298,22 +311,14 @@ def start_jdl():
 	else:
 		dmx_jdl=d_vars['jdl_file']
         shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')
-        filedata=None
-        with open(dmx_jdl,'r') as file:
-            filedata = file.read()
-        filedata = filedata.replace('$PICAS_DB $PICAS_USR $PICAS_USR_PWD', os.environ["PICAS_DB"]+" "+os.environ["PICAS_USR"]+" "+os.environ["PICAS_USR_PWD"])
-
-
-        os.remove(dmx_jdl)
+	replace_in_file(dmx_jdl,'$PICAS_DB $PICAS_USR $PICAS_USR_PWD', os.environ["PICAS_DB"]+" "+os.environ["PICAS_USR"]+" "+os.environ["PICAS_USR_PWD"])
 
         num_lines = sum(1 for line in open('prefactor-sandbox/prefactor/srm.txt'))
         numprocess= num_lines/d_vars["numpernode"]+[0,1][num_lines%d_vars["numpernode"]>0]
-        filedata=filedata.replace("Parameters=50","Parameters="+str(numprocess))
-        with open(dmx_jdl,'w+') as file:
-            file.write(filedata)
+        replace_in_file(dmx_jdl,"Parameters=50","Parameters="+str(numprocess))
 
 
-        subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs',dmx_jdl])
+        subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs'+d_vars["OBSID"],dmx_jdl])
 
         shutil.move('avg_dmx_with_variables.jdl',dmx_jdl)
 
@@ -376,9 +381,9 @@ def prepare_sandbox():
 		print "directory "+testdir+"/"+d_vars["sw_ver"]+" doesn't exist Exiting"
 		sys.exit()
 	## move the appropriate .sh file to master.sh
- 
-	sub = subprocess.call(['sed','-i', 's/^SW_DIR=.*/SW_DIR='+d_vars["sw_dir"]+'/g', "prefactor.sh"])
-        sub = subprocess.call(['sed','-i', 's/\/current\//\/'+d_vars["sw_ver"]+'\//g', "prefactor.sh"])	
+	replace_in_file("prefactor.sh","SW_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack","SW_DIR="+d_vars["sw_dir"]) 
+	replace_in_file("prefactor.sh","2.16",d_vars["sw_ver"])
+
 	shutil.copy("../../../"+d_vars["parsetfile"],"prefactor/Pre-Facet-Cal.parset")
 	print("tarring everything")
 	subprocess.call(["tar","-cf", "prefactor.tar","prefactor/"])	
@@ -389,8 +394,8 @@ def prepare_sandbox():
 	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox"
         print "uploading sandbox to storage for pull by nodes"
 
-	subprocess.call(["uberftp", "-rm",sandbox_base_dir+"/prefactor-sandbox_"+os.environ["PICAS_USR"]+".tar"])
-	subprocess.call(['globus-url-copy', "file:"+os.environ["PWD"]+"/"+d_vars['fadir']+"/Application/prefactor-sandbox.tar",sandbox_base_dir+"/prefactor-sandbox_"+os.environ["PICAS_USR"]+".tar"])	
+	subprocess.call(["uberftp", "-rm",sandbox_base_dir+"/prefactor-sandbox_"+os.environ["PICAS_USR"]+"_"+d_vars["OBSID"]+".tar"])
+	subprocess.call(['globus-url-copy', "file:"+os.environ["PWD"]+"/"+d_vars['fadir']+"/Application/prefactor-sandbox.tar",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+d_vars["OBSID"]+".tar"])	
 
         os.chdir("../../")
 	return
@@ -434,13 +439,12 @@ if __name__ == "__main__":
 #Clean Directories and old parset
 ###########
 
-
-devnl=open(os.devnull, 'w')
-greproc=subprocess.Popen(['glite-wms-job-status','-i',"FAD_v1/Application/jobIDs"],stdout=subprocess.PIPE,stderr=devnl)
-grep=greproc.communicate()[0]
-greproc.wait()
-if (grep.find("    Current Status:     Running")>1) or (grep.find("    Current Status:     Scheduled")>1):
-	print grep
-	print "\033[31mYour Job Is Still Running.\033[0m Please wait until it's set as 'Completed'. This should happen <15 mins after all tokens complete\nThis program will continue when all jobs are set to completed so that the correct parameters are sent to the node."
-	sys.exit()
-
+def replace_in_file(filename="",istring="",ostring=""):
+	filedata=None
+	with open(filename,'r') as file:
+        	filedata = file.read()
+	filedata = filedata.replace(istring,ostring)
+	os.remove(filename)
+        with open(filename,'w') as file:
+        	file.write(filedata)
+	

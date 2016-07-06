@@ -29,6 +29,18 @@ import subprocess
 
 d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack","sw_ver":"2.16","parsetfile":"-","jdl_file":"","customscript":""}
 
+###################
+#Helper function to do a replace in file
+##################
+def replace_in_file(filename="",istring="",ostring=""):
+        filedata=None
+        with open(filename,'r') as file:
+                filedata = file.read()
+        filedata = filedata.replace(istring,ostring)
+        os.remove(filename)
+        with open(filename,'w') as file:
+                file.write(filedata)
+
 
 ############
 # Some checks on input arguments
@@ -302,7 +314,8 @@ def start_jdl():
         subprocess.call(["ls","-lat","sandbox/scripts/parsets"])
         #TODO: Change avg_dmx's number of jobs to number of subbands
 	if d_vars['jdl_file']=="": 
-        	dmx_jdl='avg_dmx.jdl'
+        	dmx_jdl='remote.jdl'
+		print("Running the (default) remote sandbox for compatibility with other pipelines")
 	else:
 		dmx_jdl=d_vars['jdl_file']
         shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')
@@ -333,6 +346,7 @@ def prepare_sandbox():
 	os.chdir(d_vars['fadir']+"/Application/sandbox")
 	try:
 	        os.remove("scripts.tar")
+		os.remove("master.sh")
                 os.remove("scripts/custom_script.py")
 	except OSError:
 	        pass
@@ -349,15 +363,14 @@ def prepare_sandbox():
 		print "directory "+testdir+"/"+d_vars["sw_ver"]+" doesn't exist Exiting"
 		sys.exit()
 	## move the appropriate .sh file to master.sh
-	infile=["master_no_TS.sh","master_with_TS.sh"][d_vars['TSplit']]
+	shutil.copy(["master_no_TS.sh","master_with_TS.sh"][d_vars['TSplit']],"master.sh")
 	print "adding "+d_vars["sw_dir"]+"/"+d_vars["sw_ver"]+" to the file" 
-	outfile=open("master.sh","w")
-	sub = subprocess.call(['sed', "s=/cvmfs/softdrive.nl/wjvriend/lofar_stack="+d_vars["sw_dir"]+"=g",infile],stdout=outfile)
-	print ""
-        sub = subprocess.call(['sed',"s/\/current\//\/"+d_vars["sw_ver"]+"\//g", infile],stdout=outfile)	
+        replace_in_file("master.sh","SW_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack","SW_DIR="+d_vars["sw_dir"])
+        replace_in_file("master.sh","2.16",d_vars["sw_ver"])
+
 	print("tarring everything")
 	subprocess.call(["tar","-cf", "scripts.tar","scripts/"])	
-	try:
+	try:	
 		os.remove("scripts/customscript.py")
 	except OSError:
                 pass
@@ -367,8 +380,8 @@ def prepare_sandbox():
 	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox"
         print "uploading sandbox to storage for pull by nodes"
 
-	subprocess.call(["uberftp", "-rm",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+".tar"])
-	subprocess.call(['globus-url-copy', "file:"+os.environ["PWD"]+"/"+d_vars['fadir']+"/Application/sandbox.tar",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+".tar"])	
+	subprocess.call(["uberftp", "-rm",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+d_vars["OBSID"]+".tar"])
+	subprocess.call(['globus-url-copy', "file:"+os.environ["PWD"]+"/"+d_vars['fadir']+"/Application/sandbox.tar",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+d_vars["OBSID"]+".tar"])	
 
         os.chdir("../../")
 	return
@@ -411,14 +424,3 @@ if __name__ == "__main__":
 ###########
 #Clean Directories and old parset
 ###########
-
-
-devnl=open(os.devnull, 'w')
-greproc=subprocess.Popen(['glite-wms-job-status','-i',"FAD_v1/Application/jobIDs"],stdout=subprocess.PIPE,stderr=devnl)
-grep=greproc.communicate()[0]
-greproc.wait()
-if (grep.find("    Current Status:     Running")>1) or (grep.find("    Current Status:     Scheduled")>1):
-	print grep
-	print "\033[31mYour Job Is Still Running.\033[0m Please wait until it's set as 'Completed'. This should happen <15 mins after all tokens complete\nThis program will continue when all jobs are set to completed so that the correct parameters are sent to the node."
-	sys.exit()
-

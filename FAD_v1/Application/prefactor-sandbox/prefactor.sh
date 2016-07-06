@@ -71,13 +71,13 @@ echo "START LOFAR FROM SOFTDRIVE"
 echo "Setting up the LOFAR environment; setting release"
 
 #LOFAR SOFTWARE SOFTDRIVE VERSION
-# 2.16
+# current
 #
-#USR_LOFAR_VERSION=2.16
+#USR_LOFAR_VERSION=current
 #echo "USR_LOFAR_VERSION", ${USR_LOFAR_VERSION}
 
 # TEST
-#VO_LOFAR_SW_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack/
+#VO_LOFAR_SW_DIR=$VO_LOFAR_SW_DIR/
 
 #LOFARROOT=${VO_LOFAR_SW_DIR}/${USR_LOFAR_VERSION}/lofar/release
 #echo "LOFARROOT: ", ${LOFARROOT}
@@ -88,7 +88,7 @@ echo "Setting up the LOFAR environment; setting release"
 #. /cvmfs/softdrive.nl/wjvriend/lofar_stack/current/init_env_release.sh 
 
 
-SW_DIR=$VO_LOFAR_SW_DIR
+LOF_SW_DIR=$VO_LOFAR_SW_DIR
 #LOFARROOT=${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release
 LOFARROOT=${SW_DIR}/current/lofar/release
 
