@@ -12,9 +12,14 @@
 # ===================================================================== #
 
 set -x
+tar -xf picas.tar
+tar -xf couchdb.tar
 
-globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/prefactor_sandbox_$1.tar file:`pwd`/sandbox_$1.tar
-tar -xf sandbox_$1.tar
+OBSID=$(python getOBSID.py $1 $2 $3 |tail -1)
+echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_$1_$OBSID.tar"
+
+globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_$1_$OBSID.tar file:`pwd`/sandbox.tar
+tar -xf sandbox.tar
 
 mv prefactor-sandbox/* . 
 rm -rf prefactor-sandbox*.tar
