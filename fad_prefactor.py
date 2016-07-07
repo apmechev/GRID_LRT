@@ -27,7 +27,7 @@ import subprocess
 #Dictionary of input variables to make keeping track of values easier
 ###########
 
-d_vars = {"srmfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"$VO_LOFAR_SW_DIR","sw_ver":"current","parsetfile":"-","jdl_file":"remote-prefactor.jdl","numpernode":10}
+d_vars = {"srmfile":"", "fadir":".", "resuberr":False, "TSplit":True, "OBSID":"", "sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack/", "sw_ver":"2.16", "parsetfile":"-", "jdl_file":"remote-prefactor.jdl", "numpernode":10}
 
 
 ###################
@@ -315,8 +315,9 @@ def start_jdl():
 
         num_lines = sum(1 for line in open('prefactor-sandbox/prefactor/srm.txt'))
         numprocess= num_lines/d_vars["numpernode"]+[0,1][num_lines%d_vars["numpernode"]>0]
+	print numprocess
         replace_in_file(dmx_jdl,"Parameters=50","Parameters="+str(numprocess))
-
+	replace_in_file(dmx_jdl,"ParameterStep=50","ParameterStep="+str(numprocess))
 
         subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs'+d_vars["OBSID"],dmx_jdl])
 
@@ -390,7 +391,6 @@ def prepare_sandbox():
 
 	os.chdir("../")
 	subprocess.call(["tar","-cf", "prefactor-sandbox.tar","prefactor-sandbox/"])
-	resub = subprocess.call(['sed','-i', 's/\/'+d_vars["sw_ver"]+'\//\/current\//g', "prefactor-sandbox/prefactor.sh"]) #reverting
 	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox"
         print "uploading sandbox to storage for pull by nodes"
 

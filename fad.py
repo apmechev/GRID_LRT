@@ -116,8 +116,8 @@ def parse_arguments(args):
                 print "Using jdl_file="+args[idxv+1]
                 d_vars['jdl_file']=args[idxv+1]
 
-	
-	if d_vars['srmfile']== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other filenames
+	#This block grabs the obsid from the file's first line. This will ignore other Obsids	
+	if d_vars['srmfile']== 'srm.txt': #If filename is just srm.txt 
 		with open(d_vars['srmfile'],'r') as f:
 			line=f.readline()
 			d_vars['OBSID']='L'+str(re.search("L(.+?)_",line).group(1))
@@ -125,6 +125,8 @@ def parse_arguments(args):
 		shutil.copyfile('srm.txt','srm_'+obs_name+'.txt')
 		d_vars['srmfile']='srm_'+d_vars['OBSID']+'.txt'
 	d_vars['parsetfile']=""
+
+	##Loads the parsetfile from the cfg file and grabs the OBSID from the SRMfile (MAYBE obsoletes above block)
 	with open(d_vars['cfgfile'],'r') as readparset:
 		for line in readparset:
 			if "PARSET" in line:
@@ -149,6 +151,8 @@ def parse_arguments(args):
 	
 ###########
 #re-extracts the FAD tarfile if needed and sets up fad-dir
+#This function also cleans up the dataset directory in Staging and Tokens and removes the stagefile. 
+#Cleans the parsets directory in the sandbox in case a custom parset is injected here. 
 ###########
 def setup_dirs():
 
@@ -214,6 +218,10 @@ def setup_dirs():
 ####################
 #Check state of files, if NEARLINE stage them
 #If they're staged here, check if ONLINE_AND_NEARLINE and if not, abort
+#The  state_all and stage_all files will get the file location automatically 
+#** (Actually poznan is a fallthrough because 
+#** once the link is stripped, there's no cue 
+#** left in the filename)
 ####################
 def check_state_and_stage():
 
@@ -365,7 +373,7 @@ def prepare_sandbox():
 	## move the appropriate .sh file to master.sh
 	shutil.copy(["master_no_TS.sh","master_with_TS.sh"][d_vars['TSplit']],"master.sh")
 	print "adding "+d_vars["sw_dir"]+"/"+d_vars["sw_ver"]+" to the file" 
-        replace_in_file("master.sh","SW_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack","SW_DIR="+d_vars["sw_dir"])
+        replace_in_file("master.sh","SW_BASE_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack","SW_BASE_DIR="+d_vars["sw_dir"])
         replace_in_file("master.sh","2.16",d_vars["sw_ver"])
 
 	print("tarring everything")
