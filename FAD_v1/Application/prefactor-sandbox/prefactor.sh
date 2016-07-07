@@ -85,22 +85,22 @@ echo "Setting up the LOFAR environment; setting release"
 
 # NEW INIT VIA init_env_release.sh
 #echo "source init_env_release.sh" || exit 1
-#. /cvmfs/softdrive.nl/wjvriend/lofar_stack/current/init_env_release.sh 
+. /cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/init_env_release.sh 
 
 
-LOF_SW_DIR=$VO_LOFAR_SW_DIR
+#LOF_SW_DIR=$VO_LOFAR_SW_DIR
 #LOFARROOT=${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release
-LOFARROOT=${LOF_SW_DIR}/current/lofar/release
+#LOFARROOT=${LOF_SW_DIR}/current/lofar/release
 
 echo "source lofarinit.sh"
 #. ${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release/lofarinit.sh || exit 1
-. ${LOF_SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
+#. ${LOF_SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
 
 echo "correct PATH and LD_LIBRARY_PATH for incomplete settings in lofarinit.sh"
 # initialize the Lofar LTA environment; release LTA_2_1
-export PATH=$SW_DIR/current/lofar/release/bin:$SW_DIR/current/lofar/release/sbin:$SW_DIR/current/local/release/bin:$PATH
-export LD_LIBRARY_PATH=$SW_DIR/current/lofar/release/lib:$SW_DIR/current/lofar/release/lib64:$SW_DIR/current/local/release/lib:$SW_DIR/current/local/release/lib64:$LD_LIBRARY_PATH
-export PYTHONPATH=$SW_DIR/current/lofar/release/lib/python2.7/site-packages:$SW_DIR/current/local/release/lib/python2.7/site-packages:$PYTHONPATH
+#export PATH=$SW_DIR/current/lofar/release/bin:$SW_DIR/current/lofar/release/sbin:$SW_DIR/current/local/release/bin:$PATH
+#export LD_LIBRARY_PATH=$SW_DIR/current/lofar/release/lib:$SW_DIR/current/lofar/release/lib64:$SW_DIR/current/local/release/lib:$SW_DIR/current/local/release/lib64:$LD_LIBRARY_PATH
+#export PYTHONPATH=$SW_DIR/current/lofar/release/lib/python2.7/site-packages:$SW_DIR/current/local/release/lib/python2.7/site-packages:$PYTHONPATH
 
 
 
@@ -111,8 +111,8 @@ echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
 ln -s ${LOFARDATAROOT} ~/
 
 #losoto path
-echo "Exporting LoSoTo path"
-export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/current/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:/cvmfs/softdrive.nl/wjvriend/lofar_stack/current/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
+#echo "Exporting LoSoTo path"
+#export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/current/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:/cvmfs/softdrive.nl/wjvriend/lofar_stack/current/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
 
 
 ##set -x
@@ -365,7 +365,7 @@ du -hs instruments.tar
 OBSID=$(echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 echo "copying the instrument tables into <storage>/spectroscopy/prefactor/instr_"$OBSID.tar
 #globus-url-copy file:`pwd`/instruments.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/instr_$OBSID.tar
-globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$OBSID.tar
+globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$OBSID_$STARTSB.tar
 # Exit loop on non-zero exit status:
 if [[ "$?" != "0" ]]; then
    echo "Problem copying final files to the Grid. Clean up and Exit now..."
