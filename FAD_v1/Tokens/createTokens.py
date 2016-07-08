@@ -18,7 +18,7 @@ if not 'couchdb' in sys.modules:
         import couchdb
 
 
-def loadTokens(db):
+def loadTokens(db,token_type):
    OBSID = sys.argv[1]
    tokens = []
 
@@ -47,7 +47,7 @@ def loadTokens(db):
          token = {
 
             '_id': 'token_' + OBSID + '_' + str(subband_num)+"v1.0",
-            'type': 'token',
+            'type': token_type,
 	    'OBSID': config.get('OBSERVATION','OBSID'),
             'SURL_SUBBAND': SURL_SB,
             'AVG_FREQ_STEP': config.get('OBSERVATION','AVG_FREQ_STEP'),
@@ -81,4 +81,9 @@ if __name__ == '__main__':
    #Create a connection to the server
    db = get_db()
    #Load the tokens to the database
-   loadTokens(db)
+   token_type='token'
+   try:
+        token_type=sys.argv[5]
+   except IndexError:
+	token_type='generic_token'
+   loadTokens(db,token_type)
