@@ -12,22 +12,20 @@
 # ===================================================================== #
 
 set -x
-
-globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_$1.tar file:`pwd`/sandbox_$1.tar
-tar -xf sandbox_$1.tar
-
-mv sandbox/* . 
-rm -rf sandbox*.tar
-rm -rf sandbox/
 tar -xf picas.tar
 tar -xf couchdb.tar
 
-# Set permissions for the master script
-chmod u+x master*.sh
+python getOBSID.py $1 $2 $3 
+echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_$2_$OBSID.tar"
 
+
+
+
+
+uberftp -rm gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_$1_$OBSID.tar
 ls -l
 
 # Start the pilot jobs by contacting PiCaS tokens
 
-python pilot.py $1 $2 $3 > pilot.log
+
 

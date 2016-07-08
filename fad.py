@@ -27,7 +27,19 @@ import subprocess
 #Dictionary of input variables to make keeping track of values easier
 ###########
 
-d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"$VO_LOFAR_SW_DIR","sw_ver":"current","parsetfile":"-","jdl_file":"","customscript":""}
+d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack","sw_ver":"2.16","parsetfile":"-","jdl_file":"","customscript":""}
+
+###################
+#Helper function to do a replace in file
+##################
+def replace_in_file(filename="",istring="",ostring=""):
+        filedata=None
+        with open(filename,'r') as file:
+                filedata = file.read()
+        filedata = filedata.replace(istring,ostring)
+        os.remove(filename)
+        with open(filename,'w') as file:
+                file.write(filedata)
 
 
 ############
@@ -104,8 +116,8 @@ def parse_arguments(args):
                 print "Using jdl_file="+args[idxv+1]
                 d_vars['jdl_file']=args[idxv+1]
 
-	
-	if d_vars['srmfile']== 'srm.txt': #If filename is just srm.txt TODO: Maybe catch other filenames
+	#This block grabs the obsid from the file's first line. This will ignore other Obsids	
+	if d_vars['srmfile']== 'srm.txt': #If filename is just srm.txt 
 		with open(d_vars['srmfile'],'r') as f:
 			line=f.readline()
 			d_vars['OBSID']='L'+str(re.search("L(.+?)_",line).group(1))
@@ -113,6 +125,8 @@ def parse_arguments(args):
 		shutil.copyfile('srm.txt','srm_'+obs_name+'.txt')
 		d_vars['srmfile']='srm_'+d_vars['OBSID']+'.txt'
 	d_vars['parsetfile']=""
+
+	##Loads the parsetfile from the cfg file and grabs the OBSID from the SRMfile (MAYBE obsoletes above block)
 	with open(d_vars['cfgfile'],'r') as readparset:
 		for line in readparset:
 			if "PARSET" in line:
@@ -137,11 +151,13 @@ def parse_arguments(args):
 	
 ###########
 #re-extracts the FAD tarfile if needed and sets up fad-dir
+#This function also cleans up the dataset directory in Staging and Tokens and removes the stagefile. 
+#Cleans the parsets directory in the sandbox in case a custom parset is injected here. 
 ###########
 def setup_dirs():
 
 	print ""
-	print "You're running \033[33m FAD1.0\033[0m Time-Splitting is \033[33m"+["OFF","ON"][d_vars['TSplit']]+"\033[0m"+[" By User Request"," By Default"][d_vars['TSplit']]+"!"
+	print "You're running \033[33m SARA_LRT 1.5\033[0m Time-Splitting is \033[33m"+["OFF","ON"][d_vars['TSplit']]+"\033[0m"+[" By User Request"," By Default"][d_vars['TSplit']]+"!"
 	print ""
 	
 	latest_tar=glob.glob('FAD_*[0-9]*.tar')[-1]
@@ -202,6 +218,10 @@ def setup_dirs():
 ####################
 #Check state of files, if NEARLINE stage them
 #If they're staged here, check if ONLINE_AND_NEARLINE and if not, abort
+#The  state_all and stage_all files will get the file location automatically 
+#** (Actually poznan is a fallthrough because 
+#** once the link is stripped, there's no cue 
+#** left in the filename)
 ####################
 def check_state_and_stage():
 
@@ -239,58 +259,24 @@ def check_state_and_stage():
 	sys.path.append(os.path.abspath("."))
 	shutil.copy(d_vars['OBSID']+"_files","files")
 	
-	
-	#Maybe check if grid storage is online??
-	if fileloc=='s':
-	        import state
-	        locs=state.main('files')
-	        if len(locs)==0:
-	                print "No files found!! State error"
-	                sys.exit()
-	        for sublist in locs:
-	                if 'NEARLINE' in sublist :
-	                        os.system("python stage.py")
-	                        print "Staging your file."
-	        ##TODO Would be nice not to check this twice if staged
-	        locs=state.main('files')
-	        for sublist in locs:
-	                if 'NEARLINE' in sublist :
-	                        print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-	                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-	                        print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m"
-	                        sys.exit()
-	
-	elif fileloc=='j':
-	        import state_fzj
-	        locs=state_fzj.main('files')
-	        for subs in locs:
-	                if 'NEARLINE' in subs :
-	                        os.system("python stage_fzj.py")
-	                        print "Staging your file"
-	
-	        locs=state_fzj.main('files')
-	        for subs in locs:
-	                if 'NEARLINE' in subs :
-	                        print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-	                        print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-	                        print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
-	                        sys.exit()
-        elif fileloc=='p':
-                import state_psnc
-                locs=state_psnc.main('files')
-                for subs in locs:
-                        if 'NEARLINE' in subs :
-                                os.system("python stage_psnc.py")
-                                print "Staging your file"
-
-                locs=state_psnc.main('files')
-                for subs in locs:
-                        if 'NEARLINE' in subs :
-                                print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-                                print "I've staged the file but it's not ONLINE yet. I'll exit so the tokens don't crash"
-                                print "+=+=+=+=+=+=+=+=+=+=+=+=+=+=\033[0m"
-                                sys.exit()
-                                                                                                            
+	import state_all
+	import stage_all
+	locs=state_all.main('files')
+	if len(locs)==0:
+		print "No files found!! State error"
+	for sublist in locs:
+		if 'NEARLINE' in sublist :
+                        stage_all.main('files')
+                        print "Staging your file."
+			break
+			
+	locs=state_all.main('files')
+	for sublist in locs:
+               if 'NEARLINE' in sublist :
+                               print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+                               print "I've requested staging but srms are not ONLINE yet. I'll exit so the tokens don't crash. Re-run in a few (or tens of) minutes"
+                               print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m"
+                               sys.exit()
 	print ""
 	os.chdir("../../")
 	#os.chdir(d_vars['fadir']+"/Tokens/")
@@ -336,7 +322,8 @@ def start_jdl():
         subprocess.call(["ls","-lat","sandbox/scripts/parsets"])
         #TODO: Change avg_dmx's number of jobs to number of subbands
 	if d_vars['jdl_file']=="": 
-        	dmx_jdl=['avg_dmx_no-TS.jdl','avg_dmx.jdl'][d_vars['TSplit']] #If Tsplit=True (Default), file is avg_dmx.jdl else the other one
+        	dmx_jdl='remote.jdl'
+		print("Running the (default) remote sandbox for compatibility with other pipelines")
 	else:
 		dmx_jdl=d_vars['jdl_file']
         shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')
@@ -353,7 +340,7 @@ def start_jdl():
             file.write(filedata)
 
 
-        subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs',dmx_jdl])
+        subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs'+d_vars["OBSID"],dmx_jdl])
 
         shutil.move('avg_dmx_with_variables.jdl',dmx_jdl)
 
@@ -367,10 +354,11 @@ def prepare_sandbox():
 	os.chdir(d_vars['fadir']+"/Application/sandbox")
 	try:
 	        os.remove("scripts.tar")
+		os.remove("master.sh")
                 os.remove("scripts/custom_script.py")
-
 	except OSError:
 	        pass
+	
 	if d_vars['customscript']!="":
 		shutil.copy("../../../"+d_vars['customscript'], "scripts/customscript.py")	
 	if "$" in d_vars["sw_dir"]:
@@ -384,24 +372,24 @@ def prepare_sandbox():
 		sys.exit()
 	## move the appropriate .sh file to master.sh
 	shutil.copy(["master_no_TS.sh","master_with_TS.sh"][d_vars['TSplit']],"master.sh")
- 
-	sub = subprocess.call(['sed','-i', 's/^SW_DIR=.*/SW_DIR='+d_vars["sw_dir"]+'/g', "master.sh"])
-        sub = subprocess.call(['sed','-i', 's/\/current\//\/'+d_vars["sw_ver"]+'\//g', "master.sh"])	
+	print "adding "+d_vars["sw_dir"]+"/"+d_vars["sw_ver"]+" to the file" 
+        replace_in_file("master.sh","SW_BASE_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack","SW_BASE_DIR="+d_vars["sw_dir"])
+        replace_in_file("master.sh","2.16",d_vars["sw_ver"])
+
 	print("tarring everything")
 	subprocess.call(["tar","-cf", "scripts.tar","scripts/"])	
-	try:
-		os.remove("scripts/custom_script.py")
+	try:	
+		os.remove("scripts/customscript.py")
 	except OSError:
                 pass
 
 	os.chdir("../")
 	subprocess.call(["tar","-cf", "sandbox.tar","sandbox/"])
-	resub = subprocess.call(['sed','-i', 's/\/'+d_vars["sw_ver"]+'\//\/current\//g', "sandbox/master.sh"]) #reverting
 	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox"
         print "uploading sandbox to storage for pull by nodes"
 
-	subprocess.call(["uberftp", "-rm",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+".tar"])
-	subprocess.call(['globus-url-copy', "file:"+os.environ["PWD"]+"/"+d_vars['fadir']+"/Application/sandbox.tar",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+".tar"])	
+	subprocess.call(["uberftp", "-rm",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+d_vars["OBSID"]+".tar"])
+	subprocess.call(['globus-url-copy', "file:"+os.environ["PWD"]+"/"+d_vars['fadir']+"/Application/sandbox.tar",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+d_vars["OBSID"]+".tar"])	
 
         os.chdir("../../")
 	return
@@ -434,8 +422,9 @@ if __name__ == "__main__":
 	else:
 	   sys.exit()
 
-	submit_to_picas()
+	submit_to_picas()	
 	start_jdl()
+	print("https://goo.gl/CtHlbP")
 	sys.exit()
 
 
@@ -443,14 +432,3 @@ if __name__ == "__main__":
 ###########
 #Clean Directories and old parset
 ###########
-
-
-devnl=open(os.devnull, 'w')
-greproc=subprocess.Popen(['glite-wms-job-status','-i',"FAD_v1/Application/jobIDs"],stdout=subprocess.PIPE,stderr=devnl)
-grep=greproc.communicate()[0]
-greproc.wait()
-if (grep.find("    Current Status:     Running")>1) or (grep.find("    Current Status:     Scheduled")>1):
-	print grep
-	print "\033[31mYour Job Is Still Running.\033[0m Please wait until it's set as 'Completed'. This should happen <15 mins after all tokens complete\nThis program will continue when all jobs are set to completed so that the correct parameters are sent to the node."
-	sys.exit()
-

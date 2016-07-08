@@ -81,23 +81,31 @@ cat /proc/cpuinfo | grep "model name"
 echo ""
 echo "Setting up the LOFAR environment; release current:"
 
-SW_DIR=$VO_LOFAR_SW_DIR
+SW_BASE_DIR=/cvmfs/softdrive.nl/apmechev/lofar_prof/
 #LOFARROOT=${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release
-LOFARROOT=${SW_DIR}/current/lofar/release
+LOFARROOT=${SW_BASE_DIR}/2_16_4/current/lofar/release
 
 echo "source lofarinit.sh"
 #. ${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release/lofarinit.sh || exit 1
-. ${SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
+#. ${SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
+. $SW_BASE_DIR/2_16_4/init_env_release.sh
+
+# NEW NB we can't assume the home dir is shared across all Grid nodes.
+echo ""
+echo "LOFARDATAROOT: ", ${LOFARDATAROOT}
+echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
+
 
 echo "correct PATH and LD_LIBRARY_PATH for incomplete settings in lofarinit.sh"
 # initialize the Lofar LTA environment; release LTA_2_1
-export PATH=$SW_DIR/current/lofar/release/bin:$SW_DIR/current/lofar/release/sbin:$SW_DIR/current/local/release/bin:$PATH
-export LD_LIBRARY_PATH=$SW_DIR/current/lofar/release/lib:$SW_DIR/current/lofar/release/lib64:$SW_DIR/current/local/release/lib:$SW_DIR/current/local/release/lib64:$LD_LIBRARY_PATH
-export PYTHONPATH=$SW_DIR/current/lofar/release/lib/python2.7/site-packages:$SW_DIR/current/local/release/lib/python2.7/site-packages:$PYTHONPATH
+#export PATH=$SW_DIR/current/lofar/release/bin:$SW_DIR/current/lofar/release/sbin:$SW_DIR/current/local/release/bin:$PATH
+#export LD_LIBRARY_PATH=$SW_DIR/current/lofar/release/lib:$SW_DIR/current/lofar/release/lib64:$SW_DIR/current/local/release/lib:$SW_DIR/current/local/release/lib64:$LD_LIBRARY_PATH
+#export PYTHONPATH=$SW_DIR/current/lofar/release/lib/python2.7/site-packages:$SW_DIR/current/local/release/lib/python2.7/site-packages:$PYTHONPATH
 
 # NB we can't assume the home dir is shared across all Grid nodes.
-echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
-ln -s test/data ~/
+#echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
+ln -s $VO_LOFAR_SW_DIR/data ~/
+
 
 # initialize job arguments
 # - note, obsid is only used to store the data
@@ -270,7 +278,13 @@ echo ""
 echo "execute avg_dmx.py"
 
 echo "parset is" $parset
-time python avg_dmx_v2_TS.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
+if [[ -e "customscript.py" ]]; then
+        echo "Executing custom avg_dmx script"
+        time python customscript.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
+else
+        time python avg_dmx_v2_noTS.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
+fi
+
 
 echo "Done Command: "
 echo "time python avg_dmx_v2.py", $name, $avg_freq_step, $avg_time_step, $do_demix, $demix_freq_step, $demix_time_step, $demix_sources, $select_nl
