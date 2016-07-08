@@ -127,7 +127,7 @@ def parse_arguments(args):
 def setup_dirs():
 
 	print ""
-	print "You're running \033[33m FAD1.0\033[0m Time-Splitting is \033[33m"+["OFF","ON"][d_vars['TSplit']]+"\033[0m"+[" By User Request"," By Default"][d_vars['TSplit']]+"!"
+	print "You're running \033[33m SARA LRT1.5\033[0m Prefactor version with "+str(d_vars["numpernode"])+" subbands per node"
 	print ""
 	
 	latest_tar=glob.glob('FAD_*[0-9]*.tar')[-1]
