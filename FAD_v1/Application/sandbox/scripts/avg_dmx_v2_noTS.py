@@ -91,7 +91,7 @@ if not ".parset" in parset:
 	infile_script.dodmx(ndppp_fa_parset,do_demix)
 	infile_script.selectnl(ndppp_fa_parset,select_nl)
 else:
-	shutil.copy("parsets/"+obsid+"_"+parset,ndppp_fa_parset)
+	shutil.copy("parsets/"+parset,ndppp_fa_parset)
 	infile_script.msinmsout(ndppp_fa_parset,infile)
 
 
