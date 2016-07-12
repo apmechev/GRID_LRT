@@ -81,14 +81,14 @@ cat /proc/cpuinfo | grep "model name"
 echo ""
 echo "Setting up the LOFAR environment; release current:"
 
-SW_BASE_DIR=/cvmfs/softdrive.nl/apmechev/lofar_prof/
+SW_BASE_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack/
 #LOFARROOT=${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release
-LOFARROOT=${SW_BASE_DIR}/2_16_4/current/lofar/release
+LOFARROOT=${SW_BASE_DIR}/2.16/current/lofar/release
 
 echo "source lofarinit.sh"
 #. ${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release/lofarinit.sh || exit 1
 #. ${SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
-. $SW_BASE_DIR/2_16_4/init_env_release.sh
+. $SW_BASE_DIR/2.16/init_env_release.sh
 
 # NEW NB we can't assume the home dir is shared across all Grid nodes.
 echo ""
