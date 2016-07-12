@@ -141,6 +141,10 @@ def setup_dirs():
 	
 	if latest_tar:
 		d_vars['fadir']=os.path.splitext(latest_tar)[0]
+	if not os.path.isdir(d_vars["fadir"]+"/Application/prefactor-sandbox/prefactor/bin"):
+		print "Cloning prefactor submodule, because it's not there.\n Didn't I tell you to use git clone --recursive?"
+		subprocess.call(['git','submodule','init'])
+                subprocess.call(['git','submodule','update'])
 
 	with open(d_vars['srmfile'],'r') as f:
                 line=f.readline()
