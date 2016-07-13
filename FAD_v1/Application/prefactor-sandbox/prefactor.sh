@@ -92,7 +92,7 @@ export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/li
 echo "LOFARDATAROOT: ", ${LOFARDATAROOT}
 echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
 ln -s ${LOFARDATAROOT} .
-
+ln -s ${LOFARDATAROOT} ~/
 
 ##set -x
 #Detect segmentation violation and exit
