@@ -27,7 +27,7 @@ import subprocess
 #Dictionary of input variables to make keeping track of values easier
 ###########
 
-d_vars = {"srmfile":"", "fadir":".", "resuberr":False, "TSplit":True, "OBSID":"", "sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack/", "sw_ver":"2.16", "parsetfile":"-", "jdl_file":"remote-prefactor.jdl", "numpernode":10}
+d_vars = {"srmfile":"", "fadir":".", "resuberr":False, "TSplit":True, "OBSID":"", "sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack/", "sw_ver":"2.16", "parsetfile":"-", "jdl_file":"remote-prefactor.jdl", "numpernode":10,"ignoreunstaged":False}
 
 
 ###################
@@ -61,6 +61,7 @@ def parse_arguments(args):
                 print "(-d or --software-dir)           - path to custom LOFAR software dir "
                 print "(-v or --software-version)       - software version (subfolder of software-dir)"
                 print "(-n or --number-per-node)        - number of subbands per node (10 default)"
+                print "(-i or --ignore-unstaged)        - continue even if some files unstaged"
 		print "(-h or --help)                   - prints this message (obv)"
 		sys.exit()
 	
@@ -109,6 +110,11 @@ def parse_arguments(args):
                         idxv=args.index("--jdl")
                 print "Using jdl_file="+args[idxv+1]
                 d_vars['jdl_file']=args[idxv+1]
+
+        if ("-i" in args[:-2] or ("--ignore-unstaged" in args[:-2])):
+                print "Will continue even if files unstaged"
+                d_vars['ignoreunstaged']=True
+
 
         if ("-n" in args[:-2] or ("--number-per-node" in args[:-2])):
                 try:
@@ -259,14 +265,18 @@ def check_state_and_stage():
 			print "Nearline, add stage-all.py"	
                         stage_all.main('files')
                         print "Staging your file."
+			break
 			
 	locs=state_all.main('files')
 	for sublist in locs:
                if 'NEARLINE' in sublist :
+			       if d_vars["ignoreunstaged"]:
+			            print " \033[31m Continuing although there are unstaged files\033[0m"
+			            break
                                print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-                               print "I've requested staging but srms are not ONLINE yet. I'll exit so the tokens don't crash. Re-run in a few (or tens of) minutes"
-                               print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m"
-                               sys.exit()
+                               print "I've requested staging but srms are not ONLINE yet. I'll exit so the tokens don't crash. Re-run in a few (or tens of) minutes OR re-run with -i or --ignore-unstaged"
+                               print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m" 
+			       sys.exit()
 	print ""
 	os.chdir("../../")
 	#os.chdir(d_vars['fadir']+"/Tokens/")
