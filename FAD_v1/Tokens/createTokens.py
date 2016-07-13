@@ -49,16 +49,17 @@ def loadTokens(db):
             '_id': 'token_' + OBSID + '_' + str(subband_num)+"v1.0",
             'type': 'token',
 	    'OBSID': config.get('OBSERVATION','OBSID'),
-	    'SURL_SUBBAND': SURL_SB,
-	    'AVG_FREQ_STEP': config.get('OBSERVATION','AVG_FREQ_STEP'),
-	    'AVG_TIME_STEP': config.get('OBSERVATION','AVG_TIME_STEP'),
-	    'DO_DEMIX': config.get('OBSERVATION','DO_DEMIX'),
-	    'DEMIX_FREQ_STEP': config.get('OBSERVATION','DEMIX_FREQ_STEP'),
-	    'DEMIX_TIME_STEP': config.get('OBSERVATION','DEMIX_TIME_STEP'),
-	    'DEMIX_SOURCES': config.get('OBSERVATION','DEMIX_SOURCES'),
-	    'SELECT_NL': config.get('OBSERVATION','SELECT_NL'),
-	    'PARSET':  config.get('OBSERVATION','PARSET'),
+            'SURL_SUBBAND': SURL_SB,
+            'AVG_FREQ_STEP': config.get('OBSERVATION','AVG_FREQ_STEP'),
+            'AVG_TIME_STEP': config.get('OBSERVATION','AVG_TIME_STEP'),
+            'DO_DEMIX': config.get('OBSERVATION','DO_DEMIX'),
+            'DEMIX_FREQ_STEP': config.get('OBSERVATION','DEMIX_FREQ_STEP'),
+            'DEMIX_TIME_STEP': config.get('OBSERVATION','DEMIX_TIME_STEP'),
+            'DEMIX_SOURCES': config.get('OBSERVATION','DEMIX_SOURCES'),
+            'SELECT_NL': config.get('OBSERVATION','SELECT_NL'),
+            'PARSET':  config.get('OBSERVATION','PARSET'),
             'SUBBAND_NUM': subband_num,
+
             'lock': 0,
             'done': 0,
             'hostname': '',
@@ -79,5 +80,5 @@ def get_db():
 if __name__ == '__main__':
    #Create a connection to the server
    db = get_db()
-   #Load the tokens to the database
+   #Load the tokens to the databas
    loadTokens(db)
