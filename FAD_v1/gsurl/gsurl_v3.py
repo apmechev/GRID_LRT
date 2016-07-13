@@ -17,7 +17,7 @@ import glob
 # parameters set by user when starting
 #
 
-def main(infile):
+def main(infile,stride=1):
 	#infile          = str(sys.argv[1])
 	outsrm		= 'srmlist'
 	outsbl		= 'subbandlist'
@@ -35,20 +35,24 @@ def main(infile):
 	os.system('rm -f '+outsbl)
 	srm=open(outsrm, 'w')
 	sbl=open(outsbl, 'w')
-	
+	stridecount=0
 	#read lines
 	for line in f:
+	    if stridecount%int(stride) != 0:
+	    	stridecount+=1
+		continue
 	    #surl=line
+	    stridecount+=1
 	    if not line in ['\n','\r\n','\r']:
 		line=re.sub('//pnfs','/pnfs',line)
 	    	surl=line.split()[0]
-	    #print surl
+	    	#print surl
 	    	srm.write('%s\n' % surl)
 	
 	    #tmp1=line.split(' ')[1]
 	    	tmp1=line.split('SB')[1]
 	    	sbn=tmp1.split('_')[0]
-	    #print sbn
+	    	#print sbn
 	    	sbl.write('%s\n' % sbn)
 	
 	f.close()
@@ -59,4 +63,7 @@ def main(infile):
 	print 'done'
 
 if __name__=='__main__':
-    sys.exit(main(sys.argv[1]))
+    if len(sys.argv)==3:
+	sys.exit(main(sys.argv[1],sys.argv[2]))
+    else:
+         sys.exit(main(sys.argv[1]),1)
