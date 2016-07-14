@@ -267,9 +267,9 @@ sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" prefactor/pipeline.cfg
 
 
 #Check if any files match the target, if so, download the calibration tables matching the calibrator OBSID. If no tables are downloaded, xit with an error message.
-if [[ $( grep " target_input_pattern =" Pre-Facet-Cal.parset |awk '{print $NF}' |xargs find . -name )> 0 ]]
+if [[ $( grep " target_input_pattern =" prefactor/Pre-Facet-Cal.parset |awk '{print $NF}' |xargs find . -name )> 0 ]]
 then
- $CAL_OBSID=$( grep "cal_input_pattern" Pre-Facet-Cal.parset| grep -v "}" |awk '{print $NF}' | awk -F "*" '{print $1}')
+ CAL_OBSID=$( grep "cal_input_pattern " prefactor/Pre-Facet-Cal.parset | grep -v "}" | awk '{print $NF}' | awk -F "*" '{print $1}' )
  echo "Getting solutions from obsid "$CAL_OBSID
  globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$CAL_OBSID.tar file:`pwd`/numpys.tar
  if [[ -e numpys.tar ]]
@@ -283,8 +283,13 @@ fi
 echo ""
 echo "execute generic pipeline"
 genericpipeline.py ./prefactor/Pre-Facet-Cal.parset -d -c prefactor/pipeline.cfg > output
+
+
+
+
 find . -name "*png"|xargs tar -zcf pngs.tar.gz
 find . -name "*npy"|xargs tar -cf numpys.tar
+find . -name "statistics.xml" -exec tar -rf numpys.tar {};  ##TEST THIS
 find . -name "*h5" -exec tar -rf numpys.tar {};  ##TEST THIS
 cp pngs.tar.gz ${JOBDIR}
 echo "Numpy files found:"
