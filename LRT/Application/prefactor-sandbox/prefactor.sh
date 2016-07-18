@@ -142,6 +142,7 @@ echo ""
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/prefactor.tar $RUNDIR
+cp -r $PWD/openTSDB_tcollector $RUNDIR
 cd ${RUNDIR}
 echo "untarring Prefactor" 
 tar -xf prefactor.tar
@@ -281,8 +282,10 @@ then
 fi
 
 echo "start tCollector in dryrun mode"
-./openTSDB_tcollector/tcollector.py > tcollector.out &
+cd openTSDB_tcollector/
+./tcollector.py > tcollector.out &
 TCOLL_PID=$!
+cd ..
 echo ""
 echo "execute generic pipeline"
 genericpipelline.py ./prefactor/Pre-Facet-Cal.parset -d -c prefactor/pipeline.cfg > output
