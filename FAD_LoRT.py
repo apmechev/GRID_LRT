@@ -1,3 +1,4 @@
+#!/bin/env python
 ##########################
 #Python script to check SURLS, stage files, create and run tokens
 #
@@ -160,17 +161,9 @@ def setup_dirs():
 	print "You're running \033[33m FAD_LRT 1.5\033[0m Time-Splitting is \033[33m"+["OFF","ON"][d_vars['TSplit']]+"\033[0m"+[" By User Request"," By Default"][d_vars['TSplit']]+"!"
 	print ""
 	
-	latest_tar=glob.glob('LRT.tar')[-1]
-	if not latest_tar:
-		d_vars['fadir']=glob.glob('LRT')[-1]
-	if not os.path.isdir(os.path.splitext(latest_tar)[0]):
-		print "Extracting "+ latest_tar
-		tar=tarfile.open(latest_tar)
-		tar.extractall()
-		tar.close()
+
 	
-	if latest_tar:
-		d_vars['fadir']=os.path.splitext(latest_tar)[0]
+	d_vars['fadir']='LRT'
 		
 	sys.path.append(str(d_vars['fadir']+'/gsurl'))
 	import gsurl_v3
