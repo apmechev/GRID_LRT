@@ -36,7 +36,6 @@ class ExampleActor(RunActor):
 	print location
 	subprocess.call(["globus-url-copy", location, "sandbox.tar"])
 	subprocess.call(["tar", "-xf", "sandbox.tar","-C",".","--strip-components=1"])
-	subprocess.call(["chmod","u+x","master.sh"])
         subprocess.call(["chmod","u+x","prefactor.sh"])
 
 	#This will process the token from the DOWNLOADED pilot.py (The timelines diverge at this point)
