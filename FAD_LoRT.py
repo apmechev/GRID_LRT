@@ -116,7 +116,7 @@ def parse_arguments(args):
                         idxv=args.index("--jdl")
                 print "Using jdl_file="+args[idxv+1]
                 d_vars['jdl_file']=args[idxv+1]
-       if ("-i" in args[:-2] or ("--ignore-unstaged" in args[:-2])):
+        if ("-i" in args[:-2] or ("--ignore-unstaged" in args[:-2])):
                 print "Will continue even if files unstaged"
                 d_vars['ignoreunstaged']=True
 
