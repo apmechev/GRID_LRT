@@ -1,4 +1,0 @@
-compression=7
-flags=[h5_imp_map.output.mapfile,h5imp_cal_losoto.h5]
-instrument=/instrument
-solsetName=sol000
