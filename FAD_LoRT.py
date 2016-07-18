@@ -28,7 +28,7 @@ import subprocess
 #Dictionary of input variables to make keeping track of values easier
 ###########
 
-d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack","sw_ver":"2.16","parsetfile":"-","jdl_file":"","customscript":""}
+d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack","sw_ver":"2.16","parsetfile":"-","jdl_file":"","customscript":"","ignoreunstaged":False}
 
 ###################
 #Helper function to do a replace in file
@@ -116,6 +116,9 @@ def parse_arguments(args):
                         idxv=args.index("--jdl")
                 print "Using jdl_file="+args[idxv+1]
                 d_vars['jdl_file']=args[idxv+1]
+       if ("-i" in args[:-2] or ("--ignore-unstaged" in args[:-2])):
+                print "Will continue even if files unstaged"
+                d_vars['ignoreunstaged']=True
 
 	#This block grabs the obsid from the file's first line. This will ignore other Obsids	
 	if d_vars['srmfile']== 'srm.txt': #If filename is just srm.txt 
@@ -266,6 +269,9 @@ def check_state_and_stage():
 	locs=state_all.main('files')
 	for sublist in locs:
                if 'NEARLINE' in sublist :
+                               if d_vars["ignoreunstaged"]:
+                                    print " \033[31m Continuing although there are unstaged files\033[0m"
+                                    break
                                print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
                                print "I've requested staging but srms are not ONLINE yet. I'll exit so the tokens don't crash. Re-run in a few (or tens of) minutes"
                                print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m"
