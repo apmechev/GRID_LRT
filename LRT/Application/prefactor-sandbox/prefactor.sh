@@ -280,15 +280,21 @@ then
  fi
 fi
 
+echo "start tCollector in dryrun mode"
+./openTSDB_tcollector/tcollector.py > tcollector.out &
+TCOLL_PID=$!
 echo ""
 echo "execute generic pipeline"
-genericpipeline.py ./prefactor/Pre-Facet-Cal.parset -d -c prefactor/pipeline.cfg > output
+genericpipelline.py ./prefactor/Pre-Facet-Cal.parset -d -c prefactor/pipeline.cfg > output
 
+echo "killing tcollector"
+kill $TCOLL_PID
 
 
 
 find . -name "*png"|xargs tar -zcf pngs.tar.gz
 find . -name "*npy"|xargs tar -cf numpys.tar
+find . -name "tcollector.out" -exec tar -rf numpys.tar {};  ##TEST THIS
 find . -name "statistics.xml" -exec tar -rf numpys.tar {};  ##TEST THIS
 find . -name "*h5" -exec tar -rf numpys.tar {};  ##TEST THIS
 cp pngs.tar.gz ${JOBDIR}
