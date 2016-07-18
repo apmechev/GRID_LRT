@@ -1,0 +1,7 @@
+manifest.txt
+*.rpm
+*.swix
+bld
+dist
+tmp
+tcollector-t.spec
