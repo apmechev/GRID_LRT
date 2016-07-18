@@ -201,7 +201,7 @@ sleep 10
  STALLED=0
  NUMJOBS=244
 set +x
- while [ $NUMJOBS -ge 2 ]
+ while [ $NUMJOBS  -ge 1  ]
   do
      echo $NUMJOBS
      clean_dl_pids 
@@ -267,7 +267,7 @@ sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" prefactor/pipeline.cfg
 
 
 #Check if any files match the target, if so, download the calibration tables matching the calibrator OBSID. If no tables are downloaded, xit with an error message.
-if [[ $( grep " target_input_pattern =" prefactor/Pre-Facet-Cal.parset |awk '{print $NF}' |xargs find . -name )> 0 ]]
+if [[ ! -z $( grep " target_input_pattern =" prefactor/Pre-Facet-Cal.parset | awk '{print $NF}' | xargs find . -name )  ]]
 then
  CAL_OBSID=$( grep "cal_input_pattern " prefactor/Pre-Facet-Cal.parset | grep -v "}" | awk '{print $NF}' | awk -F "*" '{print $1}' )
  echo "Getting solutions from obsid "$CAL_OBSID
@@ -301,7 +301,7 @@ OBSID=$(echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 if [[ $( grep "finished unsuccesfully" output) > "" ]]
 then
      echo "Pipeline did not finish, tarring work and run directories for re-run"
-     RERUN_FILE=$OBSID"_prefactor_error.tar"
+     RERUN_FILE=$OBSID"_"$STARTSB"prefactor_error.tar"
      echo "Will be  at gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/error_states"$RERUN_FILE
      tar -cf $RERUN_FILE prefactor/
      globus-url-copy file:`pwd`/$RERUN_FILE gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/error_states/$RERUN_FILE
@@ -309,7 +309,11 @@ then
     echo "removing RunDir"
     rm -rf ${RUNDIR}
    fi
-  
+   if [[ $( grep "bad_alloc" output) > "" ]]
+   then
+	echo "Prefactor crashed because of bad_alloc. Not enough memory"
+	exit 16
+   fi
    exit 1
 fi 
 
