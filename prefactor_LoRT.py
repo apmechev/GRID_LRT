@@ -1,3 +1,4 @@
+#!/bin/env python
 ##########################
 #Python script to check SURLS, stage files, create and run tokens
 #
@@ -136,17 +137,9 @@ def setup_dirs():
 	print "You're running \033[33m SARA LRT1.5\033[0m, Prefactor version with "+str(d_vars["numpernode"])+" subbands per node"
 	print ""
 	
-	latest_tar=glob.glob('LRT.tar')[-1]
-	if not latest_tar:
-		d_vars['fadir']=glob.glob('LRT/')[-1]
-	if not os.path.isdir(os.path.splitext(latest_tar)[0]):
-		print "Extracting "+ latest_tar
-		tar=tarfile.open(latest_tar)
-		tar.extractall()
-		tar.close()
 	
-	if latest_tar:
-		d_vars['fadir']=os.path.splitext(latest_tar)[0]
+
+	d_vars['fadir']='LRT'
 	if not os.path.isdir(d_vars["fadir"]+"/Application/prefactor-sandbox/prefactor/bin"):
 		print "Cloning prefactor submodule, because it's not there.\n Didn't I tell you to use git clone --recursive?"
 		subprocess.call(['git','submodule','init'])
