@@ -284,7 +284,7 @@ fi
 
 echo "start tCollector in dryrun mode"
 cd openTSDB_tcollector/
-./tcollector.py > tcollector.out &
+./tcollector.py -d > tcollector.out &
 TCOLL_PID=$!
 cd ..
 echo ""
