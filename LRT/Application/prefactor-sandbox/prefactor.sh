@@ -94,6 +94,7 @@ echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
 ln -s ${LOFARDATAROOT} .
 ln -s ${LOFARDATAROOT} ~/
 
+which genericpipeline.py
 ##set -x
 #Detect segmentation violation and exit
 trap '{ echo "Trap detected segmentation fault... status=$?"; exit 1; }' SIGSEGV
@@ -288,7 +289,7 @@ TCOLL_PID=$!
 cd ..
 echo ""
 echo "execute generic pipeline"
-genericpipelline.py ./prefactor/Pre-Facet-Cal.parset -d -c prefactor/pipeline.cfg > output
+genericpipeline.py ./prefactor/Pre-Facet-Cal.parset -d -c prefactor/pipeline.cfg > output
 
 echo "killing tcollector"
 kill $TCOLL_PID
