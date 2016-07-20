@@ -94,6 +94,7 @@ echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
 ln -s ${LOFARDATAROOT} .
 ln -s ${LOFARDATAROOT} ~/
 
+which genericpipeline.py
 ##set -x
 #Detect segmentation violation and exit
 trap '{ echo "Trap detected segmentation fault... status=$?"; exit 1; }' SIGSEGV
@@ -142,6 +143,7 @@ echo ""
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/prefactor.tar $RUNDIR
+cp -r $PWD/openTSDB_tcollector $RUNDIR
 cd ${RUNDIR}
 echo "untarring Prefactor" 
 tar -xf prefactor.tar
@@ -280,15 +282,23 @@ then
  fi
 fi
 
+echo "start tCollector in dryrun mode"
+cd openTSDB_tcollector/
+./tcollector.py -d > tcollector.out &
+TCOLL_PID=$!
+cd ..
 echo ""
 echo "execute generic pipeline"
-genericpipeline.py ./prefactor/Pre-Facet-Cal.parset -d -c prefactor/pipeline.cfg > output
+genericpipeline.py ./prefactor/Pre-Facet-Cal.parset -d -c pipeline.cfg > output
 
+echo "killing tcollector"
+kill $TCOLL_PID
 
 
 
 find . -name "*png"|xargs tar -zcf pngs.tar.gz
 find . -name "*npy"|xargs tar -cf numpys.tar
+find . -name "tcollector.out" -exec tar -rf numpys.tar {};  ##TEST THIS
 find . -name "statistics.xml" -exec tar -rf numpys.tar {};  ##TEST THIS
 find . -name "*h5" -exec tar -rf numpys.tar {};  ##TEST THIS
 cp pngs.tar.gz ${JOBDIR}
