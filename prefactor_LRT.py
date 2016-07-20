@@ -332,6 +332,7 @@ def start_jdl():
 
 
 def splitsrms():
+	###TODO: Maybe use the parset file to determine which one is cal, targ and prompt user?
 	OBSIDS=[]
 	srmfiles=[]
 	with open(d_vars["srmfile"],'r') as txtfile:
