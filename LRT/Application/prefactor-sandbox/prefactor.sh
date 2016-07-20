@@ -289,7 +289,7 @@ TCOLL_PID=$!
 cd ..
 echo ""
 echo "execute generic pipeline"
-genericpipeline.py ./prefactor/Pre-Facet-Cal.parset -d -c prefactor/pipeline.cfg > output
+genericpipeline.py ./prefactor/Pre-Facet-Cal.parset -d -c pipeline.cfg > output
 
 echo "killing tcollector"
 kill $TCOLL_PID
