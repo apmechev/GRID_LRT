@@ -1,0 +1,1354 @@
+put net.sockstat.num_sockets 1468482964 26 type=tcp host=loui
+put net.sockstat.num_timewait 1468482964 0 host=loui
+put net.sockstat.sockets_inuse 1468482964 22 type=tcp host=loui
+put net.sockstat.sockets_inuse 1468482964 14 type=udp host=loui
+put net.sockstat.sockets_inuse 1468482964 0 type=udplite host=loui
+put net.sockstat.sockets_inuse 1468482964 0 type=raw host=loui
+put net.sockstat.num_orphans 1468482964 0 host=loui
+put net.sockstat.memory 1468482964 12288 type=tcp host=loui
+put net.sockstat.memory 1468482964 16384 type=udp host=loui
+put net.sockstat.memory 1468482964 0 type=ipfrag host=loui
+put net.sockstat.ipfragqueues 1468482964 0 host=loui
+put net.stat.tcp.invalid_sack 1468482964 727 type=olddup host=loui
+put net.stat.tcp.delayedack 1468482964 297127 type=sent host=loui
+put net.stat.tcp.reording 1468482964 0 detectedby=sack host=loui
+put net.stat.tcp.abort 1468482964 1486 type=data_after_close host=loui
+put net.stat.tcp.failed_accept 1468482964 0 reason=other host=loui
+put net.stat.tcp.abort 1468482964 0 type=out_of_memory host=loui
+put net.stat.tcp.abort 1468482964 410 type=data_after_fin_wait1 host=loui
+put net.stat.tcp.syncookies 1468482964 0 type=received host=loui
+put net.stat.tcp.packetloss.recovery 1468482964 3439 type=sack host=loui
+put net.stat.tcp.syncookies 1468482964 27 type=failed host=loui
+put net.stat.tcp.congestion.recovery 1468482964 8 type=sack host=loui
+put net.stat.tcp.invalid_sack 1468482964 1 type=invalid host=loui
+put net.stat.tcp.delayedack 1468482964 990 type=lost host=loui
+put net.stat.tcp.retransmit 1468482964 23695 type=slowstart host=loui
+put net.stat.tcp.memory.pressure 1468482964 0 host=loui
+put net.stat.tcp.congestion.recovery 1468482964 1585 type=full_undo host=loui
+put net.stat.tcp.memory.prune 1468482964 0 type=drop_received host=loui
+put net.stat.tcp.invalid_sack 1468482964 9 type=retransmit host=loui
+put net.stat.tcp.reording 1468482964 4452 detectedby=fast_retransmit host=loui
+put net.stat.tcp.delayedack 1468482964 451 type=locked host=loui
+put net.stat.tcp.congestion.recovery 1468482964 1 type=hoe_heuristic host=loui
+put net.stat.tcp.reording 1468482964 1 detectedby=fack host=loui
+put net.stat.tcp.abort 1468482964 0 type=linger host=loui
+put net.stat.tcp.retransmit 1468482964 18745 type=fast host=loui
+put net.stat.tcp.abort 1468482964 2846 type=timeout host=loui
+put net.stat.tcp.memory.prune 1468482964 0 type=drop_ofo_queue host=loui
+put net.stat.tcp.syncookies 1468482964 0 type=sent host=loui
+put net.stat.tcp.receive.queue.full 1468482964 3 host=loui
+put net.stat.tcp.failed_accept 1468482964 44 reason=full_acceptq host=loui
+put net.stat.tcp.congestion.recovery 1468482964 3957 type=ack host=loui
+put net.stat.tcp.retransmit 1468482964 160 type=forward host=loui
+put net.stat.tcp.reording 1468482964 1 detectedby=timestamp host=loui
+put net.stat.tcp.abort.failed 1468482964 0 host=loui
+put net.stat.tcp.packetloss.recovery 1468482964 4582 type=fast_retransmit host=loui
+put net.stat.udp.datagrams 1468482964 361404 direction=in host=loui
+put net.stat.udp.datagrams 1468482964 2437536 direction=out host=loui
+put net.stat.udp.errors 1468482964 0 direction=in reason=nomem host=loui
+put net.stat.udp.errors 1468482964 0 direction=in reason=other host=loui
+put net.stat.udp.errors 1468482964 0 direction=out reason=nomem host=loui
+put net.stat.udp.errors 1468482964 1758 direction=in reason=noport host=loui
+put ntp.offset 1468482964 -0.254 host=loui
+put iostat.disk.read_requests 1468482964 5610480 dev=vda host=loui
+put iostat.disk.read_merged 1468482964 16249449 dev=vda host=loui
+put iostat.disk.read_sectors 1468482964 204881206 dev=vda host=loui
+put iostat.disk.msec_read 1468482964 80920705 dev=vda host=loui
+put iostat.disk.write_requests 1468482964 3897964 dev=vda host=loui
+put iostat.disk.write_merged 1468482964 35030316 dev=vda host=loui
+put iostat.disk.write_sectors 1468482964 310701256 dev=vda host=loui
+put iostat.disk.msec_write 1468482964 2554434855 dev=vda host=loui
+put iostat.disk.ios_in_progress 1468482964 2 dev=vda host=loui
+put iostat.disk.msec_total 1468482964 42326923 dev=vda host=loui
+put iostat.disk.msec_weighted_total 1468482964 2639664027 dev=vda host=loui
+put iostat.disk.svctm 1468482964 4.45 dev=vda host=loui
+put iostat.disk.r_await 1468482964 14.42 dev=vda host=loui
+put iostat.disk.w_await 1468482964 655.33 dev=vda host=loui
+put iostat.disk.await 1468482964 277.16 dev=vda host=loui
+put iostat.disk.util 1468482964 2.45 dev=vda host=loui
+put iostat.part.read_requests 1468482964 1100 dev=vda1 host=loui
+put iostat.part.read_merged 1468482964 292 dev=vda1 host=loui
+put iostat.part.read_sectors 1468482964 31362 dev=vda1 host=loui
+put iostat.part.msec_read 1468482964 2141 dev=vda1 host=loui
+put iostat.part.write_requests 1468482964 88 dev=vda1 host=loui
+put iostat.part.write_merged 1468482964 23 dev=vda1 host=loui
+put iostat.part.write_sectors 1468482964 888 dev=vda1 host=loui
+put iostat.part.msec_write 1468482964 4717 dev=vda1 host=loui
+put iostat.part.ios_in_progress 1468482964 0 dev=vda1 host=loui
+put iostat.part.msec_total 1468482964 4846 dev=vda1 host=loui
+put iostat.part.msec_weighted_total 1468482964 6857 dev=vda1 host=loui
+put iostat.part.read_requests 1468482964 5609227 dev=vda2 host=loui
+put iostat.part.read_merged 1468482964 16249157 dev=vda2 host=loui
+put iostat.part.read_sectors 1468482964 204848620 dev=vda2 host=loui
+put iostat.part.msec_read 1468482964 80918469 dev=vda2 host=loui
+put iostat.part.write_requests 1468482964 3383716 dev=vda2 host=loui
+put iostat.part.write_merged 1468482964 35030293 dev=vda2 host=loui
+put iostat.part.write_sectors 1468482964 310700368 dev=vda2 host=loui
+put iostat.part.msec_write 1468482964 2553494093 dev=vda2 host=loui
+put iostat.part.ios_in_progress 1468482964 2 dev=vda2 host=loui
+put iostat.part.msec_total 1468482964 42220742 dev=vda2 host=loui
+put iostat.part.msec_weighted_total 1468482964 2638721241 dev=vda2 host=loui
+put iostat.disk.read_requests 1468482964 1833867 dev=vdb host=loui
+put iostat.disk.read_merged 1468482964 14851 dev=vdb host=loui
+put iostat.disk.read_sectors 1468482964 65693458 dev=vdb host=loui
+put iostat.disk.msec_read 1468482964 8522357 dev=vdb host=loui
+put iostat.disk.write_requests 1468482964 607488 dev=vdb host=loui
+put iostat.disk.write_merged 1468482964 241826 dev=vdb host=loui
+put iostat.disk.write_sectors 1468482964 130434804 dev=vdb host=loui
+put iostat.disk.msec_write 1468482964 304063764 dev=vdb host=loui
+put iostat.disk.ios_in_progress 1468482964 0 dev=vdb host=loui
+put iostat.disk.msec_total 1468482964 8001789 dev=vdb host=loui
+put iostat.disk.msec_weighted_total 1468482964 312641407 dev=vdb host=loui
+put iostat.disk.svctm 1468482964 3.28 dev=vdb host=loui
+put iostat.disk.r_await 1468482964 4.65 dev=vdb host=loui
+put iostat.disk.w_await 1468482964 500.53 dev=vdb host=loui
+put iostat.disk.await 1468482964 128.04 dev=vdb host=loui
+put iostat.disk.util 1468482964 0.46 dev=vdb host=loui
+put iostat.disk.read_requests 1468482964 8603439 dev=vdc host=loui
+put iostat.disk.read_merged 1468482964 9090 dev=vdc host=loui
+put iostat.disk.read_sectors 1468482964 5407528580 dev=vdc host=loui
+put iostat.disk.msec_read 1468482964 591100763 dev=vdc host=loui
+put iostat.disk.write_requests 1468482964 7463706 dev=vdc host=loui
+put iostat.disk.write_merged 1468482964 258663 dev=vdc host=loui
+put iostat.disk.write_sectors 1468482964 6269521706 dev=vdc host=loui
+put iostat.disk.msec_write 1468482964 1901070239 dev=vdc host=loui
+put iostat.disk.ios_in_progress 1468482964 1071 dev=vdc host=loui
+put iostat.disk.msec_total 1468482964 25963460 dev=vdc host=loui
+put iostat.disk.msec_weighted_total 1468482964 2492984746 dev=vdc host=loui
+put iostat.disk.svctm 1468482964 1.62 dev=vdc host=loui
+put iostat.disk.r_await 1468482964 68.71 dev=vdc host=loui
+put iostat.disk.w_await 1468482964 254.71 dev=vdc host=loui
+put iostat.disk.await 1468482964 155.11 dev=vdc host=loui
+put iostat.disk.util 1468482964 1.50 dev=vdc host=loui
+put iostat.disk.read_requests 1468482964 971354 dev=dm-0 host=loui
+put iostat.disk.read_merged 1468482964 0 dev=dm-0 host=loui
+put iostat.disk.read_sectors 1468482964 27255442 dev=dm-0 host=loui
+put iostat.disk.msec_read 1468482964 18586163 dev=dm-0 host=loui
+put iostat.disk.write_requests 1468482964 3036798 dev=dm-0 host=loui
+put iostat.disk.write_merged 1468482964 0 dev=dm-0 host=loui
+put iostat.disk.write_sectors 1468482964 24294336 dev=dm-0 host=loui
+put iostat.disk.msec_write 1468482964 3595321582 dev=dm-0 host=loui
+put iostat.disk.ios_in_progress 1468482964 2 dev=dm-0 host=loui
+put iostat.disk.msec_total 1468482964 8366743 dev=dm-0 host=loui
+put iostat.disk.msec_weighted_total 1468482964 3613908366 dev=dm-0 host=loui
+put iostat.disk.svctm 1468482964 2.09 dev=dm-0 host=loui
+put iostat.disk.r_await 1468482964 19.13 dev=dm-0 host=loui
+put iostat.disk.w_await 1468482964 1183.92 dev=dm-0 host=loui
+put iostat.disk.await 1468482964 901.64 dev=dm-0 host=loui
+put iostat.disk.util 1468482964 0.48 dev=dm-0 host=loui
+put iostat.part.read_requests 1468482964 20554480 dev=dm-1 host=loui
+put iostat.part.read_merged 1468482964 0 dev=dm-1 host=loui
+put iostat.part.read_sectors 1468482964 164435840 dev=dm-1 host=loui
+put iostat.part.msec_read 1468482964 318307327 dev=dm-1 host=loui
+put iostat.part.write_requests 1468482964 30309932 dev=dm-1 host=loui
+put iostat.part.write_merged 1468482964 0 dev=dm-1 host=loui
+put iostat.part.write_sectors 1468482964 242479456 dev=dm-1 host=loui
+put iostat.part.msec_write 1468482964 1597653198 dev=dm-1 host=loui
+put iostat.part.ios_in_progress 1468482964 0 dev=dm-1 host=loui
+put iostat.part.msec_total 1468482964 24162752 dev=dm-1 host=loui
+put iostat.part.msec_weighted_total 1468482964 1923903325 dev=dm-1 host=loui
+put iostat.part.svctm 1468482964 0.48 dev=dm-1 host=loui
+put iostat.part.r_await 1468482964 15.49 dev=dm-1 host=loui
+put iostat.part.w_await 1468482964 52.71 dev=dm-1 host=loui
+put iostat.part.await 1468482964 37.67 dev=dm-1 host=loui
+put iostat.part.util 1468482964 1.40 dev=dm-1 host=loui
+put iostat.part.read_requests 1468482964 340251 dev=dm-2 host=loui
+put iostat.part.read_merged 1468482964 0 dev=dm-2 host=loui
+put iostat.part.read_sectors 1468482964 13156866 dev=dm-2 host=loui
+put iostat.part.msec_read 1468482964 5477449 dev=dm-2 host=loui
+put iostat.part.write_requests 1468482964 5833828 dev=dm-2 host=loui
+put iostat.part.write_merged 1468482964 0 dev=dm-2 host=loui
+put iostat.part.write_sectors 1468482964 43926576 dev=dm-2 host=loui
+put iostat.part.msec_write 1468482964 261152557 dev=dm-2 host=loui
+put iostat.part.ios_in_progress 1468482964 0 dev=dm-2 host=loui
+put iostat.part.msec_total 1468482964 24439949 dev=dm-2 host=loui
+put iostat.part.msec_weighted_total 1468482964 266630078 dev=dm-2 host=loui
+put iostat.part.svctm 1468482964 3.96 dev=dm-2 host=loui
+put iostat.part.r_await 1468482964 16.10 dev=dm-2 host=loui
+put iostat.part.w_await 1468482964 44.77 dev=dm-2 host=loui
+put iostat.part.await 1468482964 43.19 dev=dm-2 host=loui
+put iostat.part.util 1468482964 1.42 dev=dm-2 host=loui
+put proc.uptime.total 1468482964 1726924.46 host=loui
+put proc.uptime.now 1468482964 10013800.27 host=loui
+put proc.meminfo.memtotal 1468482964 25196175360 host=loui
+put proc.meminfo.memfree 1468482964 210046976 host=loui
+put proc.meminfo.buffers 1468482964 1277952 host=loui
+put proc.meminfo.cached 1468482964 23417823232 host=loui
+put proc.meminfo.swapcached 1468482964 4620288 host=loui
+put proc.meminfo.active 1468482964 11771846656 host=loui
+put proc.meminfo.inactive 1468482964 11863072768 host=loui
+put proc.meminfo.unevictable 1468482964 0 host=loui
+put proc.meminfo.mlocked 1468482964 0 host=loui
+put proc.meminfo.swaptotal 1468482964 4294963200 host=loui
+put proc.meminfo.swapfree 1468482964 4239986688 host=loui
+put proc.meminfo.dirty 1468482964 1231732736 host=loui
+put proc.meminfo.writeback 1468482964 508084224 host=loui
+put proc.meminfo.anonpages 1468482964 214159360 host=loui
+put proc.meminfo.mapped 1468482964 13389824 host=loui
+put proc.meminfo.shmem 1468482964 12288 host=loui
+put proc.meminfo.slab 1468482964 1108996096 host=loui
+put proc.meminfo.sreclaimable 1468482964 1059155968 host=loui
+put proc.meminfo.sunreclaim 1468482964 49840128 host=loui
+put proc.meminfo.kernelstack 1468482964 5554176 host=loui
+put proc.meminfo.pagetables 1468482964 13205504 host=loui
+put proc.meminfo.nfs_unstable 1468482964 0 host=loui
+put proc.meminfo.bounce 1468482964 0 host=loui
+put proc.meminfo.writebacktmp 1468482964 0 host=loui
+put proc.meminfo.commitlimit 1468482964 16893050880 host=loui
+put proc.meminfo.committed_as 1468482964 920313856 host=loui
+put proc.meminfo.vmalloctotal 1468482964 35184372087808 host=loui
+put proc.meminfo.vmallocused 1468482964 68808704 host=loui
+put proc.meminfo.vmallocchunk 1468482964 35184209281024 host=loui
+put proc.meminfo.hardwarecorrupted 1468482964 0 host=loui
+put proc.meminfo.anonhugepages 1468482964 31457280 host=loui
+put proc.meminfo.hugepagesize 1468482964 2097152 host=loui
+put proc.meminfo.directmap4k 1468482964 8376320 host=loui
+put proc.meminfo.directmap2m 1468482964 25761415168 host=loui
+put proc.vmstat.pgpgin 1468482964 2839061082 host=loui
+put proc.vmstat.pgpgout 1468482964 3355824967 host=loui
+put proc.vmstat.pswpin 1468482964 20554153 host=loui
+put proc.vmstat.pswpout 1468482964 30309932 host=loui
+put proc.vmstat.pgfault 1468482964 1108708834 host=loui
+put proc.vmstat.pgmajfault 1468482964 3550181 host=loui
+put proc.stat.cpu 1468482964 22459328 type=user host=loui
+put proc.stat.cpu 1468482964 4885 type=nice host=loui
+put proc.stat.cpu 1468482964 3287143 type=system host=loui
+put proc.stat.cpu 1468482964 1000219792 type=idle host=loui
+put proc.stat.cpu 1468482964 9172397 type=iowait host=loui
+put proc.stat.cpu 1468482964 1429 type=irq host=loui
+put proc.stat.cpu 1468482964 122879 type=softirq host=loui
+put proc.stat.cpu 1468482964 156294 type=guest host=loui
+put proc.stat.cpu 1468482964 0 type=guest_nice host=loui
+put proc.stat.cpu.percpu 1468482964 3242701 type=user cpu=0 host=loui
+put proc.stat.cpu.percpu 1468482964 1649 type=nice cpu=0 host=loui
+put proc.stat.cpu.percpu 1468482964 490542 type=system cpu=0 host=loui
+put proc.stat.cpu.percpu 1468482964 165902162 type=idle cpu=0 host=loui
+put proc.stat.cpu.percpu 1468482964 2890640 type=iowait cpu=0 host=loui
+put proc.stat.cpu.percpu 1468482964 11 type=irq cpu=0 host=loui
+put proc.stat.cpu.percpu 1468482964 295 type=softirq cpu=0 host=loui
+put proc.stat.cpu.percpu 1468482964 8408 type=guest cpu=0 host=loui
+put proc.stat.cpu.percpu 1468482964 0 type=guest_nice cpu=0 host=loui
+put proc.stat.cpu.percpu 1468482964 4235045 type=user cpu=1 host=loui
+put proc.stat.cpu.percpu 1468482964 264 type=nice cpu=1 host=loui
+put proc.stat.cpu.percpu 1468482964 659414 type=system cpu=1 host=loui
+put proc.stat.cpu.percpu 1468482964 165948002 type=idle cpu=1 host=loui
+put proc.stat.cpu.percpu 1468482964 1762932 type=iowait cpu=1 host=loui
+put proc.stat.cpu.percpu 1468482964 18 type=irq cpu=1 host=loui
+put proc.stat.cpu.percpu 1468482964 339 type=softirq cpu=1 host=loui
+put proc.stat.cpu.percpu 1468482964 6164 type=guest cpu=1 host=loui
+put proc.stat.cpu.percpu 1468482964 0 type=guest_nice cpu=1 host=loui
+put proc.stat.cpu.percpu 1468482964 3655889 type=user cpu=2 host=loui
+put proc.stat.cpu.percpu 1468482964 725 type=nice cpu=2 host=loui
+put proc.stat.cpu.percpu 1468482964 398097 type=system cpu=2 host=loui
+put proc.stat.cpu.percpu 1468482964 167502863 type=idle cpu=2 host=loui
+put proc.stat.cpu.percpu 1468482964 1077340 type=iowait cpu=2 host=loui
+put proc.stat.cpu.percpu 1468482964 0 type=irq cpu=2 host=loui
+put proc.stat.cpu.percpu 1468482964 275 type=softirq cpu=2 host=loui
+put proc.stat.cpu.percpu 1468482964 4154 type=guest cpu=2 host=loui
+put proc.stat.cpu.percpu 1468482964 0 type=guest_nice cpu=2 host=loui
+put proc.stat.cpu.percpu 1468482964 3970101 type=user cpu=3 host=loui
+put proc.stat.cpu.percpu 1468482964 1144 type=nice cpu=3 host=loui
+put proc.stat.cpu.percpu 1468482964 860653 type=system cpu=3 host=loui
+put proc.stat.cpu.percpu 1468482964 166318309 type=idle cpu=3 host=loui
+put proc.stat.cpu.percpu 1468482964 1175921 type=iowait cpu=3 host=loui
+put proc.stat.cpu.percpu 1468482964 1398 type=irq cpu=3 host=loui
+put proc.stat.cpu.percpu 1468482964 117885 type=softirq cpu=3 host=loui
+put proc.stat.cpu.percpu 1468482964 17464 type=guest cpu=3 host=loui
+put proc.stat.cpu.percpu 1468482964 0 type=guest_nice cpu=3 host=loui
+put proc.stat.cpu.percpu 1468482964 3627991 type=user cpu=4 host=loui
+put proc.stat.cpu.percpu 1468482964 393 type=nice cpu=4 host=loui
+put proc.stat.cpu.percpu 1468482964 378204 type=system cpu=4 host=loui
+put proc.stat.cpu.percpu 1468482964 167492425 type=idle cpu=4 host=loui
+put proc.stat.cpu.percpu 1468482964 1072629 type=iowait cpu=4 host=loui
+put proc.stat.cpu.percpu 1468482964 0 type=irq cpu=4 host=loui
+put proc.stat.cpu.percpu 1468482964 1836 type=softirq cpu=4 host=loui
+put proc.stat.cpu.percpu 1468482964 5402 type=guest cpu=4 host=loui
+put proc.stat.cpu.percpu 1468482964 0 type=guest_nice cpu=4 host=loui
+put proc.stat.cpu.percpu 1468482964 3727598 type=user cpu=5 host=loui
+put proc.stat.cpu.percpu 1468482964 708 type=nice cpu=5 host=loui
+put proc.stat.cpu.percpu 1468482964 500230 type=system cpu=5 host=loui
+put proc.stat.cpu.percpu 1468482964 167056029 type=idle cpu=5 host=loui
+put proc.stat.cpu.percpu 1468482964 1192933 type=iowait cpu=5 host=loui
+put proc.stat.cpu.percpu 1468482964 0 type=irq cpu=5 host=loui
+put proc.stat.cpu.percpu 1468482964 2247 type=softirq cpu=5 host=loui
+put proc.stat.cpu.percpu 1468482964 114699 type=guest cpu=5 host=loui
+put proc.stat.cpu.percpu 1468482964 0 type=guest_nice cpu=5 host=loui
+put proc.stat.intr 1468482964 905224351 host=loui
+put proc.stat.ctxt 1468482964 428343700 host=loui
+put proc.stat.processes 1468482964 2028289 host=loui
+put proc.stat.procs_blocked 1468482964 5 host=loui
+put proc.loadavg.1min 1468482964 1.69 host=loui
+put proc.loadavg.5min 1468482964 4.44 host=loui
+put proc.loadavg.15min 1468482964 5.40 host=loui
+put proc.loadavg.runnable 1468482964 6 host=loui
+put proc.loadavg.total_threads 1468482964 361 host=loui
+put proc.kernel.entropy_avail 1468482964 173 host=loui
+put proc.interrupts 1468482964 0 type=NMI cpu=0 host=loui
+put proc.interrupts 1468482964 0 type=NMI cpu=1 host=loui
+put proc.interrupts 1468482964 0 type=NMI cpu=2 host=loui
+put proc.interrupts 1468482964 0 type=NMI cpu=3 host=loui
+put proc.interrupts 1468482964 0 type=NMI cpu=4 host=loui
+put proc.interrupts 1468482964 0 type=NMI cpu=5 host=loui
+put proc.interrupts 1468482964 75866257 type=LOC cpu=0 host=loui
+put proc.interrupts 1468482964 81969056 type=LOC cpu=1 host=loui
+put proc.interrupts 1468482964 79366727 type=LOC cpu=2 host=loui
+put proc.interrupts 1468482964 155395291 type=LOC cpu=3 host=loui
+put proc.interrupts 1468482964 127793602 type=LOC cpu=4 host=loui
+put proc.interrupts 1468482964 170280467 type=LOC cpu=5 host=loui
+put proc.interrupts 1468482964 0 type=SPU cpu=0 host=loui
+put proc.interrupts 1468482964 0 type=SPU cpu=1 host=loui
+put proc.interrupts 1468482964 0 type=SPU cpu=2 host=loui
+put proc.interrupts 1468482964 0 type=SPU cpu=3 host=loui
+put proc.interrupts 1468482964 0 type=SPU cpu=4 host=loui
+put proc.interrupts 1468482964 0 type=SPU cpu=5 host=loui
+put proc.interrupts 1468482964 0 type=PMI cpu=0 host=loui
+put proc.interrupts 1468482964 0 type=PMI cpu=1 host=loui
+put proc.interrupts 1468482964 0 type=PMI cpu=2 host=loui
+put proc.interrupts 1468482964 0 type=PMI cpu=3 host=loui
+put proc.interrupts 1468482964 0 type=PMI cpu=4 host=loui
+put proc.interrupts 1468482964 0 type=PMI cpu=5 host=loui
+put proc.interrupts 1468482964 0 type=IWI cpu=0 host=loui
+put proc.interrupts 1468482964 0 type=IWI cpu=1 host=loui
+put proc.interrupts 1468482964 0 type=IWI cpu=2 host=loui
+put proc.interrupts 1468482964 0 type=IWI cpu=3 host=loui
+put proc.interrupts 1468482964 0 type=IWI cpu=4 host=loui
+put proc.interrupts 1468482964 0 type=IWI cpu=5 host=loui
+put proc.interrupts 1468482964 4426570 type=RES cpu=0 host=loui
+put proc.interrupts 1468482964 4206960 type=RES cpu=1 host=loui
+put proc.interrupts 1468482964 3927502 type=RES cpu=2 host=loui
+put proc.interrupts 1468482964 4191957 type=RES cpu=3 host=loui
+put proc.interrupts 1468482964 4166249 type=RES cpu=4 host=loui
+put proc.interrupts 1468482964 4497639 type=RES cpu=5 host=loui
+put proc.interrupts 1468482964 700033 type=CAL cpu=0 host=loui
+put proc.interrupts 1468482964 742521 type=CAL cpu=1 host=loui
+put proc.interrupts 1468482964 900739 type=CAL cpu=2 host=loui
+put proc.interrupts 1468482964 888234 type=CAL cpu=3 host=loui
+put proc.interrupts 1468482964 904429 type=CAL cpu=4 host=loui
+put proc.interrupts 1468482964 891153 type=CAL cpu=5 host=loui
+put proc.interrupts 1468482964 12530275 type=TLB cpu=0 host=loui
+put proc.interrupts 1468482964 16545569 type=TLB cpu=1 host=loui
+put proc.interrupts 1468482964 15228867 type=TLB cpu=2 host=loui
+put proc.interrupts 1468482964 16519236 type=TLB cpu=3 host=loui
+put proc.interrupts 1468482964 14941399 type=TLB cpu=4 host=loui
+put proc.interrupts 1468482964 15764642 type=TLB cpu=5 host=loui
+put proc.interrupts 1468482964 0 type=TRM cpu=0 host=loui
+put proc.interrupts 1468482964 0 type=TRM cpu=1 host=loui
+put proc.interrupts 1468482964 0 type=TRM cpu=2 host=loui
+put proc.interrupts 1468482964 0 type=TRM cpu=3 host=loui
+put proc.interrupts 1468482964 0 type=TRM cpu=4 host=loui
+put proc.interrupts 1468482964 0 type=TRM cpu=5 host=loui
+put proc.interrupts 1468482964 0 type=THR cpu=0 host=loui
+put proc.interrupts 1468482964 0 type=THR cpu=1 host=loui
+put proc.interrupts 1468482964 0 type=THR cpu=2 host=loui
+put proc.interrupts 1468482964 0 type=THR cpu=3 host=loui
+put proc.interrupts 1468482964 0 type=THR cpu=4 host=loui
+put proc.interrupts 1468482964 0 type=THR cpu=5 host=loui
+put proc.interrupts 1468482964 0 type=MCE cpu=0 host=loui
+put proc.interrupts 1468482964 0 type=MCE cpu=1 host=loui
+put proc.interrupts 1468482964 0 type=MCE cpu=2 host=loui
+put proc.interrupts 1468482964 0 type=MCE cpu=3 host=loui
+put proc.interrupts 1468482964 0 type=MCE cpu=4 host=loui
+put proc.interrupts 1468482964 0 type=MCE cpu=5 host=loui
+put proc.interrupts 1468482964 5757 type=MCP cpu=0 host=loui
+put proc.interrupts 1468482964 5757 type=MCP cpu=1 host=loui
+put proc.interrupts 1468482964 5757 type=MCP cpu=2 host=loui
+put proc.interrupts 1468482964 5757 type=MCP cpu=3 host=loui
+put proc.interrupts 1468482964 5757 type=MCP cpu=4 host=loui
+put proc.interrupts 1468482964 5757 type=MCP cpu=5 host=loui
+put proc.interrupts 1468482964 0 type=ERR cpu=0 host=loui
+put proc.interrupts 1468482964 0 type=MIS cpu=0 host=loui
+put proc.softirqs 1468482964 0 type=HI cpu=0 host=loui
+put proc.softirqs 1468482964 0 type=HI cpu=1 host=loui
+put proc.softirqs 1468482964 0 type=HI cpu=2 host=loui
+put proc.softirqs 1468482964 0 type=HI cpu=3 host=loui
+put proc.softirqs 1468482964 0 type=HI cpu=4 host=loui
+put proc.softirqs 1468482964 0 type=HI cpu=5 host=loui
+put proc.softirqs 1468482964 63004823 type=TIMER cpu=0 host=loui
+put proc.softirqs 1468482964 63357620 type=TIMER cpu=1 host=loui
+put proc.softirqs 1468482964 53625781 type=TIMER cpu=2 host=loui
+put proc.softirqs 1468482964 69634320 type=TIMER cpu=3 host=loui
+put proc.softirqs 1468482964 61318287 type=TIMER cpu=4 host=loui
+put proc.softirqs 1468482964 79701435 type=TIMER cpu=5 host=loui
+put proc.softirqs 1468482964 335 type=NET_TX cpu=0 host=loui
+put proc.softirqs 1468482964 304 type=NET_TX cpu=1 host=loui
+put proc.softirqs 1468482964 229 type=NET_TX cpu=2 host=loui
+put proc.softirqs 1468482964 1205 type=NET_TX cpu=3 host=loui
+put proc.softirqs 1468482964 288 type=NET_TX cpu=4 host=loui
+put proc.softirqs 1468482964 298 type=NET_TX cpu=5 host=loui
+put proc.softirqs 1468482964 6295 type=NET_RX cpu=0 host=loui
+put proc.softirqs 1468482964 6184 type=NET_RX cpu=1 host=loui
+put proc.softirqs 1468482964 5875 type=NET_RX cpu=2 host=loui
+put proc.softirqs 1468482964 73679712 type=NET_RX cpu=3 host=loui
+put proc.softirqs 1468482964 2166431 type=NET_RX cpu=4 host=loui
+put proc.softirqs 1468482964 5427 type=NET_RX cpu=5 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK cpu=0 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK cpu=1 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK cpu=2 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK cpu=3 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK cpu=4 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK cpu=5 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK_IOPOLL cpu=0 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK_IOPOLL cpu=1 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK_IOPOLL cpu=2 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK_IOPOLL cpu=3 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK_IOPOLL cpu=4 host=loui
+put proc.softirqs 1468482964 0 type=BLOCK_IOPOLL cpu=5 host=loui
+put proc.softirqs 1468482964 0 type=TASKLET cpu=0 host=loui
+put proc.softirqs 1468482964 0 type=TASKLET cpu=1 host=loui
+put proc.softirqs 1468482964 1 type=TASKLET cpu=2 host=loui
+put proc.softirqs 1468482964 5 type=TASKLET cpu=3 host=loui
+put proc.softirqs 1468482964 0 type=TASKLET cpu=4 host=loui
+put proc.softirqs 1468482964 2 type=TASKLET cpu=5 host=loui
+put proc.softirqs 1468482964 18272464 type=SCHED cpu=0 host=loui
+put proc.softirqs 1468482964 10145081 type=SCHED cpu=1 host=loui
+put proc.softirqs 1468482964 9418186 type=SCHED cpu=2 host=loui
+put proc.softirqs 1468482964 12072167 type=SCHED cpu=3 host=loui
+put proc.softirqs 1468482964 15629182 type=SCHED cpu=4 host=loui
+put proc.softirqs 1468482964 28619033 type=SCHED cpu=5 host=loui
+put proc.softirqs 1468482964 32401 type=HRTIMER cpu=0 host=loui
+put proc.softirqs 1468482964 554275 type=HRTIMER cpu=1 host=loui
+put proc.softirqs 1468482964 131202 type=HRTIMER cpu=2 host=loui
+put proc.softirqs 1468482964 232469 type=HRTIMER cpu=3 host=loui
+put proc.softirqs 1468482964 21430 type=HRTIMER cpu=4 host=loui
+put proc.softirqs 1468482964 28390 type=HRTIMER cpu=5 host=loui
+put proc.softirqs 1468482964 68110456 type=RCU cpu=0 host=loui
+put proc.softirqs 1468482964 68415243 type=RCU cpu=1 host=loui
+put proc.softirqs 1468482964 58055894 type=RCU cpu=2 host=loui
+put proc.softirqs 1468482964 76710329 type=RCU cpu=3 host=loui
+put proc.softirqs 1468482964 65745153 type=RCU cpu=4 host=loui
+put proc.softirqs 1468482964 86430555 type=RCU cpu=5 host=loui
+put sys.numa.zoneallocs 1468482964 2806981663 node=0 type=hit host=loui
+put sys.numa.zoneallocs 1468482964 0 node=0 type=miss host=loui
+put sys.numa.foreign_allocs 1468482964 0 node=0 host=loui
+put sys.numa.allocation 1468482964 2806981663 node=0 type=local host=loui
+put sys.numa.allocation 1468482964 0 node=0 type=remote host=loui
+put sys.numa.interleave 1468482964 34037 node=0 type=hit host=loui
+put proc.net.bytes 1468482964 240588606 iface=eth0 direction=in host=loui
+put proc.net.packets 1468482964 2208558 iface=eth0 direction=in host=loui
+put proc.net.errs 1468482964 0 iface=eth0 direction=in host=loui
+put proc.net.dropped 1468482964 0 iface=eth0 direction=in host=loui
+put proc.net.fifo.errs 1468482964 0 iface=eth0 direction=in host=loui
+put proc.net.frame.errs 1468482964 0 iface=eth0 direction=in host=loui
+put proc.net.compressed 1468482964 0 iface=eth0 direction=in host=loui
+put proc.net.multicast 1468482964 0 iface=eth0 direction=in host=loui
+put proc.net.bytes 1468482964 517115091 iface=eth0 direction=out host=loui
+put proc.net.packets 1468482964 3482859 iface=eth0 direction=out host=loui
+put proc.net.errs 1468482964 0 iface=eth0 direction=out host=loui
+put proc.net.dropped 1468482964 0 iface=eth0 direction=out host=loui
+put proc.net.fifo.errs 1468482964 0 iface=eth0 direction=out host=loui
+put proc.net.collisions 1468482964 0 iface=eth0 direction=out host=loui
+put proc.net.carrier.errs 1468482964 0 iface=eth0 direction=out host=loui
+put proc.net.compressed 1468482964 0 iface=eth0 direction=out host=loui
+put proc.net.bytes 1468482964 1209292470514 iface=eth1 direction=in host=loui
+put proc.net.packets 1468482964 122795123 iface=eth1 direction=in host=loui
+put proc.net.errs 1468482964 0 iface=eth1 direction=in host=loui
+put proc.net.dropped 1468482964 0 iface=eth1 direction=in host=loui
+put proc.net.fifo.errs 1468482964 0 iface=eth1 direction=in host=loui
+put proc.net.frame.errs 1468482964 0 iface=eth1 direction=in host=loui
+put proc.net.compressed 1468482964 0 iface=eth1 direction=in host=loui
+put proc.net.multicast 1468482964 0 iface=eth1 direction=in host=loui
+put proc.net.bytes 1468482964 148136566249 iface=eth1 direction=out host=loui
+put proc.net.packets 1468482964 74669660 iface=eth1 direction=out host=loui
+put proc.net.errs 1468482964 0 iface=eth1 direction=out host=loui
+put proc.net.dropped 1468482964 0 iface=eth1 direction=out host=loui
+put proc.net.fifo.errs 1468482964 0 iface=eth1 direction=out host=loui
+put proc.net.collisions 1468482964 0 iface=eth1 direction=out host=loui
+put proc.net.carrier.errs 1468482964 0 iface=eth1 direction=out host=loui
+put proc.net.compressed 1468482964 0 iface=eth1 direction=out host=loui
+put proc.net.bytes 1468482964 0 iface=eth2 direction=in host=loui
+put proc.net.packets 1468482964 0 iface=eth2 direction=in host=loui
+put proc.net.errs 1468482964 0 iface=eth2 direction=in host=loui
+put proc.net.dropped 1468482964 0 iface=eth2 direction=in host=loui
+put proc.net.fifo.errs 1468482964 0 iface=eth2 direction=in host=loui
+put proc.net.frame.errs 1468482964 0 iface=eth2 direction=in host=loui
+put proc.net.compressed 1468482964 0 iface=eth2 direction=in host=loui
+put proc.net.multicast 1468482964 0 iface=eth2 direction=in host=loui
+put proc.net.bytes 1468482964 0 iface=eth2 direction=out host=loui
+put proc.net.packets 1468482964 0 iface=eth2 direction=out host=loui
+put proc.net.errs 1468482964 0 iface=eth2 direction=out host=loui
+put proc.net.dropped 1468482964 0 iface=eth2 direction=out host=loui
+put proc.net.fifo.errs 1468482964 0 iface=eth2 direction=out host=loui
+put proc.net.collisions 1468482964 0 iface=eth2 direction=out host=loui
+put proc.net.carrier.errs 1468482964 0 iface=eth2 direction=out host=loui
+put proc.net.compressed 1468482964 0 iface=eth2 direction=out host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=internal service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=closing endpoint=external service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 9 state=listen endpoint=internal service=other user=root host=loui
+put proc.net.tcp 1468482964 1 state=listen endpoint=external service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=internal service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=other user=mysql host=loui
+put proc.net.tcp 1468482964 4 state=listen endpoint=internal service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=listen endpoint=external service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=internal service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_sent endpoint=external service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=internal service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=syn_recv endpoint=external service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=other user=root host=loui
+put proc.net.tcp 1468482964 9 state=established endpoint=external service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=internal service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=established endpoint=external service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=internal service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=time_wait endpoint=external service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=internal service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=close endpoint=external service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=internal service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait1 endpoint=external service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=internal service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=fin_wait2 endpoint=external service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=external service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=close_wait endpoint=internal service=other user=other host=loui
+put proc.net.tcp 1468482964 3 state=close_wait endpoint=external service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=http user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=http user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=http user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=http user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=memcache user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=memcache user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=memcache user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=memcache user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=datanode user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=datanode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=datanode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=datanode user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=https user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=https user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=https user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=https user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=mysql user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=mysql user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=mysql user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=mysql user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=hregionserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=hregionserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=hregionserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=hregionserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=namenode user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=namenode user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=namenode user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=namenode user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=thriftserver user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=thriftserver user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=thriftserver user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=thriftserver user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=http-varnish user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=http-varnish user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=http-varnish user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=http-varnish user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=other user=root host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=other user=www-data host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=other user=mysql host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=internal service=other user=other host=loui
+put proc.net.tcp 1468482964 0 state=last_ack endpoint=external service=other user=other host=loui
+
