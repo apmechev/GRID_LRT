@@ -370,7 +370,7 @@ OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 
 echo "copying the instrument tables into <storage>/spectroscopy/prefactor/instr_"$OBSID.tar
 #globus-url-copy file:`pwd`/instruments.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/instr_$OBSID.tar
-if [[ -z $CAL_OBSID ]]
+if [[ ! -z $CAL_OBSID ]]
 then
 	tar -zxvf results.tar ./prefactor/result*
 	globus-url-copy file:`pwd`/results.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/results_$OBSID_$STARTSB.tar
