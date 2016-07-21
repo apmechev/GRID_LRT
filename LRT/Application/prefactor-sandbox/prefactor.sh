@@ -219,7 +219,7 @@ set +x
       fi
      NUMJOBS=$(( $LENJOBS - $NUMDONE ))
      echo $NUMJOBS" Subbands remaining "$STALLED" have stalled"
-     sleep 60
+     sleep 30
      if [[ $(( $NUMDONE + $STALLED )) -eq $LENJOBS ]]; then
        break
      fi
@@ -282,11 +282,13 @@ then
  fi
 fi
 
+
 echo "start tCollector in dryrun mode"
 cd openTSDB_tcollector/
 ./tcollector.py -d > tcollector.out &
 TCOLL_PID=$!
 cd ..
+
 echo ""
 echo "execute generic pipeline"
 genericpipeline.py ./prefactor/Pre-Facet-Cal.parset -d -c pipeline.cfg > output
@@ -298,16 +300,17 @@ kill $TCOLL_PID
 
 find . -name "*png"|xargs tar -zcf pngs.tar.gz
 find . -name "*npy"|xargs tar -cf numpys.tar
-find . -name "tcollector.out" -exec tar -rf numpys.tar {};  ##TEST THIS
-find . -name "statistics.xml" -exec tar -rf numpys.tar {};  ##TEST THIS
-find . -name "*h5" -exec tar -rf numpys.tar {};  ##TEST THIS
+find . -name "*tcollector.out"|xargs tar -cf profile.tar
+find . -iname "statistics.xml" -exec tar -rvf profile.tar {} \;
+find . -iname "*h5" -exec tar -rvf numpys.tar {} \;
+
 cp pngs.tar.gz ${JOBDIR}
 echo "Numpy files found:"
 find . -name "*npy"
 #
 # - step3 finished check contents
 more output
-OBSID=$(echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
+OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 if [[ $( grep "finished unsuccesfully" output) > "" ]]
 then
      echo "Pipeline did not finish, tarring work and run directories for re-run"
@@ -342,11 +345,11 @@ echo "Copy the output from the Worker Node to the Grid Storage Element"
 echo "---------------------------------------------------------------------------"
 
 echo "JOBDIR, RUNDIR, PWD: ", ${JOBDIR}, ${RUNDIR}, ${PWD}
-ls -l ${JOBDIR}
-ls -l ${RUNDIR}
-ls -l ${PWD}
-du -hs $PWD
-du -hs $PWD/*
+#ls -l ${JOBDIR}
+#ls -l ${RUNDIR}
+#ls -l ${PWD}
+#du -hs $PWD
+#du -hs $PWD/*
 
 
 
@@ -360,10 +363,18 @@ du -hs instruments.tar
 
 
 # copy the output tarball to the Grid storage
-OBSID=$(echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
+OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
+
 echo "copying the instrument tables into <storage>/spectroscopy/prefactor/instr_"$OBSID.tar
 #globus-url-copy file:`pwd`/instruments.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/instr_$OBSID.tar
-globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$OBSID_$STARTSB.tar
+if [[ -z $CAL_OBSID ]]
+then
+	tar -zxvf results.tar ./prefactor/result*
+	globus-url-copy file:`pwd`/results.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/results_$OBSID_$STARTSB.tar
+else
+	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$OBSID.tar
+fi
+
 # Exit loop on non-zero exit status:
 if [[ "$?" != "0" ]]; then
    echo "Problem copying final files to the Grid. Clean up and Exit now..."
