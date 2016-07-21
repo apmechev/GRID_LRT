@@ -144,6 +144,7 @@ echo ""
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/prefactor.tar $RUNDIR
 cp -r $PWD/openTSDB_tcollector $RUNDIR
+cp pipeline.cfg $RUNDIR
 cd ${RUNDIR}
 echo "untarring Prefactor" 
 tar -xf prefactor.tar
@@ -265,7 +266,7 @@ sbn=${SUBBAND_NUM}
 echo "Replacing "$PWD" in the prefactor parset"
 
 sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" prefactor/Pre-Facet-Cal.parset 
-sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" prefactor/pipeline.cfg
+sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" pipeline.cfg
 
 
 #Check if any files match the target, if so, download the calibration tables matching the calibrator OBSID. If no tables are downloaded, xit with an error message.
@@ -303,6 +304,8 @@ find . -name "*npy"|xargs tar -cf numpys.tar
 find . -name "*tcollector.out"|xargs tar -cf profile.tar
 find . -iname "statistics.xml" -exec tar -rvf profile.tar {} \;
 find . -iname "*h5" -exec tar -rvf numpys.tar {} \;
+
+globus-url-copy file: profile.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_$OBSID.tar
 
 cp pngs.tar.gz ${JOBDIR}
 echo "Numpy files found:"
