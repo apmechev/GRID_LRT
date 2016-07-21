@@ -313,7 +313,7 @@ find . -name "*npy"
 # - step3 finished check contents
 more output
 OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
-globus-url-copy file:`pwd`/profile.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_$OBSID.tar
+globus-url-copy file:`pwd`/profile.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_$OBSID_$( date  +%s ).tar
 if [[ $( grep "finished unsuccesfully" output) > "" ]]
 then
      echo "Pipeline did not finish, tarring work and run directories for re-run"
