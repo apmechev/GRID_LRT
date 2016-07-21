@@ -305,7 +305,6 @@ find . -name "*tcollector.out"|xargs tar -cf profile.tar
 find . -iname "statistics.xml" -exec tar -rvf profile.tar {} \;
 find . -iname "*h5" -exec tar -rvf numpys.tar {} \;
 
-globus-url-copy file: profile.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_$OBSID.tar
 
 cp pngs.tar.gz ${JOBDIR}
 echo "Numpy files found:"
@@ -314,6 +313,7 @@ find . -name "*npy"
 # - step3 finished check contents
 more output
 OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
+globus-url-copy file: profile.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_$OBSID.tar
 if [[ $( grep "finished unsuccesfully" output) > "" ]]
 then
      echo "Pipeline did not finish, tarring work and run directories for re-run"
