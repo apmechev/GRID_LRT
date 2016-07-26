@@ -13,6 +13,8 @@
 #		Now accepts user defined parset in FAD_v#/parsets in custom_setup
 #		Can Invoke scripts to modify parset on the node
 #		--resubmit errors only implemented 
+#TODO: Check if skymodel exists before running?
+#TODO: annotate srms with target/calibrator to help user for many many OBSIDs in one file
 ##########################
 
 import glob
