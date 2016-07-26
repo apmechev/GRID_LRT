@@ -315,7 +315,7 @@ find . -name "*npy"
 more output
 OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 echo "Saving profiling data to profile_"$OBSID_$( date  +%s )".tar.gz"
-globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_$OBSID_$( date  +%s ).tar.gz
+globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_${OBSID}_$( date  +%s ).tar.gz
 if [[ $( grep "finished unsuccesfully" output) > "" ]]
 then
      echo "Pipeline did not finish, tarring work and run directories for re-run"
@@ -370,7 +370,7 @@ echo "copying the instrument tables into <storage>/spectroscopy/prefactor/instr_
 if [[ ! -z $CAL_OBSID ]]
 then
 	tar -cvf results.tar prefactor/results/*
-	globus-url-copy file:`pwd`/results.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/results_$OBSID_$STARTSB.tar
+	globus-url-copy file:`pwd`/results.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/results_${OBSID}_${STARTSB}.tar
 else
 	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$OBSID.tar
 fi
