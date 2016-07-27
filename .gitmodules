@@ -6,3 +6,6 @@
         url = https://github.com/OpenTSDB/tcollector
 
 
+[submodule "LRT/Application/prefactor-sandbox/piechart"]
+	path = LRT/Application/prefactor-sandbox/piechart
+	url = git@gitlab.com:astron-profiling/statistics.git
