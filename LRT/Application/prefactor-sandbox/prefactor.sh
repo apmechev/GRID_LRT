@@ -144,6 +144,8 @@ echo ""
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/prefactor.tar $RUNDIR
 cp -r $PWD/openTSDB_tcollector $RUNDIR
+mkdir $RUNDIR/piechart
+cp -r $PWD/piechart/* $RUNDIR/piechart 
 cp pipeline.cfg $RUNDIR
 cd ${RUNDIR}
 echo "untarring Prefactor" 
@@ -297,12 +299,14 @@ genericpipeline.py ./prefactor/Pre-Facet-Cal.parset -d -c pipeline.cfg > output
 echo "killing tcollector"
 kill $TCOLL_PID
 
-
+xmlfile=$( find . -name "*statistics.xml" 2>/dev/null)
+./piechart/make_a_pie.py ${xmlfile} PIE_${xmlfile}.png
 
 find . -name "*png"|xargs tar -zcf pngs.tar.gz
 find . -name "*npy"|xargs tar -cf numpys.tar
 find . -name "*tcollector.out"|xargs tar -cf profile.tar
 find . -iname "*statistics.xml" -exec tar -rvf profile.tar {} \;
+find . -name "*png"|xargs tar -exec tar -rvf profile.tar {} \;
 tar -zcvf profile.tar.gz profile.tar
 find . -iname "*h5" -exec tar -rvf numpys.tar {} \;
 
@@ -369,8 +373,8 @@ echo "copying the instrument tables into <storage>/spectroscopy/prefactor/instr_
 #globus-url-copy file:`pwd`/instruments.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/instr_$OBSID.tar
 if [[ ! -z $CAL_OBSID ]]
 then
-	tar -cvf results.tar prefactor/results/*
-	globus-url-copy file:`pwd`/results.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/results_${OBSID}_${STARTSB}.tar
+	tar -zcvf results.tar.gz prefactor/results/*
+	globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/results_${OBSID}_${STARTSB}.tar.gz
 else
 	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$OBSID.tar
 fi
