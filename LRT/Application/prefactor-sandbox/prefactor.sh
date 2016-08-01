@@ -304,9 +304,11 @@ xmlfile=$( find . -name "*statistics.xml" 2>/dev/null)
 
 find . -name "*png"|xargs tar -zcf pngs.tar.gz
 find . -name "*npy"|xargs tar -cf numpys.tar
-find . -name "*tcollector.out"|xargs tar -cf profile.tar
+tar --append --file=numpys.tar pngs.tar.gz
+find . -name "*tcollector.out" | xargs tar -cf profile.tar
 find . -iname "*statistics.xml" -exec tar -rvf profile.tar {} \;
-find . -name "*png"|xargs tar -exec tar -rvf profile.tar {} \;
+find . -name "*png" -exec tar -rvf profile.tar {} \;
+tar --append --file=profile.tar output
 tar -zcvf profile.tar.gz profile.tar
 find . -iname "*h5" -exec tar -rvf numpys.tar {} \;
 
