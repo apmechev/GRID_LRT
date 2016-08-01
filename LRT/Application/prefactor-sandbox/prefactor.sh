@@ -269,7 +269,8 @@ echo "Replacing "$PWD" in the prefactor parset"
 
 sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" prefactor/Pre-Facet-Cal.parset 
 sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" pipeline.cfg
-
+echo "Concatinating only "${NUMLINES}" Subbands"
+sed -i "s?num_SBs_per_group.*?num_SBs_per_group    = ${NUMLINES}?g" prefactor/Pre-Facet-Cal.parset
 
 #Check if any files match the target, if so, download the calibration tables matching the calibrator OBSID. If no tables are downloaded, xit with an error message.
 if [[ ! -z $( grep " target_input_pattern =" prefactor/Pre-Facet-Cal.parset | awk '{print $NF}' | xargs find . -name )  ]]
