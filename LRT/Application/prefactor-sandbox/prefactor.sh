@@ -193,7 +193,7 @@ head -n $NUMSB srm-stripped.txt |grep $OBSID > srm-final.txt
 echo "Final srm"
 cat srm-final.txt
 
-NUMLINES=$(( $(wc -l srm-final.txt |awk '{print $1}' )/10 + 1 )) #WHAT USE IS THIS?
+NUMLINES=$(( $(wc -l srm-final.txt |awk '{print $1}' ) )) #WHAT USE IS THIS?
 
 for block in `seq 1 $(( NUMSB / 10 ))`; do
  let init=" ($block - 1) * 10 + 1"
