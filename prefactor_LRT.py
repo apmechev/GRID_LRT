@@ -207,6 +207,7 @@ def setup_dirs():
         	        cfgfile.write("OBSID           = "+d_vars['OBSID']+"\n")
 			cfgfile.write("AVG_FREQ_STEP   ="+str(d_vars["numpernode"])+"\nAVG_TIME_STEP   = 2\nDO_DEMIX        = False\nDEMIX_FREQ_STEP = 2\nDEMIX_TIME_STEP = 2\nDEMIX_SOURCES   = CasA\nSELECT_NL       = True\n")
         	        cfgfile.write('PARSET     = '+d_vars["parsetfile"]+'\n')
+			cfgiile.write("LOFARDIR="+d_vars["sw_dir"]+"/"+d_vars["sw_ver"]+'\n')
 
 	return 
 
