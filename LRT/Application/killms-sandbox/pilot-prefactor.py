@@ -43,17 +43,9 @@ class ExampleActor(RunActor):
         #
 	
 #        command = "valgrind --tool=memcheck --track-fds=yes --trace-children=yes --log-file=CACHEgrind%p  ./master_avg_dmx_v2.sh "+ str(token['OBSID']) + " " + str(token['SURL_SUBBAND']) + " " + str(token['AVG_FREQ_STEP']) + " " + str(token['AVG_TIME_STEP']) + " " + str(token['DO_DEMIX']) + " " + str(token['DEMIX_FREQ_STEP']) + " " + str(token['DEMIX_TIME_STEP']) + " " + str(token['DEMIX_SOURCES']) + " " + str(token['SELECT_NL']) + " " + str(token['SUBBAND_NUM']) + " 2> logs_" + str(token['OBSID']) + "_" + str(token['SUBBAND_NUM']) + ".err 1> logs_" + str(token['OBSID']) + "_" + str(token['SUBBAND_NUM']) + ".out" ##CACHEGRIND VERSION
-	try:
-		parsetfile= "prefactor/"+str(token['PARSET'])
-	except:
-		parsetfile="prefactor/Pre-Facet-Cal.parset"
-        try:
-                lofdir= str(token['LOFARDIR'])
-        except:
-                lofdir="/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16"
-	
+
 	execute("ls -lat",shell=True)
-	command = "/usr/bin/time -v ./prefactor-refactor.sh " + str(token['SUBBAND_NUM']) + " "+ str(token['AVG_FREQ_STEP']) +" "+ parsetfile+" "+lofdir+" 2> logs_.err 1> logs_out"
+	command = "/usr/bin/time -v ./prefactor.sh 2> logs_.err 1> logs_out"
         print command
         
 	out = execute(command,shell=True)

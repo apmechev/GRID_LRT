@@ -53,7 +53,7 @@ class ExampleActor(RunActor):
                 lofdir="/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16"
 	
 	execute("ls -lat",shell=True)
-	command = "/usr/bin/time -v ./prefactor-refactor.sh " + str(token['SUBBAND_NUM']) + " "+ str(token['AVG_FREQ_STEP']) +" "+ parsetfile+" "+lofdir+" 2> logs_.err 1> logs_out"
+	command = "/usr/bin/time -v ./killms.sh " + str(token['SUBBAND_NUM']) + " "+ str(token['AVG_FREQ_STEP']) +" "+ parsetfile+" "+lofdir+" 2> logs_.err 1> logs_out"
         print command
         
 	out = execute(command,shell=True)

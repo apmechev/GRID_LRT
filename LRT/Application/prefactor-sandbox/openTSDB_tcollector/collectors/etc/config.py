@@ -62,7 +62,7 @@ def get_defaults():
         'port': 4242,
         'pidfile': './run/tcollector.pid',
         'http': False,
-        'tags': [],
+        'tags': [],		#Modify this on the host to include OBSID,pipeline
         'remove_inactive_collectors': False,
         'host': 'localhost',
         'backup_count': 1,

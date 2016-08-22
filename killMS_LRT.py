@@ -30,7 +30,7 @@ import subprocess
 #Dictionary of input variables to make keeping track of values easier
 ###########
 
-d_vars = {"srmfile":"", "fadir":".", "resuberr":False, "TSplit":True, "OBSID":"", "sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack/", "sw_ver":"2.16", "parsetfile":"-", "jdl_file":"remote-prefactor.jdl", "numpernode":10,"ignoreunstaged":False}
+d_vars = {"srmfile":"", "fadir":".", "resuberr":False, "TSplit":True, "OBSID":"", "sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack/", "sw_ver":"2.16", "parsetfile":"-", "jdl_file":"remote-prefactor.jdl", "numpernode":1,"ignoreunstaged":False,"customscript":""}
 
 
 ###################
@@ -68,11 +68,11 @@ def parse_arguments(args):
 		print "(-h or --help)                   - prints this message (obv)"
 		sys.exit()
 	
-	if ("srm" in args[-2]) and (".parset" in args[-1]):
+	if ("srm" in args[-2]) and ((".sh" in args[-1]) or (".py" in args[-1])):
 		d_vars['srmfile']=sys.argv[-2]
 		d_vars['parsetfile']=sys.argv[-1]
 	
-	elif ("srm" in args[-1]) and (".parset" in args[-2]):
+	elif ("srm" in args[-1]) and ((".sh" in args[-2]) or (".py" in args[-2])):
 	        d_vars['srmfile']=args[-1]
 		d_vars['parsetfile']=args[-2]
 	
