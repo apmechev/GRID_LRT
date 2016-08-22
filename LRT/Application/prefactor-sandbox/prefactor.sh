@@ -85,8 +85,8 @@ echo "Setting up the LOFAR environment; setting release"
 
 # NEW INIT VIA init_env_release.sh
 #echo "source init_env_release.sh" || exit 1
-. /cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/init_env_release.sh 
-export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
+. /cvmfs/softdrive.nl/wjvriend/lofar_stack/2_16_4/init_env_release.sh 
+export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2_16_4/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2_16_4/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
 
 # NEW NB we can't assume the home dir is shared across all Grid nodes.
 echo "LOFARDATAROOT: ", ${LOFARDATAROOT}
@@ -378,7 +378,7 @@ echo "copying the instrument tables into <storage>/spectroscopy/prefactor/instr_
 if [[ ! -z $CAL_OBSID ]]
 then
 	tar -zcvf results.tar.gz prefactor/results/*
-	globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/results_${OBSID}_${STARTSB}.tar.gz
+	globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/results_${OBSID}_SB${STARTSB}_.tar.gz
 else
 	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$OBSID.tar
 fi

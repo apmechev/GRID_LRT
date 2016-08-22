@@ -72,7 +72,7 @@ if [ -d /cvmfs/softdrive.nl ]
 fi
 
 
-echo "START LOFAR FROM SOFTDRIVE, in "$LOFAR_PATH
+echo "START LOFAR FROM SOFTDRIVE"
 echo "Setting up the LOFAR environment; setting release"
 
 function setup_env(){
@@ -81,13 +81,11 @@ function setup_env(){
     echo "Initializing default environment"
     . /cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/init_env_release.sh
     export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
-  LOFAR_PATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/
   else
     if [ -e "$1/init_env_release.sh" ]; then
       echo "Initializing environment from ${1}"
       . ${1}/init_env_release.sh
       export PYTHONPATH=${1}/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:${1}/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
-      export LOFARDATAROOT=/cvmfs/softdrive.nl/wjvriend/data
     else
 	echo "The environment script doesn't exist. check the path $1 again"
 	exit 1
@@ -154,8 +152,7 @@ cd ${RUNDIR}
 echo "untarring Prefactor" 
 tar -xf prefactor.tar
 cp prefactor/srm.txt $RUNDIR
-sed -i "s?LOFAR_ROOT?${LOFAR_PATH}?g" pipeline.cfg
-echo "replaced LOFAR_PATH in pipeline.cfg"
+
 pwd
 touch activejobs
 echo ""
@@ -313,19 +310,6 @@ then
  fi
 fi
 
-if [[ ! -z ${CAL_OBSID} ]]
-then
-pipelinetype="pref.targ"
-elif [[ ! -z $( echo $PARSET | grep Initial-Subtract ) ]]
-then
-pipelinetype="pref.insub"
-else
-pipelinetype="pref.cal"
-fi
-
-echo "Pipeline type is "$pipelinetype
-echo "Adding $OBSID and $pipelinetype into the tcollector tags"
-sed -i "s?\[\]?\[\ \"obsid=${OBSID}\",\ \"pipeline=${pipelinetype}\"\]?g" openTSDB_tcollector/collectors/etc/config.py
 
 echo "start tCollector in dryrun mode"
 cd openTSDB_tcollector/
@@ -335,40 +319,35 @@ TCOLL_PID=$!
 cd ..
 
 echo ""
-echo "execute generic pipeline"
-genericpipeline.py $parset -d -c pipeline.cfg > output
+echo "execute Killms"
+python $PARSET
 
 echo "killing tcollector"
 kill $TCOLL_PID
 
-xmlfile=$( find . -name "*statistics.xml" 2>/dev/null)
-./piechart/make_a_pie.py ${xmlfile} PIE_${xmlfile}.png
-
+find . -name "*fits"|xargs tar -zcf fits.tar.gz
 find . -name "*png"|xargs tar -zcf pngs.tar.gz
-find . -name "*npy"|xargs tar -cf numpys.tar
-tar --append --file=numpys.tar pngs.tar.gz
 find . -name "*tcollector.out" | xargs tar -cf profile.tar
-find . -iname "*statistics.xml" -exec tar -rvf profile.tar {} \;
 find . -name "*png" -exec tar -rvf profile.tar {} \;
 tar --append --file=profile.tar output
 tar -zcvf profile.tar.gz profile.tar
-find . -iname "*h5" -exec tar -rvf numpys.tar {} \;
+
 
 
 cp pngs.tar.gz ${JOBDIR}
-echo "Numpy files found:"
-find . -name "*npy"
+
+
 #
 # - step3 finished check contents
 more output
 OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 echo "Saving profiling data to profile_"$OBSID_$( date  +%s )".tar.gz"
-globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_${OBSID}_$( date  +%s ).tar.gz
-if [[ $( grep "finished unsuccesfully" output) > "" ]]
+globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_${OBSID}_KILLMS_$( date  +%s ).tar.gz
+if [[ $( grep "FAILED" output) > "" ]]
 then
      echo "Pipeline did not finish, tarring work and run directories for re-run"
-     RERUN_FILE=$OBSID"_"$STARTSB"prefactor_error.tar"
-     echo "Will be  at gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/error_states"$RERUN_FILE
+     RERUN_FILE=$OBSID"_"$STARTSB"killMS_error.tar"
+     echo "Will be  at gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/error_states/"$RERUN_FILE
      tar -cf $RERUN_FILE prefactor/
      globus-url-copy file:`pwd`/$RERUN_FILE gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/error_states/$RERUN_FILE
    if [[ $(hostname -s) != 'loui' ]]; then
@@ -416,19 +395,9 @@ OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 echo "copying the Results"
 #globus-url-copy file:`pwd`/instruments.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/instr_$OBSID.tar
 
-if [ ! -z $( echo $PARSET | grep Initial-Subtract ) ]
-   then
-   OBSID="Init_"${OBSID}
-   CAL_OBSID="2" #do this nicer
-fi
 
-if [[ ! -z $CAL_OBSID ]]
-then
-	tar -zcvf results.tar.gz prefactor/results/*
-	globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/results_${OBSID}_SB${STARTSB}_.tar.gz
-else
-	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$OBSID.tar
-fi
+globus-url-copy file:`pwd`/fits.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/killms_$OBSID.tar
+
 
 # Exit loop on non-zero exit status:
 if [[ "$?" != "0" ]]; then
