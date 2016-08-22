@@ -19,9 +19,9 @@
   #Requirements = (RegExp("mediummc",other.GlueCEUniqueID) || RegExp("nikhef.nl:8443/cream-pbs-medium",other.GlueCEUniqueID) || RegExp("rug.nl:8443/cream-pbs-medium",other.GlueCEUniqueID));
 
   # Just 4 cores on a single node
-  SmpGranularity = 15;
-  CPUNumber = 15;
+  SmpGranularity = 16;
+  CPUNumber = 16;
 
   #requirement for Nikhef high memory jobs
-  #CERequirements = "other.GlueHostMainMemoryRAMSize >= 16192";
+  CERequirements = "other.GlueHostMainMemoryRAMSize >= 200192";
 ]

@@ -43,7 +43,10 @@ def loadTokens(db):
                if srminput.find('SB'+subband_num)!=-1:
                   SURL_SB = srminput
                   print subband_num, SURL_SB
-
+	 try:
+            lofdir=config.get('OBSERVATION','LOFARDIR')
+         except:
+            lofdir="/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16"
          token = {
 
             '_id': 'token_' + OBSID + '_' + str(subband_num)+"v1.0",
@@ -58,6 +61,7 @@ def loadTokens(db):
             'DEMIX_SOURCES': config.get('OBSERVATION','DEMIX_SOURCES'),
             'SELECT_NL': config.get('OBSERVATION','SELECT_NL'),
             'PARSET':  config.get('OBSERVATION','PARSET'),
+            'LOFARDIR': lofdir,
             'SUBBAND_NUM': subband_num,
 
             'lock': 0,
