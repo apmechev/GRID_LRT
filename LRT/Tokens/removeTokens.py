@@ -3,6 +3,7 @@ if not 'couchdb' in sys.modules:
         import couchdb
 from couchdb import Server
 from couchdb.design import ViewDefinition
+import pdb
 
 # python removeTokens.py [db_name] [username] [pwd]
 """
@@ -11,8 +12,9 @@ from couchdb.design import ViewDefinition
 """
 
 def deleteDocs(db):
-     v=db.view("Monitor/done")
+     v=db.view("Monitor/error") 
      for x in v:
+         pdb.set_trace()
          document = db[x['key']]
          db.delete(document)
 
