@@ -28,7 +28,7 @@ import subprocess
 #Dictionary of input variables to make keeping track of values easier
 ###########
 
-d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack","sw_ver":"2.16","parsetfile":"-","jdl_file":"","customscript":""}
+d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack","sw_ver":"2.16","parsetfile":"-","jdl_file":"","customscript":"","ignoreunstaged"=False}
 
 ###################
 #Helper function to do a replace in file
@@ -102,7 +102,11 @@ def parse_arguments(args):
                 print "Using Software version="+args[idxv+1]
                 d_vars['sw_ver']=args[idxv+1]
 
-	if ("-s" in args[:-2] or ("--script" in args[:-2])):
+        if ("-i" in args[:-2] or ("--ignore-unstaged" in args[:-2])):
+                print "Will continue even if files unstaged"
+                d_vars['ignoreunstaged']=True
+
+        if ("-s" in args[:-2] or ("--script" in args[:-2])):
 		try:
                         idxv=args.index("-s")
                 except:
@@ -143,6 +147,7 @@ def parse_arguments(args):
 	                if d_vars['OBSID'] in line:
 	                        found=True
 	                        print("Processing OBSID=\033[32m"+d_vars['OBSID']+"\033[0m")
+                                break
 	        if not found:
 	                print "\033[31mOBSID not found in SRM file!\033[0m"
 	                sys.exit()
@@ -266,6 +271,9 @@ def check_state_and_stage():
 	locs=state_all.main('files')
 	for sublist in locs:
                if 'NEARLINE' in sublist :
+                              if d_vars["ignoreunstaged"]:
+                                    print " \033[31m Continuing although there are unstaged files\033[0m"
+                                    break
                                print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
                                print "I've requested staging but srms are not ONLINE yet. I'll exit so the tokens don't crash. Re-run in a few (or tens of) minutes"
                                print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m"

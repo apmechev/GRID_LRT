@@ -11,24 +11,24 @@
 #   doesn't work on multiple nodes on CEP-2 or CEP3.)
 
 ### First run this and check the generated plots! Modify and re-run if neccessary.
-pipeline.steps=[createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal, fitclock, ampl, plots, phase]
+#pipeline.steps=[createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal, fitclock, ampl, plots, phase]
 ### When calibrator processing is done, you can do the processing of the target data.
 ### Either by using the same pipeline and running this:
 #pipeline.steps=[ createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal, fitclock, ampl, plots, phase, createmap_target, ndppp_prep_target, trans, parmmap, calibtarget, dpppaverage, ateamtarget, ateamcliptar, sortmap_tar, dpppconcat, gsmcalibtarget, gsmcal_parmmap, plot_gsm_phases, make_results_mapfile, move_results, createmap_plots, copy_plots]
 ### Or by copying the *.npy files from the calibrator and running this:
-#pipeline.steps=[createmap_target, ndppp_prep_target, trans, parmmap, calibtarget, dpppaverage, ateamtarget, ateamcliptar, sortmap_tar, dpppconcat, gsmcalibtarget, gsmcal_parmmap, plot_gsm_phases, make_results_mapfile, move_results, createmap_plots, copy_plots]
+pipeline.steps=[createmap_target, ndppp_prep_target, trans, parmmap, calibtarget, dpppaverage, ateamtarget, ateamcliptar, sortmap_tar, dpppconcat, gsmcalibtarget, gsmcal_parmmap, plot_gsm_phases, make_results_mapfile, move_results, createmap_plots, copy_plots]
 
 
 # parameters you will need to adjust.
-! avg_timestep         = 2   # averaging step needed to average the data to 4 seconds time resolution
-! avg_freqstep         = 2   # averaging step needed to average the data to 4 ch/SB frequency resolution
+! avg_timestep         = 4   # averaging step needed to average the data to 4 seconds time resolution
+! avg_freqstep         = 4   # averaging step needed to average the data to 4 ch/SB frequency resolution
 ! cal_input_path       = PREFACTOR_SCRATCH_DIR
 ! cal_input_pattern    = L342934*MS
 ! calibrator_skymodel  = PREFACTOR_SCRATCH_DIR/prefactor/skymodels/3C196-pandey.skymodel
 ! target_input_path    = PREFACTOR_SCRATCH_DIR 			#TODO: ADD THIS
 ! target_input_pattern = L342938*MS
 ! target_skymodel      = PREFACTOR_SCRATCH_DIR/prefactor/skymodels/LOCKMAN_5deg.txt 
-! num_SBs_per_group    = 10 # make concatenated measurement-sets with that many subbands
+! num_SBs_per_group    = 10
 ! results_directory    = PREFACTOR_SCRATCH_DIR/prefactor/results		  #TODO: ADD THIS
 
 # pathes to the scripts etc.
@@ -42,6 +42,7 @@ pipeline.steps=[createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal,
 ! fitclock_script      = PREFACTOR_SCRATCH_DIR/prefactor/bin/fit_clocktec_initialguess_losoto.py
 ! fitamps_script       = PREFACTOR_SCRATCH_DIR/prefactor/bin/amplitudes_losoto_3.py
 ! plotsols_script      = PREFACTOR_SCRATCH_DIR/prefactor/bin/examine_npys.py
+! piemaker_script      = PREFACTOR_SCRATCH_DIR/prefactor/bin/autopie.py
 ! fit_XYoffset_script  = PREFACTOR_SCRATCH_DIR/prefactor/bin/find_cal_global_phaseoffset_losoto.py
 ! transfer_script      = PREFACTOR_SCRATCH_DIR/prefactor/bin/transfer_amplitudes+clock+offset_toMS.py
 ! ATeam_Clipper        = PREFACTOR_SCRATCH_DIR/prefactor/bin/Ateamclipper.py
@@ -50,14 +51,6 @@ pipeline.steps=[createmap_cal, ndppp_prep_cal, calib_cal, h5_imp_map, h5imp_cal,
 
 # set this to True if you want the pipeline run to continue if single bands fail
 ! error_tolerance           =  False
-
-
-#copy the diagnostic plots to the results_directory
-getfiles.control.kind               =  recipe
-getfiles.control.type               =  executable_args
-getfiles.control.executable         =  bin/getfiles.sh
-getfiles.control.arguments          =  [srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc3_008/342934/L342934_SB000_uv.dppp.MS_31642b30.tar]
-#
 
 
 # generate a mapfile of all the calibrator data
@@ -71,7 +64,7 @@ createmap_cal.control.pattern         =   {{ cal_input_pattern }}
 
 # run NDPPP on the calibrator data
 ndppp_prep_cal.control.type                    = dppp
-ndppp_prep_cal.control.max_per_node            = 10                   # \ feel free to adjust these two values to match your system
+ndppp_prep_cal.control.max_per_node            = 12                   # \ feel free to adjust these two values to match your system
 ndppp_prep_cal.control.environment             = {OMP_NUM_THREADS: 4} # / they should be reasonable for CEP3
 ndppp_prep_cal.control.error_tolerance         = {{ error_tolerance }}
 ndppp_prep_cal.argument.msin                   = createmap_cal.output.mapfile    # The input data.
@@ -93,7 +86,7 @@ ndppp_prep_cal.argument.flagamp.amplmin        = 1e-30
 
 #now run BBS on the NDPPP-ed calibrator data.
 calib_cal.control.type             =  python-calibrate-stand-alone  
-calib_cal.control.max_per_node     =  24                         # feel free to adjust this value to match your system  
+calib_cal.control.max_per_node     =  12                         # feel free to adjust this value to match your system  
 calib_cal.control.error_tolerance  =  {{ error_tolerance }}
 calib_cal.argument.force           =  True 
 calib_cal.argument.observation     =  ndppp_prep_cal.output.mapfile  # mapfile for the NDPPP-ed calibrator data
@@ -150,6 +143,19 @@ phase.control.executable      = {{ fit_XYoffset_script }}
 # order for flags is: [<input-filename>,<output-filename-base>]
 phase.argument.flags          = [h5imp_cal.output.h5parm.mapfile,caldata_transfer]
 
+piemap.control.kind               =  plugin
+piemap.control.type               =  createMapfile
+piemap.control.method             =  mapfile_from_folder
+piemap.control.mapfile_dir        =  input.output.mapfile_dir
+piemap.control.filename           =  piemap.mapfile
+piemap.control.folder             =  input.output.xml_stat_file
+piemap.pattern                    =  *xml
+
+make_a_pie.control.type            = pythonplugin
+make_a_pie.control.executable      = {{ piemaker_script }}
+make_a_pie.argument.flags          = [piemap.output.mapfile]
+make_a_pie.argument.imagefile      = autopie.png
+
 
 # ############################################################################################################
 # # Stop processing here and check the plots generated by the previous steps! Only then continue processing. #
@@ -167,7 +173,7 @@ createmap_target.control.pattern         =   {{ target_input_pattern }}
 
 # run NDPPP on the target data
 ndppp_prep_target.control.type                    = dppp
-ndppp_prep_target.control.max_per_node            = 10                   # \ feel free to adjust these two values to match your system
+ndppp_prep_target.control.max_per_node            = 12                   # \ feel free to adjust these two values to match your system
 ndppp_prep_target.control.environment             = {OMP_NUM_THREADS: 4} # / they should be reasonable for CEP3
 ndppp_prep_target.control.error_tolerance         = {{ error_tolerance }}
 ndppp_prep_target.argument.msin                   = createmap_target.output.mapfile    # The input data.
@@ -187,7 +193,7 @@ ndppp_prep_target.argument.flagamp.amplmin        = 1e-30
 # generate parmDB with the interpolated calibrator data to apply to the traget
 trans.control.type            = pythonplugin
 trans.control.executable      = {{ transfer_script }}
-trans.control.max_per_node    =  20                                 # feel free to adjust this value to match your system
+trans.control.max_per_node    =  12                                 # feel free to adjust this value to match your system
 trans.control.error_tolerance = {{ error_tolerance }}
 # order for flags is: [<input-filenames>,<output-filename-base>,<extension_for_new_parmDBs>]
 trans.argument.flags          = [ndppp_prep_target.output.mapfile,caldata_transfer,/instrument_amp_clock_offset]
@@ -203,7 +209,7 @@ parmmap.control.filename           =  targetparmdb.mapfile
 
 # run BBS to apply the calibrator values to the target data
 calibtarget.control.type             =  python-calibrate-stand-alone  
-calibtarget.control.max_per_node     =  24                                 # feel free to adjust this value to match your system  
+calibtarget.control.max_per_node     =  12                                 # feel free to adjust this value to match your system  
 calibtarget.control.error_tolerance  = {{ error_tolerance }}
 calibtarget.argument.observation     =  ndppp_prep_target.output.mapfile   # mapfile for the NDPPP-ed target data
 calibtarget.argument.parset          =  {{ cal_transfer_parset }}
@@ -230,7 +236,7 @@ dpppaverage.argument.avg.freqstep           = {{ avg_freqstep }}       # average
 
 # run BBS to predict the A-Team contribution
 ateamtarget.control.type             =  python-calibrate-stand-alone  
-ateamtarget.control.max_per_node     =  20                          # feel free to adjust this value to match your system  
+ateamtarget.control.max_per_node     =  12                          # feel free to adjust this value to match your system  
 ateamtarget.control.error_tolerance  =  {{ error_tolerance }}
 ateamtarget.argument.force           =  True 
 ateamtarget.argument.observation     =  dpppaverage.output.mapfile
@@ -240,7 +246,7 @@ ateamtarget.argument.catalog         =  {{ ATeam_skymodel }}
 # run the a-team clipper to flag data affected by the a-team
 ateamcliptar.control.kind               =  recipe
 ateamcliptar.control.type               =  executable_args
-ateamcliptar.control.max_per_node       =  24
+ateamcliptar.control.max_per_node       =  12
 ateamcliptar.control.mapfile_in         =  dpppaverage.output.mapfile
 ateamcliptar.control.executable         =  {{ ATeam_Clipper }}
 ateamcliptar.control.error_tolerance    =  {{ error_tolerance }}
@@ -301,7 +307,7 @@ gsmcal_parmmap.control.filename           =  gsmcal_parmdbs.mapfile
 plot_gsm_phases.control.kind               =  recipe
 plot_gsm_phases.control.type               =  executable_args
 plot_gsm_phases.control.executable         =  {{ plotphases_script }}
-plot_gsm_phases.control.max_per_node       =  24
+plot_gsm_phases.control.max_per_node       =  12
 plot_gsm_phases.control.mapfiles_in        =  [gsmcal_parmmap.output.mapfile,dpppconcat.output.mapfile]
 plot_gsm_phases.control.inputkeys          =  [infile,outbase]
 plot_gsm_phases.control.arguments          =  [-p,infile,outbase]
