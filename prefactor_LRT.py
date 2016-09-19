@@ -284,21 +284,36 @@ def check_state_and_stage():
 #PICAS Database Submission
 #####################
 def submit_to_picas():
-
+        sys.path.append(os.getcwd()+"/"+d_vars['fadir']+"/Tokens")
         os.chdir(d_vars['fadir']+"/Tokens")
 	try:
             print "Your picas user is "+os.environ["PICAS_USR"]+" and the DB is "+os.environ["PICAS_DB"]
         except KeyError:
             print "\033[31m You haven't set $PICAS_USR or $PICAS_DB or $PICAS_USR_PWD! \n\n Exiting\033[0m"
             sys.exit()
+        import Token
+        th=Token.Token_Handler(uname="apmechev",pwd="prQn98rQA",dbn="spectroscopy_alex",t_type="pref")
+        th.add_view("todo",'doc.lock == 0 && doc.done == 0')
+        th.add_view("locked",'doc.lock > 0 && doc.done == 0')
+        th.add_view("done",'doc.lock > 0 && doc.done > 0 && doc.output == 0')
+        th.add_view("error",'doc.lock > 0 && doc.done > 0 && doc.output > 0')
+        th.add_overview_view()
 
         if d_vars['resuberr']:
-                subprocess.call(['python','resetErrorTokens.py',os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+            th.reset_tokens(view_name="error",key=["OBSID",d_vars["OBSID"]])
         else:
-                subprocess.call(['python','removeObsIDTokens.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
-                subprocess.call(['python','createTokens.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
-        subprocess.call(['python','createViews.py',os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
-        subprocess.call(['python','createObsIDView.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+            th.add_view(v_name=d_vars["OBSID"],cond='doc.OBSID == %s '%(d_vars["OBSID"]))
+            th.delete_tokens(view_name=d_vars["OBSID"],key=["OBSID",d_vars["OBSID"]])
+            for line in open("datasets/"+d_vars["OBSID"]+"/subbandlist",'rb'):
+                th.create_token(keys={"num_per_node":d_vars["numpernode"],"lofar_sw_dir":d_vars["sw_dir"]+"/"+d_vars["sw_ver"],"OBSID":d_vars["OBSID"],"parset":d_vars["parsetfile"]},append=d_vars["OBSID"]+"_"+line.rstrip())
+                
+
+
+        
+        #        subprocess.call(['python','removeObsIDTokens.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+        #        subprocess.call(['python','createTokens.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+        #subprocess.call(['python','createViews.py',os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+        #subprocess.call(['python','createObsIDView.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
         os.chdir("../../")
 
         os.remove('srmlist')
@@ -405,7 +420,7 @@ def prepare_sandbox():
 
 	os.chdir("../")
 	subprocess.call(["tar","-cf", "prefactor-sandbox.tar","prefactor-sandbox/"])
-	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox"
+	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/sksp/disk/spectroscopy-migrated/sandbox"
         print "uploading sandbox to storage for pull by nodes"
 
 	subprocess.call(["uberftp", "-rm", sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+d_vars["OBSID"]+".tar"])
@@ -419,6 +434,7 @@ if __name__ == "__main__":
         parse_arguments(sys.argv)
 	splitsrms()
 	setup_dirs()
+        submit_to_picas()
         prepare_sandbox()
 
         check_state_and_stage()
