@@ -345,18 +345,12 @@ OBSID=$(echo $SURL_SUBBAND |sed 's/\(L[0-9]*\)_\(SAP[0-9][0-9][0-9]\)_\(SB[0-9][
 fi
 echo ${OBSID}_${sbn}
 #
-#srmrm srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tar
-#srmrm srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tgz
-#srmrmdir -recursive srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
-#srmmkdir srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
-#lcg-cp --vo lofar file:`pwd`/${name}.fs.msc.img.tar srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tar
-#lcg-cp --vo lofar file:`pwd`/${name}.fa.tgz srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tgz
 # remove any old existing directory from the Grid storage
-uberftp -rm -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
+uberftp -rm -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/${OBSID}_${sbn}
 # create the output directory on the Grid storage
-uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
+uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/${OBSID}_${sbn}
 # copy the output tarball to the Grid storage
-globus-url-copy file:`pwd`/${name}.fa.tgz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tgz
+globus-url-copy file:`pwd`/${name}.fa.tgz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/${OBSID}_${sbn}/${name}.fa.tgz
 # Exit loop on non-zero exit status:
 if [[ "$?" != "0" ]]; then
    echo "Problem copying final files to the Grid. Clean up and Exit now..."
@@ -372,8 +366,8 @@ fi
 
 echo ""
 echo "List the files copied to the SE lofar/user/disk:"
-#srmls srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
-uberftp -ls gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
+
+uberftp -ls gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/${OBSID}_${sbn}
 #
 echo ""
 echo "listing final files in scratch"
