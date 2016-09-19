@@ -386,7 +386,7 @@ def prepare_sandbox():
 
 	os.chdir("../")
 	subprocess.call(["tar","-cf", "sandbox.tar","sandbox/"])
-	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox"
+	sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox"
         print "uploading sandbox to storage for pull by nodes"
 
 	subprocess.call(["uberftp", "-rm",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+d_vars["OBSID"]+".tar"])

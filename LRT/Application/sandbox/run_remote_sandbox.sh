@@ -22,7 +22,7 @@ echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/l
 
 
 
-uberftp -rm gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_$1_$OBSID.tar
+uberftp -rm gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_$1_$OBSID.tar
 ls -l
 
 # Start the pilot jobs by contacting PiCaS tokens
