@@ -42,6 +42,7 @@ from Queue import Empty
 from Queue import Full
 from optparse import OptionParser
 
+import pdb
 
 # global variables.
 COLLECTORS = {}

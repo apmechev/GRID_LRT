@@ -28,7 +28,7 @@ import subprocess
 #Dictionary of input variables to make keeping track of values easier
 ###########
 
-d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack","sw_ver":"2.16","parsetfile":"-","jdl_file":"","customscript":"","ignoreunstaged"=False}
+d_vars = {"srmfile":"","cfgfile":"","fadir":".","resuberr":False,"TSplit":True,"OBSID":"","sw_dir":"/cvmfs/softdrive.nl/wjvriend/lofar_stack","sw_ver":"2.16","parsetfile":"","jdl_file":"","customscript":"","ignoreunstaged":False}
 
 ###################
 #Helper function to do a replace in file
@@ -72,9 +72,12 @@ def parse_arguments(args):
 	        d_vars['srmfile']=args[-1]
 		d_vars['cfgfile']=args[-2]
 	
-	else: 
-		print "there may be a typo in your filenames"
-		sys.exit()
+	else:
+                if "-p" in args:
+                    d_vars['srmfile']=args[-1] 
+		else:
+                    print "there may be a typo in your filenames"
+            	    sys.exit()
 	
 	d_vars['resuberr']=False
 	d_vars['TSplit']=True
@@ -112,7 +115,16 @@ def parse_arguments(args):
                 except:
                         idxv=args.index("--script")
                 print "Using Custom script="+args[idxv+1]
-                d_vars['customscript']=args[idxv+1]
+                d_vars['customscript']=os.path.abspath(args[idxv+1])
+
+        if ("-p" in args[:-2] or ("--parset" in args[:-2])):
+                try:
+                        idxv=args.index("-p")
+                except:
+                        idxv=args.index("--parset")
+                print "Using Custom Parset="+args[idxv+1]
+                d_vars['parsetfile']=os.path.abspath(args[idxv+1])
+
         if ("-j" in args[:-2] or ("--jdl" in args[:-2])):
                 try:
                         idxv=args.index("-j")
@@ -129,13 +141,7 @@ def parse_arguments(args):
 			print "copying srm.txt into srm_L"+obs_name+".txt "
 		shutil.copyfile('srm.txt','srm_'+obs_name+'.txt')
 		d_vars['srmfile']='srm_'+d_vars['OBSID']+'.txt'
-	d_vars['parsetfile']=""
 
-	##Loads the parsetfile from the cfg file and grabs the OBSID from the SRMfile (MAYBE obsoletes above block)
-	with open(d_vars['cfgfile'],'r') as readparset:
-		for line in readparset:
-			if "PARSET" in line:
-				d_vars['parsetfile']=line.split("PARSET",1)[1].split("= ")[1].split('\n')[0]
 
 	with open(d_vars['srmfile'], 'r') as f:
 	         d_vars['OBSID']=re.search('L[0-9]*',f.readline()).group(0)
@@ -182,9 +188,7 @@ def setup_dirs():
 	for oldstagefile in glob.glob(d_vars['fadir']+"/Staging/*files*"):
 	     os.remove(oldstagefile)
 	
-	for oldparset in glob.glob(d_vars['fadir']+"/Application/sandbox/scripts/parsets/*.parset"):
-	        if (not d_vars['parsetfile']=="") and (not "default" in  oldparset ): ##Remove old parsets but not the default.parset
-	                os.remove(oldparset)
+            
 	        #TODO Maybe check if srm_L****.txt file in proper format?
 	
 	os.makedirs(d_vars['fadir']+'/Tokens/datasets/'+d_vars['OBSID'])
@@ -196,21 +200,15 @@ def setup_dirs():
 	shutil.copy("srmlist",d_vars['fadir']+"/Staging/datasets/"+d_vars['OBSID'])
 	shutil.copy("subbandlist",d_vars['fadir']+"/Staging/datasets/"+d_vars['OBSID'])
 	
-	if not ((len(d_vars['parsetfile'])<4) or ("fault" in d_vars['parsetfile']) or d_vars['parsetfile']=="DEFAULT"):
-	        shutil.copy(d_vars['fadir']+"/parsets/"+d_vars['parsetfile'],d_vars['fadir']+"/Application/sandbox/scripts/parsets/")
 	
 	for dir in ['Tokens','Staging']:
         	with open(d_vars['fadir']+"/"+dir+"/datasets/"+d_vars['OBSID']+"/setup.cfg","a") as cfgfile:
         	        cfgfile.write("[OBSERVATION]\n")
         	        cfgfile.write("OBSID           = "+d_vars['OBSID']+"\n")
-        	        with open(d_vars['cfgfile'],'r') as cfg:
-        	                for i, line in enumerate(cfg):
-        	                        if 'PARSET' in line and len(d_vars['parsetfile'])<4:# if a parset is not defined
-        	                                continue  #don't write PARSET= "", will be handled below
-        	                        cfgfile.write(line)
-        	        if len(d_vars['parsetfile'])<4:
-        	                cfgfile.write('PARSET     = "-"\n')
-	
+                        if d_vars['cfgfile']!="":
+                            with open(d_vars['cfgfile'],'r') as cfg:
+                                for i, line in enumerate(cfg):	
+                                    cfgfile.write(line)
 	return 
 
 ####################
@@ -271,7 +269,7 @@ def check_state_and_stage():
 	locs=state_all.main('files')
 	for sublist in locs:
                if 'NEARLINE' in sublist :
-                              if d_vars["ignoreunstaged"]:
+                               if d_vars["ignoreunstaged"]:
                                     print " \033[31m Continuing although there are unstaged files\033[0m"
                                     break
                                print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
@@ -287,6 +285,7 @@ def check_state_and_stage():
 #PICAS Database Submission
 #####################
 def submit_to_picas():
+        sys.path.append(os.getcwd()+"/"+d_vars['fadir']+"/Tokens")
 
         os.chdir(d_vars['fadir']+"/Tokens")
 	try:
@@ -295,13 +294,45 @@ def submit_to_picas():
             print "\033[31m You haven't set $PICAS_USR or $PICAS_DB or $PICAS_USR_PWD! \n\n Exiting\033[0m"
             sys.exit()
 
+
+        import itertools
+        import Token
+        th=Token.Token_Handler(uname=os.environ["PICAS_USR"],pwd=os.environ["PICAS_USR_PWD"],dbn=os.environ["PICAS_DB"],t_type="FAD")
+        th.add_view("todo",'doc.lock == 0 && doc.done == 0')
+        th.add_view("locked",'doc.lock > 0 && doc.done == 0')
+        th.add_view("done",'doc.lock > 0 && doc.done > 0 && doc.output == 0')
+        th.add_view("error",'doc.lock > 0 && doc.done > 0 && doc.output > 0')
+        th.add_overview_view()
+        
         if d_vars['resuberr']:
-                subprocess.call(['python','resetErrorTokens.py',os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+            th.reset_tokens(view_name="error",key=["OBSID",d_vars["OBSID"]])
         else:
-                subprocess.call(['python','removeObsIDTokens.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
-                subprocess.call(['python','createTokens.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
-        subprocess.call(['python','createViews.py',os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
-        subprocess.call(['python','createObsIDView.py',d_vars['OBSID'],os.environ["PICAS_DB"],os.environ["PICAS_USR"],os.environ["PICAS_USR_PWD"]])
+            th.add_view(v_name=d_vars["OBSID"],cond='doc.OBSID == "%s" '%(d_vars["OBSID"]))
+            th.delete_tokens(view_name=d_vars["OBSID"])
+            sub_l=open("datasets/"+d_vars["OBSID"]+"/subbandlist",'r')
+            sur_l=open("datasets/"+d_vars["OBSID"]+"/srmlist",'r')
+
+            s=sub_l.readlines()
+            l=sur_l.readlines()
+            sub_l.close()
+            sur_l.close()
+
+            config_keys={}
+            with open("datasets/"+d_vars["OBSID"]+"/setup.cfg") as cfg:
+                cfglines=cfg.readlines()
+            for line in range(1,len(cfglines)):
+                config_keys[cfglines[line].split()[0]]=cfglines[line].split()[2]
+
+
+            for line in range(len(s)):
+                attachment=[]
+                if len(d_vars['parsetfile'] )>5:
+                     attachment=[open(d_vars['parsetfile'],'r'),os.path.basename(d_vars['parsetfile'])]
+                if len(d_vars['customscript'] )>5:
+                     attachment=[open(d_vars['customscript'],'r' ),os.path.basename(d_vars['customscript'])]
+                default_keys={'SURL_SUBBAND':l[line].rstrip(),"TSplit":d_vars['TSplit'],"LOFARDIR":d_vars["sw_dir"]+"/"+d_vars["sw_ver"],"OBSID":d_vars["OBSID"],"SUBBAND_NUM":s[line].rstrip()}
+                th.create_token(keys=dict(itertools.chain(config_keys.iteritems(), default_keys.iteritems())) ,append=d_vars["OBSID"]+"_"+s[line].rstrip(),attach=attachment) #dict that combines the default keys and setup.cfg keys
+        
         os.chdir("../../")
 
         os.remove('srmlist')
@@ -320,7 +351,6 @@ def start_jdl():
                 os.remove(d_vars['fadir']+"/Application/jobIDs")
 
         os.chdir(d_vars['fadir']+"/Application")
-        subprocess.call(["ls","-lat","sandbox/scripts/parsets"])
         #TODO: Change avg_dmx's number of jobs to number of subbands
 	if d_vars['jdl_file']=="": 
         	dmx_jdl='remote.jdl'
@@ -355,13 +385,9 @@ def prepare_sandbox():
 	os.chdir(d_vars['fadir']+"/Application/sandbox")
 	try:
 	        os.remove("scripts.tar")
-		os.remove("master.sh")
-                os.remove("scripts/custom_script.py")
 	except OSError:
 	        pass
 	
-	if d_vars['customscript']!="":
-		shutil.copy("../../../"+d_vars['customscript'], "scripts/customscript.py")	
 	if "$" in d_vars["sw_dir"]:
 		testdir=os.environ[d_vars["sw_dir"][1:]]
 	else:
@@ -371,18 +397,10 @@ def prepare_sandbox():
 	else:
 		print "directory "+testdir+"/"+d_vars["sw_ver"]+" doesn't exist Exiting"
 		sys.exit()
-	## move the appropriate .sh file to master.sh
-	shutil.copy(["master_no_TS.sh","master_with_TS.sh"][d_vars['TSplit']],"master.sh")
-	print "adding "+d_vars["sw_dir"]+"/"+d_vars["sw_ver"]+" to the file" 
-        replace_in_file("master.sh","SW_BASE_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack","SW_BASE_DIR="+d_vars["sw_dir"])
-        replace_in_file("master.sh","2.16",d_vars["sw_ver"])
+
 
 	print("tarring everything")
 	subprocess.call(["tar","-cf", "scripts.tar","scripts/"])	
-	try:	
-		os.remove("scripts/customscript.py")
-	except OSError:
-                pass
 
 	os.chdir("../")
 	subprocess.call(["tar","-cf", "sandbox.tar","sandbox/"])
