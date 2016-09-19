@@ -30,31 +30,6 @@
 # ===================================================================== #
 
 
-function clean_dl_pids() {
-
- for line in `seq 1 $(wc -l activejobs|awk '{print $1}')`
-  do
-   dlprocess=$(cat activejobs|head -$line |tail -1 |awk '{print $1}')
-   dlSB=$(cat activejobs|head -$line |tail -1 |awk '{print $2}')
-   if [[ ! -f /proc/$dlprocess/net/dev ]]; then
-       if [[ $(du -s $dlSB 2>/dev/null |awk '{print $1}') != '000000' ]]; then
-         sed -i $line's/.*/done '$dlSB'/' activejobs
-         continue
-       fi
-   fi  ##use du hs on the directory for download or find pid of globus
-   download=$(du -s $dlSB 2>/dev/null |awk '{print $1}') 
-   if [[ $download == "" ]]; then
-       download=000000
-   fi 
-   sed -i $line's/.*/'$dlprocess' '$dlSB' '$download'/' activejobs
-      echo "Process "$dlprocess" has untarred "$download"b in "$dlSB
-done
-
-}
-
-
-
-
 #--- NEW SD ---
 JOBDIR=${PWD}
 STARTSB=${1}
@@ -68,13 +43,24 @@ if [ -d /cvmfs/softdrive.nl ]
     echo "Softdrive directory found"
  else
 	echo "softdrive not found"
-	exit 1
+	exit 10 #exit 10=>softdrive not mounted
 fi
 
 
-echo "START LOFAR FROM SOFTDRIVE, in "$LOFAR_PATH
-echo "Setting up the LOFAR environment; setting release"
+echo "INITIALIZE LOFAR FROM SOFTDRIVE, in "$LOFAR_PATH
 
+function log(){
+if [ -z "$2" ]
+  then
+    echo "                     |"${1}
+  else
+     printf "%20s %s" ${1}
+     printf "|"${2}
+     printf "\n"
+fi 
+}
+######while read -r line; do log  "$line"; done <<<"$output"
+#### use above code to print out command result 
 function setup_env(){
  if [ -z "$1" ]
   then
@@ -90,7 +76,7 @@ function setup_env(){
       export LOFARDATAROOT=/cvmfs/softdrive.nl/wjvriend/data
     else
 	echo "The environment script doesn't exist. check the path $1 again"
-	exit 1
+	exit 11 #exit 11=> no init_env script
     fi
   fi  
 }
@@ -98,33 +84,33 @@ function setup_env(){
 setup_env $LOFAR_PATH
 
 # NEW NB we can't assume the home dir is shared across all Grid nodes.
-echo "LOFARDATAROOT: ", ${LOFARDATAROOT}
-echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
+log  "var LOFARDATAROOT: " ${LOFARDATAROOT}
+log  "setup" "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
 ln -s ${LOFARDATAROOT} .
 ln -s ${LOFARDATAROOT} ~/
 
-which genericpipeline.py
+log "setup" "generic pipeline is at $( which genericpipeline.py )"
 #set -x
 #Detect segmentation violation and exit
-trap '{ echo "Trap detected segmentation fault... status=$?"; exit 1; }' SIGSEGV
+trap '{ echo "Trap detected segmentation fault... status=$?"; exit 2; }' SIGSEGV #exit 2=> SIGSEGV caught
 
-echo ""
-echo "----------------------------------------------------------------------"
-echo "Obtain information for the Worker Node and set the LOFAR environment"
-echo "----------------------------------------------------------------------"
+log  ""
+log  "-----------------------------------------------------------------------"
+log  "Obtain information for the Worker Node and set the LOFAR environment"
+log  "----------------------------------------------------------------------"
 
-echo ""
-echo `date`
-echo $HOSTNAME
-echo $HOME
+log "-"
+log "worker info" `date`
+log "worker info"  $HOSTNAME
+log "worker info" $HOME
 
-echo ""
-echo "Job directory is:"
-echo $PWD
+log "worker info" "-"
+log "worker info" "Job directory is:"
+log "worker info" $PWD
 ls -l $PWD
 
-echo ""
-echo "WN Architecture is:"
+log "-"
+log "worker info" "WN Architecture is:"
 cat /proc/meminfo | grep "MemTotal"
 cat /proc/cpuinfo | grep "model name"
 
@@ -132,15 +118,15 @@ cat /proc/cpuinfo | grep "model name"
 # initialize job arguments
 # - note, obsid is only used to store the data
 
-echo "++++++++++++++++++++++++++++++"
-echo "++++++++++++++++++++++++++++++"
+log "++++++++++++++++++++++++++++++"
+log "++++++++++++++++++++++++++++++"
 
-echo "INITIALIZATION OF JOB ARGUMENTS"
-echo ${JOBDIR}
-echo ${STARTSB}
-echo ${NUMSB}
-echo ${PARSET}
-echo ""
+log "job info" "INITIALIZATION OF JOB ARGUMENTS"
+log "job info" ${JOBDIR}
+log "job info" ${STARTSB}
+log "job info" ${NUMSB}
+log "job info" ${PARSET}
+log 
 
 
 # create a temporary working directory
@@ -154,6 +140,7 @@ cd ${RUNDIR}
 echo "untarring Prefactor" 
 tar -xf prefactor.tar
 cp prefactor/srm.txt $RUNDIR
+
 sed -i "s?LOFAR_ROOT?${LOFAR_PATH}?g" pipeline.cfg
 echo "replaced LOFAR_PATH in pipeline.cfg"
 pwd
@@ -193,8 +180,9 @@ sleep 6
 sed -n -e '/SB'$STARTSB'/,$p' srm.txt > srm-stripped.txt
 OBSID=$(echo $(head -1 srm-stripped.txt) |grep -Po "L[0-9]*" | head -1 )
 head -n $NUMSB srm-stripped.txt |grep $OBSID > srm-final.txt
-echo "processing " $PARSET
-if [ ! -z $( echo $PARSET | grep Initial-Subtract ) ]
+echo "processing parset " $PARSET
+
+if [ ! -z $( echo $PARSET | grep Initial-Subtract ) ] #parset must have Initial-Subtract*.parset
  then
   echo ""
   echo "processing INITIAL-SUBTRACT Parset ${PARSET}"
@@ -213,68 +201,10 @@ cat srm-final.txt
 
 
 NUMLINES=$(( $(wc -l srm-final.txt |awk '{print $1}' ) )) #WHAT USE IS THIS?
+echo "Downloading files"
+python ./prefactor/bin/download_srms.py srm-final.txt &
 
-for block in `seq 1 $(( NUMSB / 10 ))`; do
- let init=" ($block - 1) * 10 + 1"
- let fin=" $block * 10"
- ./prefactor/bin/download_num_files.sh $init $fin srm-final.txt  &
-
-
-sleep 10
-if [ ! -z $( echo $PARSET | grep Initial-Subtract ) ]
- then
-	for folder in `ls -d prefactor/results/*ms`; do linkedfile=$( ls -d prefactor/results/*ms |xargs basename ); ln -s $folder $linkedfile ; done	
-fi 
-
- STALLED=0
- NUMJOBS=244
-set +x
- while [ $NUMJOBS  -ge 1  ]
-  do
-     echo $NUMJOBS
-     clean_dl_pids 
-
-     LENJOBS=$(wc -l activejobs | awk '{print $1}')
-     NUMDONE=$(grep 'done' activejobs |wc -l |awk '{print $1}' )
-     if [ ! -z $( echo $PARSET | grep Initial-Subtract ) ]
-       then
-       sed -i 's/\ 00000/\ 123456/g' activejobs
-     fi
-     STALLED=$(grep '000000' activejobs |wc -l|awk '{print $1}')
-      if [[ $NUMDONE == "" ]]; then 
-        NUMDONE=0
-      fi
-      if [[ $STALLED == "" ]]; then 
-        STALLED=0
-      fi
-     NUMJOBS=$(( $LENJOBS - $NUMDONE ))
-     echo $NUMJOBS" Subbands remaining "$STALLED" have stalled"
-     sleep 30
-     if [[ $(( $NUMDONE + $STALLED )) -eq $LENJOBS ]]; then
-       break
-     fi
-  done
-set -x
- echo "Done downloading, killing stalled jobs"
- sleep 15
-  
- for line in `seq 1 $(wc -l activejobs|awk '{print $1}')`
-  do
-    killPID=$(cat activejobs |head -$line |tail -1 |awk '{print $1}')
-    if [[ ! $killPID == "" ]]; then
-    kill $killPID
-    echo "ending download process "$killPID
-      fi
-  done
-  echo "" > activejobs
-done
-
-
-#while [[ $(ps -aux |grep tar| wc -l |awk '{print $1}') > 1 ]]
-#do
-#sleep 120
-#done
-
+wait
 
 ##TODO:Wait for all tarfiles!
 # - step2 finished check contents

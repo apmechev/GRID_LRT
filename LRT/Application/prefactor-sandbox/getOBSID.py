@@ -34,7 +34,8 @@ class ExampleActor(RunActor):
 	# Print token information
 	location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_"+str(sys.argv[2])+"_"+str(token['OBSID'])+".tar"
 	print location
-	subprocess.call(["globus-url-copy", location, "sandbox.tar"])
+	##If token["type"] in ["pref.cal","pref.targ","pref.insub"]:continue else exit
+        subprocess.call(["globus-url-copy", location, "sandbox.tar"])
 	subprocess.call(["tar", "-xf", "sandbox.tar","-C",".","--strip-components=1"])
         subprocess.call(["chmod","a+x","prefactor-refactor.sh"])
 	subprocess.call(["chmod","a+x","prefactor.sh"])

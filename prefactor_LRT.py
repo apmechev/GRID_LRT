@@ -434,7 +434,7 @@ if __name__ == "__main__":
         parse_arguments(sys.argv)
 	splitsrms()
 	setup_dirs()
-        submit_to_picas()
+
         prepare_sandbox()
 
         check_state_and_stage()
