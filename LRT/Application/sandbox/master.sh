@@ -83,7 +83,7 @@ echo "Setting up the LOFAR environment; release current:"
 
 SW_BASE_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16
 #LOFARROOT=${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release
-TEMP=`getopt -o osftdFTsnbpcx: --long obsid:,surl:,avfreq:,avtime:,demix,demixf:,demixt:,demixs:,lofdir:,donl,sbn:,pars:,script:,split -- "$@"`
+TEMP=`getopt -o osftdFTsnbpcx: --long obsid:,surl:,avfreq:,avtime:,demix:,demixf:,demixt:,demixs:,lofdir:,donl:,sbn:,pars:,script:,split -- "$@"`
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
 
@@ -104,12 +104,12 @@ do
     -s | --surl ) SURL_SUBBAND="$2"; shift  ;;
     -f | --avfreq ) AVG_FREQ_STEP="$2"; shift  ;;
     -t | --avtime ) AVG_TIME_STEP="$2"; shift  ;;
-    -d | --demix ) DO_DEMIX=true  ;;
+    -d | --demix ) DO_DEMIX="$2";shift  ;;
     -F | --demixf ) DEMIX_FREQ_STEP="$2"; shift  ;;
     -T | --demixt ) DEMIX_TIME_STEP="$2"; shift  ;;
     -s | --demixs ) DEMIX_SOURCES="$2"; shift  ;;
     -l | --lofdir ) SW_BASE_DIR="$2";shift ;;
-    -n | --donl ) SELECT_NL=true ;;
+    -n | --donl ) SELECT_NL="$2";shift ;;
     -b | --sbn ) SUBBAND_NUM="$2"; shift  ;;
     -p | --pars ) PARSET="$2"; shift  ;;
     -c | --script ) SCRIPT="$2"; shift   ;;
@@ -301,7 +301,7 @@ echo ""
 echo "execute avg_dmx.py"
 
 echo "parset is" $parset
-if [[ !-z "$SCRIPT" ]]; then
+if [ !-z "$SCRIPT" ]; then
         echo "Executing custom avg_dmx script"
         time python "$SCRIPT"  $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
 else
