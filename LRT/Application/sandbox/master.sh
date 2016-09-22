@@ -95,6 +95,7 @@ DEMIX_TIME_STEP=1
 DO_DEMIX=false
 SELECT_NL=false
 PARSET="-"
+DEMIX_SOURCES=[]
 eval set -- "$TEMP"
 echo $TEMP
 while [ true ]
@@ -169,6 +170,8 @@ TURL_SUBBAND=$( SURLtoTURL ${SURL_SUBBAND} )
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/scripts.tar $RUNDIR
+cp $PARSET $RUNDIR
+cp $SCRIPT $RUNDIR
 cd ${RUNDIR}
 echo "untar scripts, parsets!!"
 tar -xvf scripts.tar
@@ -323,7 +326,6 @@ du -hs $PWD
 du -hs $PWD/*
 
 echo "::::parsetfile run:::::"
-more *.parset*
 #python log contents
 echo "python run log contents"
 more log_$name
@@ -350,8 +352,6 @@ du -hs $PWD/*
 if [[ `ls -d *.fa | wc -l` < 1 ]]; then
    cat log_$name 
    echo ".FA FILES do not exist. Clean up and Exit now..."
-   more *.parset*
-   more log_$name
    cp log_$name ${JOBDIR}
    cd ${JOBDIR}
 
