@@ -12,10 +12,10 @@
 # ===================================================================================== #
 
 #python imports
-import sys
+import sys,os
 import time
 import couchdb
-
+import subprocess
 #picas imports
 from picas.actors import RunActor
 from picas.clients import CouchClient
@@ -41,11 +41,29 @@ class ExampleActor(RunActor):
         #
         # !!!! should try to get SB number from SURL to get unique OBSID+SB combination for logs (to replace SURL_SUBBAND here) TBD !!!!
         #
+        server = couchdb.Server(url="https://picas-lofar.grid.sara.nl:6984")
+        server.resource.credentials = (str(sys.argv[2]),str(sys.argv[3]))
+        db = server[str(sys.argv[1])]
 	
-#        command = "valgrind --tool=memcheck --track-fds=yes --trace-children=yes --log-file=CACHEgrind%p  ./master_avg_dmx_v2.sh "+ str(token['OBSID']) + " " + str(token['SURL_SUBBAND']) + " " + str(token['AVG_FREQ_STEP']) + " " + str(token['AVG_TIME_STEP']) + " " + str(token['DO_DEMIX']) + " " + str(token['DEMIX_FREQ_STEP']) + " " + str(token['DEMIX_TIME_STEP']) + " " + str(token['DEMIX_SOURCES']) + " " + str(token['SELECT_NL']) + " " + str(token['SUBBAND_NUM']) + " 2> logs_" + str(token['OBSID']) + "_" + str(token['SUBBAND_NUM']) + ".err 1> logs_" + str(token['OBSID']) + "_" + str(token['SUBBAND_NUM']) + ".out" ##CACHEGRIND VERSION
+        attachies=token["_attachments"].keys()
+        for att in [s for s in attachies if "parset" ] :
+            att_txt=db.get_attachment(token["_id"],att).read()
+            with open(att,'w') as f:
+                for line in att_txt:
+                    f.write(line)
+                if "parset" in att:
+                    parsetfile=att
+                else:
+                    parsetfile="Pre-Facet-Cal.parset"
 
+
+        try:
+                lofdir= str(token['lofar_sw_dir'])
+        except:
+                lofdir="/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16"
+	
 	execute("ls -lat",shell=True)
-	command = "/usr/bin/time -v ./prefactor.sh " + str(token['SUBBAND_NUM']) + " "+ str(token['AVG_FREQ_STEP']) +" 2> logs_.err 1> logs_out"
+	command = "/usr/bin/time -v ./prefactor-refactor.sh " + str(token['start_SB']) + " "+ str(token['num_per_node']) +" "+ parsetfile+" "+lofdir+" 2> logs_.err 1> logs_out"
         print command
         
 	out = execute(command,shell=True)
@@ -55,10 +73,17 @@ class ExampleActor(RunActor):
 
 	token = self.modifier.close(token)
 	self.client.db[token['_id']] = token
+        sols_search=subprocess.Popen(["find",".","-name","*.png"],stdout=subprocess.PIPE)
+        result=sols_search.communicate()[0]
 
+        for png in result.split():
+            try:
+                self.client.db.put_attachment(token,open(os.path.basename(png),'r'),os.path.split(png)[1])
+            except:
+                print "error attaching"+png
 	# Attach logs in token
-	#self.client.db.put_attachment(token,out[1],filename="stdout")
-	#self.client.db.put_attachment(token,out[2],filename="stderr")
+
+	
 	curdate=time.strftime("%d/%m/%Y_%H:%M:%S_")
 	try:
            logsout = "logs_out"
@@ -67,18 +92,6 @@ class ExampleActor(RunActor):
            logserr = "logs_.err"
            log_handle = open(logserr, 'rb')
            self.client.db.put_attachment(token,log_handle,curdate+logserr)
-	   logs_zipped_pngs="pngs.tar.gz"
-	   log_handle = open(logs_zipped_pngs, 'rb')
-	   self.client.db.put_attachment(token,log_handle,curdate+log_zipped_pngs)
-           #logcal = "logcal_" + str(token['OBSID']) + "_" + str(token['subband_cal']) + "_uv.MS"
-           #log_handle = open(logcal, 'rb')
-           #self.client.db.put_attachment(token,log_handle,curdate+logcal+".log")
-	   #logsrc = "logsrc_" + str(token['obsID']) + "_" + str(token['subband_src']) + "_uv.MS"
-           #log_handle = open(logsrc, 'rb')
-	   #self.client.db.put_attachment(token,log_handle,curdate+logsrc+".log")
-           #logtar = "logtar_" + str(token['obsID']) + "_" + str(token['subband_src']) + "_uv.MS.fs.msc"
-           #log_handle = open(logtar, 'rb')
-           #self.client.db.put_attachment(token,log_handle,curdate+logtar+".log")
 	except: 
   	   pass
 
@@ -89,7 +102,7 @@ def main():
     # Create token modifier
     modifier = BasicTokenModifier()
     # Create iterator, point to the right todo view
-    iterator = BasicViewIterator(client, "Monitor/todo", modifier)
+    iterator = BasicViewIterator(client, "pref/todo", modifier)
     # Create actor
     actor = ExampleActor(iterator, modifier)
     # Start work!

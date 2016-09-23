@@ -32,11 +32,13 @@ class ExampleActor(RunActor):
 
     def process_token(self, key, token):
 	# Print token information
-	location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_"+str(sys.argv[2])+"_"+str(token['OBSID'])+".tar"
+	location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_"+str(sys.argv[2])+"_"+str(token['OBSID'])+".tar"
 	print location
-	subprocess.call(["globus-url-copy", location, "sandbox.tar"])
+	##If token["type"] in ["pref.cal","pref.targ","pref.insub"]:continue else exit
+        subprocess.call(["globus-url-copy", location, "sandbox.tar"])
 	subprocess.call(["tar", "-xf", "sandbox.tar","-C",".","--strip-components=1"])
-        subprocess.call(["chmod","u+x","prefactor.sh"])
+        subprocess.call(["chmod","a+x","prefactor-refactor.sh"])
+	subprocess.call(["chmod","a+x","prefactor.sh"])
 
 	#This will process the token from the DOWNLOADED pilot.py (The timelines diverge at this point)
 	from  pilot import ExampleActor as Actor2
@@ -53,7 +55,7 @@ def main():
     # Create token modifier
     modifier = BasicTokenModifier()
     # Create iterator, point to the right todo view
-    iterator = BasicViewIterator(client, "Monitor/todo", modifier)
+    iterator = BasicViewIterator(client, "pref/todo", modifier)
     # Create actor
     actor = ExampleActor(iterator, modifier)
     # Start work!

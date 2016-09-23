@@ -56,7 +56,6 @@ def replace(filename,file_loc):
 	    surls.append(m.sub(repl_string,strip(u)))
 	
 	req={}
-	
 	# Set the timeout to 24 hours
 	# gfal_set_timeout_srm  Sets  the  SRM  timeout, used when doing an asyn-
 	# chronous SRM request. The request will be aborted if it is still queued

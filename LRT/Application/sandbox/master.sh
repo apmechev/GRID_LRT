@@ -81,14 +81,54 @@ cat /proc/cpuinfo | grep "model name"
 echo ""
 echo "Setting up the LOFAR environment; release current:"
 
-SW_BASE_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack/
+SW_BASE_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16
 #LOFARROOT=${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release
-LOFARROOT=${SW_BASE_DIR}/2.16/current/lofar/release
+TEMP=`getopt -o osftdFTsnbpcx: --long obsid:,surl:,avfreq:,avtime:,demix:,demixf:,demixt:,demixs:,lofdir:,donl:,sbn:,pars:,script:,split -- "$@"`
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+
+
+AVG_FREQ_STEP=1
+AVG_TIME_STEP=1
+DEMIX_FREQ_STEP=1
+DEMIX_TIME_STEP=1
+DO_DEMIX=false
+SELECT_NL=false
+PARSET="-"
+DEMIX_SOURCES=[]
+eval set -- "$TEMP"
+echo $TEMP
+while [ true ]
+do
+    case $1 in
+    -o | --obsid ) OBSID="$2" ; shift  ;;
+    -s | --surl ) SURL_SUBBAND="$2"; shift  ;;
+    -f | --avfreq ) AVG_FREQ_STEP="$2"; shift  ;;
+    -t | --avtime ) AVG_TIME_STEP="$2"; shift  ;;
+    -d | --demix ) DO_DEMIX="$2";shift  ;;
+    -F | --demixf ) DEMIX_FREQ_STEP="$2"; shift  ;;
+    -T | --demixt ) DEMIX_TIME_STEP="$2"; shift  ;;
+    -s | --demixs ) DEMIX_SOURCES="$2"; shift  ;;
+    -l | --lofdir ) SW_BASE_DIR="$2";shift ;;
+    -n | --donl ) SELECT_NL="$2";shift ;;
+    -b | --sbn ) SUBBAND_NUM="$2"; shift  ;;
+    -p | --pars ) PARSET="$2"; shift  ;;
+    -c | --script ) SCRIPT="$2"; shift   ;;
+    -x | --split ) SPLIT=true; ;;
+    -- ) shift; break;;
+#    -*) echo "$0: error - unrecognized option $1" 1>&2; exit 1;;
+    * ) break;;
+    esac
+    shift
+done
+
+
+LOFARROOT=${SW_BASE_DIR}/current/lofar/release
 
 echo "source lofarinit.sh"
 #. ${VO_LOFAR_SW_DIR}/LTA_2_1/lofar/release/lofarinit.sh || exit 1
 #. ${SW_DIR}/current/lofar/release/lofarinit.sh || exit 1
-. $SW_BASE_DIR/2.16/init_env_release.sh
+. $SW_BASE_DIR/init_env_release.sh
 
 # NEW NB we can't assume the home dir is shared across all Grid nodes.
 echo ""
@@ -97,10 +137,6 @@ echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
 
 
 echo "correct PATH and LD_LIBRARY_PATH for incomplete settings in lofarinit.sh"
-# initialize the Lofar LTA environment; release LTA_2_1
-#export PATH=$SW_DIR/current/lofar/release/bin:$SW_DIR/current/lofar/release/sbin:$SW_DIR/current/local/release/bin:$PATH
-#export LD_LIBRARY_PATH=$SW_DIR/current/lofar/release/lib:$SW_DIR/current/lofar/release/lib64:$SW_DIR/current/local/release/lib:$SW_DIR/current/local/release/lib64:$LD_LIBRARY_PATH
-#export PYTHONPATH=$SW_DIR/current/lofar/release/lib/python2.7/site-packages:$SW_DIR/current/local/release/lib/python2.7/site-packages:$PYTHONPATH
 
 # NB we can't assume the home dir is shared across all Grid nodes.
 #echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
@@ -109,18 +145,6 @@ ln -s $VO_LOFAR_SW_DIR/data ~/
 
 # initialize job arguments
 # - note, obsid is only used to store the data
-JOBDIR=${PWD}
-OBSID=${1}
-SURL_SUBBAND=${2}
-AVG_FREQ_STEP=${3}
-AVG_TIME_STEP=${4}
-DO_DEMIX=${5}
-DEMIX_FREQ_STEP=${6}
-DEMIX_TIME_STEP=${7}
-DEMIX_SOURCES=${8}
-SELECT_NL=${9}
-SUBBAND_NUM=${10}
-PARSET=${11}
 echo "++++++++++++++++++++++++++++++"
 echo $PARSET
 echo "++++++++++++++++++++++++++++++"
@@ -146,6 +170,8 @@ TURL_SUBBAND=$( SURLtoTURL ${SURL_SUBBAND} )
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/scripts.tar $RUNDIR
+cp $PARSET $RUNDIR
+cp $SCRIPT $RUNDIR
 cd ${RUNDIR}
 echo "untar scripts, parsets!!"
 tar -xvf scripts.tar
@@ -278,11 +304,15 @@ echo ""
 echo "execute avg_dmx.py"
 
 echo "parset is" $parset
-if [[ -e "customscript.py" ]]; then
+if [ !-z "$SCRIPT" ]; then
         echo "Executing custom avg_dmx script"
-        time python customscript.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
+        time python "$SCRIPT"  $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
 else
-        time python avg_dmx_v2_noTS.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
+    if [ "$SPLIT" == true ];then
+        time python avg_dmx_v2_TS.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
+    else
+      time python avg_dmx_v2_noTS.py $name $avg_freq_step $avg_time_step $do_demix $demix_freq_step $demix_time_step $demix_sources $select_nl $parset > log_$name 2>&1
+fi
 fi
 
 
@@ -296,7 +326,6 @@ du -hs $PWD
 du -hs $PWD/*
 
 echo "::::parsetfile run:::::"
-more *.parset*
 #python log contents
 echo "python run log contents"
 more log_$name
@@ -323,8 +352,6 @@ du -hs $PWD/*
 if [[ `ls -d *.fa | wc -l` < 1 ]]; then
    cat log_$name 
    echo ".FA FILES do not exist. Clean up and Exit now..."
-   more *.parset*
-   more log_$name
    cp log_$name ${JOBDIR}
    cd ${JOBDIR}
 
@@ -347,18 +374,12 @@ OBSID=$(echo $SURL_SUBBAND |sed 's/\(L[0-9]*\)_\(SAP[0-9][0-9][0-9]\)_\(SB[0-9][
 fi
 echo ${OBSID}_${sbn}
 #
-#srmrm srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tar
-#srmrm srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tgz
-#srmrmdir -recursive srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
-#srmmkdir srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
-#lcg-cp --vo lofar file:`pwd`/${name}.fs.msc.img.tar srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tar
-#lcg-cp --vo lofar file:`pwd`/${name}.fa.tgz srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tgz
 # remove any old existing directory from the Grid storage
-uberftp -rm -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
+uberftp -rm -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/${OBSID}_${sbn}
 # create the output directory on the Grid storage
-uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
+uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/${OBSID}_${sbn}
 # copy the output tarball to the Grid storage
-globus-url-copy file:`pwd`/${name}.fa.tgz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}/${name}.fa.tgz
+globus-url-copy file:`pwd`/${name}.fa.tgz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/${OBSID}_${sbn}/${name}.fa.tgz
 # Exit loop on non-zero exit status:
 if [[ "$?" != "0" ]]; then
    echo "Problem copying final files to the Grid. Clean up and Exit now..."
@@ -374,8 +395,8 @@ fi
 
 echo ""
 echo "List the files copied to the SE lofar/user/disk:"
-#srmls srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
-uberftp -ls gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
+
+uberftp -ls gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migraated/${OBSID}_${sbn}
 #
 echo ""
 echo "listing final files in scratch"

@@ -85,8 +85,8 @@ echo "Setting up the LOFAR environment; setting release"
 
 # NEW INIT VIA init_env_release.sh
 #echo "source init_env_release.sh" || exit 1
-. /cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/init_env_release.sh 
-export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
+. /cvmfs/softdrive.nl/wjvriend/lofar_stack/2_16_4/init_env_release.sh 
+export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2_16_4/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2_16_4/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
 
 # NEW NB we can't assume the home dir is shared across all Grid nodes.
 echo "LOFARDATAROOT: ", ${LOFARDATAROOT}
@@ -94,6 +94,7 @@ echo "adding symbolic link for EPHEMERIDES and GEODETIC data into homedir"
 ln -s ${LOFARDATAROOT} .
 ln -s ${LOFARDATAROOT} ~/
 
+which genericpipeline.py
 ##set -x
 #Detect segmentation violation and exit
 trap '{ echo "Trap detected segmentation fault... status=$?"; exit 1; }' SIGSEGV
@@ -142,6 +143,10 @@ echo ""
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/prefactor.tar $RUNDIR
+cp -r $PWD/openTSDB_tcollector $RUNDIR
+mkdir $RUNDIR/piechart
+cp -r $PWD/piechart/* $RUNDIR/piechart 
+cp pipeline.cfg $RUNDIR
 cd ${RUNDIR}
 echo "untarring Prefactor" 
 tar -xf prefactor.tar
@@ -188,7 +193,7 @@ head -n $NUMSB srm-stripped.txt |grep $OBSID > srm-final.txt
 echo "Final srm"
 cat srm-final.txt
 
-NUMLINES=$(( $(wc -l srm-final.txt |awk '{print $1}' )/10 + 1 )) #WHAT USE IS THIS?
+NUMLINES=$(( $(wc -l srm-final.txt |awk '{print $1}' ) )) #WHAT USE IS THIS?
 
 for block in `seq 1 $(( NUMSB / 10 ))`; do
  let init=" ($block - 1) * 10 + 1"
@@ -217,7 +222,7 @@ set +x
       fi
      NUMJOBS=$(( $LENJOBS - $NUMDONE ))
      echo $NUMJOBS" Subbands remaining "$STALLED" have stalled"
-     sleep 60
+     sleep 30
      if [[ $(( $NUMDONE + $STALLED )) -eq $LENJOBS ]]; then
        break
      fi
@@ -263,8 +268,9 @@ sbn=${SUBBAND_NUM}
 echo "Replacing "$PWD" in the prefactor parset"
 
 sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" prefactor/Pre-Facet-Cal.parset 
-sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" prefactor/pipeline.cfg
-
+sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" pipeline.cfg
+echo "Concatinating only "${NUMLINES}" Subbands"
+sed -i "s?num_SBs_per_group.*?num_SBs_per_group    = ${NUMLINES}?g" prefactor/Pre-Facet-Cal.parset
 
 #Check if any files match the target, if so, download the calibration tables matching the calibrator OBSID. If no tables are downloaded, xit with an error message.
 if [[ ! -z $( grep " target_input_pattern =" prefactor/Pre-Facet-Cal.parset | awk '{print $NF}' | xargs find . -name )  ]]
@@ -280,24 +286,44 @@ then
  fi
 fi
 
+
+echo "start tCollector in dryrun mode"
+cd openTSDB_tcollector/
+mkdir logs
+./tcollector.py -d > tcollector.out &
+TCOLL_PID=$!
+cd ..
+
 echo ""
 echo "execute generic pipeline"
-genericpipeline.py ./prefactor/Pre-Facet-Cal.parset -d -c prefactor/pipeline.cfg > output
+genericpipeline.py ./prefactor/Pre-Facet-Cal.parset -d -c pipeline.cfg > output
 
+echo "killing tcollector"
+kill $TCOLL_PID
 
-
+xmlfile=$( find . -name "*statistics.xml" 2>/dev/null)
+./piechart/make_a_pie.py ${xmlfile} PIE_${xmlfile}.png
 
 find . -name "*png"|xargs tar -zcf pngs.tar.gz
 find . -name "*npy"|xargs tar -cf numpys.tar
-find . -name "statistics.xml" -exec tar -rf numpys.tar {};  ##TEST THIS
-find . -name "*h5" -exec tar -rf numpys.tar {};  ##TEST THIS
+tar --append --file=numpys.tar pngs.tar.gz
+find . -name "*tcollector.out" | xargs tar -cf profile.tar
+find . -iname "*statistics.xml" -exec tar -rvf profile.tar {} \;
+find . -name "*png" -exec tar -rvf profile.tar {} \;
+tar --append --file=profile.tar output
+tar -zcvf profile.tar.gz profile.tar
+find . -iname "*h5" -exec tar -rvf numpys.tar {} \;
+
+
 cp pngs.tar.gz ${JOBDIR}
 echo "Numpy files found:"
 find . -name "*npy"
 #
 # - step3 finished check contents
 more output
-OBSID=$(echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
+OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
+echo "Saving profiling data to profile_"$OBSID_$( date  +%s )".tar.gz"
+globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_${OBSID}_$( date  +%s ).tar.gz
 if [[ $( grep "finished unsuccesfully" output) > "" ]]
 then
      echo "Pipeline did not finish, tarring work and run directories for re-run"
@@ -332,28 +358,31 @@ echo "Copy the output from the Worker Node to the Grid Storage Element"
 echo "---------------------------------------------------------------------------"
 
 echo "JOBDIR, RUNDIR, PWD: ", ${JOBDIR}, ${RUNDIR}, ${PWD}
-ls -l ${JOBDIR}
-ls -l ${RUNDIR}
-ls -l ${PWD}
-du -hs $PWD
-du -hs $PWD/*
+#ls -l ${JOBDIR}
+#ls -l ${RUNDIR}
+#ls -l ${PWD}
+#du -hs $PWD
+#du -hs $PWD/*
 
-
-
-
-echo "Tarring instrument tables (TODO):"
-find . -name "instrument" | xargs tar -cf instruments.tar
 echo "Copy output to the Grid SE"
-du -hs instruments.tar
+
 
 
 
 
 # copy the output tarball to the Grid storage
-OBSID=$(echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
+OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
+
 echo "copying the instrument tables into <storage>/spectroscopy/prefactor/instr_"$OBSID.tar
 #globus-url-copy file:`pwd`/instruments.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/instr_$OBSID.tar
-globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$OBSID_$STARTSB.tar
+if [[ ! -z $CAL_OBSID ]]
+then
+	tar -zcvf results.tar.gz prefactor/results/*
+	globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/results_${OBSID}_SB${STARTSB}_.tar.gz
+else
+	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$OBSID.tar
+fi
+
 # Exit loop on non-zero exit status:
 if [[ "$?" != "0" ]]; then
    echo "Problem copying final files to the Grid. Clean up and Exit now..."
