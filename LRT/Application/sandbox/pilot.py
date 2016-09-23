@@ -15,8 +15,9 @@
 import sys
 import time
 import couchdb
-
+import pdb
 #picas imports
+
 from picas.actors import RunActor
 from picas.clients import CouchClient
 from picas.iterators import BasicViewIterator
@@ -53,6 +54,23 @@ class ExampleActor(RunActor):
                     arguments=arguments+ " "+ str(args[key])+ " "+str(token[key])+ " "
             except KeyError:
                 pass
+        
+        attachies=token["_attachments"].keys()
+        server = couchdb.Server(url="https://picas-lofar.grid.sara.nl:6984")
+        server.resource.credentials = (str(sys.argv[2]),str(sys.argv[3]))
+        db = server[str(sys.argv[1])]
+        for att in [s for s in attachies if ("parset" in s or "py" in s) ] :
+            att_txt=db.get_attachment(token["_id"],att).read()
+            with open(att,'w') as f:
+                for line in att_txt:
+                    f.write(line)
+            if "parset" in att:
+                arguments= arguments+" --pars "+att
+            elif ".py" in att:
+                arguments= arguments+" --scr "+att
+            break
+    
+
 
 	command = "/usr/bin/time -v ./master.sh "+ arguments + " 2> logs_" + str(token['OBSID']) + "_" + str(token['SUBBAND_NUM']) + ".err 1> logs_" + str(token['OBSID']) + "_" + str(token['SUBBAND_NUM']) + ".out"
         print command
