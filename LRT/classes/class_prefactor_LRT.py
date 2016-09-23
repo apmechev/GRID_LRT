@@ -32,8 +32,7 @@ class pref_LRT(LRT):
         LRT.setup_dirs(self) 
 
 
-    def prepare_sandbox(self,sandboxdir=""):
-
+    def prepare_sandbox(self,sandboxdir=None): 
         if not sandboxdir:
             sandboxdir=self.workdir+"/LRT/Application/prefactor-sandbox" 
         os.chdir(sandboxdir)
@@ -52,13 +51,16 @@ class pref_LRT(LRT):
             print "nothing to stage with Initial_subtract parset"
             return
         LRT.check_state_and_stage(self)
+        if self.nostage:
+            print "The files were not staged, but using -fs or --force-stage will stage them for you"
         for sublist in self.locs:
             if "NEARLINE" in sublist:
                 if self.ignoreunstaged:
                     print " \033[31m Continuing although there are unstaged files\033[0m"
                     break
                 print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
-                print "I've requested staging but srms are not ONLINE yet. I'll exit so the tokens don't crash. Re-run in a few (or tens of) minutes OR re-run with -i or --ignore-unstaged"
+                print "The srms are not ONLINE yet, use -fs or --force-stage to stage them." 
+                print "I'll exit so the tokens don't crash. Re-run in a few (or tens of) minutes OR re-run with -i or --ignore-unstaged"
                 perc_left=[item for sublist in self.locs for item in sublist].count('NEARLINE')/(float(len(self.locs)))
                 print str(perc_left*100)+"%  left unstaged"
                 print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m" 
