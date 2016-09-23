@@ -32,7 +32,7 @@ class ExampleActor(RunActor):
 
     def process_token(self, key, token):
 	# Print token information
-	location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_"+str(sys.argv[2])+"_"+str(token['OBSID'])+".tar"
+	location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_"+str(sys.argv[2])+"_"+str(token['OBSID'])+".tar"
 	print location
 	##If token["type"] in ["pref.cal","pref.targ","pref.insub"]:continue else exit
         subprocess.call(["globus-url-copy", location, "sandbox.tar"])
@@ -55,7 +55,7 @@ def main():
     # Create token modifier
     modifier = BasicTokenModifier()
     # Create iterator, point to the right todo view
-    iterator = BasicViewIterator(client, "Monitor/todo", modifier)
+    iterator = BasicViewIterator(client, "pref/todo", modifier)
     # Create actor
     actor = ExampleActor(iterator, modifier)
     # Start work!
