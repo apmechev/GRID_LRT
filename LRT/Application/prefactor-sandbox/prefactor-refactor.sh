@@ -129,9 +129,16 @@ log "job info" ${PARSET}
 log 
 
 
+if [[ -z "$PARSET" ]]; then
+    ls "$PARSET"
+    echo not found
+    exit 111 
+fi
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/prefactor.tar $RUNDIR
+cp download_srms.py $RUNDIR
+cp ${PARSET} $RUNDIR
 cp -r $PWD/openTSDB_tcollector $RUNDIR
 mkdir $RUNDIR/piechart
 cp -r $PWD/piechart/* $RUNDIR/piechart 
@@ -188,7 +195,7 @@ if [ ! -z $( echo $PARSET | grep Initial-Subtract ) ] #parset must have Initial-
   echo "processing INITIAL-SUBTRACT Parset ${PARSET}"
   echo ""
   echo "Setting download of subbands in OBSID ${OBSID}"
-  uberftp -ls -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/ |grep $OBSID |awk '{print "srm://srm.grid.sara.nl:8443"$NF}' > gsiftps_init.txt
+  uberftp -ls -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/ |grep $OBSID |awk '{print "srm://srm.grid.sara.nl:8443"$NF}' > gsiftps_init.txt
   echo "found these gsiftps associated with ${OBSID}"
   cat gsiftps_init.txt
   echo ""
@@ -202,7 +209,7 @@ cat srm-final.txt
 
 NUMLINES=$(( $(wc -l srm-final.txt |awk '{print $1}' ) )) #WHAT USE IS THIS?
 echo "Downloading files"
-python ./prefactor/bin/download_srms.py srm-final.txt &
+python ./download_srms.py srm-final.txt &
 
 wait
 
@@ -234,7 +241,7 @@ if [[ ! -z $( grep " target_input_pattern =" prefactor/Pre-Facet-Cal.parset | aw
 then
  CAL_OBSID=$( grep "cal_input_pattern " prefactor/Pre-Facet-Cal.parset | grep -v "}" | awk '{print $NF}' | awk -F "*" '{print $1}' )
  echo "Getting solutions from obsid "$CAL_OBSID
- globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$CAL_OBSID.tar file:`pwd`/numpys.tar
+ globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_$CAL_OBSID.tar file:`pwd`/numpys.tar
  if [[ -e numpys.tar ]]
   then
     tar -xvf numpys.tar
@@ -272,9 +279,12 @@ echo "killing tcollector"
 kill $TCOLL_PID
 
 xmlfile=$( find . -name "*statistics.xml" 2>/dev/null)
-./piechart/make_a_pie.py ${xmlfile} PIE_${xmlfile}.png
+cp piechart/autopie.py .
+./autopie.py ${xmlfile} PIE_${OBSID}_.png
 
 find . -name "*png"|xargs tar -zcf pngs.tar.gz
+find . -name "*sols.png" -exec cp {} ${JOBDIR} \;
+cp PIE_${xmlfile}.png ${JOBDIR}
 find . -name "*npy"|xargs tar -cf numpys.tar
 tar --append --file=numpys.tar pngs.tar.gz
 find . -name "*tcollector.out" | xargs tar -cf profile.tar
@@ -298,9 +308,9 @@ if [[ $( grep "finished unsuccesfully" output) > "" ]]
 then
      echo "Pipeline did not finish, tarring work and run directories for re-run"
      RERUN_FILE=$OBSID"_"$STARTSB"prefactor_error.tar"
-     echo "Will be  at gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/error_states"$RERUN_FILE
+     echo "Will be  at gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/error_states"$RERUN_FILE
      tar -cf $RERUN_FILE prefactor/
-     globus-url-copy file:`pwd`/$RERUN_FILE gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/error_states/$RERUN_FILE
+     globus-url-copy file:`pwd`/$RERUN_FILE gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/error_states/$RERUN_FILE
    if [[ $(hostname -s) != 'loui' ]]; then
     echo "removing RunDir"
     rm -rf ${RUNDIR}
@@ -344,7 +354,7 @@ echo "Copy output to the Grid SE"
 OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 
 echo "copying the Results"
-#globus-url-copy file:`pwd`/instruments.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/instr_$OBSID.tar
+#globus-url-copy file:`pwd`/instruments.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/instr_$OBSID.tar
 
 if [ ! -z $( echo $PARSET | grep Initial-Subtract ) ]
    then
@@ -355,9 +365,9 @@ fi
 if [[ ! -z $CAL_OBSID ]]
 then
 	tar -zcvf results.tar.gz prefactor/results/*
-	globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/results_${OBSID}_SB${STARTSB}_.tar.gz
+	globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/results_${OBSID}_SB${STARTSB}_.tar.gz
 else
-	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/prefactor/numpy_$OBSID.tar
+	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_$OBSID.tar
 fi
 
 # Exit loop on non-zero exit status:
@@ -375,8 +385,8 @@ fi
 
 echo ""
 echo "List the files copied to the SE lofar/user/disk:"
-#srmls srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
-#uberftp -ls gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/${OBSID}_${sbn}
+
+
 #
 echo ""
 
