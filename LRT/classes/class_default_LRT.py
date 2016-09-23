@@ -25,8 +25,29 @@ class LRT(object):
         self.jdl_file="remote.jdl"
         self.ignoreunstaged=False
         self.numpernode=1
+        self.nostage=False
+
+    def print_help(self):
+        print ""
+        print "You need to input the SRM file and the config/parset file"
+        print "ex.  ./FAD_LRT.py [OPTIONS] srm_L229587.txt master_setup.cfg"
+        print "optional flags ( -r, -j, -s, -noTS, -d, -v) come before srm and config file "
+        print ""
+        print "+=+=+=+= Default LRT Options +=+=+=+="
+        print "(-r  or --resub-error-only)       - resubmit only error tokens "
+        print "(-i  or --ignore-unstaged)        - If any files unstaged, it doesn't exit but continue "
+        print "(-n  or --num-per-node)           - Splits SRMS to have a certain nuber on each node "
+        print "(-j  or --jdl)                    - specify .jdl file to run  " 
+        print "(-d  or --software-dir)           - path to custom LOFAR software dir "
+        print "(-v  or --software-version)       - software version (subfolder of software-dir)"
+        print "(-ns or --no-stage)               - do not stage the files if any NEARLINE (be kind to LTA)" 
+        print "(-h  or --help)                   - prints this message (obv)"
+
 
     def parse_arguments(self,args):
+        if ("-h" in args) or ("--help" in args):
+            self.print_help()
+            sys.exit()
         if ("srm" in args[-2]) and (".cfg" in args[-1] or ".parset" in args[-1]):
             self.srmfile=os.path.abspath(args[-2])
             if ".cfg" in args[-1]:
@@ -63,6 +84,11 @@ class LRT(object):
         if ("-i" in args[:-1] or ("--ignore-unstaged" in args[:-1])):
             print "Will continue even if files unstaged"
             self.ignoreunstaged=True
+
+        if ("-ns" in args[:-1] or ("--no-stage" in args[:-1])):
+            print "Will not attempt staging"
+            self.nostage=True
+
 
         if ("-j" in args[:-1] or ("--jdl" in args[:-1])):
             try:
@@ -174,12 +200,7 @@ class LRT(object):
     def prepare_sandbox(self,sandboxdir="LRT/Application/sandbox"):
         import subprocess
         os.chdir(sandboxdir)
-        try:
-            os.remove("prefactor.tar")
-            os.remove("prefactor/*.parset")
-        except OSError:
-            pass
-        
+        sandboxname=os.path.basename(sandboxdir)        
         if "$" in self.sw_dir:
             testdir=os.environ[self.sw_dir[1:]]
         else:
@@ -189,12 +210,12 @@ class LRT(object):
         else:
             print "directory "+testdir+"/"+self.sw_ver+" doesn't exist Exiting"
             sys.exit()
-        subprocess.call(["tar","-cf", "prefactor.tar","prefactor/"])
         os.chdir("../")
-        subprocess.call(["tar","-cf", "prefactor-sandbox.tar","prefactor-sandbox/"])
+        
+        subprocess.call(["tar","-cf", sandboxname+".tar",sandboxname+"/"])
         sandbox_base_dir="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox"
         subprocess.call(["uberftp", "-rm", sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+self.OBSID+".tar"])
-        subprocess.call(['globus-url-copy', "file:"+os.environ["PWD"]+"/LRT/Application/prefactor-sandbox.tar",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+self.OBSID+".tar"])
+        subprocess.call(['globus-url-copy', "file:"+os.environ["PWD"]+"/LRT/Application/"+sandboxname+".tar",sandbox_base_dir+"/sandbox_"+os.environ["PICAS_USR"]+"_"+self.OBSID+".tar"])
         os.chdir(self.workdir)
         
 
@@ -211,9 +232,6 @@ class LRT(object):
 
 
     def check_state_and_stage(self):
-        if "Initial" in self.parsetfile:
-            print "nothing to stage with Initial_subtract parset"
-            return
         file1=open("LRT/Staging/datasets/"+self.OBSID+"/srmlist",'r').read()
         if "fz-juelich.de" in file1:
             self.fix_srms('srm:\/\/lofar-srm.fz-juelich.de:8443')
@@ -229,10 +247,12 @@ class LRT(object):
         import state_all
         import stage_all
         self.locs=state_all.main('files')
-        if [item for sublist in self.locs for item in sublist].count('NEARLINE')/(float(len(self.locs)))>0.99:
+        self.unstaged=[item for sublist in self.locs for item in sublist].count('NEARLINE')/(float(len(self.locs)))
+        if self.unstaged<0.01:
             pass
         else:
-            stage_all.main('files')
+            if not self.nostage:
+                stage_all.main('files')
         os.chdir(self.workdir)
 
     def submit_to_picas(self,token_type="token",keys={},attfile=""):

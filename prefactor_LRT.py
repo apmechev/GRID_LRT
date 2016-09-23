@@ -19,11 +19,13 @@
 
 if __name__ == "__main__":
         import sys
+        sys.path.append('./LRT/classes')
         from class_prefactor_LRT import pref_LRT
+        
         pf=pref_LRT()
-        pf.parse_arguments(sys.argv) #Done in default, extend though
-	pf.splitsrms()               #done in default
-	pf.setup_dirs()              #done in default extend (a bit?)
+        pf.parse_arguments(sys.argv) 
+	pf.splitsrms()               
+	pf.setup_dirs()              
 
         pf.prepare_sandbox()
 
