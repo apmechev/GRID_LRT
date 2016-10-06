@@ -32,16 +32,19 @@ class srm_getter:
             try:
                 subprocess.Popen(["uberftp","-ls",self.srm])
             except:
-                pass
+                print "Can't gett size"
         ubersize=subprocess.Popen(["uberftp","-ls",self.turl],stdout=subprocess.PIPE)
         uber_result=ubersize.communicate()[0]
-        self.size=uber_result.split()[4]
-        self.filename=re.sub('_[a-z,1-9]{8}',"",uber_result.split()[8])
-        self.filename=re.sub('.tar*','/',self.filename)
+        try:
+            self.size=uber_result.split()[4]
+            self.filename=re.sub('_[a-z,1-9]{8}',"",uber_result.split()[8])
+            self.filename=re.sub('.tar*','/',self.filename)
+        except:
+            print "Can't get size"
 
     def getprogress(self):
-        FNULL = open(os.devnull, 'w')
-        if (time.time() - self.start_time) > 900: 
+        FNULL = open(os.devnull, 'w') 
+        if (time.time() - self.start_time) > 120*(float(self.size)/1000000000.): 
             self.done=True
             self.kill_dl()
         if self.done: return 
@@ -63,12 +66,17 @@ class srm_getter:
                 self.filename=filename
                 self.extracted=getdlsize.communicate()[0].split()[0]
             except:
-                self.extracted=0.0
+                if self.filename:
+                    getdlsize=subprocess.Popen(["du","-s",self.filename],stdout=subprocess.PIPE,stderr=FNULL)
+                    try:
+                        self.extracted=getdlsize.communicate()[0].split()[0]
+                    except:
+                        pass
                 if (time.time()-self.start_time) < 60 :
                     return 0.0
                 
                 self.stuck=True
-                if (time.time()-self.start_time) > 600 :
+                if (time.time()-self.start_time) > 120*(float(self.size)/1000000000.) :
                     self.kill_dl()
                     return 1
         self.progress=float(self.extracted)/float(float(self.size)/1000.)
@@ -102,12 +110,14 @@ class srm_getter:
                         self.progress=1
                         return self.done
         except:
-            pass
+            if os.path.exists(self.filename):
+                self.done=True
+                return
         try:
             os.kill(self.pid, 0)#relax this doesn't *really* kill anything :)
         except OSError:
             self.done=True
-        if (time.time()-self.start_time)>900:
+        if (time.time()-self.start_time)> 120*(float(self.size)/1000000000.):
                 self.done=True
                 self.kill_dl()
         else:
@@ -130,6 +140,7 @@ def main(srmfile,start=0,end=-1,step=10):
     else:
         srms=srms[start:end]
     running=[]
+    print "download srms has caught "+str(len(srms))+" fiels"
     step=[step,end-start][step>(end-start) and (end-start)>0]
     for i in range(0,step): #if less than 10 items, len(running) shorter
         srm_tmp=srms[0]
@@ -139,7 +150,7 @@ def main(srmfile,start=0,end=-1,step=10):
         del srms[0]
 
     done=[x.isdone() for x in running]
-    while len(srms)>0 :
+    while len(srms)>0 : 
         time.sleep(5) 
         prog=[x.getprogress() for x in running]
         done=[x.isdone() for x in running]
@@ -155,13 +166,21 @@ def main(srmfile,start=0,end=-1,step=10):
                     del srms[0]
                 except IndexError:
                     pass
+
+
     while not all([x.done for x in running]):
+
         time.sleep(3)
         for x in running:
-            if (time.time()-x.start_time) > 900 and not (x.done):
+            if (time.time()-x.start_time) > 120*(float(x.size)/1000000000.) and not (x.done):
                 x.done=True
                 x.kill_dl()
+                print "killing process in last block"
         prog=[x.getprogress() for x in running]
+        if len(glob.glob("GRID*"))==0:
+            break
+ 
+
     for f in glob.glob("GRID*tar"):
         os.remove(f)
     print [x.isdone() for x in running]
