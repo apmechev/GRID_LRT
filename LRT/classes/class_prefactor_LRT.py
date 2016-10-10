@@ -39,8 +39,11 @@ class pref_LRT(LRT):
         try:
             os.remove("prefactor.tar")
             os.remove("prefactor/*.parset")
+            os.remove("prefactor/srm.txt")
         except OSError:
             pass
+        import shutil
+        shutil.copyfile(self.srmfile,"prefactor/srm.txt")
         subprocess.call(["tar","-cf", "prefactor.tar","prefactor/"])
         os.chdir(self.workdir)
 
@@ -61,10 +64,10 @@ class pref_LRT(LRT):
                 print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
                 print "The srms are not ONLINE yet, use -fs or --force-stage to stage them." 
                 print "I'll exit so the tokens don't crash. Re-run in a few (or tens of) minutes OR re-run with -i or --ignore-unstaged"
-                perc_left=[item for sublist in self.locs for item in sublist].count('NEARLINE')/(float(len(self.locs)))
-                print str(perc_left*100)+"%  left unstaged"
+                self.perc_left=[item for sublist in self.locs for item in sublist].count('NEARLINE')/(float(len(self.locs)))
+                print str(self.perc_left*100)+"%  left unstaged"
                 print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m" 
-                sys.exit()
+
 
     def submit_to_picas(self,pref_type="",add_keys={}):
         LRT.submit_to_picas(self,token_type="pref"+pref_type,keys=add_keys,attfile=self.parsetfile)

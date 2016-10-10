@@ -61,9 +61,9 @@ class ExampleActor(RunActor):
                 lofdir= str(token['lofar_sw_dir'])
         except:
                 lofdir="/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16"
-	
+###calobsid:
 	execute("ls -lat",shell=True)
-	command = "/usr/bin/time -v ./prefactor-refactor.sh " + str(token['start_SB']) + " "+ str(token['num_per_node']) +" "+ parsetfile+" "+lofdir+" 2> logs_.err 1> logs_out"
+	command = "/usr/bin/time -v ./prefactor-refactor.sh --startsb " + str(token['start_SB']) + " --numsb "+ str(token['num_per_node']) +" --parset "+ parsetfile+" --lofdir "+lofdir+" --obsid "+str(token['OBSID'])+" --token "+token["_id"] +" 2> logs_.err 1> logs_out"
         print command
         
 	out = execute(command,shell=True)

@@ -32,11 +32,6 @@
 
 #--- NEW SD ---
 JOBDIR=${PWD}
-STARTSB=${1}
-NUMSB=${2}
-PARSET=${3}
-LOFAR_PATH=${4}
-
 
 if [ -d /cvmfs/softdrive.nl ]
   then
@@ -81,7 +76,34 @@ function setup_env(){
   fi  
 }
 
+
+TEMP=`getopt -o octlsnp: --long obsid:,calobsid:,token:,lofdir:,startsb:,numsb:,parset: -- "$@"`
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+PARSET="Pre-Facet-Target.parset"
+eval set -- "$TEMP"
+echo $TEMP
+while [ true ]
+do
+    case $1 in
+    -o | --obsid ) OBSID="$2" ; shift  ;;
+    -c | --calobsid ) CAL_OBSID="$2"; shift  ;;
+    -t | --token ) TOKEN="$2"; shift  ;;
+    -l | --lofdir ) LOFAR_PATH="$2";shift ;;
+    -s | --startsb) STARTSB="$2";shift ;;
+    -n | --numsb ) NUMSB="$2"; shift  ;;
+    -p | --parset ) PARSET="$2"; shift  ;;
+    -- ) shift; break;;
+#    -*) echo "$0: error - unrecognized option $1" 1>&2; exit 1;;
+    * ) break;;
+    esac
+    shift
+done
+
+export LD_LIBRARY_PATH=/cvmfs/softdrive.nl/apmechev/gcc-4.8.5/lib:/cvmfs/softdrive.nl/apmechev/gcc-4.8.5/lib64:$LD_LIBRARY_PATH
 setup_env $LOFAR_PATH
+
+
 
 # NEW NB we can't assume the home dir is shared across all Grid nodes.
 log  "var LOFARDATAROOT: " ${LOFARDATAROOT}
@@ -126,7 +148,7 @@ log "job info" ${JOBDIR}
 log "job info" ${STARTSB}
 log "job info" ${NUMSB}
 log "job info" ${PARSET}
-log 
+log "job info" ${OBSID}
 
 
 if [[ -z "$PARSET" ]]; then
@@ -208,8 +230,10 @@ cat srm-final.txt
 
 
 NUMLINES=$(( $(wc -l srm-final.txt |awk '{print $1}' ) )) #WHAT USE IS THIS?
-echo "Downloading files"
-python ./download_srms.py srm-final.txt &
+echo "Downloading $NUMSB files"
+
+python ./download_srms.py srm.txt $(( $STARTSB ))  $(( ${STARTSB} +  ${NUMSB}  ))  || \
+     { echo "Download Failed!!"; exit 20; } 
 
 wait
 
@@ -234,12 +258,12 @@ echo "Replacing "$PWD" in the prefactor parset"
 sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" $parset
 sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" pipeline.cfg
 echo "Concatinating only "${NUMLINES}" Subbands"
-sed -i "s?num_SBs_per_group.*?num_SBs_per_group    = ${NUMLINES}?g" $parset
+sed -i "s?num_SBs_per_group.*=?num_SBs_per_group    = ${NUMLINES}?g" $parset
 
 #Check if any files match the target, if so, download the calibration tables matching the calibrator OBSID. If no tables are downloaded, xit with an error message.
-if [[ ! -z $( grep " target_input_pattern =" prefactor/Pre-Facet-Cal.parset | awk '{print $NF}' | xargs find . -name )  ]]
+if [[ ! -z $( grep " target_input_pattern =" ${parset} | awk '{print $NF}' | xargs find . -name )  ]]
 then
- CAL_OBSID=$( grep "cal_input_pattern " prefactor/Pre-Facet-Cal.parset | grep -v "}" | awk '{print $NF}' | awk -F "*" '{print $1}' )
+ CAL_OBSID=$( grep "cal_input_pattern " ${parset} | grep -v "}" | awk '{print $NF}' | awk -F "*" '{print $1}' )
  echo "Getting solutions from obsid "$CAL_OBSID
  globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_$CAL_OBSID.tar file:`pwd`/numpys.tar
  if [[ -e numpys.tar ]]
@@ -270,6 +294,8 @@ mkdir logs
 ./tcollector.py -d > tcollector.out &
 TCOLL_PID=$!
 cd ..
+cat $parset
+
 
 echo ""
 echo "execute generic pipeline"
@@ -282,20 +308,22 @@ xmlfile=$( find . -name "*statistics.xml" 2>/dev/null)
 cp piechart/autopie.py .
 ./autopie.py ${xmlfile} PIE_${OBSID}_.png
 
-find . -name "*png"|xargs tar -zcf pngs.tar.gz
-find . -name "*sols.png" -exec cp {} ${JOBDIR} \;
-cp PIE_${xmlfile}.png ${JOBDIR}
-find . -name "*npy"|xargs tar -cf numpys.tar
+
+find . -name "PIE*png"|xargs tar -zcf pngs.tar.gz
+find . -name "*.png" -exec cp {} ${JOBDIR} \;
+cp PIE_*.png ${JOBDIR}
+cp ./prefactor/cal_results/*png ${JOBDIR}
+find ./prefactor/cal_results/ -name "*npy"|xargs tar -cf numpys.tar
 tar --append --file=numpys.tar pngs.tar.gz
 find . -name "*tcollector.out" | xargs tar -cf profile.tar
 find . -iname "*statistics.xml" -exec tar -rvf profile.tar {} \;
-find . -name "*png" -exec tar -rvf profile.tar {} \;
+find . -name "PIE*png" -exec tar -rvf profile.tar {} \;
 tar --append --file=profile.tar output
 tar -zcvf profile.tar.gz profile.tar
-find . -iname "*h5" -exec tar -rvf numpys.tar {} \;
+find ./prefactor/results/ -iname "*h5" -exec tar -rvf numpys.tar {} \;
 
 
-cp pngs.tar.gz ${JOBDIR}
+
 echo "Numpy files found:"
 find . -name "*npy"
 #
@@ -320,7 +348,7 @@ then
 	echo "Prefactor crashed because of bad_alloc. Not enough memory"
 	exit 16
    fi
-   exit 1
+   exit 99
 fi 
 
 echo "step3 finished, list contents"
@@ -362,7 +390,7 @@ if [ ! -z $( echo $PARSET | grep Initial-Subtract ) ]
    CAL_OBSID="2" #do this nicer
 fi
 
-if [[ ! -z $CAL_OBSID ]]
+if [[ ! -z $CAL_OBSID ]] #if target is defined, CALOBSID is also defined to differentiate from OBSID
 then
 	tar -zcvf results.tar.gz prefactor/results/*
 	globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/results_${OBSID}_SB${STARTSB}_.tar.gz
@@ -382,12 +410,6 @@ if [[ "$?" != "0" ]]; then
    fi
    exit 1
 fi
-
-echo ""
-echo "List the files copied to the SE lofar/user/disk:"
-
-
-#
 echo ""
 
 echo ""
