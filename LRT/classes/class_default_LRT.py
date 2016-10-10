@@ -70,7 +70,7 @@ class LRT(object):
                     idx=args.index("-d")
             except:
                     idx=args.index("--software-dir")
-            print "Using Software dir="+args[idx+1]
+            print "Using Software dir=\033[33m"+args[idx+1]+"\033[0m"
             self.sw_dir=args[idx+1]
 
         if ("-v" in args[:-1] or ("--software-version" in args[:-1])):
@@ -78,8 +78,8 @@ class LRT(object):
                 idxv=args.index("-v")
             except:
                 idxv=args.index("--software-version")
-                print "Using Software version="+args[idxv+1]
-                self.sw_ver=args[idxv+1]
+            print "Using Software version=\033[33m"+args[idxv+1]+"\033[0m"
+            self.sw_ver=args[idxv+1]
 
         if ("-i" in args[:-1] or ("--ignore-unstaged" in args[:-1])):
             print "Will continue even if files unstaged"
@@ -95,8 +95,8 @@ class LRT(object):
                 idxv=args.index("-j")
             except:
                 idxv=args.index("--jdl")
-                print "Using jdl_file="+args[idxv+1]
-                self.jdl_file=args[idxv+1] 
+            print "Using jdl_file="+args[idxv+1]
+            self.jdl_file=args[idxv+1] 
 
 
 
@@ -145,7 +145,7 @@ class LRT(object):
         with open(self.srmfile,'r') as f:
             line=f.readline()
             self.OBSID='L'+str(re.search("L(.+?)_",line).group(1))
-            print "processing"+self.OBSID
+
 
         
 
@@ -276,11 +276,13 @@ class LRT(object):
         else:
             th.add_view(v_name=self.OBSID,cond='doc.OBSID == "%s" '%(self.OBSID))
             th.delete_tokens(view_name=self.OBSID)
+            num_token=0
             for line in open("datasets/"+self.OBSID+"/subbandlist",'rb'):
                 if len(self.parsetfile )>5:
                     attachment=[open(attfile,'r'),os.path.basename(attfile)]
-                    default_keys={"num_per_node":self.numpernode,"lofar_sw_dir":self.sw_dir+"/"+self.sw_ver,"OBSID":self.OBSID,"start_SB":0}
+                    default_keys={"num_per_node":self.numpernode,"lofar_sw_dir":self.sw_dir+"/"+self.sw_ver,"OBSID":self.OBSID,"start_SB":num_token*self.numpernode}
                     th.create_token(keys=dict(itertools.chain(keys.iteritems(), default_keys.iteritems())),append=self.OBSID+"_"+line.rstrip(),attach=attachment)
+                    num_token+=1
 
         os.chdir(self.workdir)
 
@@ -298,7 +300,6 @@ class LRT(object):
         numprocess = num_lines/self.numpernode+[0,1][num_lines%self.numpernode>0]
         print numprocess
         self.replace_in_file(dmx_jdl,"Parameters=50","Parameters="+str(numprocess))
-        self.replace_in_file(dmx_jdl,"ParameterStep=50","ParameterStep="+str(numprocess))
 
         subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs'+self.OBSID,dmx_jdl])
         self.glite_job=open('jobIDs'+self.OBSID).readlines()[-1]

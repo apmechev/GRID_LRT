@@ -18,7 +18,7 @@ if not 'couchdb' in sys.modules:
         import couchdb
 
 
-def loadTokens(db):
+def loadTokens(db,LRT_ver="1.5",tok_name="token"):
    OBSID = sys.argv[1]
    tokens = []
 
@@ -49,8 +49,8 @@ def loadTokens(db):
             lofdir="/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16"
          token = {
 
-            '_id': 'token_' + OBSID + '_' + str(subband_num)+"v1.0",
-            'type': 'token',
+            '_id': 'token_' + OBSID + '_' + str(subband_num)+"v"+LRT_ver,
+            'type': tok_name,
 	    'OBSID': config.get('OBSERVATION','OBSID'),
             'SURL_SUBBAND': SURL_SB,
             'AVG_FREQ_STEP': config.get('OBSERVATION','AVG_FREQ_STEP'),
@@ -63,7 +63,6 @@ def loadTokens(db):
             'PARSET':  config.get('OBSERVATION','PARSET'),
             'LOFARDIR': lofdir,
             'SUBBAND_NUM': subband_num,
-
             'lock': 0,
             'done': 0,
             'hostname': '',
@@ -73,16 +72,17 @@ def loadTokens(db):
          tokens.append(token)
    db.update(tokens)
 
-def get_db():
-    server = couchdb.Server("https://picas-lofar.grid.sara.nl:6984")
-    username = sys.argv[3]
-    pwd = sys.argv[4]
+def get_db(uname,pwd,dbn,srv="https://picas-lofar.grid.sara.nl:6984"):
+    server = couchdb.Server(srv)
     server.resource.credentials = (username,pwd)
-    db = server[sys.argv[2]]
+    db = server[dbn]
     return db
 
 if __name__ == '__main__':
    #Create a connection to the server
-   db = get_db()
+   username = sys.argv[3]
+   pwd = sys.argv[4]
+   dbn= sys.argv[2]
+   db = get_db(username,pwd,dbn)
    #Load the tokens to the databas
    loadTokens(db)

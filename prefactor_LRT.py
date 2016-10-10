@@ -27,7 +27,7 @@ if __name__ == "__main__":
 	pf.splitsrms()               
 	pf.setup_dirs()              
 
-        pf.prepare_sandbox()
+#        pf.prepare_sandbox()
 
         pf.check_state_and_stage()
 	
