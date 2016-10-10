@@ -1,0 +1,342 @@
++ trap '{ echo "Trap detected segmentation fault... status=$?"; exit 1; }' SIGSEGV
++ echo ''
++ echo ----------------------------------------------------------------------
++ echo 'Obtain information for the Worker Node and set the LOFAR environment'
++ echo ----------------------------------------------------------------------
++ echo ''
+++ date
++ echo Sat Sep 24 10:28:54 CEST 2016
++ echo loui
++ echo /home/oonk
++ echo /data/softwaredir/lofar
++ ls -l /data/softwaredir/lofar
++ echo ''
++ echo 'Job directory is:'
++ echo /home/oonk/LGPPP_GRD/GRID_LRT/LRT/Application/lgppp-sandbox
++ ls -l /home/oonk/LGPPP_GRD/GRID_LRT/LRT/Application/lgppp-sandbox
++ echo ''
++ echo 'WN Architecture is:'
++ cat /proc/meminfo
++ grep MemTotal
++ cat /proc/cpuinfo
++ grep 'model name'
++ echo ''
++ echo 'Setting up the LOFAR environment; release current:'
++ SW_BASE_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16
+++ getopt -o osftdFTsnbpcx: --long obsid:,surl:,avfreq:,avtime:,demix:,demixf:,demixt:,demixs:,lofdir:,donl:,sbn:,pars:,script:,split -- --demixf 2 --pars - --demix False --donl True --surl srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar --avfreq 2 --avtime 4 --sbn 000 --demixt 2 --demixs CasA --obsid L229585
++ TEMP=' --demixf '\''2'\'' --pars '\''-'\'' --demix '\''False'\'' --donl '\''True'\'' --surl '\''srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar'\'' --avfreq '\''2'\'' --avtime '\''4'\'' --sbn '\''000'\'' --demixt '\''2'\'' --demixs '\''CasA'\'' --obsid '\''L229585'\'' --'
++ '[' 0 '!=' 0 ']'
++ AVG_FREQ_STEP=1
++ AVG_TIME_STEP=1
++ DEMIX_FREQ_STEP=1
++ DEMIX_TIME_STEP=1
++ DO_DEMIX=false
++ SELECT_NL=false
++ PARSET=-
++ DEMIX_SOURCES='[]'
++ eval set -- ' --demixf '\''2'\'' --pars '\''-'\'' --demix '\''False'\'' --donl '\''True'\'' --surl '\''srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar'\'' --avfreq '\''2'\'' --avtime '\''4'\'' --sbn '\''000'\'' --demixt '\''2'\'' --demixs '\''CasA'\'' --obsid '\''L229585'\'' --'
+++ set -- --demixf 2 --pars - --demix False --donl True --surl srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar --avfreq 2 --avtime 4 --sbn 000 --demixt 2 --demixs CasA --obsid L229585 --
++ echo --demixf ''\''2'\''' --pars ''\''-'\''' --demix ''\''False'\''' --donl ''\''True'\''' --surl ''\''srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar'\''' --avfreq ''\''2'\''' --avtime ''\''4'\''' --sbn ''\''000'\''' --demixt ''\''2'\''' --demixs ''\''CasA'\''' --obsid ''\''L229585'\''' --
++ '[' true ']'
++ case $1 in
++ DEMIX_FREQ_STEP=2
++ shift
++ shift
++ '[' true ']'
++ case $1 in
++ PARSET=-
++ shift
++ shift
++ '[' true ']'
++ case $1 in
++ DO_DEMIX=False
++ shift
++ shift
++ '[' true ']'
++ case $1 in
++ SELECT_NL=True
++ shift
++ shift
++ '[' true ']'
++ case $1 in
++ SURL_SUBBAND=srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar
++ shift
++ shift
++ '[' true ']'
++ case $1 in
++ AVG_FREQ_STEP=2
++ shift
++ shift
++ '[' true ']'
++ case $1 in
++ AVG_TIME_STEP=4
++ shift
++ shift
++ '[' true ']'
++ case $1 in
++ SUBBAND_NUM=000
++ shift
++ shift
++ '[' true ']'
++ case $1 in
++ DEMIX_TIME_STEP=2
++ shift
++ shift
++ '[' true ']'
++ case $1 in
++ DEMIX_SOURCES=CasA
++ shift
++ shift
++ '[' true ']'
++ case $1 in
++ OBSID=L229585
++ shift
++ shift
++ '[' true ']'
++ case $1 in
++ shift
++ break
++ LOFARROOT=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/current/lofar/release
++ echo 'source lofarinit.sh'
++ . /cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/init_env_release.sh
+++ SOFTDRIVE_BASE=/cvmfs/softdrive.nl/wjvriend
+++ LOFAR_INSTALL_DIR=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16
+++ '[' '!' -d /cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/lofar/release ']'
+++ export LD_LIBRARY_PATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/lofar/release/lib:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/lofar/release/lib64:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib64:/cvmfs/softdrive.nl/wjvriend/local/gcc-4.8.5/lib:/cvmfs/softdrive.nl/wjvriend/local/gcc-4.8.5/lib64:
+++ LD_LIBRARY_PATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/lofar/release/lib:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/lofar/release/lib64:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib64:/cvmfs/softdrive.nl/wjvriend/local/gcc-4.8.5/lib:/cvmfs/softdrive.nl/wjvriend/local/gcc-4.8.5/lib64:
+++ export PATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/lofar/release/bin:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/lofar/release/sbin:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/bin:/bin:/usr/lib64/qt-3.3/bin:/usr/lib64/ccache:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/sara/bin:/usr/sara/sbin:/home/oonk/bin:/usr/sara/bin:/usr/sara/sbin
+++ PATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/lofar/release/bin:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/lofar/release/sbin:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/bin:/bin:/usr/lib64/qt-3.3/bin:/usr/lib64/ccache:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/sara/bin:/usr/sara/sbin:/home/oonk/bin:/usr/sara/bin:/usr/sara/sbin
+++ export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/lofar/release/lib/python2.7/site-packages:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages:
+++ PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/lofar/release/lib/python2.7/site-packages:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages:
+++ export PKG_CONFIG_PATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/pkgconfig
+++ PKG_CONFIG_PATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/pkgconfig
+++ export LOFARDATAROOT=/cvmfs/softdrive.nl/wjvriend/data
+++ LOFARDATAROOT=/cvmfs/softdrive.nl/wjvriend/data
++ echo ''
++ echo 'LOFARDATAROOT: ,' /cvmfs/softdrive.nl/wjvriend/data
++ echo 'adding symbolic link for EPHEMERIDES and GEODETIC data into homedir'
++ echo 'correct PATH and LD_LIBRARY_PATH for incomplete settings in lofarinit.sh'
++ ln -s /data/softwaredir/lofar/data /home/oonk/
+ln: creating symbolic link `/home/oonk/data': File exists
++ echo ++++++++++++++++++++++++++++++
++ echo -
++ echo ++++++++++++++++++++++++++++++
++ echo 'INITIALIZATION OF JOB ARGUMENTS'
++ echo
++ echo L229585
++ echo srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar
++ echo 2
++ echo 4
++ echo False
++ echo 2
++ echo 2
++ echo CasA
++ echo True
++ echo 000
++ echo ''
++ INPUT_FIFO=GRID_input_fifo.tar
+++ SURLtoTURL srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar
+++ SURL=srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar
+++ sara_TURL_string=gsiftp://gridftp.grid.sara.nl:2811
+++ sara_SURL_string=srm://srm.grid.sara.nl:8443
+++ juelich_TURL_string=gsiftp://dcachepool12.fz-juelich.de:2811
+++ juelich_SURL_string=srm://lofar-srm.fz-juelich.de:8443
+++ poznan_TURL_string=gsiftp://door02.lofar.psnc.pl:2811
+++ poznan_SURL_string=srm://lta-head.lofar.psnc.pl:8443
+++ [[ srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar == *sara* ]]
++++ echo srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar
++++ sed -e s%srm://srm.grid.sara.nl:8443%gsiftp://gridftp.grid.sara.nl:2811%g
+++ TURL=gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar
+++ echo gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar
++ TURL_SUBBAND=gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar
+++ mktemp -d -p /scratch
++ RUNDIR=/scratch/tmp.J0WE5cYsZu
++ cp /home/oonk/LGPPP_GRD/GRID_LRT/LRT/Application/lgppp-sandbox/scripts.tar /scratch/tmp.J0WE5cYsZu
++ cp - /scratch/tmp.J0WE5cYsZu
+cp: cannot stat `-': No such file or directory
++ cp /scratch/tmp.J0WE5cYsZu
+cp: missing destination file operand after `/scratch/tmp.J0WE5cYsZu'
+Try `cp --help' for more information.
++ cd /scratch/tmp.J0WE5cYsZu
++ echo 'untar scripts, parsets!!'
++ tar -xvf scripts.tar
++ cp -r scripts/Ateam_LBA.sky.tar scripts/avg_dmx_v2_noTS.py scripts/avg_dmx_v2_TS.py scripts/HBAdefault-aoflagger-2.7.1.rfis scripts/infile_script.py scripts/LBAdefault-aoflagger-2.7.1.rfis scripts/notes_scripts.txt scripts/parsets .
++ ls -lat parsets/
++ ls -lat
++ pwd
++ echo ''
++ echo ---------------------------------------------------------------------------
++ echo 'START PROCESSING' L229585 SUBBAND: srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar
++ echo ---------------------------------------------------------------------------
++ full_surl=srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar
++ echo ''
++ echo 'current data and time'
++ date
++ echo 'free disk space'
++ df -h .
++ echo 'free memory'
++ free
++ echo ''
++ echo ---------------------------
++ echo 'START AVG DMX'
++ echo ---------------------------
++ echo 'create fifo for input'
++ mkfifo GRID_input_fifo.tar
++ TAR_PID=19357
++ echo 'download file'
++ tar -Bxf GRID_input_fifo.tar
+++ pwd
++ globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar file:////scratch/tmp.J0WE5cYsZu/GRID_input_fifo.tar
+
+real	0m6.111s
+user	0m0.114s
+sys	0m0.582s
++ wait 19357
++ [[ 0 != \0 ]]
++ echo 'remove fifo'
++ rm -f GRID_input_fifo.tar
++ echo 'step2 finished, list contents'
++ ls -l /scratch/tmp.J0WE5cYsZu
++ du -hs /scratch/tmp.J0WE5cYsZu
++ du -hs /scratch/tmp.J0WE5cYsZu/Ateam_LBA.sky.tar /scratch/tmp.J0WE5cYsZu/avg_dmx_v2_noTS.py /scratch/tmp.J0WE5cYsZu/avg_dmx_v2_TS.py /scratch/tmp.J0WE5cYsZu/HBAdefault-aoflagger-2.7.1.rfis /scratch/tmp.J0WE5cYsZu/infile_script.py /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS /scratch/tmp.J0WE5cYsZu/LBAdefault-aoflagger-2.7.1.rfis /scratch/tmp.J0WE5cYsZu/notes_scripts.txt /scratch/tmp.J0WE5cYsZu/parsets /scratch/tmp.J0WE5cYsZu/scripts /scratch/tmp.J0WE5cYsZu/scripts.tar
++ echo 'Surl subband is'
++ echo '{srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar}'
+++ ls -lat
+++ grep L229585_SB000_uv.dppp.MS
+++ awk '{print $(NF)}'
++ SURL_SUBBAND=L229585_SB000_uv.dppp.MS
++ echo L229585_SB000_uv.dppp.MS
++ grep SAP
++ echo L229585_SB000_uv.dppp.MS
++ grep dppp
+++ echo L229585_SB000_uv.dppp.MS
+++ sed 's/.*\(L[0-9]*\)_\(SB[0-9][0-9][0-9]\)_uv\.dppp\.MS_[a-z0-9]*.tar/\1_\2_uv\.MS\.tar/'
++ new_name=L229585_SB000_uv.dppp.MS
++ echo 'dppp data'
++ untarred_name=L229585_SB000_uv.dppp.MS
++ echo 'untarred surl file: ,' L229585_SB000_uv.dppp.MS
++ echo 'desired file name : ,' L229585_SB000_uv.dppp.MS
+++ echo L229585_SB000_uv.dppp.MS
+++ sed 's/.*_\(SB[0-9][0-9][0-9]\)_.*/\1/'
++ sbn=SB000
++ echo 'sbn from sn2 : ,' SB000
++ echo ''
++ echo 'rename untarred surl file: ,' L229585_SB000_uv.dppp.MS
++ mv L229585_SB000_uv.dppp.MS L229585_SB000_uv.dppp.MS
+mv: cannot move `L229585_SB000_uv.dppp.MS' to a subdirectory of itself, `L229585_SB000_uv.dppp.MS/L229585_SB000_uv.dppp.MS'
++ echo 'Done Rename to create: ,' L229585_SB000_uv.dppp.MS
++ echo 'step3 mv file done, list contents'
++ ls -l /scratch/tmp.J0WE5cYsZu
++ du -hs /scratch/tmp.J0WE5cYsZu
++ du -hs /scratch/tmp.J0WE5cYsZu/Ateam_LBA.sky.tar /scratch/tmp.J0WE5cYsZu/avg_dmx_v2_noTS.py /scratch/tmp.J0WE5cYsZu/avg_dmx_v2_TS.py /scratch/tmp.J0WE5cYsZu/HBAdefault-aoflagger-2.7.1.rfis /scratch/tmp.J0WE5cYsZu/infile_script.py /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS /scratch/tmp.J0WE5cYsZu/LBAdefault-aoflagger-2.7.1.rfis /scratch/tmp.J0WE5cYsZu/notes_scripts.txt /scratch/tmp.J0WE5cYsZu/parsets /scratch/tmp.J0WE5cYsZu/scripts /scratch/tmp.J0WE5cYsZu/scripts.tar
++ dirc=/scratch/tmp.J0WE5cYsZu
++ name=L229585_SB000_uv.dppp.MS
++ path=/scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS
++ avg_freq_step=2
++ avg_time_step=4
++ do_demix=False
++ demix_freq_step=2
++ demix_time_step=2
++ demix_sources=CasA
++ select_nl=True
++ parset=-
++ sbn=000
++ echo /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS
++ echo ''
++ echo 'execute avg_dmx.py'
++ echo 'parset is' -
++ '[' '!-z' '' ']'
+./master.sh: line 307: [: !-z: unary operator expected
++ '[' '' == true ']'
++ python avg_dmx_v2_noTS.py L229585_SB000_uv.dppp.MS 2 4 False 2 2 CasA True -
+
+real	0m7.784s
+user	0m14.180s
+sys	0m0.480s
++ echo 'Done Command: '
++ echo 'time python avg_dmx_v2.py,' L229585_SB000_uv.dppp.MS, 2, 4, False, 2, 2, CasA, True
++ echo 'step3 finished, list contents'
++ ls -l /scratch/tmp.J0WE5cYsZu
++ du -hs /scratch/tmp.J0WE5cYsZu
++ du -hs /scratch/tmp.J0WE5cYsZu/Ateam_LBA.sky /scratch/tmp.J0WE5cYsZu/Ateam_LBA.sky.tar /scratch/tmp.J0WE5cYsZu/avg_dmx_v2_noTS.py /scratch/tmp.J0WE5cYsZu/avg_dmx_v2_TS.py /scratch/tmp.J0WE5cYsZu/HBAdefault-aoflagger-2.7.1.rfis /scratch/tmp.J0WE5cYsZu/infile_script.py /scratch/tmp.J0WE5cYsZu/infile_script.pyc /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS.fa /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS_fa.parset /scratch/tmp.J0WE5cYsZu/LBAdefault-aoflagger-2.7.1.rfis /scratch/tmp.J0WE5cYsZu/log_L229585_SB000_uv.dppp.MS /scratch/tmp.J0WE5cYsZu/notes_scripts.txt /scratch/tmp.J0WE5cYsZu/parsets /scratch/tmp.J0WE5cYsZu/scripts /scratch/tmp.J0WE5cYsZu/scripts.tar
++ echo '::::parsetfile run:::::'
++ echo 'python run log contents'
++ more log_L229585_SB000_uv.dppp.MS
++ echo ''
++ echo ---------------------------------------------------------------------------
++ echo 'Copy the output from the Worker Node to the Grid Storage Element'
++ echo ---------------------------------------------------------------------------
++ echo 'JOBDIR, RUNDIR, PWD: ,' , /scratch/tmp.J0WE5cYsZu, /scratch/tmp.J0WE5cYsZu
++ ls -l
++ ls -l /scratch/tmp.J0WE5cYsZu
++ ls -l /scratch/tmp.J0WE5cYsZu
++ du -hs /scratch/tmp.J0WE5cYsZu
++ du -hs /scratch/tmp.J0WE5cYsZu/Ateam_LBA.sky /scratch/tmp.J0WE5cYsZu/Ateam_LBA.sky.tar /scratch/tmp.J0WE5cYsZu/avg_dmx_v2_noTS.py /scratch/tmp.J0WE5cYsZu/avg_dmx_v2_TS.py /scratch/tmp.J0WE5cYsZu/HBAdefault-aoflagger-2.7.1.rfis /scratch/tmp.J0WE5cYsZu/infile_script.py /scratch/tmp.J0WE5cYsZu/infile_script.pyc /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS.fa /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS_fa.parset /scratch/tmp.J0WE5cYsZu/LBAdefault-aoflagger-2.7.1.rfis /scratch/tmp.J0WE5cYsZu/log_L229585_SB000_uv.dppp.MS /scratch/tmp.J0WE5cYsZu/notes_scripts.txt /scratch/tmp.J0WE5cYsZu/parsets /scratch/tmp.J0WE5cYsZu/scripts /scratch/tmp.J0WE5cYsZu/scripts.tar
+++ ls -d L229585_SB000_uv.dppp.MS.fa
+++ wc -l
++ [[ 1 < 1 ]]
++ echo 'Tarring .fa files: L229585_SB000_uv.dppp.MS.fa'
++ tar -czvf L229585_SB000_uv.dppp.MS.fa.tgz L229585_SB000_uv.dppp.MS.fa L229585_SB000_uv.dppp.MS_fa.parset log_L229585_SB000_uv.dppp.MS
++ echo 'Copy output to the Grid SE'
++ echo L229585_000
++ echo L229585_SB000_uv.dppp.MS
++ grep SAP
++ echo L229585_000
++ uberftp -rm -r $'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/L229585_000\r'
+No match for /pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/L229585_000
++ uberftp -mkdir $'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/L229585_000\r'
+++ pwd
++ globus-url-copy file:/scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS.fa.tgz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/L229585_000/L229585_SB000_uv.dppp.MS.fa.tgz
++ [[ 0 != \0 ]]
++ echo ''
++ echo 'List the files copied to the SE lofar/user/disk:'
++ uberftp -ls gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migraated/L229585_000
+No match for /pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migraated/L229585_000
++ echo ''
++ echo 'listing final files in scratch'
++ ls -allh /scratch/tmp.J0WE5cYsZu
++ echo ''
++ du -hs /scratch/tmp.J0WE5cYsZu
++ du -hs /scratch/tmp.J0WE5cYsZu/Ateam_LBA.sky /scratch/tmp.J0WE5cYsZu/Ateam_LBA.sky.tar /scratch/tmp.J0WE5cYsZu/avg_dmx_v2_noTS.py /scratch/tmp.J0WE5cYsZu/avg_dmx_v2_TS.py /scratch/tmp.J0WE5cYsZu/HBAdefault-aoflagger-2.7.1.rfis /scratch/tmp.J0WE5cYsZu/infile_script.py /scratch/tmp.J0WE5cYsZu/infile_script.pyc /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS.fa /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS_fa.parset /scratch/tmp.J0WE5cYsZu/L229585_SB000_uv.dppp.MS.fa.tgz /scratch/tmp.J0WE5cYsZu/LBAdefault-aoflagger-2.7.1.rfis /scratch/tmp.J0WE5cYsZu/log_L229585_SB000_uv.dppp.MS /scratch/tmp.J0WE5cYsZu/logtar_L229585_SB000_uv.dppp.MS.fa /scratch/tmp.J0WE5cYsZu/notes_scripts.txt /scratch/tmp.J0WE5cYsZu/parsets /scratch/tmp.J0WE5cYsZu/scripts /scratch/tmp.J0WE5cYsZu/scripts.tar
++ echo ''
++ echo 'copy logs to the Job home directory and clean temp files in scratch'
++ cp log_L229585_SB000_uv.dppp.MS logtar_L229585_SB000_uv.dppp.MS.fa
++ cd
+++ hostname -s
++ [[ loui != \l\o\u\i ]]
++ ls -l /scratch/tmp.J0WE5cYsZu
++ echo ''
++ echo 'listing final files in Job directory'
++ ls -allh /home/oonk
++ echo ''
++ du -hs /home/oonk
++ du -hs /home/oonk/APM_TOKENS /home/oonk/cal_lc6_019_uftp.txt /home/oonk/data /home/oonk/Desktop /home/oonk/Downloads /home/oonk/environment /home/oonk/FADC_v1 /home/oonk/FADC_v1_LC4_010 /home/oonk/FAD_PREPROC /home/oonk/FADR_v7 /home/oonk/FAD_TS_v1 /home/oonk/FAD_TS_v1.tar /home/oonk/FAD_TS_v2 /home/oonk/FADT_v1 /home/oonk/FADT_v1_LC4_010 /home/oonk/FAD_v7 /home/oonk/FAD_v7_eo /home/oonk/FAD_v7.tar /home/oonk/FAD_v8 /home/oonk/FAD_v8_raw /home/oonk/FAD_v8_raw.tgz /home/oonk/FAD_v8.tgz /home/oonk/GIT /home/oonk/GIT_APM /home/oonk/GIT_J16 /home/oonk/LGPPP_GRD /home/oonk/LGPPP_LRT /home/oonk/LGPPP_LRT.tgz /home/oonk/log_uftp /home/oonk/loui_bf_jobs /home/oonk/loui_bf_scripts /home/oonk/loui_if_scripts /home/oonk/loui_jobs /home/oonk/LOUI_TAR_BALLS /home/oonk/MISC_SAV /home/oonk/NOTE.TXT /home/oonk/old /home/oonk/PLSRM /home/oonk/read_token /home/oonk/rfi_strategies /home/oonk/setup_lgppp.txt /home/oonk/setup_lgppp.txt~ /home/oonk/spectroscopy_v6 /home/oonk/spectroscopy_v6.tar /home/oonk/srm_remove /home/oonk/srm_retrieve /home/oonk/surl_tab_v1 /home/oonk/surl_v3 /home/oonk/surl_v3.tar /home/oonk/TAB_v1 /home/oonk/TAB_v1c /home/oonk/TAB_v1_migr /home/oonk/TAB_v64 /home/oonk/templates_ta /home/oonk/templates_ta_new /home/oonk/test /home/oonk/TEST /home/oonk/TEST_TT /home/oonk/TMP_SARA_FAD /home/oonk/TODO /home/oonk/todo_uftp.log /home/oonk/todo_uftp.log~ /home/oonk/uftp_many.log /home/oonk/WGET_TRIALS /home/oonk/wsclean_note.txt /home/oonk/wsclean_note.txt~
++ echo ''
+++ date
++ echo Sat Sep 24 10:29:14 CEST 2016
++ echo ---------------------------------------------------------------------------
++ echo FINISHED L229585 SUBBAND: L229585_SB000_uv.dppp.MS
++ echo ---------------------------------------------------------------------------
+	Command being timed: "./master.sh --demixf 2 --pars - --demix False --donl True --surl srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar --avfreq 2 --avtime 4 --sbn 000 --demixt 2 --demixs CasA --obsid L229585"
+	User time (seconds): 16.26
+	System time (seconds): 1.20
+	Percent of CPU this job got: 91%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:19.13
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 314948
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 439
+	Minor (reclaiming a frame) page faults: 143435
+	Voluntary context switches: 30612
+	Involuntary context switches: 6916
+	Swaps: 0
+	File system inputs: 99424
+	File system outputs: 788376
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

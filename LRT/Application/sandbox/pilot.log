@@ -1,0 +1,25 @@
+Connected to the database spectroscopy sucessfully. Now starting work...
+-----------------------
+Working on token: token_L229585_000v1.5
+lock 1474728911
+_rev 29-09c89e1a8f9356d6f29f4ab1759e724d
+DEMIX_SOURCES CasA
+DEMIX_FREQ_STEP 2
+PARSET "-"
+DO_DEMIX False
+done 0
+SELECT_NL True
+SURL_SUBBAND srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar
+AVG_FREQ_STEP 2
+AVG_TIME_STEP 4
+SUBBAND_NUM 000
+hostname loui
+scrub_count 0
+LOFARDIR /cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16
+DEMIX_TIME_STEP 2
+OBSID L229585
+output 
+_id token_L229585_000v1.5
+type token
+-----------------------
+/usr/bin/time -v ./master.sh  --demixf 2  --pars "-"  --demix False  --donl True  --surl srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/229585/L229585_SB000_uv.dppp.MS_65198c92.tar  --avfreq 2  --avtime 4  --sbn 000  --demixt 2  --demixs CasA  --obsid L229585  2> logs_L229585_000.err 1> logs_L229585_000.out

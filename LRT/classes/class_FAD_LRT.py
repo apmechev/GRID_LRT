@@ -43,14 +43,17 @@ class FAD_LRT(LRT):
         LRT.setup_dirs(self) 
     def prepare_sandbox(self,sandboxdir=""):
         if not sandboxdir:
-            sandboxdir=self.workdir+"/LRT/Application/sandbox" 
+            #sandboxdir=self.workdir+"/LRT/Application/sandbox" 
+            sandboxdir=self.workdir+"/LRT/Application/lgppp-sandbox" 
+            print "Prepare sandbox: ", sandboxdir
         LRT.prepare_sandbox(self,sandboxdir)
 
     def check_state_and_stage(self):
         LRT.check_state_and_stage(self)
 
     def submit_to_picas(self,pref_type="",add_keys={}):
-        LRT.submit_to_picas(self,token_type="FAD"+pref_type,keys=add_keys,attfile=self.parsetfile)
+        #LRT.submit_to_picas(self,token_type="FAD"+pref_type,keys=add_keys,attfile=self.parsetfile)
+        LRT.submit_to_picas(self,token_type="token"+pref_type,keys=add_keys,attfile=self.parsetfile)
 
     def start_jdl(self):
         LRT.start_jdl(self)

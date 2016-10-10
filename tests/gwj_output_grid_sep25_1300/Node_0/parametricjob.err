@@ -1,0 +1,37 @@
++ tar -xf picas.tar
++ tar -xf couchdb.tar
++ python getOBSID.py spectroscopy raymond reeJua2f
+Traceback (most recent call last):
+  File "getOBSID.py", line 67, in <module>
+    main()
+  File "getOBSID.py", line 64, in main
+    actor.run()
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/picas/actors.py", line 28, in run
+    for key, ref, token in self.iterator:            
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/picas/iterators.py", line 32, in next
+    return self.claim_token()
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/picas/iterators.py", line 64, in claim_token
+    view_params=self.view_params, window_size=100)
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/picas/clients.py", line 51, in get_token
+    l = len(view.rows)
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/couchdb/client.py", line 1176, in rows
+    self._fetch()
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/couchdb/client.py", line 1163, in _fetch
+    data = self.view._exec(self.options)
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/couchdb/client.py", line 1029, in _exec
+    _, _, data = _call_viewlike(self.resource, options)
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/couchdb/client.py", line 1088, in _call_viewlike
+    return resource.get_json(**_encode_view_options(options))
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/couchdb/http.py", line 523, in get_json
+    return self._request_json('GET', path, headers=headers, **params)
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/couchdb/http.py", line 546, in _request_json
+    headers=headers, **params)
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/couchdb/http.py", line 542, in _request
+    credentials=self.credentials)
+  File "/data/scratch/5583283.batch.gina.sara.nl/CREAM699215107/couchdb/http.py", line 392, in request
+    raise ResourceNotFound(error)
+couchdb.http.ResourceNotFound: (u'not_found', u'missing')
++ echo 'Pulling down the sandbox for OBSID  from /pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_raymond_.tar'
++ uberftp -rm gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_spectroscopy_.tar
+No match for /pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_spectroscopy_.tar
++ ls -l

@@ -2,11 +2,11 @@
   JobType="Parametric";
   ParameterStart=0;
   ParameterStep=1;
-  Parameters=50;
+  Parameters=1;
 
   Executable = "/bin/sh";
 
-  Arguments = "run_remote_sandbox.sh $PICAS_DB $PICAS_USR $PICAS_USR_PWD";
+  Arguments = "run_remote_sandbox.sh spectroscopy raymond reeJua2f";
   Stdoutput = "parametricjob.out";
   StdError = "parametricjob.err";
   InputSandbox = {"sandbox/run_remote_sandbox.sh","sandbox/couchdb.tar","sandbox/picas.tar","sandbox/getOBSID.py"};

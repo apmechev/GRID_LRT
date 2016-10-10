@@ -1,0 +1,10 @@
+Pulling down the sandbox for OBSID  from /pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_raymond_.tar
+total 276
+drwxr-xr-x 4 lfr027 lofar   4096 Sep 25 12:47 couchdb
+-rw-r--r-- 1 lfr027 lofar 225280 Sep 25 12:47 couchdb.tar
+-rw-r--r-- 1 lfr027 lofar   2635 Sep 25 12:47 getOBSID.py
+-rw-r--r-- 1 lfr027 lofar   2451 Sep 25 12:47 parametricjob.err
+-rw-r--r-- 1 lfr027 lofar    123 Sep 25 12:47 parametricjob.out
+drwxr-xr-x 2 lfr027 lofar   4096 Sep 25 12:47 picas
+-rw-r--r-- 1 lfr027 lofar  30720 Sep 25 12:47 picas.tar
+-rw-r--r-- 1 lfr027 lofar   1284 Sep 25 12:47 run_remote_sandbox.sh
