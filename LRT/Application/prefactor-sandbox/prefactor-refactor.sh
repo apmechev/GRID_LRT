@@ -33,6 +33,11 @@
 #--- NEW SD ---
 JOBDIR=${PWD}
 
+OLD_PYTHON=$( which python)
+
+echo $OLD_PYTHON
+
+
 if [ -d /cvmfs/softdrive.nl ]
   then
     echo "Softdrive directory found"
@@ -78,7 +83,7 @@ function setup_env(){
 
 
 TEMP=`getopt -o octlsnp: --long obsid:,calobsid:,token:,lofdir:,startsb:,numsb:,parset: -- "$@"`
-if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 9 ; fi #exit 9=> prefactor.sh got bad argument
 
 PARSET="Pre-Facet-Target.parset"
 eval set -- "$TEMP"
@@ -94,7 +99,7 @@ do
     -n | --numsb ) NUMSB="$2"; shift  ;;
     -p | --parset ) PARSET="$2"; shift  ;;
     -- ) shift; break;;
-#    -*) echo "$0: error - unrecognized option $1" 1>&2; exit 1;;
+    -*) echo "$0: error - unrecognized option $1" 1>&2; exit 8;; #exit 8=> Unknown argument
     * ) break;;
     esac
     shift
@@ -113,7 +118,7 @@ ln -s ${LOFARDATAROOT} ~/
 
 log "setup" "generic pipeline is at $( which genericpipeline.py )"
 #set -x
-#Detect segmentation violation and exit
+
 trap '{ echo "Trap detected segmentation fault... status=$?"; exit 2; }' SIGSEGV #exit 2=> SIGSEGV caught
 
 log  ""
@@ -154,12 +159,15 @@ log "job info" ${OBSID}
 if [[ -z "$PARSET" ]]; then
     ls "$PARSET"
     echo not found
-    exit 111 
+    exit 30  #exit 30=> Parset doesn't exist
 fi
 # create a temporary working directory
 RUNDIR=`mktemp -d -p $TMPDIR`
 cp $PWD/prefactor.tar $RUNDIR
 cp download_srms.py $RUNDIR
+cp update*py $RUNDIR
+cp wait_*py $RUNDIR
+cp -r couchdb/ $RUNDIR
 cp ${PARSET} $RUNDIR
 cp -r $PWD/openTSDB_tcollector $RUNDIR
 mkdir $RUNDIR/piechart
@@ -184,7 +192,7 @@ echo ""
 echo "current data and time"
 date
 echo "free disk space"
-df -h .
+f -h .
 echo "free memory"
 free 
 freespace=`stat --format "%a*%s/1024^3" -f $TMPDIR|bc`
@@ -232,12 +240,18 @@ cat srm-final.txt
 NUMLINES=$(( $(wc -l srm-final.txt |awk '{print $1}' ) )) #WHAT USE IS THIS?
 echo "Downloading $NUMSB files"
 
+#TODO: Only start if there are less than 5 downloading tokens: Do in python script
+python wait_for_dl.py
+$OLD_PYTHON update_token_status.py ${TOKEN} 'downloading'
 python ./download_srms.py srm.txt $(( $STARTSB ))  $(( ${STARTSB} +  ${NUMSB}  ))  || \
-     { echo "Download Failed!!"; exit 20; } 
+     { echo "Download Failed!!"; exit 20; } #exit 20=> Download fails
+ 
 
 wait
+$OLD_PYTHON update_token_status.py ${TOKEN} 'downloaded'
 
-##TODO:Wait for all tarfiles!
+
+
 # - step2 finished check contents
 echo "step2 finished, list contents"
 ls -l $PWD
@@ -270,7 +284,7 @@ then
   then
     tar -xvf numpys.tar
  else
-    exit 1
+    exit 31 #exit 31=> numpy solutions do not get downloaded
  fi
 fi
 
@@ -299,7 +313,10 @@ cat $parset
 
 echo ""
 echo "execute generic pipeline"
+$OLD_PYTHON update_token_status.py ${TOKEN} 'starting_generic_pipeline'
+$OLD_PYTHON update_token_progress.py ${TOKEN} output $parset &
 genericpipeline.py $parset -d -c pipeline.cfg > output
+$OLD_PYTHON update_token_status.py ${TOKEN} 'processing_finished'
 
 echo "killing tcollector"
 kill $TCOLL_PID
@@ -329,11 +346,13 @@ find . -name "*npy"
 #
 # - step3 finished check contents
 more output
+
 OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 echo "Saving profiling data to profile_"$OBSID_$( date  +%s )".tar.gz"
 globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_${OBSID}_$( date  +%s ).tar.gz
 if [[ $( grep "finished unsuccesfully" output) > "" ]]
 then
+     $OLD_PYTHON update_token_status.py ${TOKEN} 'prefactor_crashed!'
      echo "Pipeline did not finish, tarring work and run directories for re-run"
      RERUN_FILE=$OBSID"_"$STARTSB"prefactor_error.tar"
      echo "Will be  at gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/error_states"$RERUN_FILE
@@ -346,11 +365,11 @@ then
    if [[ $( grep "bad_alloc" output) > "" ]]
    then
 	echo "Prefactor crashed because of bad_alloc. Not enough memory"
-	exit 16
+	exit 16 #exit 16=> Bad_alloc error in prefactor
    fi
-   exit 99
+   exit 99 #exit 99=> generic prefactor error
 fi 
-
+$OLD_PYTHON update_token_status.py ${TOKEN} 'uploading_results'
 echo "step3 finished, list contents"
 
 #python log contents
@@ -398,7 +417,7 @@ else
 	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_$OBSID.tar
 fi
 
-# Exit loop on non-zero exit status:
+
 if [[ "$?" != "0" ]]; then
    echo "Problem copying final files to the Grid. Clean up and Exit now..."
    cp log_$name logtar_$name.fa ${JOBDIR}
@@ -408,7 +427,7 @@ if [[ "$?" != "0" ]]; then
     echo "removing RunDir"
     rm -rf ${RUNDIR} 
    fi
-   exit 1
+   exit 21 #exit 21=> cannot upload final files
 fi
 echo ""
 

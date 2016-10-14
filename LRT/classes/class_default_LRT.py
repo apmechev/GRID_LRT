@@ -8,7 +8,7 @@ import subprocess
 class LRT(object):
     """
     The LRT class is created to be inherited and extended by different types of Lofar Reduction Tools
-    (FAD_LRT, prefactor_LRT, killMS_LRT, factor_LRT, LGPPP_LRT, etc)
+    (FAD_LRT, prefactor_LRT, killMS_LRT, factor_LRT, LGPPP_LRT, fields_LRT etc)
     It is designed to have options and features common to all LRTs and as a class, it holds instance
     variables in case the user needs to access the internals. 
     """
@@ -264,6 +264,7 @@ class LRT(object):
             print "\033[31m You haven't set $PICAS_USR or $PICAS_DB or $PICAS_USR_PWD! \n\n Exiting\033[0m"
             sys.exit()
         import Token
+        self.t_type=token_type
         th=Token.Token_Handler(uname=os.environ["PICAS_USR"],pwd=os.environ["PICAS_USR_PWD"],dbn=os.environ["PICAS_DB"],t_type=token_type)
         th.add_view("todo",'doc.lock == 0 && doc.done == 0')
         th.add_view("locked",'doc.lock > 0 && doc.done == 0')
@@ -283,19 +284,22 @@ class LRT(object):
                     default_keys={"num_per_node":self.numpernode,"lofar_sw_dir":self.sw_dir+"/"+self.sw_ver,"OBSID":self.OBSID,"start_SB":num_token*self.numpernode}
                     th.create_token(keys=dict(itertools.chain(keys.iteritems(), default_keys.iteritems())),append=self.OBSID+"_"+line.rstrip(),attach=attachment)
                     num_token+=1
-
+        self.tokens=[]
+        v=th.db.view(self.t_type+"/"+self.OBSID)
+        for x in v:
+            self.tokens.append(x['id'])
         os.chdir(self.workdir)
 
-        os.remove('srmlist')
-        os.remove('subbandlist')
+        #os.remove('srmlist')
+        #os.remove('subbandlist')
 
     def start_jdl(self):
         os.chdir(self.workdir+"/LRT/Application")
         #TODO: Change avg_dmx's number of jobs to number of subbands
         dmx_jdl=self.jdl_file
         shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')
-        self.replace_in_file(dmx_jdl,'$PICAS_DB $PICAS_USR $PICAS_USR_PWD', os.environ["PICAS_DB"]+" "+os.environ["PICAS_USR"]+" "+os.environ["PICAS_USR_PWD"])
-
+        self.replace_in_file(dmx_jdl,'$PICAS_DB $PICAS_USR $PICAS_USR_PWD', os.environ["PICAS_DB"]+" "+os.environ["PICAS_USR"]+" "+os.environ["PICAS_USR_PWD"]+" "+self.t_type)
+        print "including "+self.t_type
         num_lines = sum(1 for line in open(self.srmfile))
         numprocess = num_lines/self.numpernode+[0,1][num_lines%self.numpernode>0]
         print numprocess

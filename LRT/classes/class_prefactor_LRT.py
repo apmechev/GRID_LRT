@@ -64,9 +64,9 @@ class pref_LRT(LRT):
                 print "\033[31m+=+=+=+=+=+=+=+=+=+=+=+=+=+="
                 print "The srms are not ONLINE yet, use -fs or --force-stage to stage them." 
                 print "I'll exit so the tokens don't crash. Re-run in a few (or tens of) minutes OR re-run with -i or --ignore-unstaged"
-                self.perc_left=[item for sublist in self.locs for item in sublist].count('NEARLINE')/(float(len(self.locs)))
-                print str(self.perc_left*100)+"%  left unstaged"
-                print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m" 
+        self.perc_left=[item for sublist in self.locs for item in sublist].count('NEARLINE')/(float(len(self.locs)))
+        print str(self.perc_left*100)+"%  left unstaged"
+        print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m" 
 
 
     def submit_to_picas(self,pref_type="",add_keys={}):

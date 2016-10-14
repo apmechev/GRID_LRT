@@ -55,7 +55,7 @@ def main():
     # Create token modifier
     modifier = BasicTokenModifier()
     # Create iterator, point to the right todo view
-    iterator = BasicViewIterator(client, "pref/todo", modifier)
+    iterator = BasicViewIterator(client, sys.argv[4]+"/todo", modifier)
     # Create actor
     actor = ExampleActor(iterator, modifier)
     # Start work!

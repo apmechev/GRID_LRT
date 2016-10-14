@@ -14,6 +14,7 @@ class srm_getter:
         self.done=False
         self.stuck=False
         self.restart=False
+        self.progress=0
         if len(srm.split())>1:
             self.srm = srm.split()[0]
         else:
