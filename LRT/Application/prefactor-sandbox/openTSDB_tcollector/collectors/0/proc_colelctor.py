@@ -66,18 +66,22 @@ def main(proc_names=[]):
     no_trace=dict(zip(proc_names[:],["" for x in range(len(proc_names))]))
         #zip each procname with "" and make dict
     for pname in proc_names:
-        no_trace[pname]=getPIDs(pname) #This list holds all old processes as well as ones traced
+        no_trace[pname]=getPIDs(pname) #This list initally holds all the already running processes
+                                       #So that they don't get traced
 
     procs=[] #holds process objects for stdout read
     while True:
         ts = int(time.time())
         find_pids=dict(zip(proc_names[:],[[] for x in range(len(proc_names))]))
+        with open('../pipeline_status','r') as step_file: ##Direct path???
+            stepname=step_file.readline().strip('\n')
+        
         for pname in proc_names:
             p_tmp=getPIDs(pname) #for all matching pids, trace ones not in notrace, add them
-            for pid in p_tmp:	
+            for pid in p_tmp:
                 if pid not in no_trace[pname]: 
                     try:
-                        proc_trace=subprocess.Popen(["/cvmfs/softdrive.nl/apmechev/tools/proc_stat/proc_stat", pid],stdout=subprocess.PIPE)
+                        proc_trace=subprocess.Popen(["/cvmfs/softdrive.nl/apmechev/tools/proc_stat/proc_stat",'--pid', pid,'--metric',stepname],stdout=subprocess.PIPE)
                         #proc_trace=subprocess.Popen(["/home/apmechev/procsamp/bin/Debug/procfs-sampler", pid],stdout=subprocess.PIPE)
 			#pdb.set_trace()
 			#ex("../../procfsamp "+pid+" &")
@@ -85,9 +89,9 @@ def main(proc_names=[]):
                         procs.append(proc_trace)
                     except OSError:
                            sys.stderr.write("Launch error a@ proc Sampler")
-	stdout=[]	
+	stdout=[] 
         for p in procs:
-#	   pdb.set_trace()
+	   #pdb.set_trace()
            while True:
                line = p.stdout.readline()
                stdout.append(line)

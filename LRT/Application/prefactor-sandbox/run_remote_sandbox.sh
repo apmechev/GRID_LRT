@@ -15,8 +15,11 @@ set -x
 tar -xf picas.tar
 tar -xf couchdb.tar
 
-python getOBSID.py $1 $2 $3 
-echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_$2_$OBSID.tar"
+python getOBSID.py $1 $2 $3 $4
+export p_un=$2
+export p_pw=$3
+export p_db=$1 
+echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_$2_$OBSID.tar with token type $4"
 
 
 

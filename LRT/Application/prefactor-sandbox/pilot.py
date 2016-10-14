@@ -23,6 +23,8 @@ from picas.iterators import BasicViewIterator
 from picas.modifiers import BasicTokenModifier
 from picas.executers import execute
 
+from update_token_status import update_status
+
 class ExampleActor(RunActor):
     def __init__(self, iterator, modifier):
         self.iterator = iterator
@@ -63,11 +65,20 @@ class ExampleActor(RunActor):
                 lofdir="/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16"
 ###calobsid:
 	execute("ls -lat",shell=True)
-	command = "/usr/bin/time -v ./prefactor-refactor.sh --startsb " + str(token['start_SB']) + " --numsb "+ str(token['num_per_node']) +" --parset "+ parsetfile+" --lofdir "+lofdir+" --obsid "+str(token['OBSID'])+" --token "+token["_id"] +" 2> logs_.err 1> logs_out"
+        try:
+            update_status(str(sys.argv[1]),str(sys.argv[2]),str(sys.argv[3]),token['_id'],'launched')
+        except:
+            pass
+	
+        command = "/usr/bin/time -v ./prefactor-refactor.sh --startsb " + str(token['start_SB']) + " --numsb "+ str(token['num_per_node']) +" --parset "+ parsetfile+" --lofdir "+lofdir+" --obsid "+str(token['OBSID'])+" --token "+token["_id"] +" 2> logs_.err 1> logs_out"
         print command
         
 	out = execute(command,shell=True)
-
+        try:
+            update_status(str(sys.argv[1]),str(sys.argv[2]),str(sys.argv[3]),token['_id'],'done')
+            token['progress']=1.0
+        except:
+            pass
 	# Get the job exit code in the token 
         token['output'] = out[0]
 
@@ -102,7 +113,7 @@ def main():
     # Create token modifier
     modifier = BasicTokenModifier()
     # Create iterator, point to the right todo view
-    iterator = BasicViewIterator(client, "pref/todo", modifier)
+    iterator = BasicViewIterator(client, sys.argv[4]+"/todo", modifier)
     # Create actor
     actor = ExampleActor(iterator, modifier)
     # Start work!

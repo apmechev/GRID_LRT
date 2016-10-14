@@ -22,12 +22,12 @@ if __name__ == "__main__":
         sys.path.append('./LRT/classes')
         from class_prefactor_LRT import pref_LRT
         
-        pf=pref_LRT()
-        pf.parse_arguments(sys.argv) 
-	pf.splitsrms()               
-	pf.setup_dirs()              
+        pf=pref_LRT() #initializes the LRT
+        pf.parse_arguments(sys.argv) #passes system arguments to LRT class (parsed first by pref_LRT then default_LRT
+	pf.splitsrms()               #Splits the .srm files so that only one obsid resides in a file
+	pf.setup_dirs()              #Some setup for legacy compatibility, will be overhauled
 
-#        pf.prepare_sandbox()
+        pf.prepare_sandbox()
 
         pf.check_state_and_stage()
 	
