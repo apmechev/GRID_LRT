@@ -4,26 +4,31 @@
 #=========
 
 import couchdb
-import os,sys,time
+import os,sys,time,pdb
 
 def update_status(p_db,p_usr,p_pwd):
     server = couchdb.Server(url="https://picas-lofar.grid.sara.nl:6984")
     server.resource.credentials = (p_usr,p_pwd)
     db = server[p_db]
     statuses=[]
-    for i in db:
+    
+
+    while True:
+        statuses=[]
         try:
-            statuses.append(db[i]['status'])
-        except KeyError:
-            pass
-
-
-    while(True):
-        if len(filter(lambda x: x=='downloading',statuses))<5:
-            sys.exit()
-        else:
-            time.sleep(1)
+            for i in db:
+                try:
+                    statuses.append(db[i]['status'])
+                except KeyError:
+                    pass  
+            if len(filter(lambda x: x=='downloading',statuses))<5:
+                sys.exit()
+            else:
+                time.sleep(1)
+        except couchdb.http.ServerError:
+            print "couchDB threw ServerError"
+            time.sleep(30)
 
 if __name__ == '__main__':
-    update_status(os.environ['p_db'],os.environ['p_un'],os.environ['p_pw'])
+    update_status(sys.argv[1],sys.argv[2],sys.argv[3])
 
