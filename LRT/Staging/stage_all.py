@@ -21,7 +21,26 @@ from string import strip
 
 def main(filename):
         file_loc=location(filename)
-        return (replace(filename,file_loc))
+        rs,m=replace(file_loc)
+        f=open(filename,'r')
+        urls=f.readlines()
+        f.close()
+        return (process(urls,rs,m))
+
+def state_dict(srm_dict):
+        locs_options=['s','j','p']
+
+        line=srm_dict.itervalues().next()
+        file_loc=[locs_options[i] for i in range(len(locs_options)) if ["sara" in line,"juelich" in line, not "sara" in line and not "juelich" in line][i] ==True][0]
+        rs,m=replace(file_loc)
+
+        urls=[]
+        for key, value in srm_dict.iteritems():
+            urls.append(value)
+        return (process(urls,rs,m))
+
+
+
 
 def location(filename):
         locs_options=['s','j','p']
@@ -31,26 +50,26 @@ def location(filename):
         file_loc=[locs_options[i] for i in range(len(locs_options)) if ["sara" in line,"juelich" in line, not "sara" in line and not "juelich" in line][i] ==True]
         return file_loc[0]
 
-def replace(filename,file_loc):
+def replace(file_loc):
         if file_loc=='p':
                 m=re.compile('/lofar')
                 repl_string="srm://lta-head.lofar.psnc.pl:8443/srm/managerv2?SFN=/lofar"
-                print("Staging files in Poznan")
+                print("Staging in Poznan")
         else:
                 m=re.compile('/pnfs')
                 if file_loc=='j':
                         repl_string="srm://lofar-srm.fz-juelich.de:8443/srm/managerv2?SFN=/pnfs/"
-                        print("Staging files in Juleich")
+                        print("Staging in Juleich")
                 elif file_loc=='s':
                         repl_string="srm://srm.grid.sara.nl:8443/srm/managerv2?SFN=/pnfs"
-                        print("Staging files on SARA")
+                        print("files are on SARA")
                 else:
                         sys.exit()
-	
-	f=open(filename,'r')
-	urls=f.readlines()
-	f.close()
-	
+        return repl_string,m
+
+
+
+def process(urls,repl_string,m):
 	surls=[]
 	for u in urls:
 	    surls.append(m.sub(repl_string,strip(u)))
@@ -80,7 +99,7 @@ def replace(filename,file_loc):
 	    sys.stderr.write(err+'\n')
 	    sys.exit(1)
 	del req
-	
+        print "staged"	
 
 
 if __name__=='__main__':

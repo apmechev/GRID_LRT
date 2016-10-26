@@ -15,6 +15,7 @@ class srm_getter:
         self.stuck=False
         self.restart=False
         self.progress=0
+        self.extracted=0
         if len(srm.split())>1:
             self.srm = srm.split()[0]
         else:
@@ -44,8 +45,8 @@ class srm_getter:
             print "Can't get size"
 
     def getprogress(self):
-        FNULL = open(os.devnull, 'w') 
-        if (time.time() - self.start_time) > 120*(float(self.size)/1000000000.): 
+        FNULL = open(os.devnull, 'w')
+        if (time.time() - self.start_time) > 300*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 : 
             self.done=True
             self.kill_dl()
         if self.done: return 
@@ -59,7 +60,7 @@ class srm_getter:
                 tarpids=min(gettarpid.communicate()[0].split())
                 curr_file=os.readlink("/proc/"+tarpids+"/fd/4")
                 #filename=os.path.abspath(os.path.join(curr_file, os.pardir))
-                filename=os.path.abspath(os.path.dirname(curr_file)) #temp filename to test
+                filename=os.path.abspath(curr_file) #temp filename to test
                 if self.filename:
                     getdlsize=subprocess.Popen(["du","-s",self.filename],stdout=subprocess.PIPE,stderr=FNULL)
                 else:
@@ -67,6 +68,7 @@ class srm_getter:
                 self.filename=filename
                 self.extracted=getdlsize.communicate()[0].split()[0]
             except:
+                self.extracted=0
                 if self.filename:
                     getdlsize=subprocess.Popen(["du","-s",self.filename],stdout=subprocess.PIPE,stderr=FNULL)
                     try:
@@ -77,7 +79,7 @@ class srm_getter:
                     return 0.0
                 
                 self.stuck=True
-                if (time.time()-self.start_time) > 120*(float(self.size)/1000000000.) :
+                if (time.time()-self.start_time) > 300*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 :
                     self.kill_dl()
                     return 1
         self.progress=float(self.extracted)/float(float(self.size)/1000.)
@@ -87,9 +89,10 @@ class srm_getter:
     def kill_dl(self):
         gettarpid=subprocess.Popen(["pgrep","-P",str(self.pid)],stdout=subprocess.PIPE)
         tarpids=gettarpid.communicate()[0].split()
+        print "Attempting Delete of "+self.filename
         os.kill(self.pid,signal.SIGKILL)
         try:
-            os.rmfile(self.filename)
+            subprocess.Popen(['rm','-rf',self.filename])
         except:
             pass
         for tarpid in tarpids:
@@ -118,7 +121,7 @@ class srm_getter:
             os.kill(self.pid, 0)#relax this doesn't *really* kill anything :)
         except OSError:
             self.done=True
-        if (time.time()-self.start_time)> 120*(float(self.size)/1000000000.):
+        if (time.time()-self.start_time)> 300*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 :
                 self.done=True
                 self.kill_dl()
         else:
@@ -173,7 +176,7 @@ def main(srmfile,start=0,end=-1,step=10):
 
         time.sleep(3)
         for x in running:
-            if (time.time()-x.start_time) > 120*(float(x.size)/1000000000.) and not (x.done):
+            if (time.time()-x.start_time) > 300*(float(x.size)/1000000000.) and (not (x.done)) and ((time.time() - x.start_time) > 1800) :
                 x.done=True
                 x.kill_dl()
                 print "killing process in last block"

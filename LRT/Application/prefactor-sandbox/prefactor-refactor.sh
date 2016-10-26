@@ -29,14 +29,12 @@
 #       finally copy the output to a (temporary) Grid Storage           #
 # ===================================================================== #
 
-
 #--- NEW SD ---
 JOBDIR=${PWD}
 
 OLD_PYTHON=$( which python)
 
 echo $OLD_PYTHON
-
 
 if [ -d /cvmfs/softdrive.nl ]
   then
@@ -75,19 +73,19 @@ function setup_env(){
       export PYTHONPATH=${1}/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:${1}/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
       export LOFARDATAROOT=/cvmfs/softdrive.nl/wjvriend/data
     else
-	echo "The environment script doesn't exist. check the path $1 again"
+	echo "The environment script doesn't exist. check the path $1/init_env_release.sh again"
 	exit 11 #exit 11=> no init_env script
     fi
   fi  
 }
 
 
-TEMP=`getopt -o octlsnp: --long obsid:,calobsid:,token:,lofdir:,startsb:,numsb:,parset: -- "$@"`
+TEMP=`getopt -o octlsnpduw: --long obsid:,calobsid:,token:,lofdir:,startsb:,numsb:,parset:,picasdb:,picasuname:,picaspwd: -- "$@"`
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 9 ; fi #exit 9=> prefactor.sh got bad argument
 
 PARSET="Pre-Facet-Target.parset"
 eval set -- "$TEMP"
-echo $TEMP
+log $TEMP
 while [ true ]
 do
     case $1 in
@@ -98,6 +96,9 @@ do
     -s | --startsb) STARTSB="$2";shift ;;
     -n | --numsb ) NUMSB="$2"; shift  ;;
     -p | --parset ) PARSET="$2"; shift  ;;
+    -d | --picasdb ) PICAS_DB="$2"; shift ;;
+    -u | --picasuname ) PICAS_USR="$2"; shift ;;
+    -w | --picaspwd ) PICAS_USR_PWD="$2" ; shift ;;
     -- ) shift; break;;
     -*) echo "$0: error - unrecognized option $1" 1>&2; exit 8;; #exit 8=> Unknown argument
     * ) break;;
@@ -158,7 +159,7 @@ log "job info" ${OBSID}
 
 if [[ -z "$PARSET" ]]; then
     ls "$PARSET"
-    echo not found
+    log not found
     exit 30  #exit 30=> Parset doesn't exist
 fi
 # create a temporary working directory
@@ -174,29 +175,29 @@ mkdir $RUNDIR/piechart
 cp -r $PWD/piechart/* $RUNDIR/piechart 
 cp pipeline.cfg $RUNDIR
 cd ${RUNDIR}
-echo "untarring Prefactor" 
+log "untarring Prefactor" 
 tar -xf prefactor.tar
 cp prefactor/srm.txt $RUNDIR
 
 sed -i "s?LOFAR_ROOT?${LOFAR_PATH}?g" pipeline.cfg
-echo "replaced LOFAR_PATH in pipeline.cfg"
+log  "replaced LOFAR_PATH in pipeline.cfg"
 pwd
 touch activejobs
-echo ""
-echo "---------------------------------------------------------------------------"
-echo "START PROCESSING" $OBSID "SUBBAND:" $SURL_SUBBAND
-echo "---------------------------------------------------------------------------"
+log ""
+log "---------------------------------------------------------------------------"
+log "START PROCESSING" $OBSID "SUBBAND:" $SURL_SUBBAND
+log "---------------------------------------------------------------------------"
 
 #CHECKING FREE DISKSPACE AND FREE MEMORY AT CURRENT TIME
-echo ""
-echo "current data and time"
+log ""
+log "current data and time"
 date
-echo "free disk space"
-f -h .
-echo "free memory"
+log "free disk space"
+df -h .
+log "free memory"
 free 
 freespace=`stat --format "%a*%s/1024^3" -f $TMPDIR|bc`
-echo "Free scratch space "$freespace"GB"
+log "Free scratch space "$freespace"GB"
 
 
 #STEP2 
@@ -204,11 +205,11 @@ echo "Free scratch space "$freespace"GB"
 # Download the data on the node 10 subbands at a time while ignoring subbands that 
 # cannot be downloaded (so that the job doesn't hang)
 ####
-echo ""
-echo "---------------------------"
-echo "Starting Data Retrieval"
-echo "---------------------------"
-echo "Get subbands "
+log ""
+log "---------------------------"
+log "Starting Data Retrieval"
+log "---------------------------"
+log "Get subbands "
 
 
 sleep 6
@@ -217,43 +218,43 @@ sleep 6
 sed -n -e '/SB'$STARTSB'/,$p' srm.txt > srm-stripped.txt
 OBSID=$(echo $(head -1 srm-stripped.txt) |grep -Po "L[0-9]*" | head -1 )
 head -n $NUMSB srm-stripped.txt |grep $OBSID > srm-final.txt
-echo "processing parset " $PARSET
+log "processing parset " $PARSET
 
 if [ ! -z $( echo $PARSET | grep Initial-Subtract ) ] #parset must have Initial-Subtract*.parset
  then
-  echo ""
-  echo "processing INITIAL-SUBTRACT Parset ${PARSET}"
-  echo ""
-  echo "Setting download of subbands in OBSID ${OBSID}"
+  log ""
+  log "processing INITIAL-SUBTRACT Parset ${PARSET}"
+  log ""
+  log "Setting download of subbands in OBSID ${OBSID}"
   uberftp -ls -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/ |grep $OBSID |awk '{print "srm://srm.grid.sara.nl:8443"$NF}' > gsiftps_init.txt
-  echo "found these gsiftps associated with ${OBSID}"
+  log "found these gsiftps associated with ${OBSID}"
   cat gsiftps_init.txt
-  echo ""
+  log ""
   rm -rf srm*txt
   grep $STARTSB gsiftps_init.txt > srm-final.txt
 fi
 
-echo "Final srms tp download"
+log "Final srms tp download"
 cat srm-final.txt
 
 
 NUMLINES=$(( $(wc -l srm-final.txt |awk '{print $1}' ) )) #WHAT USE IS THIS?
-echo "Downloading $NUMSB files"
+log "Downloading $NUMSB files"
 
 #TODO: Only start if there are less than 5 downloading tokens: Do in python script
-python wait_for_dl.py
-$OLD_PYTHON update_token_status.py ${TOKEN} 'downloading'
+$OLD_PYTHON  wait_for_dl.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD}
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'downloading'
 python ./download_srms.py srm.txt $(( $STARTSB ))  $(( ${STARTSB} +  ${NUMSB}  ))  || \
      { echo "Download Failed!!"; exit 20; } #exit 20=> Download fails
  
 
 wait
-$OLD_PYTHON update_token_status.py ${TOKEN} 'downloaded'
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'downloaded'
 
 
 
 # - step2 finished check contents
-echo "step2 finished, list contents"
+log "step2 finished, list contents"
 ls -l $PWD
 du -hs $PWD
 du -hs $PWD/*
@@ -267,19 +268,19 @@ parset=${PARSET}
 sbn=${SUBBAND_NUM}
 
 
-echo "Replacing "$PWD" in the prefactor parset"
+log "Replacing "$PWD" in the prefactor parset"
 
 sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" $parset
 sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" pipeline.cfg
-echo "Concatinating only "${NUMLINES}" Subbands"
+log "Concatinating only "${NUMLINES}" Subbands"
 sed -i "s?num_SBs_per_group.*=?num_SBs_per_group    = ${NUMLINES}?g" $parset
 
 #Check if any files match the target, if so, download the calibration tables matching the calibrator OBSID. If no tables are downloaded, xit with an error message.
-if [[ ! -z $( grep " target_input_pattern =" ${parset} | awk '{print $NF}' | xargs find . -name )  ]]
+if [[ ! -z ${CAL_OBSID}  ]]
 then
- CAL_OBSID=$( grep "cal_input_pattern " ${parset} | grep -v "}" | awk '{print $NF}' | awk -F "*" '{print $1}' )
- echo "Getting solutions from obsid "$CAL_OBSID
- globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_$CAL_OBSID.tar file:`pwd`/numpys.tar
+ #CAL_OBSID=$( grep "cal_input_pattern " ${parset} | grep -v "}" | awk '{print $NF}' | awk -F "*" '{print $1}' )
+ log "Getting solutions from obsid "$CAL_OBSID
+ globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_${CAL_OBSID}.tar file:`pwd`/numpys.tar
  if [[ -e numpys.tar ]]
   then
     tar -xvf numpys.tar
@@ -298,27 +299,27 @@ else
 pipelinetype="pref.cal"
 fi
 
-echo "Pipeline type is "$pipelinetype
-echo "Adding $OBSID and $pipelinetype into the tcollector tags"
+log "Pipeline type is "$pipelinetype
+log "Adding $OBSID and $pipelinetype into the tcollector tags"
 sed -i "s?\[\]?\[\ \"obsid=${OBSID}\",\ \"pipeline=${pipelinetype}\"\]?g" openTSDB_tcollector/collectors/etc/config.py
 
-echo "start tCollector in dryrun mode"
+log "start tCollector in dryrun mode"
 cd openTSDB_tcollector/
 mkdir logs
 ./tcollector.py -d > tcollector.out &
 TCOLL_PID=$!
 cd ..
-cat $parset
 
 
-echo ""
-echo "execute generic pipeline"
-$OLD_PYTHON update_token_status.py ${TOKEN} 'starting_generic_pipeline'
-$OLD_PYTHON update_token_progress.py ${TOKEN} output $parset &
+
+log ""
+log "execute generic pipeline"
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'starting_generic_pipeline'
+$OLD_PYTHON update_token_progress.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} output $parset &
 genericpipeline.py $parset -d -c pipeline.cfg > output
-$OLD_PYTHON update_token_status.py ${TOKEN} 'processing_finished'
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'processing_finished'
 
-echo "killing tcollector"
+log "killing tcollector"
 kill $TCOLL_PID
 
 xmlfile=$( find . -name "*statistics.xml" 2>/dev/null)
@@ -341,36 +342,48 @@ find ./prefactor/results/ -iname "*h5" -exec tar -rvf numpys.tar {} \;
 
 
 
-echo "Numpy files found:"
+log "Numpy files found:"
 find . -name "*npy"
 #
 # - step3 finished check contents
 more output
 
 OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
-echo "Saving profiling data to profile_"$OBSID_$( date  +%s )".tar.gz"
+log "Saving profiling data to profile_"$OBSID_$( date  +%s )".tar.gz"
 globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_${OBSID}_$( date  +%s ).tar.gz
 if [[ $( grep "finished unsuccesfully" output) > "" ]]
 then
-     $OLD_PYTHON update_token_status.py ${TOKEN} 'prefactor_crashed!'
-     echo "Pipeline did not finish, tarring work and run directories for re-run"
+     $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'prefactor_crashed!'
+     log "Pipeline did not finish, tarring work and run directories for re-run"
      RERUN_FILE=$OBSID"_"$STARTSB"prefactor_error.tar"
-     echo "Will be  at gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/error_states"$RERUN_FILE
-     tar -cf $RERUN_FILE prefactor/
-     globus-url-copy file:`pwd`/$RERUN_FILE gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/error_states/$RERUN_FILE
+     log "Will be  at gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/error_states"$RERUN_FILE
+#     tar -cf $RERUN_FILE prefactor/
+#     globus-url-copy file:`pwd`/$RERUN_FILE gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/error_states/$RERUN_FILE
    if [[ $(hostname -s) != 'loui' ]]; then
-    echo "removing RunDir"
+    log "removing RunDir"
     rm -rf ${RUNDIR}
    fi
    if [[ $( grep "bad_alloc" output) > "" ]]
    then
-	echo "Prefactor crashed because of bad_alloc. Not enough memory"
+	log "Prefactor crashed because of bad_alloc. Not enough memory"
 	exit 16 #exit 16=> Bad_alloc error in prefactor
    fi
+   if [[ $( grep "-9" output) > "" ]]
+   then
+        log "Prefactor crashed because of dppp: Not enough memory"
+        exit 15 #exit 15=> dppp memory error in prefactor
+   fi
+
+   if [[ $( grep "RegularFileIO" output) > "" ]]
+   then
+        log "Prefactor crashed because of bad download"
+        exit 17 #exit 17=> Files not downloaded fully
+   fi
+
    exit 99 #exit 99=> generic prefactor error
 fi 
-$OLD_PYTHON update_token_status.py ${TOKEN} 'uploading_results'
-echo "step3 finished, list contents"
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'uploading_results'
+log "step3 finished, list contents"
 
 #python log contents
 
@@ -379,19 +392,19 @@ echo "step3 finished, list contents"
 
 
 # STORE PROCESSING RESULTS AND CLEAN UP
-echo ""
-echo "---------------------------------------------------------------------------"
-echo "Copy the output from the Worker Node to the Grid Storage Element"
-echo "---------------------------------------------------------------------------"
+log ""
+log "---------------------------------------------------------------------------"
+log "Copy the output from the Worker Node to the Grid Storage Element"
+log "---------------------------------------------------------------------------"
 
-echo "JOBDIR, RUNDIR, PWD: ", ${JOBDIR}, ${RUNDIR}, ${PWD}
+log "JOBDIR, RUNDIR, PWD: ", ${JOBDIR}, ${RUNDIR}, ${PWD}
 #ls -l ${JOBDIR}
 #ls -l ${RUNDIR}
 #ls -l ${PWD}
 #du -hs $PWD
 #du -hs $PWD/*
 
-echo "Copy output to the Grid SE"
+log "Copy output to the Grid SE"
 
 
 
@@ -400,7 +413,7 @@ echo "Copy output to the Grid SE"
 # copy the output tarball to the Grid storage
 OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 
-echo "copying the Results"
+log "copying the Results"
 #globus-url-copy file:`pwd`/instruments.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/instr_$OBSID.tar
 
 if [ ! -z $( echo $PARSET | grep Initial-Subtract ) ]
@@ -412,46 +425,46 @@ fi
 if [[ ! -z $CAL_OBSID ]] #if target is defined, CALOBSID is also defined to differentiate from OBSID
 then
 	tar -zcvf results.tar.gz prefactor/results/*
-	globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/results_${OBSID}_SB${STARTSB}_.tar.gz
+	globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/${OBSID}/t1_${OBSID}_SB${STARTSB}_.tar.gz
 else
 	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_$OBSID.tar
 fi
 
 
 if [[ "$?" != "0" ]]; then
-   echo "Problem copying final files to the Grid. Clean up and Exit now..."
+   log "Problem copying final files to the Grid. Clean up and Exit now..."
    cp log_$name logtar_$name.fa ${JOBDIR}
    cd ${JOBDIR}
 
    if [[ $(hostname -s) != 'loui' ]]; then
-    echo "removing RunDir"
+    log "removing RunDir"
     rm -rf ${RUNDIR} 
    fi
    exit 21 #exit 21=> cannot upload final files
 fi
-echo ""
+log ""
 
-echo ""
-echo "copy logs to the Job home directory and clean temp files in scratch"
+log ""
+log "copy logs to the Job home directory and clean temp files in scratch"
 cp out* ${JOBDIR}
 cd ${JOBDIR}
 cp pngs.tar.gz ${JOBDIR}
 
 if [[ $(hostname -s) != 'loui' ]]; then
-    echo "removing RunDir"
+    log "removing RunDir"
     rm -rf ${RUNDIR} 
 fi
 ls -l ${RUNDIR}
-echo ""
-echo "listing final files in Job directory"
+log ""
+log "listing final files in Job directory"
 ls -allh $PWD
-echo ""
+log ""
 du -hs $PWD
 
 
-echo ""
-echo `date`
-echo "---------------------------------------------------------------------------"
-echo "FINISHED" $OBSID "SUBBAND:" $SURL_SUBBAND
-echo "---------------------------------------------------------------------------"
+log ""
+log `date`
+log "---------------------------------------------------------------------------"
+log "FINISHED" $OBSID "SUBBAND:" $SURL_SUBBAND
+log "---------------------------------------------------------------------------"
 
