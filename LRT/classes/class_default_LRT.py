@@ -45,6 +45,9 @@ class LRT(object):
 
 
     def parse_arguments(self,args):
+        '''Parses the arguments given to the program (or class) TODO: merge in init?
+            It updates the instance variables accordingly
+        '''
         if ("-h" in args) or ("--help" in args):
             self.print_help()
             sys.exit()
@@ -155,7 +158,7 @@ class LRT(object):
         print ""
         #Check if the OBSID really is in the srmfile:
         found=False
-        with open(self.srmfile,'rt') as f:
+        with open(self.srmfile,'rt') as f: #Checks if the OBSID is in the srmfile (TODO: Do in class srmlinks)
             for line in f:
                 if self.OBSID in line:
                     found=True
@@ -166,7 +169,7 @@ class LRT(object):
                     sys.exit()
         sys.path.append('LRT/gsurl')
         import gsurl_v3
-        try:
+        try: 
             for stuff in glob.glob('LRT/Tokens/datasets/'+self.OBSID+"/"):
                 shutil.rmtree(stuff)
             for stuff in glob.glob('LRT/Staging/datasets/'+self.OBSID+"/"):
@@ -179,6 +182,7 @@ class LRT(object):
         os.makedirs('LRT/Tokens/datasets/'+self.OBSID)
         os.makedirs('LRT/Staging/datasets/'+self.OBSID)
         gsurl_v3.main(self.srmfile,stride=self.numpernode)  #creates srmlist and subbandlist files
+        ##todo: Make gsurl_v3 return lists and make them srmobject/dict
         shutil.copy("srmlist","LRT/Tokens/datasets/"+self.OBSID)
         shutil.copy("subbandlist","LRT/Tokens/datasets/"+self.OBSID)
         os.remove("srmlist")
@@ -267,13 +271,16 @@ class LRT(object):
         self.t_type=token_type
         th=Token.Token_Handler(uname=os.environ["PICAS_USR"],pwd=os.environ["PICAS_USR_PWD"],dbn=os.environ["PICAS_DB"],t_type=token_type)
         th.add_view("todo",'doc.lock == 0 && doc.done == 0')
-        th.add_view("locked",'doc.lock > 0 && doc.done == 0')
-        th.add_view("done",'doc.lock > 0 && doc.done > 0 && doc.output == 0')
-        th.add_view("error",'doc.lock > 0 && doc.done > 0 && doc.output > 0')
+        #th.add_view("locked",'doc.lock > 0 && doc.done == 0')
+        th.add_view("locked",'doc.lock > 0 && doc.status !="done" ')
+        #th.add_view("done",'doc.lock > 0 && doc.done > 0 && doc.output == 0')
+        th.add_view("done",'doc.status == "done" ')
+        #th.add_view("error",'doc.lock > 0 && doc.done > 0 && doc.output > 0')
+        th.add_view("error",'doc.status == "error" ')
         th.add_overview_view()
-
+        #TODO: make token_holder object to store a LRT's tokens
         if self.resuberr:
-            th.reset_tokens(view_name=self.OBSID)
+            th.reset_tokens(view_name='todo')
         else:
             th.add_view(v_name=self.OBSID,cond='doc.OBSID == "%s" '%(self.OBSID))
             th.delete_tokens(view_name=self.OBSID)

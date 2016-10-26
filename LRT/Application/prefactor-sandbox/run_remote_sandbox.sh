@@ -14,20 +14,26 @@
 set -x
 tar -xf picas.tar
 tar -xf couchdb.tar
+#Remove the tarfiles and just pull GRID picastools from git
 
-python getOBSID.py $1 $2 $3 $4
-export p_un=$2
-export p_pw=$3
-export p_db=$1 
+#git clone https://github.com/apmechev/GRID_picastools.git .
+
+#ls /cvmfs/softdrive.nl/apmechev/lofar_prof/2_18/
+
+/usr/bin/python getOBSID.py $1 $2 $3 $4
+export p_un=${2}
+export p_pw=${3}
+export p_db=${1}
+
 echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_$2_$OBSID.tar with token type $4"
 
 
 
 
 
-uberftp -rm gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_$1_$OBSID.tar
-ls -l
 
+ls -l
+cat log*
 # Start the pilot jobs by contacting PiCaS tokens
 
 

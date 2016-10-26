@@ -20,10 +20,29 @@ import time
 import re
 import sys
 from string import strip
+import pdb
 
 def main(filename):
 	file_loc=location(filename)
-	return (replace(filename,file_loc))
+        rs,m=replace(file_loc)
+        f=open(filename,'r')
+        urls=f.readlines()
+        f.close()
+        return (process(urls,rs,m))
+
+
+def state_dict(srm_dict):
+        locs_options=['s','j','p']
+
+        line=srm_dict.itervalues().next() 
+        file_loc=[locs_options[i] for i in range(len(locs_options)) if ["sara" in line,"juelich" in line, not "sara" in line and not "juelich" in line][i] ==True][0]
+        print file_loc
+        rs,m=replace(file_loc)
+        
+        urls=[]
+        for key, value in srm_dict.iteritems():
+            urls.append(value)
+        return (process(urls,rs,m))
 
 def location(filename):
 	locs_options=['s','j','p']
@@ -33,7 +52,7 @@ def location(filename):
 	file_loc=[locs_options[i] for i in range(len(locs_options)) if ["sara" in line,"juelich" in line, not "sara" in line and not "juelich" in line][i] ==True]
 	return file_loc[0]
 
-def replace(filename,file_loc):
+def replace(file_loc):
 	if file_loc=='p':
 		m=re.compile('/lofar')
 		repl_string="srm://lta-head.lofar.psnc.pl:8443/srm/managerv2?SFN=/lofar"
@@ -48,12 +67,10 @@ def replace(filename,file_loc):
 			print("files are on SARA")
 		else:
 			sys.exit()
+        return repl_string,m
+   
+def process(urls,repl_string,m): 
 	nf=100
-	
-	f=open(filename,'r')
-	urls=f.readlines()
-	f.close()
-	
 	surls=[]
 	for u in urls:
 	    surls.append(m.sub(repl_string,strip(u)))
@@ -76,11 +93,14 @@ def replace(filename,file_loc):
 	    a,b,c=gfal.gfal_ls(b)
 	    a,b,c=gfal.gfal_get_results(b)
 	    for j in range(0,len(c)):
-	       if c[j]['locality']=='NEARLINE':
+	       if c[j]['status']!=0:
+                        print "\033[31mSURL "+c[j]['surl']+" not OK! Will Skip this one "+"\033[0m"
+                        continue
+               if c[j]['locality']=='NEARLINE':
 			colour="\033[31m"
 	       else:
 			colour="\033[32m"
-	       print c[j]['surl']+" "+colour+c[j]['locality']+"\033[0m"
+	       print str(j)+c[j]['surl']+" "+colour+c[j]['locality']+"\033[0m"
 	       locality.append([c[j]['surl'],c[j]['locality']])
 	    i=i+nf
 	    time.sleep(1)

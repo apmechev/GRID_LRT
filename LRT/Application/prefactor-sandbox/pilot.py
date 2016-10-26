@@ -58,6 +58,10 @@ class ExampleActor(RunActor):
                 else:
                     parsetfile="Pre-Facet-Cal.parset"
 
+        try:
+            cal_obsid=" --calobsid "+str(token['CAL_OBSID'])+" "
+        except:
+            cal_obsid=""
 
         try:
                 lofdir= str(token['lofar_sw_dir'])
@@ -69,21 +73,34 @@ class ExampleActor(RunActor):
             update_status(str(sys.argv[1]),str(sys.argv[2]),str(sys.argv[3]),token['_id'],'launched')
         except:
             pass
-	
-        command = "/usr/bin/time -v ./prefactor-refactor.sh --startsb " + str(token['start_SB']) + " --numsb "+ str(token['num_per_node']) +" --parset "+ parsetfile+" --lofdir "+lofdir+" --obsid "+str(token['OBSID'])+" --token "+token["_id"] +" 2> logs_.err 1> logs_out"
+        	
+        command = "/usr/bin/time -v ./prefactor-refactor.sh --startsb " + str(token['start_SB']) + " --numsb "+ str(token['num_per_node']) +" --parset "+ parsetfile+" --lofdir "+lofdir+" --obsid "+str(token['OBSID'])+cal_obsid+" --token "+token["_id"] +" --picasdb "+ str(sys.argv[1]) +" --picasuname "+str(sys.argv[2])+" --picaspwd "+ str(sys.argv[3])+ " 2> logs_.err 1> logs_out"
         print command
         
 	out = execute(command,shell=True)
+        print 'exit status is ' 
+        print out
+#        token=self.client.modify_token(token)
         try:
-            update_status(str(sys.argv[1]),str(sys.argv[2]),str(sys.argv[3]),token['_id'],'done')
-            token['progress']=1.0
+            if out[0]==0:
+                update_status(str(sys.argv[1]),str(sys.argv[2]),str(sys.argv[3]),token['_id'],'done')
+                token['progress']=1.0
+            else:
+                update_status(str(sys.argv[1]),str(sys.argv[2]),str(sys.argv[3]),token['_id'],'error')
         except:
             pass
 	# Get the job exit code in the token 
-        token['output'] = out[0]
+        token=db[token["_id"]]
+        token['output']=out[0]
+        
+#	 token = self.modifier.close(token)
+#	 self.client.db[token['_id']] = token ##Fix this update
+        db.update([token])
+        #token=self.client.modify_token(token)
+        #self.modifier.add_output(token,out[0])
+        token=db[token["_id"]]
+        token = self.modifier.close(token)
 
-	token = self.modifier.close(token)
-	self.client.db[token['_id']] = token
         sols_search=subprocess.Popen(["find",".","-name","*.png"],stdout=subprocess.PIPE)
         result=sols_search.communicate()[0]
 

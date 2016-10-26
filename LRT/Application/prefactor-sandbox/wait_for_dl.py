@@ -21,10 +21,10 @@ def update_status(p_db,p_usr,p_pwd):
                     statuses.append(db[i]['status'])
                 except KeyError:
                     pass  
-            if len(filter(lambda x: x=='downloading',statuses))<5:
+            if len(filter(lambda x: x=='downloading',statuses))<50:
                 sys.exit()
             else:
-                time.sleep(1)
+                time.sleep(39.87654321)
         except couchdb.http.ServerError:
             print "couchDB threw ServerError"
             time.sleep(30)
