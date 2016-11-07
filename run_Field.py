@@ -2,7 +2,7 @@ import fields_LRT
 import sys,math
 
 
-def initialize_from_file(OBSIDS_file,line,time_avg=4,freq_avg=4):
+def initialize_from_file(OBSIDS_file,line,time_avg=8,freq_avg=2):
     '''Initializes the field object from a file
         by default it sets parameters to 4chan/SB and 4sec resolution
     '''
@@ -35,21 +35,28 @@ def run_field(f_obj,cal_thresh=0.05):
     s3=fields_LRT.Stage_step("Stage_targ_full")
 
     p1=fields_LRT.pref_Step("pref_cal")
-    p2=fields_LRT.pref_Step("pref_targ")
+    p2=fields_LRT.pref_Step("pref_targ1")
+    p3=fields_LRT.pref_Step("pref_targ2")
+
+
 
     f_obj.add_step(s1)
     f_obj.add_step(s2)
     f_obj.add_step(p1)
     f_obj.add_step(s3)
     f_obj.add_step(p2)
+    f_obj.add_step(p3)
+    
 
     s1.start(f_obj.srms['targ'][0],threshold=1.) #just stages target and doesn't wait
-    s2.start(f_obj.srms['cal'][0],threshold=cal_thresh) #stages and waits for the calibrator
-    p1.start(f_obj.srms['cal'],f_obj.parsets['cal'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','244','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof/','-v','2_18'])
+    s2.start(f_obj.srms['cal'][0],threshold=cal_thresh) #stages and waits for the calibrator 
+    #p1.start(f_obj.srms['cal'],f_obj.parsets['cal'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','244','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18','-j','remote-prefactor-cal.jdl'])   
+    p1.progress=1
     s3.start(f_obj.srms['targ'][0],threshold=cal_thresh)#really waits for the target to be staged fully
-    s3.start_time=s1.start_time #staging started with s1, gives realistic staging length
-    p2.start(f_obj.srms['targ'],f_obj.parsets['targ'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','10','/cvmfs/softdrive.nl/apmechev/lofar_prof/','-v','2_18'])
-
+    s3.start_time=s1.start_time #staging started with s1, gives realistic staging length 
+    p2.start(f_obj.srms['targ'],f_obj.parsets['targ'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','1','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18'],prev_step=p1,calobsid=f_obj.OBSIDs['cal'])
+    #Add targ2 to parsets!!!!! 
+    p3.start(f_obj.srms['targ'],f_obj.parsets['targ2'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','10','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18','-j','remote-prefactor-targ2.jdl'],prev_step=p2,calobsid=f_obj.OBSIDs['cal'])
 
 
 

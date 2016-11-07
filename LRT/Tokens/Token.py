@@ -1,9 +1,11 @@
 import sys
 import os
 import ConfigParser
+
 if not 'couchdb' in sys.modules:
     import couchdb
 from couchdb.design import ViewDefinition
+
 import pdb
 import itertools
 
@@ -31,6 +33,7 @@ class Token_Handler:
         '''Creates a token, appends string to token ID if requested and adds 
             user requested keys through the dict keys{}
             ie t1.create_token(keys={"OBSID":"L123458","freq_res":4,"time_res":4,},append="L123458")
+            attach is [file_handle,"name of attachment"]
         '''
         default_keys={
             '_id': 't_'+self.t_type+"_",
@@ -47,7 +50,7 @@ class Token_Handler:
         self.db.update([keys]) 
         if attach:
             self.add_attachment(keys['_id'],attach[0],attach[1])
-        keys={}
+        return keys['_id'] # returns the token ID
 
     def append_id(self,keys,app=""):
         keys["_id"]+=app
@@ -110,14 +113,20 @@ function(doc) {
        if (doc.lock == 0 && doc.done == 0){
           emit('todo', 1);
        }
-       if(doc.lock > 0 && doc.done == 0) {
-          emit('locked', 1);
+       if(doc.lock > 0 && doc.status=='downloading') {
+          emit('downloading', 1);
        }
-       if(doc.lock > 0 && doc.done > 0 && doc.output == 0) {
+       if(doc.lock > 0 && doc.status=='done') {
           emit('done', 1);
        }
-       if(doc.lock > 0 && doc.done > 0 && doc.output > 0) {
+       if(doc.lock > 0 && doc.status=='error') {
           emit('error', 1);
+       }
+       if(doc.lock > 0 && doc.status=='launched') {
+          emit('waiting', 1);
+       }
+       if(doc.lock > 0 && "starting_generic_pipeline" in doc.times && doc.status!='done' && doc.status!='error' && doc.status!='downloading' ) {
+          emit('running', 1);
        }
    }
 }
@@ -166,7 +175,10 @@ function (key, values, rereduce) {
 
             if key[0]!="" and document[key[0]]!=key[1]: #make it not just equal
                 continue                        
-
+            try:
+                document['status']='todo'
+            except KeyError:
+                pass
             document['lock'] = 0
             document['done'] = 0
             document['scrub_count'] += 1
@@ -183,8 +195,10 @@ function (key, values, rereduce) {
     def add_attachment(self,token,filehandle,filename="test"):
         self.db.put_attachment(self.db[token],filehandle,filename)
 
+
     def list_attachments(self,token):
         return self.db[token]["_attachments"].keys()
+
 
     def get_attachment(self,token,filename):
         attach=self.db.get_attachment(token,filename).read()
@@ -193,3 +207,61 @@ function (key, values, rereduce) {
                 f.write(line)
         return os.abspath(filename)
 
+
+class View(object):
+    def __init__(self,t_type='test',srv="https://picas-lofar.grid.sara.nl:6984",uname="",pwd="",dbn="",name="test_view"):
+        self.name=name
+        self.t_type=t_type
+        self.Picas_User=uname
+        self.Picas_DB=dbn
+        self.Picas_Passwd=pwd
+        self.server=srv
+        self.db=self.get_db(self.Picas_User,self.Picas_Passwd,self.Picas_DB,self.server)
+        self.condition="doc.lock==0"        
+        self.emit="doc._id"
+
+
+    def get_db(self,uname,pwd,dbn,srv):
+        """Logs into the Couchdb server and returns the database requested
+        """
+        server = couchdb.Server(srv)
+        server.resource.credentials = (uname,pwd)
+        db = server[dbn]
+        return db
+
+
+    def set_condition(self,condition):
+        self.condition=condition
+   
+ 
+    def set_emit(self,emit):
+        self.emit=emit
+
+    def build_Map_Code(self, mapcode=""):
+        if mapcode=="":
+            mapcode='''function(doc) {
+   if(doc.type == "%s") {
+       if (doc.lock == 0 && doc.done == 0){
+          emit('todo', 1);
+       }
+       if(doc.lock > 0 && doc.status=='downloading') {
+          emit('downloading', 1);
+       }
+       if(doc.lock > 0 && doc.status=='done') {
+          emit('done', 1);
+       }
+       if(doc.lock > 0 && doc.status=='error') {
+          emit('error', 1);
+       }
+       if(doc.lock > 0 && doc.status=='launched') {
+          emit('waiting', 1);
+       }
+       if(doc.lock > 0 && "launched" in doc.times && doc.status!='done' && doc.status!='error' && doc.status!='downloading' ) {
+          emit('running', 1);
+       }
+   }
+}'''
+        self.mapcode=str(mapcode %(self.t_type))
+
+    def build_reduce_code(self,reduce_code=""):
+        self.reducecode=reduce_code

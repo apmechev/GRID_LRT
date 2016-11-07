@@ -42,7 +42,7 @@ def state_dict(srm_dict):
         urls=[]
         for key, value in srm_dict.iteritems():
             urls.append(value)
-        return (process(urls,rs,m))
+        return process(urls,rs,m)
 
 def location(filename):
 	locs_options=['s','j','p']
@@ -103,8 +103,8 @@ def process(urls,repl_string,m):
 	       print str(j)+c[j]['surl']+" "+colour+c[j]['locality']+"\033[0m"
 	       locality.append([c[j]['surl'],c[j]['locality']])
 	    i=i+nf
-	    time.sleep(1)
-	return(locality)
+	    time.sleep(1)	
+        return locality
 
 if __name__=='__main__':
 	if len(sys.argv)==2:

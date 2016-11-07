@@ -16,6 +16,7 @@ import sys,os
 import time
 import couchdb
 import subprocess
+
 #picas imports
 from picas.actors import RunActor
 from picas.clients import CouchClient
@@ -48,7 +49,7 @@ class ExampleActor(RunActor):
         db = server[str(sys.argv[1])]
 	
         attachies=token["_attachments"].keys()
-        for att in [s for s in attachies if "parset" ] :
+        for att in [s for s in attachies if "parset"  in s] : #TODO: Make only "parset" in attachy
             att_txt=db.get_attachment(token["_id"],att).read()
             with open(att,'w') as f:
                 for line in att_txt:
@@ -58,11 +59,24 @@ class ExampleActor(RunActor):
                 else:
                     parsetfile="Pre-Facet-Cal.parset"
 
+        for att in [s for s in attachies if "srm"  in s] : #TODO: Make only "parset" in attachy
+            att_txt=db.get_attachment(token["_id"],att).read()
+            print att
+            print att_txt
+            with open(att,'w') as f:
+                for line in att_txt:
+                    f.write(line)
+
+
         try:
             cal_obsid=" --calobsid "+str(token['CAL_OBSID'])+" "
         except:
             cal_obsid=""
 
+        try:
+            pipetype=" --pipetype "+str(token['pipeline'])+" "
+        except:
+            pipetype=""
         try:
                 lofdir= str(token['lofar_sw_dir'])
         except:
@@ -73,8 +87,16 @@ class ExampleActor(RunActor):
             update_status(str(sys.argv[1]),str(sys.argv[2]),str(sys.argv[3]),token['_id'],'launched')
         except:
             pass
-        	
-        command = "/usr/bin/time -v ./prefactor-refactor.sh --startsb " + str(token['start_SB']) + " --numsb "+ str(token['num_per_node']) +" --parset "+ parsetfile+" --lofdir "+lofdir+" --obsid "+str(token['OBSID'])+cal_obsid+" --token "+token["_id"] +" --picasdb "+ str(sys.argv[1]) +" --picasuname "+str(sys.argv[2])+" --picaspwd "+ str(sys.argv[3])+ " 2> logs_.err 1> logs_out"
+        
+
+        if 'start_SB' in token.keys():
+            start_SB=token['start_SB']
+        elif 'start_AB' in token.keys():
+            start_SB=token['start_AB']
+        else:
+            start_SB=""
+	
+        command = "/usr/bin/time -v ./master.sh --startsb " + str(start_SB) + " --numsb "+ str(token['num_per_node']) +" --parset "+ parsetfile+" --lofdir "+lofdir+" --obsid "+str(token['OBSID'])+pipetype+cal_obsid+" --token "+token["_id"] +" --picasdb "+ str(sys.argv[1]) +" --picasuname "+str(sys.argv[2])+" --picaspwd "+ str(sys.argv[3])+ " 2> logs_.err 1> logs_out"
         print command
         
 	out = execute(command,shell=True)

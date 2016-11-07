@@ -17,6 +17,7 @@ import time
 import couchdb
 import subprocess
 import shutil
+
 #picas imports
 from picas.actors import RunActor
 from picas.clients import CouchClient
@@ -34,11 +35,11 @@ class ExampleActor(RunActor):
 	# Print token information
 	location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_"+str(sys.argv[2])+"_"+str(token['OBSID'])+".tar"
 	print location
-	##If token["type"] in ["pref.cal","pref.targ","pref.insub"]:continue else exit
+
+	## TODO: If no globus-tools, use wget
         subprocess.call(["globus-url-copy", location, "sandbox.tar"])
 	subprocess.call(["tar", "-xf", "sandbox.tar","-C",".","--strip-components=1"])
-        subprocess.call(["chmod","a+x","prefactor-refactor.sh"])
-	subprocess.call(["chmod","a+x","prefactor.sh"])
+	subprocess.call(["chmod","a+x","master.sh"])
 
 	#This will process the token from the DOWNLOADED pilot.py (The timelines diverge at this point)
 	from  pilot import ExampleActor as Actor2

@@ -31,7 +31,7 @@ def make_list_of_surls(infile,stride):
             surl=line.split()[0]
             tmp1=line.split('SB')[1]
             sbn=tmp1.split('_')[0]
-            srmdict[sbn]=surl
+            srmdict[(int(sbn),int(sbn))]=surl
     print 'created srmDICT from ', infile
     return srmdict
 

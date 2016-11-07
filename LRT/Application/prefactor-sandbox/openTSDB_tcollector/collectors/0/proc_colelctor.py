@@ -29,7 +29,7 @@ except ImportError:
   proc_conf = None
 
 
-DEFAULT_COLLECTION_INTERVAL=10
+DEFAULT_COLLECTION_INTERVAL=1
 
 def getPIDs(st):
     ''' This searches the current user's running processes for a string

@@ -27,6 +27,7 @@ class Field(object):
         '''Adds a link for each step to check if its predecessor has finished
         '''
         if len(self.steps)==0:
+            step.prev_step=None
             self.steps.append(step)
         else:
             step.prev_step=self.steps[len(self.steps)-1]
@@ -40,7 +41,7 @@ class Field(object):
         '''
         self.OBSIDs['targ']=targ_OBSID
         self.OBSIDs['cal']=self.find_cal_obsid(targ_OBSID)
-        (self.parsets['cal'],self.parsets['targ'])=self.create_field_parsets(tim_avg,freq_avg)
+        (self.parsets['cal'],(self.parsets['targ'],self.parsets['targ2']))=self.create_field_parsets(tim_avg,freq_avg)
         self.srms['cal']=self.findsrm('SKSP/srmfiles',self.OBSIDs['cal'])
         self.srms['targ']=self.findsrm('SKSP/srmfiles',self.OBSIDs['targ'])
         if len(self.srms['cal'])==0 or len(self.srms['targ'])==0:
@@ -66,18 +67,23 @@ class Field(object):
         '''Uses the modify_parsets function to add the Calibrator/Target OBSID, and averaging 
             parameters, then write out to a field specific parsets (Fields are labeled as 'field_'+targ_obsid
         '''
-        orig_parsets=("Pre-Facet-Calibrator.parset","Pre-Facet-Target.parset")
+        orig_parsets=("Pre-Facet-Calibrator.parset","Pre-Facet-Target-1.parset","Pre-Facet-Target-2.parset")
         filedata=None
-        for tar_cal in [0,1]:
+        for tar_cal in [0,1,2]:
             filename=orig_parsets[tar_cal]
-            filedata=self.modify_parsets(tim_avg[tar_cal],freq_avg[tar_cal],filename)
+            if tar_cal==0:
+                filedata=self.modify_parsets(tim_avg[tar_cal],freq_avg[tar_cal],filename)
+            else:
+                filedata=self.modify_parsets(tim_avg[1],freq_avg[1],filename)
             with open(os.path.splitext(filename)[0]+"_"+self.name+".parset",'w') as file:
                 file.write(filedata)
             if "Calibrator" in filename:
                 cal_parset=os.path.splitext(filename)[0]+"_"+self.name+".parset"
-            elif "Target" in filename:
-                targ_parset=os.path.splitext(filename)[0]+"_"+self.name+".parset" 
-        return(cal_parset,targ_parset)
+            elif "Target-1" in filename:
+                targ_parset1=os.path.splitext(filename)[0]+"_"+self.name+".parset" 
+            elif "Target-2" in filename:
+                targ_parset2=os.path.splitext(filename)[0]+"_"+self.name+".parset"
+        return(cal_parset,(targ_parset1,targ_parset2))
 
 
     def modify_parsets(self,time,freq,parset):
@@ -89,7 +95,10 @@ class Field(object):
             filedata=re.sub(r'\! avg_timestep\s+=\s\S?',"! avg_timestep         = "+str(time),filedata)
             filedata=re.sub(r'\! avg_freqstep\s+=\s\S?',"! avg_freqstep         = "+str(freq),filedata)
             filedata=re.sub(r'\! cal_input_pattern\s+=\s\S+',"! cal_input_pattern    = "+str(self.OBSIDs['cal'])+"*MS",filedata)
-            filedata=re.sub(r'\! target_input_pattern\s+=\s\S+',"! target_input_pattern    = "+str(self.OBSIDs['targ'])+"*MS",filedata)
+            if "Target-2" in parset:
+                filedata=re.sub(r'\! target_input_pattern\s+=\s\S+',"! target_input_pattern    = "+str(self.OBSIDs['targ'])+"*ms",filedata)
+            else:
+                filedata=re.sub(r'\! target_input_pattern\s+=\s\S+',"! target_input_pattern    = "+str(self.OBSIDs['targ'])+"*MS",filedata)
             return filedata
       
 
@@ -123,12 +132,18 @@ class processing_step(object):
         self.done=False
         self.token=""
         self.prev_step=None
+        self.sleep=300
+        self.skip=False
 
-    def start(self):
+    def start(self,skip=False):
+        if skip or self.skip:
+            raise Exception("Catch this exception in the child and return "
+                            " when calling parent's start()")
+        print self.prev_step
         if self.prev_step:
             while self.prev_step.progress<1.0:
                 print "Previous step hasn't finished"
-                time.sleep(120)
+                time.sleep(self.sleep)
                 self.prev_step.check_progress()
         self.start_time=time.time()
 
@@ -139,39 +154,39 @@ class processing_step(object):
        
 
 class Stage_step(processing_step):
-    def start(self,srmfile="srmtxt",threshold=0.05,sleep=120):
+    def start(self,srmfile="srmtxt",threshold=0.05,sleep=300,skip=False):
         ''' Stages the surls in the srmfile and continues only if less than the
            threshold are unstaged (threshold goes from 0->1) 
         '''
-        processing_step.start(self)
+        try:
+            processing_step.start(self,skip)
+        except Exception:
+            return
         import re
-        from class_prefactor_LRT import pref_LRT
+        import class_srmlist
         print self.start_time
         self.threshold=threshold
-        self.l=pref_LRT()
-        self.l.srmfile = srmfile
-
-        with open(srmfile,'r') as f:
-            line=f.readline()
-            self.l.OBSID='L'+str(re.search("L(.+?)_",line).group(1))
-
-        self.l.setup_dirs()
-        self.l.parsetfile=""
-        self.l.nostage=False
-        self.l.ignoreunstaged=True
-        self.l.check_state_and_stage() 
-        self.progress=1-(self.l.perc_left -self.threshold)
-        if self.l.perc_left <= self.threshold:
+        self.srmfile=srmfile
+        self.srm1=class_srmlist.Srm_manager(filename=self.srmfile)        
+        self.srm1.file_load(filename=self.srmfile)
+        
+        locs=self.srm1.state()
+        perc_left=[item for sublist in locs for item in sublist].count('NEARLINE')/(float(len(locs)))
+        self.progress=1-(perc_left -self.threshold)
+        if perc_left <= self.threshold:
+            if self.threshold==1:
+                self.srm1.stage()
             self.stop_time=time.time()
             self.done=True
             self.progress=1.0
             print "exiting, done"
             return
         else:
-            self.progress=1-(self.l.perc_left -self.threshold)
+            self.progress=1-(perc_left -self.threshold)
             print self.progress
             while not self.done:
-                time.sleep(sleep)
+                self.srm1.stage()
+                time.sleep(self.sleep)
                 self.stop_time=time.time()
                 self.check_progress()
    
@@ -180,21 +195,28 @@ class Stage_step(processing_step):
             calculates the progress (taking the threshold in account) 
             and only finishes the step if the threshold of unstaged files is reached
         '''
-        self.l.check_state_and_stage()
-        self.progress=1-(self.l.perc_left -self.threshold)
-        if self.l.perc_left < self.threshold:
+        self.srm1.stage()
+        locs=self.srm1.state()
+        perc_left=[item for sublist in locs for item in sublist].count('NEARLINE')/(float(len(locs)))
+        self.progress=1-(perc_left -self.threshold)
+        if perc_left < self.threshold:
             self.done=True
             self.progress=1.0
         return
 
 
 class pref_Step(processing_step):
-    def start(self,srmfile,parset,OBSID,fieldname,args=[]):
-        print parset
+    def __init__(self,name):
+        self.obsid=None
+        processing_step.__init__(self,name)
+
+    def start(self,srmfile,parset,OBSID,fieldname,args=[],prev_step=None,calobsid='L12345'):
+        self.prev_pref_step=prev_step
+        
         processing_step.start(self)
         self.LRT=pref_LRT() 
         self.LRT.parse_arguments(args+[srmfile,parset]) #include srmfile, parset of calib
-
+        self.obsid=OBSID
         self.LRT.OBSID=OBSID
         self.LRT.parsetfile=os.environ['PWD']+"/"+parset
         self.LRT.srmfile=os.environ['PWD']+"/"+srmfile[0]
@@ -213,7 +235,12 @@ class pref_Step(processing_step):
                 progress_keys["times"][s.name+"_start"]=s.start_time
             except:
                 break
-        other_keys={"pipeline":self.name,"progress":0,"status":"queued"}
+        other_keys={"pipeline":self.name,"progress":0,"status":"queued","FREQ":"","ABN":""}
+        if 'targ' in self.name:
+            if self.prev_pref_step.obsid:
+                other_keys['CAL_OBSID']=self.prev_pref_step.obsid
+            else:
+                other_keys['CAL_OBSID']=calobsid
         all_keys = dict(itertools.chain(other_keys.iteritems(), progress_keys.iteritems()))
         self.LRT.submit_to_picas(pref_type="_"+fieldname,add_keys=all_keys)
         self.LRT.start_jdl()     

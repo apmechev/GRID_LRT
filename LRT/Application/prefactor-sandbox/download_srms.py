@@ -35,6 +35,7 @@ class srm_getter:
                 subprocess.Popen(["uberftp","-ls",self.srm])
             except:
                 print "Can't gett size"
+        if 'gsiftp' in self.srm: self.turl=self.srm
         ubersize=subprocess.Popen(["uberftp","-ls",self.turl],stdout=subprocess.PIPE)
         uber_result=ubersize.communicate()[0]
         try:
@@ -46,9 +47,14 @@ class srm_getter:
 
     def getprogress(self):
         FNULL = open(os.devnull, 'w')
-        if (time.time() - self.start_time) > 300*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 : 
+        if (time.time() - self.start_time) > 120*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 : 
             self.done=True
             self.kill_dl()
+        try:
+            os.kill(self.pid, 0)
+        except OSError:
+            self.done=True
+            self.progress=1
         if self.done: return 
         try:
             getdlsize=subprocess.Popen(["du","-s",self.filename],stdout=subprocess.PIPE,stderr=FNULL)
@@ -79,7 +85,7 @@ class srm_getter:
                     return 0.0
                 
                 self.stuck=True
-                if (time.time()-self.start_time) > 300*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 :
+                if (time.time()-self.start_time) > 120*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 :
                     self.kill_dl()
                     return 1
         self.progress=float(self.extracted)/float(float(self.size)/1000.)
@@ -121,7 +127,7 @@ class srm_getter:
             os.kill(self.pid, 0)#relax this doesn't *really* kill anything :)
         except OSError:
             self.done=True
-        if (time.time()-self.start_time)> 300*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 :
+        if (time.time()-self.start_time)> 120*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 :
                 self.done=True
                 self.kill_dl()
         else:
@@ -176,7 +182,7 @@ def main(srmfile,start=0,end=-1,step=10):
 
         time.sleep(3)
         for x in running:
-            if (time.time()-x.start_time) > 300*(float(x.size)/1000000000.) and (not (x.done)) and ((time.time() - x.start_time) > 1800) :
+            if (time.time()-x.start_time) > 120*(float(x.size)/1000000000.) and (not (x.done)) and ((time.time() - x.start_time) > 1800) :
                 x.done=True
                 x.kill_dl()
                 print "killing process in last block"
