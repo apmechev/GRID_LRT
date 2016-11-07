@@ -45,7 +45,7 @@
 # number of processes to use per step per node
 ! num_proc_per_node        = 6
 # number of processes to use per step per node for tasks with high i/o (dppp or cp) or memory (eg calibration)
-! num_proc_per_node_limit  = 4
+! num_proc_per_node_limit  = 6
 # number of threads per process for NDPPP
 ! max_dppp_threads         = 6
 
@@ -54,7 +54,7 @@
 
 ### Stuff that you probably don't need to modify
 # which steps to run 
-pipeline.steps=[createmap_cal, ndppp_prep_cal, combine_data_cal_map, sky_cal, sky_cal_path, calib_cal, h5_imp_cal_map, h5imp_cal, mk_inspect_dir, copy_h5imp_cal, fitclock, ampl, plots, phase, plot_cal_phases, createmap_cal_pngs, copy_cal_pngs, createmap_cal_pdfs, copy_cal_pdfs, mk_cal_values_dir, createmap_cal_npys, copy_cal_npys]
+pipeline.steps=[createmap_cal, ndppp_prep_cal, combine_data_cal_map, sky_cal, sky_cal_path, calib_cal, h5_imp_cal_map, h5imp_cal, mk_inspect_dir, copy_h5imp_cal, fitclock, ampl, plots, phase, plot_cal_phases, createmap_cal_pngs, copy_cal_pngs, mk_cal_values_dir, createmap_cal_npys, copy_cal_npys]
 
 # generate a mapfile of all the calibrator data
 createmap_cal.control.kind            =   plugin

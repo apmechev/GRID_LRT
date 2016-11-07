@@ -8,10 +8,12 @@ class pref_LRT(LRT):
         self.numpernode=10
         self.nostage=True
 
+
     def print_help(self):
         LRT.print_help(self)
         print "+=+=+=+=+ Prefactor LRT Options +=+=+=+=+="
         print "(-fs or --force-stage)                   - Force Staging of Files"
+
 
     def parse_arguments(self,args): 
         if ("-n" in args[:-2] or ("--number-per-node" in args[:-2])):
@@ -25,8 +27,10 @@ class pref_LRT(LRT):
             self.nostage=False
         LRT.parse_arguments(self,args)
     
+
     def split_srms(self):
         LRT.split_srms(self)
+
 
     def setup_dirs(self):
         LRT.setup_dirs(self) 
@@ -48,6 +52,7 @@ class pref_LRT(LRT):
         os.chdir(self.workdir)
 
         LRT.prepare_sandbox(self,sandboxdir)
+
 
     def check_state_and_stage(self):
         if "Initial" in self.parsetfile:
@@ -71,6 +76,7 @@ class pref_LRT(LRT):
 
     def submit_to_picas(self,pref_type="",add_keys={}):
         LRT.submit_to_picas(self,token_type="pref"+pref_type,keys=add_keys,attfile=self.parsetfile)
+
 
     def start_jdl(self):
         LRT.start_jdl(self)

@@ -14,13 +14,11 @@
   DataAccessProtocol = {"gsiftp"};
   ShallowRetryCount = 5;
 
-  Requirements=(RegExp("mediummc",other.GlueCEUniqueID));
-  #Requirements = (RegExp("mediummc",other.GlueCEUniqueID) || RegExp("rug.nl:8443/cream-pbs-medium",other.GlueCEUniqueID));
-  #Requirements = (RegExp("mediummc",other.GlueCEUniqueID) || RegExp("nikhef.nl:8443/cream-pbs-medium",other.GlueCEUniqueID) || RegExp("rug.nl:8443/cream-pbs-medium",other.GlueCEUniqueID));
+  Requirements = RegExp("lofarsksp",other.GlueCEUniqueID);
 
   # Just 4 cores on a single node
-  SmpGranularity = 16;
-  CPUNumber = 16;
+  SmpGranularity = 24;
+  CPUNumber = 24;
 
   #requirement for Nikhef high memory jobs
   CERequirements = "other.GlueHostMainMemoryRAMSize >= 200192";

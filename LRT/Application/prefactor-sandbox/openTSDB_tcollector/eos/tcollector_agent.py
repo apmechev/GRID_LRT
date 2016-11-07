@@ -25,7 +25,7 @@ warn = tracer.trace0
 info = tracer.trace1
 debug = tracer.trace9
 
-TCOLLECTOR_PATH = "/usr/local/tcollector/tcollector.py"
+TCOLLECTOR_PATH = "../tcollector.py"
 DEFAULT_TSD_PORT = 4242
 
 
