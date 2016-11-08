@@ -1,7 +1,7 @@
 [
   JobType="Parametric";
   ParameterStart=0;
-  ParameterStep=6;
+  ParameterStep=5;
   Parameters=1;
 
   Executable = "/bin/sh";
