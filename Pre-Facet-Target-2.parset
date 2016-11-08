@@ -24,7 +24,7 @@
 ! cal_input_pattern    = a
 ! target_input_pattern = a 
 # path to the skymodel for the phase-only calibration of the target
-! target_skymodel      = PREFACTOR_SCRATCH_DIR/prefactor/skymodels/P165+57_hetdex_5deg.txt
+! target_skymodel      = PREFACTOR_SCRATCH_DIR/prefactor/skymodels/P10_hetdex_5deg.txt
 # download the phase-only calibration skymodel from TGSS
 # "Force" : always download , "True" download if {{ target_skymodel }} does not exist , "False" : never download
 ! use_tgss_target      = True

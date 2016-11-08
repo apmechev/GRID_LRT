@@ -236,6 +236,7 @@ class LRT(object):
             if self.resuberr:
                 th.reset_tokens(view_name='error')
             for ABN in abnlist:
+                th.delete_tokens(view_name='locked')
                 attachment=[open(attfile,'r'),os.path.basename(attfile)]
                 default_keys={"num_per_node":self.numpernode,
                               "lofar_sw_dir":self.sw_dir+"/"+self.sw_ver,

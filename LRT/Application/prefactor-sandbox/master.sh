@@ -283,7 +283,7 @@ find . -name "*npy"
 #
 # - step3 finished check contents
 more output
-
+more openTSDB_tcollector/logs/*
 OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 echo "Saving profiling data to profile_"$OBSID_$( date  +%s )".tar.gz"
 globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_${OBSID}_$( date  +%s ).tar.gz
