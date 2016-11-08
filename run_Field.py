@@ -51,7 +51,7 @@ def run_field(f_obj,cal_thresh=0.05):
     s1.start(f_obj.srms['targ'][0],threshold=1.) #just stages target and doesn't wait
     s2.start(f_obj.srms['cal'][0],threshold=cal_thresh) #stages and waits for the calibrator 
     
-    calfile=subprocesss.Popen(['uberftp','-ls','gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_'+f_obj.OBSIDs['cal']+".tar"],stdout=subprocess.PIPE)
+    calfile=subprocess.Popen(['uberftp','-ls','gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_'+f_obj.OBSIDs['cal']+".tar"],stdout=subprocess.PIPE)
     cal_results=calfile.communicate()[0] #Find whether the calibrator has been run before 
 
     if cal_results=="":
@@ -61,8 +61,7 @@ def run_field(f_obj,cal_thresh=0.05):
 
     s3.start(f_obj.srms['targ'][0],threshold=cal_thresh)#really waits for the target to be staged fully
     s3.start_time=s1.start_time #staging started with s1, gives realistic staging length 
-#    p2.start(f_obj.srms['targ'],f_obj.parsets['targ'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','1','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18'],prev_step=p1,calobsid=f_obj.OBSIDs['cal'])
-    p2.progress=1
+    p2.start(f_obj.srms['targ'],f_obj.parsets['targ'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','1','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18'],prev_step=p1,calobsid=f_obj.OBSIDs['cal'])
     p3.start(f_obj.srms['targ'],f_obj.parsets['targ2'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','10','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18','-j','remote-prefactor-targ2.jdl'],prev_step=p2,calobsid=f_obj.OBSIDs['cal'])
 
 
