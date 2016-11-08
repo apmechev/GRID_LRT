@@ -57,8 +57,8 @@ class Field(object):
             for i in cal_file:
                 allcals.append(i.split(','))
         for i in allcals: 
-            if "L"+i[0]==str(targ_Obsid):
-                cal_OBSID="L"+i[5]
+            if "L"+i[1]==str(targ_Obsid):
+                cal_OBSID="L"+i[6]
 
         #TODO: This 
         return cal_OBSID
