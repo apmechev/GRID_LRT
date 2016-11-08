@@ -23,7 +23,6 @@ def initialize_from_file(OBSIDS_file,line,time_avg=4,freq_avg=4):
     print f1.OBSIDs
     print "srmfiles for the field are " 
     print f1.srms
-    sys.exit()
     return f1
 
 
