@@ -44,6 +44,7 @@ class Field(object):
         (self.parsets['cal'],(self.parsets['targ'],self.parsets['targ2']))=self.create_field_parsets(tim_avg,freq_avg)
         self.srms['cal']=self.findsrm('SKSP/srmfiles',self.OBSIDs['cal'])
         self.srms['targ']=self.findsrm('SKSP/srmfiles',self.OBSIDs['targ'])
+        time.sleep(3)
         if len(self.srms['cal'])==0 or len(self.srms['targ'])==0:
             print "Srms failed to be found"
             print self.srms

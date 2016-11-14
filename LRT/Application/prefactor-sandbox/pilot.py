@@ -130,7 +130,7 @@ class ExampleActor(RunActor):
             try:
                 self.client.db.put_attachment(token,open(os.path.basename(png),'r'),os.path.split(png)[1])
             except:
-                print "error attaching"+png
+                print "error attaching "+png
 	# Attach logs in token
 
 	
