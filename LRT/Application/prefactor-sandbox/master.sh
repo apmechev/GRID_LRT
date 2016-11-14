@@ -208,6 +208,7 @@ if [[ ! -z ${CAL_OBSID}  ]]
 then
  echo "Getting solutions from obsid "$CAL_OBSID
  globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_${CAL_OBSID}.tar file:`pwd`/cal_solutions.tar
+ wait
  if [[ -e cal_solutions.tar ]]
   then
     tar -xvf cal_solutions.tar
@@ -261,6 +262,8 @@ $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${T
 echo "killing tcollector"
 kill $TCOLL_PID
 
+./prefactor/scripts/plot_solutions_all_stations.py -p $( ls -d ${RUNDIR}/prefactor/results/*ms )/instrument_directionindependent/ ${JOBDIR}/GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png
+
 xmlfile=$( find . -name "*statistics.xml" 2>/dev/null)
 cp piechart/autopie.py .
 ./autopie.py ${xmlfile} PIE_${OBSID}.png
@@ -273,7 +276,7 @@ find ./prefactor/cal_results/ -name "*npy"|xargs tar -cf numpys.tar
 tar --append --file=numpys.tar pngs.tar.gz
 find . -name "*tcollector.out" | xargs tar -cf profile.tar
 find . -iname "*statistics.xml" -exec tar -rvf profile.tar {} \;
-find . -name "PIE*png" -exec tar -rvf profile.tar {} \;
+find . -name "*png" -exec tar -rvf profile.tar {} \;
 tar --append --file=profile.tar output
 tar -zcvf profile.tar.gz profile.tar
 find ./prefactor/results/ -iname "*h5" -exec tar -rvf numpys.tar {} \;
@@ -283,10 +286,11 @@ find . -name "*npy"
 #
 # - step3 finished check contents
 more output
-more openTSDB_tcollector/logs/*
+#more openTSDB_tcollector/logs/*
 OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 echo "Saving profiling data to profile_"$OBSID_$( date  +%s )".tar.gz"
 globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_${OBSID}_$( date  +%s ).tar.gz
+wait
 if [[ $( grep "finished unsuccesfully" output) > "" ]]
 then
      $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'prefactor_crashed!'
@@ -358,14 +362,17 @@ then
   then
    uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/${OBSID}
    globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/${OBSID}/t1_${OBSID}_AB${A_SBN}_SB${STARTSB}_.tar.gz
+    wait
   else
    uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/${OBSID}
    globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/${OBSID}/GSM_CAL_${OBSID}_ABN_${STARTSB}.tar.gz
-   .${RUNDIR}/prefactor/scripts/plot_solutions_all_stations.py -p ${RUNDIR}/prefactor/results/$( ls -d ${RUNDIR}/prefactor/results/*ms )/instrument_directionindependent/ GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png
-   globus-url-copy file:`pwd`/GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/${OBSID}/GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png  
+    wait
+   ./prefactor/scripts/plot_solutions_all_stations.py -p ${RUNDIR}/prefactor/results/$( ls -d ${RUNDIR}/prefactor/results/*ms )/instrument_directionindependent/ GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png
+   #globus-url-copy file:`pwd`/GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/${OBSID}/GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png  
   fi
 else
 	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_$OBSID.tar
+        wait
 fi
 
 

@@ -201,11 +201,17 @@ function (key, values, rereduce) {
 
 
     def get_attachment(self,token,filename):
-        attach=self.db.get_attachment(token,filename).read()
+        try:
+            attach=self.db.get_attachment(token,filename).read()
+        except AttributeError:
+            print "error getting attachment"
+            return ""
+        if "/" in filename:
+            filename=filename.replace("/","_")
         with open(filename,'w') as f:
             for line in attach:
                 f.write(line)
-        return os.abspath(filename)
+        return os.path.abspath(filename)
 
 
 class View(object):

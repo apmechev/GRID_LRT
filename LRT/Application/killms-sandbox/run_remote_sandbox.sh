@@ -12,8 +12,12 @@
 # ===================================================================== #
 
 set -x
-tar -xf picas.tar
-tar -xf couchdb.tar
+#tar -xf picas.tar
+#tar -xf couchdb.tar
+git clone https://github.com/apmechev/GRID_picastools.git p_tools_git
+mv p_tools_git/* . 
+rm -rf p_tools_git/
+
 
 python getOBSID.py $1 $2 $3 
 echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_$2_$OBSID.tar"
