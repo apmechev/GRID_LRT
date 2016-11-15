@@ -17,7 +17,7 @@ def initialize_from_file(OBSIDS_file,line,time_avg=4,freq_avg=4):
     cal_freq=int(field_values[8])/freq_avg
     cal_time=time_avg/int(math.floor(float(field_values[9])))
     try:
-        fieldname=field_values[10]
+        fieldname=field_values[11]
     except IndexError:
         fieldname="P_HetDex"
     f1=fields_LRT.Field("field_"+fieldname+"_"+str(targ_OBSID))
