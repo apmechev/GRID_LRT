@@ -1,13 +1,35 @@
 #!/bin/bash
 
-function setup_LOFAR_env(){
-export LD_LIBRARY_PATH=/cvmfs/softdrive.nl/apmechev/gcc-4.8.5/lib:/cvmfs/softdrive.nl/apmechev/gcc-4.8.5/lib64:$LD_LIBRARY_PATH
+function setup_lofar_leiden(){
+   source /net/para34/data1/oonk/lof_nov2016_2_19_0/lofim.sh
+}
+
+function setup_lofar_herts(){
+  module load casa
+  module load lofar
+  source /soft/lofar-051116/lofarinit.sh
+  export PYTHONPATH=/soft/pyrap:$PYTHONPATH
+}
+
+
+function setup_local_lofar(){
+ case "$( hostname -f )" in
+    *sara*) echo "softdrive not found";exit 10;;
+    *leiden*) setup_lofar_leiden ;;
+    node[0-9]*) setup_lofar_herts;;
+    *) echo "Can't find host";;
+ esac
+}
+
+
+function setup_softdrive_lofar(){
+ export LD_LIBRARY_PATH=/cvmfs/softdrive.nl/apmechev/gcc-4.8.5/lib:/cvmfs/softdrive.nl/apmechev/gcc-4.8.5/lib64:$LD_LIBRARY_PATH
  if [ -z "$1" ]
   then
     echo "Initializing default environment"
     . /cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/init_env_release.sh
     export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
-  LOFAR_PATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/
+    LOFAR_PATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/
   else
     if [ -e "$1/init_env_release.sh" ]; then
       echo "Initializing environment from ${1}"
@@ -19,5 +41,21 @@ export LD_LIBRARY_PATH=/cvmfs/softdrive.nl/apmechev/gcc-4.8.5/lib:/cvmfs/softdri
         exit 11 #exit 11=> no init_env script
     fi
   fi
+}
+
+function setup_LOFAR_env(){
+
+ if [ ! -z $( echo $1 | grep cvmfs ) ]
+  then
+    if [ -d /cvmfs/softdrive.nl ]
+     then
+      echo "Softdrive directory found"
+      setup_softdrive_lofar $1
+     else
+      echo "No Softdrive installation. Trying to source LOFAR otherwise"
+      setup_local_lofar 
+
+   fi
+ fi
 }
 

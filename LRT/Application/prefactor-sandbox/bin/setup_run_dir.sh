@@ -1,8 +1,5 @@
 
-
-
-
-function setup_run_dir(){
+function setup_sara_dir(){
 
 cp $PWD/prefactor.tar $1
 #TODO: Make this block just a git pull?
@@ -20,7 +17,17 @@ cp -r $PWD/openTSDB_tcollector $1
 cp pipeline.cfg $1
 cd ${RUNDIR}
 
-log "untarring Prefactor"
+echo "untarring Prefactor"
 tar -xf prefactor.tar
 
 }
+
+function setup_run_dir(){
+ case "$( hostname -f )" in
+    *sara*) RUNDIR=`mktemp -d -p $TMPDIR`; setup_sara_dir ${RUNDIR} ;;
+    *leiden*) setup_leiden_dir ;;
+    node[0-9]*) setup_herts_dir;;
+    *) echo "Can't find host";;
+ esac
+}
+

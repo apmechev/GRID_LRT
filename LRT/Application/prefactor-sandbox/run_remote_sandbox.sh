@@ -18,11 +18,11 @@ git clone https://github.com/apmechev/GRID_picastools.git p_tools_git
 mv p_tools_git/* . 
 rm -rf p_tools_git/
 
+echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_$2_$OBSID.tar with token type $4"
+
 #launches script designed to lock token, download sandbox with 
 #token's OBSID and execute the master.sh in the sandbox
 /usr/bin/python getOBSID.py $1 $2 $3 $4
-
-echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_$2_$OBSID.tar with token type $4"
 
 ls -l
 cat log*

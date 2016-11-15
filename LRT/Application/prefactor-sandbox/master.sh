@@ -42,16 +42,7 @@ source bin/setup_lofar_env.sh
 source bin/print_worker_info.sh
 source bin/setup_downloads.sh 
 source bin/setup_run_dir.sh
-
-
-if [ -d /cvmfs/softdrive.nl ]
-  then
-    echo "Softdrive directory found"
- else
-	echo "softdrive not found"
-	exit 10 #exit 10=>softdrive not mounted
-fi
-
+source bin/print_job_info.sh
 
 #########################
 #Parse input arguments
@@ -98,48 +89,25 @@ trap '{ echo "Trap detected segmentation fault... status=$?"; exit 2; }' SIGSEGV
 
 print_info                      ##Imported from bin/print_worker_info
 
-echo "job info" "INITIALIZATION OF JOB ARGUMENTS"
-echo "job info" ${JOBDIR}
-echo "job info" ${STARTSB}
-echo "job info" ${NUMSB}
-echo "job info" ${PARSET}
-echo "job info" ${OBSID}
-
-
 if [[ -z "$PARSET" ]]; then
     ls "$PARSET"
     echo "not found"
     exit 30  #exit 30=> Parset doesn't exist
 fi
 
+setup_run_dir                     #imported from bin/setup_run_dir.sh
 
-
-# create a temporary working directory #This depends on host!
-RUNDIR=`mktemp -d -p $TMPDIR`
-
-setup_run_dir ${RUNDIR}          #imported from setup_run_dir.sh
-
-
+echo "RUN DIRECTORY IS "${RUNDIR}
 sed -i "s?LOFAR_ROOT?${LOFAR_PATH}?g" pipeline.cfg
 echo  "replaced LOFAR_PATH in pipeline.cfg"
 pwd
 
+print_job_info                  #imported from bin/print_job_info.sh
 
 echo ""
 echo "---------------------------------------------------------------------------"
 echo "START PROCESSING" $OBSID "SUBBAND:" $STARTSB
 echo "---------------------------------------------------------------------------"
-
-#CHECKING FREE DISKSPACE AND FREE MEMORY AT CURRENT TIME
-echo ""
-echo "current data and time"
-date
-echo "free disk space"
-df -h .
-echo "free memory"
-free 
-freespace=`stat --format "%a*%s/1024^3" -f $TMPDIR|bc`
-echo "Free scratch space "$freespace"GB"
 
 
 #STEP2 
@@ -152,7 +120,6 @@ echo "---------------------------"
 echo "Starting Data Retrieval"
 echo "---------------------------"
 echo "Get subbands "
-
 
 sleep 6
 
