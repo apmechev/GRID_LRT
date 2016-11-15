@@ -61,12 +61,12 @@ class ExampleActor(RunActor):
 
         for att in [s for s in attachies if "srm"  in s] : #TODO: Make only "parset" in attachy
             att_txt=db.get_attachment(token["_id"],att).read()
-            print att
-            print att_txt
             with open(att,'w') as f:
                 for line in att_txt:
                     f.write(line)
 
+        if sum(1 for line in open('srm.txt','r'))<1:
+            update_status(str(sys.argv[1]),str(sys.argv[2]),str(sys.argv[3]),token['_id'],'done')
 
         try:
             cal_obsid=" --calobsid "+str(token['CAL_OBSID'])+" "

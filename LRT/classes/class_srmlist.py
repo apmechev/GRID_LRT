@@ -53,7 +53,7 @@ class Srm_manager(object):
         '''
         self.location=location
         s_ABN=self.get_ABN_list_from_token(token_type)
-        ABN_files=self.make_url_list(location)        
+        ABN_files=self.make_url_list(location)
         return self.make_list(s_ABN,ABN_files,"AB")
 
 

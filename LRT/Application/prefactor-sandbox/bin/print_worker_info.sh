@@ -8,13 +8,12 @@ echo  "Obtain information for the Worker Node and set the LOFAR environment"
 echo  "----------------------------------------------------------------------"
 
 echo "-"
-echo "worker info" `date`
-echo "worker info"  $HOSTNAME
-echo "worker info" $HOME
+echo "hostname "  $HOSTNAME
+echo "homedir " $HOME
 
 echo "worker info" "-"
 echo "worker info" "Job directory is:"
-echo "worker info" $PWD
+echo  $PWD
 ls -l $PWD
 
 echo "-"
@@ -43,6 +42,15 @@ echo "Free scratch space "$freespace"GB"
 echo "++++++++++++++++++++++++++++++"
 echo "++++++++++++++++++++++++++++++"
 
+echo ""
+echo "current data and time"
+date
+echo "free disk space"
+df -h .
+echo "free memory"
+free 
+freespace=`stat --format "%a*%s/1024^3" -f $TMPDIR|bc`
+echo "Free scratch space "$freespace"GB"
 
 
 }
