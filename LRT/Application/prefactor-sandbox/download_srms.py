@@ -30,6 +30,8 @@ class srm_getter:
             self.turl=self.srm.replace("srm://lofar-srm.fz-juelich.de:8443","gsiftp://dcachepool12.fz-juelich.de:2811")
         elif "srm.grid.sara.nl" in self.srm:
             self.turl=self.srm.replace("srm://srm.grid.sara.nl:8443","gsiftp://gridftp.grid.sara.nl:2811")
+        elif "psnc" in self.srm:
+            self.turl=self.srm.replace("srm://lta-head.lofar.psnc.pl:8443","gsiftp://door02.lofar.psnc.pl:2811")
         else:
             try:
                 subprocess.Popen(["uberftp","-ls",self.srm])
