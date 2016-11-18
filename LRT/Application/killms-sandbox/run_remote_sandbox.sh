@@ -14,19 +14,23 @@
 set -x
 #tar -xf picas.tar
 #tar -xf couchdb.tar
-git clone https://github.com/apmechev/GRID_picastools.git p_tools_git
-mv p_tools_git/* . 
-rm -rf p_tools_git/
+#git clone https://github.com/apmechev/GRID_picastools.git p_tools_git
+#rm p_tools_git/getOBSID.py
+#mv p_tools_git/* . 
+#rm -rf p_tools_git/
 
 
-python getOBSID.py $1 $2 $3 
+#python getOBSID.py $1 $2 $3 
 echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_$2_$OBSID.tar"
+globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox_apmechev_kill.tar ./sandbox.tar
+tar -xvf sandbox.tar -C . --strip-components=1
+chmod a+x master.sh
+./master.sh
 
 
 
 
-
-uberftp -rm gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_$1_$OBSID.tar
+#uberftp -rm gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_$1_$OBSID.tar
 ls -l
 
 # Start the pilot jobs by contacting PiCaS tokens

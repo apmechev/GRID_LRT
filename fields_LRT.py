@@ -222,7 +222,6 @@ class pref_Step(processing_step):
         self.LRT.parsetfile=os.environ['PWD']+"/"+parset
         self.LRT.srmfile=os.environ['PWD']+"/"+srmfile[0]
 
-        self.LRT.setup_dirs()
         self.LRT.prepare_sandbox()
         self.LRT.jdlfile="remote_prefactor.jdl"
         #pdb.set_trace()
@@ -247,6 +246,15 @@ class pref_Step(processing_step):
         self.LRT.start_jdl()     
         return
 
+    def resubmit_error(self):
+        #resubmit error tokens
+        th=Token.Token_Handler(uname=os.environ["PICAS_USR"],pwd=os.environ["PICAS_USR_PWD"],dbn=os.environ["PICAS_DB"],t_type="pref"+"_"+fieldname)
+        #count number of error tokens to submit that many jobs
+        num_reset=th.reset_tokens(view_name='error')
+        self.LRT.start_jdl(num_reset)
+
+    def print_gliete_statuses(self):
+        pass
 
     def check_progress(self):
         '''Takes all the token from the step_obj.LRT.tokens (which are created in default_LRT.submit_to_picas()

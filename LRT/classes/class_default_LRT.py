@@ -52,6 +52,10 @@ class LRT(object):
         '''Parses the arguments given to the program (or class) TODO: merge in init?
             It updates the instance variables accordingly
         '''
+        print ""
+        print "You're running \033[33m SARA LRT1.5\033[0m, default"
+        print ""
+
         if ("-h" in args) or ("--help" in args):
             self.print_help()
             sys.exit()
@@ -156,15 +160,21 @@ class LRT(object):
       
 
     def setup_dirs(self):
-        '''The setup_dirs used to keep data in files but now it's 
-            all held in a srmlist object. 
+        '''This now exists for legacy support, it's all done in 
+            check_state_and_stage()
+        '''
+        self.prepare_srms()
+
+
+    def prepare_srms(self):
+        '''This now exists for legacy support, it's all done in 
+            check_state_and_stage()
         '''
         print ""
         print "You're running \033[33m SARA LRT1.5\033[0m, default"
         print ""
         import class_srmlist
-        self.Srm_obj=class_srmlist.Srm_manager(OBSID=self.OBSID)
-        self.Srm_obj.stride=self.numpernode
+        self.Srm_obj=class_srmlist.Srm_manager(OBSID=self.OBSID,stride=self.numpernode)
         self.Srm_obj.file_load(self.srmfile)
         self.srms=self.Srm_obj.srms
 
@@ -197,7 +207,9 @@ class LRT(object):
     def check_state_and_stage(self):
         '''The srmlist object also allows to stage and or check state
         '''
-        ##TODO: Allow user to decide when to check and when to stage?
+        ##TODO: Allow user to decide when to check and when to stage? 
+        if not hasattr(self, 'Srm_obj'):
+           self.prepare_srms()
         self.locs=self.Srm_obj.state()
         self.unstaged=[item for sublist in self.locs for item in sublist].count('NEARLINE')/(float(len(self.locs)))
         if self.unstaged<0.01:
@@ -213,7 +225,8 @@ class LRT(object):
         ##TODO: Refactor
         sys.path.append(os.getcwd()+"/LRT/Tokens")
         os.chdir(self.workdir+"/LRT/Tokens")
-
+        if not hasattr(self, 'Srm_obj'):
+           self.prepare_srms()
         try:
             print "Your picas user is "+os.environ["PICAS_USR"]+" and the DB is "+os.environ["PICAS_DB"]
         except KeyError:
@@ -224,7 +237,7 @@ class LRT(object):
         self.t_type=token_type
         th=Token.Token_Handler(uname=os.environ["PICAS_USR"],pwd=os.environ["PICAS_USR_PWD"],dbn=os.environ["PICAS_DB"],t_type=token_type)
         th.add_view("todo",'doc.lock == 0 && doc.done == 0')
-        th.add_view("locked",'doc.lock > 0 && doc.status !="done" ')
+        th.add_view("locked",'doc.lock > 0 && doc.status !="done"&& doc.status !="error" && doc.status !="downloading" ')
         th.add_view("done",'doc.status == "done" ')
         th.add_view("error",'doc.status == "error" ')
         th.add_overview_view()
@@ -283,18 +296,7 @@ class LRT(object):
                     self.tokens.append(token)
 
 
-#                for line in [key for key in self.srms]:
-#                    if len(self.parsetfile )>5:
-#                        attachment=[open(attfile,'r'),os.path.basename(attfile)]
-#                        default_keys={"num_per_node":self.numpernode,"lofar_sw_dir":self.sw_dir+"/"+self.sw_ver,"OBSID":self.OBSID,"start_SB":num_token*self.numpernode}
-#                        token=th.create_token(keys=dict(itertools.chain(keys.iteritems(), default_keys.iteritems())),append=self.OBSID+"_"+line.rstrip(),attach=attachment)
-#                        num_token+=1
-#                        self.tokens.append(token)
-
-        os.chdir(self.workdir)
-
-
-    def start_jdl(self):
+    def start_jdl(self,num_jobs=None):
         '''Starts the jdl (IE it submits the job for processing)
         '''
         if self.resuberr: #return if resubmitting TODO: Check if any jdls are running, if so don't return
@@ -306,9 +308,9 @@ class LRT(object):
         self.replace_in_file(dmx_jdl,'$PICAS_DB $PICAS_USR $PICAS_USR_PWD', os.environ["PICAS_DB"]+" "+os.environ["PICAS_USR"]+" "+os.environ["PICAS_USR_PWD"]+" "+self.t_type)
         print "including "+self.t_type
         num_lines = sum(1 for line in open(self.srmfile))
-        numprocess = num_lines/self.numpernode+[0,1][num_lines%self.numpernode>0]
-        print numprocess
-        self.replace_in_file(dmx_jdl,"Parameters=1","Parameters="+str(numprocess))
+        numjobs = num_lines/self.numpernode+[0,1][num_lines%self.numpernode>0] if (not num_jobs) else num_jobs
+        print numjobs
+        self.replace_in_file(dmx_jdl,"Parameters=1","Parameters="+str(numjobs))
 
         subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs'+self.OBSID,dmx_jdl])
         self.glite_job=open('jobIDs'+self.OBSID).readlines()[-1]
