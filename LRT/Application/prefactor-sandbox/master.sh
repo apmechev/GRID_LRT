@@ -75,6 +75,9 @@ do
     shift
 done
 
+############################
+#Initialize the environment
+############################
 
 echo "INITIALIZE LOFAR FROM SOFTDRIVE, in "$LOFAR_PATH
 setup_LOFAR_env $LOFAR_PATH      ##Imported from setup_LOFAR_env.sh
@@ -85,7 +88,11 @@ echo  "setup" "adding symbolic link for EPHEMERIDES and GEODETIC data into homed
 ln -s ${LOFARDATAROOT} .
 ln -s ${LOFARDATAROOT} ~/
 
-trap '{ echo "Trap detected segmentation fault... status=$?"; exit 2; }' SIGSEGV #exit 2=> SIGSEGV caught
+trap '{ echo "Trap detected segmentation fault... status=$?"; $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} "segfault"; rm -rf *;  exit 2; }' SIGSEGV #exit 2=> SIGSEGV caught
+
+trap '{ echo "Trap detected interrupt ... status=$?"; $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} "interrupted"; rm -rf *;  exit 3; }' SIGHUP SIGINT SIGTERM  #exit 3=> INTerrupt caught
+
+trap cleanup EXIT #This ensures the script cleans_up regardless of how and where it exits
 
 print_info                      ##Imported from bin/print_worker_info
 
@@ -222,7 +229,8 @@ cd ..
 
 
 cat ${parset}
-genericpipeline.py $parset -d -c pipeline.cfg > output
+genericpipeline.py $parset -d -c pipeline.cfg > output  &
+wait # without wait, traps aren't caught
 
 $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'processing_finished'
 
@@ -256,7 +264,7 @@ more output
 #more openTSDB_tcollector/logs/*
 OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 echo "Saving profiling data to profile_"$OBSID_$( date  +%s )".tar.gz"
-globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_${OBSID}_$( date  +%s ).tar.gz
+globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_${OBSID}_$( date  +%s ).tar.gz &
 wait
 if [[ $( grep "finished unsuccesfully" output) > "" ]]
 then
@@ -292,7 +300,6 @@ fi
 $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'uploading_results'
 echo "step3 finished, list contents"
 
-#python echo contents
 
 
 # STORE PROCESSING RESULTS AND CLEAN UP
@@ -302,11 +309,6 @@ echo "Copy the output from the Worker Node to the Grid Storage Element"
 echo "---------------------------------------------------------------------------"
 
 echo "JOBDIR, RUNDIR, PWD: ", ${JOBDIR}, ${RUNDIR}, ${PWD}
-#ls -l ${JOBDIR}
-#ls -l ${RUNDIR}
-#ls -l ${PWD}
-#du -hs $PWD
-#du -hs $PWD/*
 
 echo "Copy output to the Grid SE"
 
@@ -342,7 +344,7 @@ else
         wait
 fi
 
-
+function cleanup(){
 if [[ "$?" != "0" ]]; then
    echo "Problem copying final files to the Grid. Clean up and Exit now..."
    cp log_$name logtar_$name.fa ${JOBDIR}
@@ -372,7 +374,7 @@ echo "listing final files in Job directory"
 ls -allh $PWD
 echo ""
 du -hs $PWD
-
+}
 
 echo ""
 echo `date`

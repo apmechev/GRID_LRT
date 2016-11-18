@@ -1,25 +1,15 @@
 [
-  JobType="Parametric";
-  ParameterStart=0;
-  ParameterStep=1;
-  Parameters=50;
+ Type = "Job";
+ JobType = "Normal";
+ Executable = "/bin/sh";
 
-  Executable = "/bin/sh";
+ Arguments = "run_remote_sandbox.sh $PICAS_DB $PICAS_USR $PICAS_USR_PWD";
+ Stdoutput = "parametricjob.out";
+ StdError = "parametricjob.err";
+ InputSandbox = {"killms-sandbox/run_remote_sandbox.sh","killms-sandbox/getOBSID.py"};
+ OutputSandbox = {"parametricjob.out", "parametricjob.err"};
+ DataAccessProtocol = {"gsiftp"};
+ ShallowRetryCount = 5;
 
-  Arguments = "run_remote_sandbox.sh $PICAS_DB $PICAS_USR $PICAS_USR_PWD";
-  Stdoutput = "parametricjob.out";
-  StdError = "parametricjob.err";
-  InputSandbox = {"prefactor-sandbox/run_remote_sandbox.sh","prefactor-sandbox/couchdb.tar","prefactor-sandbox/picas.tar","prefactor-sandbox/getOBSID.py"};
-  OutputSandbox = {"parametricjob.out", "parametricjob.err"};
-  DataAccessProtocol = {"gsiftp"};
-  ShallowRetryCount = 5;
-
-  Requirements = RegExp("lofarsksp",other.GlueCEUniqueID);
-
-  # Just 4 cores on a single node
-  SmpGranularity = 24;
-  CPUNumber = 24;
-
-  #requirement for Nikhef high memory jobs
-  CERequirements = "other.GlueHostMainMemoryRAMSize >= 200192";
+ Requirements = RegExp("lofarsksp",other.GlueCEUniqueID);
 ]

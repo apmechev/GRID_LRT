@@ -70,13 +70,7 @@ class Token_Handler:
             t1.delete_tokens("todo",["OBSID","L123456"])
             t1.delete_tokens("error")
         """
-        self.get_views()
-        if view_name in self.views:
-            view=self.views[view_name]
-        else:
-            print "View Named "+view_name+" Doesn't exist"
-            return
-        v=self.db.view(self.t_type+"/"+view_name)
+        v=self.list_tokens_from_view(view_name)
         for x in v:
             document = self.db[x['key']]
             if key[0]=="":
@@ -163,12 +157,7 @@ function (key, values, rereduce) {
             t1.reset_token("error",key=["OBSID","L123456"])
             t1.reset_token("error",key=["scrub_count",6])
         """
-        if view_name in self.views:
-            view=self.views[view_name]
-        else:
-            print "View Named "+view_name+" Doesn't exist"
-            return
-        v=self.db.view(self.t_type+"/"+view_name)
+        v=self.list_tokens_from_view(view_name)
         to_update=[]
         for x in v:
             document = self.db[x['key']]
@@ -189,7 +178,7 @@ function (key, values, rereduce) {
                         del document["_attachments"]
             to_update.append(document)
         self.db.update(to_update)
-
+        return (to_update)
 
 
     def add_attachment(self,token,filehandle,filename="test"):
@@ -200,18 +189,43 @@ function (key, values, rereduce) {
         return self.db[token]["_attachments"].keys()
 
 
-    def get_attachment(self,token,filename):
+    def get_attachment(self,token,filename,savename=None):
         try:
             attach=self.db.get_attachment(token,filename).read()
         except AttributeError:
             print "error getting attachment"
             return ""
         if "/" in filename:
-            filename=filename.replace("/","_")
-        with open(filename,'w') as f:
+            savename=filename.replace("/","_")
+        if not savename:
+            savename=filename
+        with open(savename,'w') as f:
             for line in attach:
                 f.write(line)
         return os.path.abspath(filename)
+
+    def list_tokens_from_view(self,view_name):
+        self.get_views()
+        if view_name in self.views:
+            view=self.views[view_name]
+        else:
+            print "View Named "+view_name+" Doesn't exist"
+            return
+        v=self.db.view(self.t_type+"/"+view_name)
+        return v
+
+    def set_view_to_status(self,view,status):
+        """Sets the status to all tokens in 'view' to 'status
+            eg. Set all locked tokens to error or all error tokens to todo
+        """
+        v=self.list_tokens_from_view(view)
+        to_update=[]
+        for x in v:
+            document = self.db[x['key']]
+            document['status']=str(status)
+            document['lock']=1
+            to_update.append(document)
+        self.db.update(to_update)
 
 
 class View(object):

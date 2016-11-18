@@ -32,11 +32,11 @@ class ExampleActor(RunActor):
 
     def process_token(self, key, token):
 	# Print token information
-	location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_"+str(sys.argv[2])+"_"+str(token['OBSID'])+".tar"
+	location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox_apmechev_kill.tar"
 	print location
 	subprocess.call(["globus-url-copy", location, "sandbox.tar"])
 	subprocess.call(["tar", "-xf", "sandbox.tar","-C",".","--strip-components=1"])
-        subprocess.call(["chmod","u+x","prefactor.sh"])
+        subprocess.call(["chmod","u+x","master.sh"])
 
 	#This will process the token from the DOWNLOADED pilot.py (The timelines diverge at this point)
 	from  pilot import ExampleActor as Actor2
