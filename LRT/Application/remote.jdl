@@ -6,7 +6,7 @@
 
   Executable = "/bin/sh";
 
-  Arguments = "run_remote_sandbox.sh $PICAS_DB $PICAS_USR $PICAS_USR_PWD";
+  Arguments = "run_remote_sandbox.sh surveys apmechev prQn98rQA pref_field_P049_41_557732";
   Stdoutput = "parametricjob.out";
   StdError = "parametricjob.err";
   InputSandbox = {"sandbox/run_remote_sandbox.sh","sandbox/couchdb.tar","sandbox/picas.tar","sandbox/getOBSID.py"};
