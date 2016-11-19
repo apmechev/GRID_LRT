@@ -307,8 +307,11 @@ class LRT(object):
         shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')
         self.replace_in_file(dmx_jdl,'$PICAS_DB $PICAS_USR $PICAS_USR_PWD', os.environ["PICAS_DB"]+" "+os.environ["PICAS_USR"]+" "+os.environ["PICAS_USR_PWD"]+" "+self.t_type)
         print "including "+self.t_type
-        num_lines = sum(1 for line in open(self.srmfile))
-        numjobs = num_lines/self.numpernode+[0,1][num_lines%self.numpernode>0] if (not num_jobs) else num_jobs
+        if num_jobs:
+            numjobs =num_jobs
+        else:
+            num_lines = sum(1 for line in open(self.srmfile))
+            numjobs = num_lines/self.numpernode+[0,1][num_lines%self.numpernode>0]
         print numjobs
         self.replace_in_file(dmx_jdl,"Parameters=1","Parameters="+str(numjobs))
 
