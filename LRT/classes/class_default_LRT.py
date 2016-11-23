@@ -317,8 +317,6 @@ class LRT(object):
 
         subprocess.call(['glite-wms-job-submit','-d',os.environ["USER"],'-o','jobIDs'+self.OBSID,dmx_jdl])
         self.glite_job=open('jobIDs'+self.OBSID).readlines()[-1]
-        #with open(dmx_jdl,'r') as f:
-        #    print(f.read())
         shutil.move('avg_dmx_with_variables.jdl',dmx_jdl)
         os.chdir(self.workdir)
 

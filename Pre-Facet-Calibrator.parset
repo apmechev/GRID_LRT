@@ -26,7 +26,7 @@
 ! cal_values_directory = PREFACTOR_SCRATCH_DIR/prefactor/cal_results
 
 # NDPPP-compatible pattern for baselines or stations to be flagged
-! flag_baselines         = [ ]
+! flag_baselines         = [  CS013HBA* ]
 # name of the station that will be used as a reference for the phase-plots
 ! reference_station      = CS001HBA0
 
