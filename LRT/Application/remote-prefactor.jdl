@@ -12,7 +12,7 @@
   InputSandbox = {"prefactor-sandbox/run_remote_sandbox.sh"};
   OutputSandbox = {"parametricjob.out", "parametricjob.err"};
   DataAccessProtocol = {"gsiftp"};
-  ShallowRetryCount = 5;
+
 
   Requirements=(RegExp("mediummc",other.GlueCEUniqueID));
   #Requirements = (RegExp("mediummc",other.GlueCEUniqueID) || RegExp("rug.nl:8443/cream-pbs-medium",other.GlueCEUniqueID));

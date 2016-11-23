@@ -45,11 +45,15 @@ class srm_getter:
             self.filename=re.sub('_[a-z,1-9]{8}',"",uber_result.split()[8])
             self.filename=re.sub('.tar*','/',self.filename)
         except:
-            print "Can't get size"
+            try:
+                s_size=subprocess.Popen(["srmls",self.srm],stdout=subprocess.PIPE)
+                self.size=s_size.communicate()[0].split()[0]
+            except:
+                print "Can't get size"
 
     def getprogress(self):
         FNULL = open(os.devnull, 'w')
-        if (time.time() - self.start_time) > 120*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 : 
+        if (time.time() - self.start_time) > 200*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 : 
             self.done=True
             self.kill_dl()
         try:
@@ -87,7 +91,7 @@ class srm_getter:
                     return 0.0
                 
                 self.stuck=True
-                if (time.time()-self.start_time) > 120*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 :
+                if (time.time()-self.start_time) > 200*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 :
                     self.kill_dl()
                     return 1
         self.progress=float(self.extracted)/float(float(self.size)/1000.)
@@ -129,7 +133,7 @@ class srm_getter:
             os.kill(self.pid, 0)#relax this doesn't *really* kill anything :)
         except OSError:
             self.done=True
-        if (time.time()-self.start_time)> 120*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 :
+        if (time.time()-self.start_time)> 200*(float(self.size)/1000000000.) and (time.time() - self.start_time) > 1800 :
                 self.done=True
                 self.kill_dl()
         else:
@@ -184,7 +188,7 @@ def main(srmfile,start=0,end=-1,step=10):
 
         time.sleep(3)
         for x in running:
-            if (time.time()-x.start_time) > 120*(float(x.size)/1000000000.) and (not (x.done)) and ((time.time() - x.start_time) > 1800) :
+            if (time.time()-x.start_time) > 200*(float(x.size)/1000000000.) and (not (x.done)) and ((time.time() - x.start_time) > 1800) :
                 x.done=True
                 x.kill_dl()
                 print "killing process in last block"
