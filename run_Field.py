@@ -73,5 +73,5 @@ def run_field(f_obj,cal_thresh=0.05):
 
 
 if __name__ == "__main__":
-    f1=initialize_from_file(sys.argv[1],sys.argv[2],time_avg=4,freq_avg=4)
+    f1=initialize_from_file(sys.argv[1],sys.argv[2],time_avg=8,freq_avg=2)
     run_field(f1,cal_thresh=0.05)

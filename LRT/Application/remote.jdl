@@ -12,7 +12,7 @@
   InputSandbox = {"sandbox/run_remote_sandbox.sh","sandbox/couchdb.tar","sandbox/picas.tar","sandbox/getOBSID.py"};
   OutputSandbox = {"parametricjob.out", "parametricjob.err"};
   DataAccessProtocol = {"gsiftp"};
-  ShallowRetryCount = 3;
+
 
   Requirements=(RegExp("mediummc",other.GlueCEUniqueID));
   #Requirements = (RegExp("mediummc",other.GlueCEUniqueID) || RegExp("rug.nl:8443/cream-pbs-medium",other.GlueCEUniqueID));
