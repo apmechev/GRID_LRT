@@ -20,8 +20,7 @@ def initialize_from_file(OBSIDS_file,line,time_avg=4,freq_avg=4):
         fieldname=field_values[11][:-1]
     except IndexError:
         fieldname=""
-    fieldname=""
-    f1=fields_LRT.Field("field_"+fieldname+str(targ_OBSID))
+    f1=fields_LRT.Field("field_"+fieldname+"_"+str(targ_OBSID))
     f1.initialize("L"+str(targ_OBSID),(cal_time,targ_time),(cal_freq,targ_freq))
     print "Initialized the Field Object:"
     print "OBSIDS for the field are "
