@@ -15,11 +15,9 @@ set -x
 tar -xf picas.tar
 tar -xf couchdb.tar
 
+
 python getOBSID.py $1 $2 $3 $4
 echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/lofar/user/disk/spectroscopy/sandbox/sandbox_$2_$OBSID.tar with token $4"
-
-
-
 
 
 uberftp -rm gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_$1_$OBSID.tar
