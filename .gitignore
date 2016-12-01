@@ -2,7 +2,7 @@
 
 master_setup.cfg
 srm*
-*pyc 
+*.pyc 
 
 #ignore dataset folders to minimize clobbering there
 FAD_v7/Tokens/datasets/*
