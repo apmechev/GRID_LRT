@@ -28,10 +28,10 @@ def main(filename):
         f=open(filename,'r')
         urls=f.readlines()
         f.close()
-        return (process(urls,rs,m))
+        return (process(urls,rs,m,True))
 
 
-def state_dict(srm_dict):
+def state_dict(srm_dict,printout=True):
         locs_options=['s','j','p']
 
         line=srm_dict.itervalues().next() 
@@ -42,7 +42,7 @@ def state_dict(srm_dict):
         urls=[]
         for key, value in srm_dict.iteritems():
             urls.append(value)
-        return process(urls,rs,m)
+        return process(urls,rs,m,printout)
 
 def location(filename):
 	locs_options=['s','j','p']
@@ -69,7 +69,7 @@ def replace(file_loc):
 			sys.exit()
         return repl_string,m
    
-def process(urls,repl_string,m): 
+def process(urls,repl_string,m,printout=True): 
 	nf=100
 	surls=[]
 	for u in urls:
@@ -100,7 +100,8 @@ def process(urls,repl_string,m):
 			colour="\033[31m"
 	       else:
 			colour="\033[32m"
-	       print str(j)+c[j]['surl']+" "+colour+c[j]['locality']+"\033[0m"
+               if printout:
+	                print str(j)+c[j]['surl']+" "+colour+c[j]['locality']+"\033[0m"
 	       locality.append([c[j]['surl'],c[j]['locality']])
 	    i=i+nf
 	    time.sleep(1)	
