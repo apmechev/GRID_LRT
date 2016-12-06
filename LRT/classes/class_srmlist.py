@@ -149,10 +149,10 @@ class Srm_manager(object):
             sys.exit()
 
 
-    def state(self): 
+    def state(self,printout=True): 
         sys.path.append('LRT/Staging/')
         import state_all
-        self.states=state_all.state_dict(self.srms)
+        self.states=state_all.state_dict(self.srms,printout=printout)
         return self.states
 
 
