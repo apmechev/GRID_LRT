@@ -21,6 +21,20 @@ class Srm_manager(object):
         self.ABN_list={} #A dictionary of {SBN:[srm1,srm2,srm3]} 
                            #With arbitrary # of srms per token
 
+    def __iter__(self):
+        self.keys=self.srms.keys()
+        self.loc=0
+        return self
+
+    def next(self):
+        if self.loc < len(self.keys):
+            tmp=self.keys[self.loc]
+            self.loc+=1
+            return self.srms[tmp]
+        raise StopIteration
+
+    __next__=next
+
 
     def file_load(self,filename,OBSID=""):
         """Loads a list of srms from a file by searching the file for 
