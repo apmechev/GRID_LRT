@@ -8,34 +8,26 @@ echo  "Obtain information for the Worker Node and set the LOFAR environment"
 echo  "----------------------------------------------------------------------"
 
 echo "-"
-echo "hostname "  $HOSTNAME
-echo "homedir " $HOME
+echo "w_info: hostname = "  $HOSTNAME
+echo "w_info: homedir = " $HOME
 
-echo "worker info" "-"
-echo "worker info" "Job directory is:"
-echo  $PWD
+echo "w_info: Job directory = " $PWD
 ls -l $PWD
 
 echo "-"
-echo "worker info" "WN Architecture is:"
-cat /proc/meminfo | grep "MemTotal"
-cat /proc/cpuinfo | grep "model name"
-
-
-# initialize job arguments
-# - note, obsid is only used to store the data
-
+echo "w_info: WN Architecture is:"
+cat /proc/meminfo | grep "MemTotal" |xargs echo "w_info: "
+cat /proc/cpuinfo | grep "model name" |xargs echo "w_info: "
 
 #CHECKING FREE DISKSPACE AND FREE MEMORY AT CURRENT TIME
 echo ""
-echo "current data and time"
-date
-echo "free disk space"
-df -h .
-echo "free memory"
-free
+echo "w_info: current data and time = " $( date )
+echo "w_info: free disk space = "
+df -h . 
+echo "w_info: free memory " 
+free 
 freespace=`stat --format "%a*%s/1024^3" -f $TMPDIR|bc`
-echo "Free scratch space "$freespace"GB"
+echo "w_info: Free scratch space = "$freespace"GB"
 
 
 
@@ -43,14 +35,4 @@ echo "++++++++++++++++++++++++++++++"
 echo "++++++++++++++++++++++++++++++"
 
 echo ""
-echo "current data and time"
-date
-echo "free disk space"
-df -h .
-echo "free memory"
-free 
-freespace=`stat --format "%a*%s/1024^3" -f $TMPDIR|bc`
-echo "Free scratch space "$freespace"GB"
-
-
 }
