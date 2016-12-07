@@ -2,14 +2,12 @@
 
 function print_job_info(){
 
-echo "job info" "INITIALIZATION OF JOB ARGUMENTS"
-echo "job info" ${JOBDIR}
-echo "job info" ${STARTSB}
-echo "job info" ${NUMSB}
-echo "job info" ${PARSET}
-echo "job info" ${OBSID}
-
-
+echo "j_info:" "INITIALIZATION OF JOB ARGUMENTS"
+echo "j_info: jobdir = " ${JOBDIR}
+echo "j_info: startSB = " ${STARTSB}
+echo "j_info: numSB = " ${NUMSB}
+echo "j_info: parset = " ${PARSET}
+echo "j_info: OBSID =" ${OBSID}
 
 }
 
