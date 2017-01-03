@@ -21,7 +21,7 @@ rm -rf p_tools_git/
 echo "Pulling down the sandbox for OBSID "$OBSID" from /pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox/sandbox_$2_$OBSID.tar with token type $4"
 
 
-trap '{ echo "Trap detected interrupt ..."; $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} "interrupted"; rm -rf *;  exit 3; }' SIGHUP SIGINT SIGTERM  #exit 3=> Interrupted by signal
+trap '{ echo "Trap detected interrupt ..."; $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} "interrupted"; sleep 2;  exit 3; }' SIGHUP SIGINT SIGTERM  #exit 3=> Interrupted by signal
 
 #launches script designed to lock token, download sandbox with 
 #token's OBSID and execute the master.sh in the sandbox

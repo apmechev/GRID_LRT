@@ -88,10 +88,6 @@ echo  "setup" "adding symbolic link for EPHEMERIDES and GEODETIC data into homed
 ln -s ${LOFARDATAROOT} .
 ln -s ${LOFARDATAROOT} ~/
 
-trap '{ echo "Trap detected segmentation fault... status=$?"; $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} "segfault"; rm -rf *;  exit 2; }' SIGSEGV #exit 2=> SIGSEGV caught
-
-trap '{ echo "Trap detected interrupt ... status=$?"; $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} "interrupted"; rm -rf *;  exit 3; }' SIGHUP SIGINT SIGTERM  #exit 3=> INTerrupt caught
-
 trap cleanup EXIT #This ensures the script cleans_up regardless of how and where it exits
 
 print_info                      ##Imported from bin/print_worker_info
@@ -103,6 +99,11 @@ if [[ -z "$PARSET" ]]; then
 fi
 
 setup_run_dir                     #imported from bin/setup_run_dir.sh
+
+trap '{ echo "Trap detected segmentation fault... status=$?"; $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} "segfault"; sleep 5; rm -rf ${RUNDIR}/*;  exit 2; }' SIGSEGV #exit 2=> SIGSEGV caught
+
+trap '{ echo "Trap detected interrupt ... status=$?"; $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} "interrupted"; rm -rf ${RUNDIR}/*;  exit 3; }' SIGHUP SIGINT SIGTERM  #exit 3=> INTerrupt caught
+
 
 echo "RUN DIRECTORY IS "${RUNDIR}
 sed -i "s?LOFAR_ROOT?${LOFAR_PATH}?g" pipeline.cfg
@@ -117,7 +118,6 @@ echo "START PROCESSING" $OBSID "SUBBAND:" $STARTSB
 echo "---------------------------------------------------------------------------"
 
 
-#STEP2 
 ####
 # Download the data on the node 10 subbands at a time while ignoring subbands that 
 # cannot be downloaded (so that the job doesn't hang)
@@ -162,22 +162,13 @@ ls -l $PWD
 du -hs $PWD
 du -hs $PWD/*
 
-# SETTINGS FOR PYTHON PROCESSING
-dirc=${RUNDIR}
-name=${new_name}
-path=${dirc}/${name}
-
-parset=${PARSET}
-sbn=${SUBBAND_NUM}
-
-
 echo "Replacing "$PWD" in the prefactor parset"
 
-sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" $parset
+sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" ${PARSET}
 sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" pipeline.cfg
 
 
-#Check if any files match the target, if so, download the calibration tables matching the calibrator OBSID. If no tables are downloaded, xit with an error message.
+#Check if any files match the target, if so, download the calibration tables matching the calibrator OBSID. If no tables are downloaded, exit with an error message.
 if [[ ! -z ${CAL_OBSID}  ]]
 then
  echo "Getting solutions from obsid "$CAL_OBSID
@@ -207,17 +198,19 @@ echo "Pipeline type is "$pipelinetype
 echo "Adding $OBSID and $pipelinetype into the tcollector tags"
 sed -i "s?\[\]?\[\ \"obsid=${OBSID}\",\ \"pipeline=${pipelinetype}\"\]?g" openTSDB_tcollector/collectors/etc/config.py
 
-echo "running taql on "$( ls -d *${OBSID}*SB*  )"/SPECTRAL_WINDOW"
-FREQ=$( echo "select distinct REF_FREQUENCY from $( ls -d *${OBSID}*SB* )/SPECTRAL_WINDOW"| taql | tail -2 | head -1)
+if [[ !-z $( echo $pipelinetype |grep targ2 ) ]]
+  then
+    echo "running taql on "$( ls -d *${OBSID}*SB*  )"/SPECTRAL_WINDOW"
+    FREQ=$( echo "select distinct REF_FREQUENCY from $( ls -d *${OBSID}*SB* )/SPECTRAL_WINDOW"| taql | tail -2 | head -1)
+    A_SBN=$( $OLD_PYTHON update_token_freq.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} ${FREQ} )
+    echo "Frequency is "${FREQ}" and Absolute Subband is "${A_SBN}
+    mv prefactor/results/L*ms ${RUNDIR}  #moves untarred results from targ1 to ${RUNDIR} 
+fi
 
-A_SBN=$( $OLD_PYTHON update_token_freq.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} ${FREQ} )
-echo "Frequency is "${FREQ}" and Absolute Subband is "${A_SBN}
-
-mv prefactor/results/L*ms ${RUNDIR}
 echo ""
 echo "execute generic pipeline"
 $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'starting_generic_pipeline'
-$OLD_PYTHON update_token_progress.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} output $parset &
+$OLD_PYTHON update_token_progress.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} output ${PARSET} &
 
 
 echo "start tCollector in dryrun mode"
@@ -227,9 +220,7 @@ mkdir logs
 TCOLL_PID=$!
 cd ..
 
-
-cat ${parset}
-genericpipeline.py $parset -d -c pipeline.cfg > output  &
+genericpipeline.py ${PARSET} -d -c pipeline.cfg > output  &
 wait # without wait, traps aren't caught
 
 $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'processing_finished'
@@ -237,7 +228,16 @@ $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${T
 echo "killing tcollector"
 kill $TCOLL_PID
 
-./prefactor/scripts/plot_solutions_all_stations.py -p $( ls -d ${RUNDIR}/prefactor/results/*ms )/instrument_directionindependent/ ${JOBDIR}/GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png
+
+#####################
+# Make plots
+#
+######################
+
+if [[ !-z $( echo $pipelinetype |grep targ2 ) ]]
+  then
+    ./prefactor/scripts/plot_solutions_all_stations.py -p $( ls -d ${RUNDIR}/prefactor/results/*ms )/instrument_directionindependent/ ${JOBDIR}/GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png
+fi
 
 xmlfile=$( find . -name "*statistics.xml" 2>/dev/null)
 cp piechart/autopie.py .

@@ -9,7 +9,8 @@
  InputSandbox = {"killms-sandbox/run_remote_sandbox.sh","killms-sandbox/getOBSID.py"};
  OutputSandbox = {"parametricjob.out", "parametricjob.err"};
  DataAccessProtocol = {"gsiftp"};
- ShallowRetryCount = 5;
+ ShallowRetryCount = 5; 
+ CPUNumber = 22;
 
  Requirements = RegExp("lofarsksp",other.GlueCEUniqueID);
 ]

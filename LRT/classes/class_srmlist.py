@@ -14,12 +14,16 @@ class Srm_manager(object):
             The self.srms dictionary is what is used later by the default_LRT
             to make the tokens and possibly to rearrange the links by real frequency
         """
-        self.OBSID=OBSID
-        self.filename=filename
-        self.stride=stride
-        self.srms={} #A dictionary of {SBN,surl} TODO: Maybe use ABN_list for all srms: tokens will be made with key:value
-        self.ABN_list={} #A dictionary of {SBN:[srm1,srm2,srm3]} 
-                           #With arbitrary # of srms per token
+        self.OBSID = OBSID
+        self.filename = filename
+        self.stride = stride
+        self.srms = {} #A dictionary of {SBN,surl} TODO: Maybe use ABN_list for all srms: tokens will be made with key:value
+        self.ABN_list = {} #A dictionary of {SBN:[srm1,srm2,srm3]} 
+        if filename and OBSID: #With arbitrary # of srms per token
+            self.file_load(filename, OBSID)
+        elif filename:
+            self.file_load(filename)
+
 
     def __iter__(self):
         self.keys=self.srms.keys()
