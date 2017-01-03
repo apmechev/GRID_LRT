@@ -2,6 +2,7 @@
 
 function setup_lofar_leiden(){
    source /net/para34/data1/oonk/lof_nov2016_2_19_0/lofim.sh
+   module load lofargrid #gridtools
    echo "setup_env: Loaded LOFAR from /net/para34/data1/oonk/lof_nov2016_2_19_0/lofim.sh"
 }
 
