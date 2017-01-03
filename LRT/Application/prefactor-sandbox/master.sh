@@ -48,7 +48,7 @@ source bin/print_job_info.sh
 #Parse input arguments
 ########################
 
-TEMP=`getopt -o octlsnpduwT: --long obsid:,calobsid:,token:,lofdir:,startsb:,numsb:,parset:,picasdb:,picasuname:,picaspwd:,pipetype: -- "$@"`
+TEMP=`getopt -o octlspduwT: --long obsid:,calobsid:,token:,lofdir:,startsb:,parset:,picasdb:,picasuname:,picaspwd:,pipetype: -- "$@"`
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 9 ; fi #exit 9=> master.sh got bad argument
 
 PARSET="Pre-Facet-Target.parset"
@@ -62,7 +62,6 @@ do
     -t | --token ) TOKEN="$2"; shift  ;;
     -l | --lofdir ) LOFAR_PATH="$2";shift ;;
     -s | --startsb) STARTSB="$2";shift ;;
-    -n | --numsb ) NUMSB="$2"; shift  ;;
     -p | --parset ) PARSET="$2"; shift  ;;
     -d | --picasdb ) PICAS_DB="$2"; shift ;;
     -u | --picasuname ) PICAS_USR="$2"; shift ;;
@@ -132,7 +131,7 @@ sleep 6
 
 setup_downloads $PIPELINE
 
-echo "Downloading $NUMSB files"
+echo "Downloading $( wc -l srm.txt ) files"
 
 if [[ -z $( echo $PIPELINE | grep targ1 ) ]]
  then
@@ -142,7 +141,7 @@ fi
 if [[ -z $( echo $PIPELINE | grep targ2 ) ]]
  then
   $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'downloading'
-  python ./download_srms.py srm.txt 0 ${NUMSB} || \
+  python ./download_srms.py srm.txt 0 10 || \ ##Replaced $NUMSB with 10, just use len(srm.txt)
      { echo "Download Failed!!"; exit 20; } #exit 20=> Download fails
   wait
  else
@@ -340,7 +339,7 @@ then
    #globus-url-copy file:`pwd`/GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/${OBSID}/GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png  
   fi
 else
-	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_$OBSID.tar
+	 globus-url-copy file:`pwd`/numpys.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_sols/${OBSID}_solutions.tar
         wait
 fi
 

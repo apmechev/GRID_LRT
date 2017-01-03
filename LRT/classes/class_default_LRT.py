@@ -251,8 +251,7 @@ class LRT(object):
             for ABN in abnlist:
                 th.delete_tokens(view_name='locked')
                 attachment=[open(attfile,'r'),os.path.basename(attfile)]
-                default_keys={"num_per_node":self.numpernode,
-                              "lofar_sw_dir":self.sw_dir+"/"+self.sw_ver,
+                default_keys={"lofar_sw_dir":self.sw_dir+"/"+self.sw_ver,
                               "OBSID":self.OBSID,
                               "start_AB":ABN}
                 token=th.create_token(keys=dict(itertools.chain(keys.iteritems(), 
@@ -279,8 +278,7 @@ class LRT(object):
                 num_token=0 #used to stride the start_SB
                 for SRM in srmlist:
                     attachment=[open(attfile,'r'),os.path.basename(attfile)]
-                    default_keys={"num_per_node":self.numpernode,
-                                  "lofar_sw_dir":self.sw_dir+"/"+self.sw_ver,
+                    default_keys={"lofar_sw_dir":self.sw_dir+"/"+self.sw_ver,
                                   "OBSID":self.OBSID,
                                   "start_SB":SRM}
                     token=th.create_token(keys=dict(itertools.chain(keys.iteritems(), 
