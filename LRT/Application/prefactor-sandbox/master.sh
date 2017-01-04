@@ -131,7 +131,7 @@ sleep 6
 
 setup_downloads $PIPELINE
 
-echo "Downloading $( wc -l srm.txt ) files"
+echo "Downloading $( wc -l srm.txt | awk '{print $1}' ) files"
 
 if [[ -z $( echo $PIPELINE | grep targ1 ) ]]
  then
@@ -141,7 +141,7 @@ fi
 if [[ -z $( echo $PIPELINE | grep targ2 ) ]]
  then
   $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'downloading'
-  python ./download_srms.py srm.txt 0 10 || \ ##Replaced $NUMSB with 10, just use len(srm.txt)
+  python ./download_srms.py srm.txt 0 $( wc -l srm.txt | awk '{print $1}' ) || \ ##Replaced $NUMSB with 10, just use len(srm.txt)
      { echo "Download Failed!!"; exit 20; } #exit 20=> Download fails
   wait
  else
