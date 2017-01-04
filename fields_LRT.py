@@ -33,7 +33,7 @@ class Field(object):
             step.prev_step = self.steps[len(self.steps)-1]
             self.steps.append(step)
 
-    def initialize(self, targ_OBSID, tim_avg=4, freq_avg=4):
+    def initialize(self, targ_OBSID, tim_avg=4, freq_avg=4,flags='[ ]'):
         '''Initializes the field object by calculating the averaging parameters
           (default is 4 chan/SB and 4sec)
           initialize also calls find_cal_obsid which searches a hardcoded file
@@ -43,7 +43,7 @@ class Field(object):
         '''
         self.OBSIDs['targ'] = targ_OBSID
         self.OBSIDs['cal'] = self.find_cal_obsid(targ_OBSID)
-        (self.parsets['cal'], (self.parsets['targ'], self.parsets['targ2'])) =self.create_field_parsets(tim_avg, freq_avg)
+        (self.parsets['cal'], (self.parsets['targ'], self.parsets['targ2'])) =self.create_field_parsets(tim_avg, freq_avg,flags)
         self.srms['cal'] = self.findsrm('SKSP/srmfiles', self.OBSIDs['cal'])
         self.srms['targ'] = self.findsrm('SKSP/srmfiles', self.OBSIDs['targ'])
         time.sleep(3)
@@ -65,7 +65,7 @@ class Field(object):
         # TODO: This
         return cal_OBSID
 
-    def create_field_parsets(self, tim_avg, freq_avg):
+    def create_field_parsets(self, tim_avg, freq_avg, flags):
         '''Uses the modify_parsets function to add the Calibrator/Target OBSID
         and averaging parameters, then write out to a field specific
         parsets (Fields are labeled as 'field_'+targ_obsid
@@ -76,9 +76,9 @@ class Field(object):
         for tar_cal in [0, 1, 2]:
             filename = orig_parsets[tar_cal]
             if tar_cal==0:
-                filedata = self.modify_parsets(tim_avg[tar_cal], freq_avg[tar_cal], filename)
+                filedata = self.modify_parsets(tim_avg[tar_cal], freq_avg[tar_cal],flags, filename)
             else:
-                filedata = self.modify_parsets(tim_avg[1], freq_avg[1], filename)
+                filedata = self.modify_parsets(tim_avg[1], freq_avg[1], flags, filename)
             with open(os.path.splitext(filename)[0]+"_"+self.name+".parset", 'w') as file:
                 file.write(filedata)
             if "Calibrator" in filename:
@@ -90,7 +90,7 @@ class Field(object):
         return(cal_parset, (targ_parset1, targ_parset2))
 
 
-    def modify_parsets(self, time, freq, parset):
+    def modify_parsets(self, time, freq, flags, parset):
         '''Some regular expressions that will hopefully not need refactoring \s\S matches one+Spaces
         '''
         with open(parset, 'r') as file:
@@ -103,6 +103,11 @@ class Field(object):
             filedata = re.sub(r'\! cal_input_pattern\s+=\s\S+',
                               "! cal_input_pattern    = "+str(self.OBSIDs['cal'])+"*MS",
                             filedata)
+            pdb.set_trace()
+            filedata = re.sub(r'\! flag_baselines\s+=\s\W\s+\S+\s\W',
+                              "! flag_baselines    = "+flags+ "\n",
+                              filedata)
+
             if "Target-2" in parset:
                 filedata = re.sub(r'\! target_input_pattern\s+=\s\S+',
                                   "! target_input_pattern    = "+str(self.OBSIDs['targ'])+"*ms",
