@@ -96,7 +96,7 @@ class ExampleActor(RunActor):
         else:
             start_SB=""
 	
-        command = "/usr/bin/time -v ./master.sh --startsb " + str(start_SB) + " --numsb "+ str(token['num_per_node']) +" --parset "+ parsetfile+" --lofdir "+lofdir+" --obsid "+str(token['OBSID'])+pipetype+cal_obsid+" --token "+token["_id"] +" --picasdb "+ str(sys.argv[1]) +" --picasuname "+str(sys.argv[2])+" --picaspwd "+ str(sys.argv[3])+ " 2> logs_.err 1> logs_out"
+        command = "/usr/bin/time -v ./master.sh --startsb " + str(start_SB) + " --parset "+ parsetfile+" --lofdir "+lofdir+" --obsid "+str(token['OBSID'])+pipetype+cal_obsid+" --token "+token["_id"] +" --picasdb "+ str(sys.argv[1]) +" --picasuname "+str(sys.argv[2])+" --picaspwd "+ str(sys.argv[3])+ " 2> logs_.err 1> logs_out"
         print command
         
 	out = execute(command,shell=True)
