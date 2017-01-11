@@ -142,8 +142,9 @@ if [[ -z $( echo $PIPELINE | grep targ2 ) ]]
  then
   $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'downloading'
   while read -r line ; do SB=$( echo ${line} | sed  "s\srm://lofar-srm.fz-juelich.de:8443\gsiftp://dcachepool12.fz-juelich.de:2811\g" | sed  "s\srm://srm.grid.sara.nl:8443\gsiftp://gridftp.grid.sara.nl:2811\g"); globus-url-copy $SB ./ ; done < srm.txt
-  wait
+  wait  #####REPLACE THIS
  for i in `ls *tar`;do tar -xvf $i; done 
+ rm *tar
  else
   $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'downloading'
   cat srm.txt | xargs -I{} globus-url-copy  {} $PWD/
@@ -197,7 +198,7 @@ echo "Pipeline type is "$pipelinetype
 echo "Adding $OBSID and $pipelinetype into the tcollector tags"
 sed -i "s?\[\]?\[\ \"obsid=${OBSID}\",\ \"pipeline=${pipelinetype}\"\]?g" openTSDB_tcollector/collectors/etc/config.py
 
-if [[ !-z $( echo $pipelinetype |grep targ2 ) ]]
+if [[ ! -z $( echo $pipelinetype |grep targ2 ) ]]
   then
     echo "running taql on "$( ls -d *${OBSID}*SB*  )"/SPECTRAL_WINDOW"
     FREQ=$( echo "select distinct REF_FREQUENCY from $( ls -d *${OBSID}*SB* )/SPECTRAL_WINDOW"| taql | tail -2 | head -1)
