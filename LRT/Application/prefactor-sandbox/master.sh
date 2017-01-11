@@ -141,9 +141,9 @@ fi
 if [[ -z $( echo $PIPELINE | grep targ2 ) ]]
  then
   $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'downloading'
-  python ./download_srms.py srm.txt 0 $( wc -l srm.txt | awk '{print $1}' ) || \ ##Replaced $NUMSB with 10, just use len(srm.txt)
-     { echo "Download Failed!!"; exit 20; } #exit 20=> Download fails
+  while read -r line ; do SB=$( echo ${line} | sed  "s\srm://lofar-srm.fz-juelich.de:8443\gsiftp://dcachepool12.fz-juelich.de:2811\g" | sed  "s\srm://srm.grid.sara.nl:8443\gsiftp://gridftp.grid.sara.nl:2811\g"); globus-url-copy $SB ./ ; done < srm.txt
   wait
+ for i in `ls *tar`;do tar -xvf $i; done 
  else
   $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'downloading'
   cat srm.txt | xargs -I{} globus-url-copy  {} $PWD/
