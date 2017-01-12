@@ -198,7 +198,7 @@ echo "Pipeline type is "$pipelinetype
 echo "Adding $OBSID and $pipelinetype into the tcollector tags"
 sed -i "s?\[\]?\[\ \"obsid=${OBSID}\",\ \"pipeline=${pipelinetype}\"\]?g" openTSDB_tcollector/collectors/etc/config.py
 
-if [[ ! -z $( echo $pipelinetype |grep targ2 ) ]]
+if [[ ! -z $( echo $pipelinetype |grep targ1 ) ]]
   then
     echo "running taql on "$( ls -d *${OBSID}*SB*  )"/SPECTRAL_WINDOW"
     FREQ=$( echo "select distinct REF_FREQUENCY from $( ls -d *${OBSID}*SB* )/SPECTRAL_WINDOW"| taql | tail -2 | head -1)
@@ -234,7 +234,7 @@ kill $TCOLL_PID
 #
 ######################
 
-if [[ ! -z $( echo $pipelinetype |grep targ1 ) ]]
+if [[ ! -z $( echo $pipelinetype |grep targ2 ) ]]
   then
     ./prefactor/scripts/plot_solutions_all_stations.py -p $( ls -d ${RUNDIR}/prefactor/results/*ms )/instrument_directionindependent/ ${JOBDIR}/GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png
 fi
