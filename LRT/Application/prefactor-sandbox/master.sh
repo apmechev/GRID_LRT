@@ -234,7 +234,7 @@ kill $TCOLL_PID
 #
 ######################
 
-if [[ ! -z $( echo $pipelinetype |grep targ2 ) ]]
+if [[ ! -z $( echo $pipelinetype |grep targ1 ) ]]
   then
     ./prefactor/scripts/plot_solutions_all_stations.py -p $( ls -d ${RUNDIR}/prefactor/results/*ms )/instrument_directionindependent/ ${JOBDIR}/GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png
 fi
