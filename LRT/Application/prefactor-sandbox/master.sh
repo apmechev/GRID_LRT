@@ -173,7 +173,7 @@ sed -i "s?PREFACTOR_SCRATCH_DIR?$(pwd)?g" pipeline.cfg
 if [[ ! -z ${CAL_OBSID}  ]]
 then
  echo "Getting solutions from obsid "$CAL_OBSID
- globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_${CAL_OBSID}.tar file:`pwd`/cal_solutions.tar
+ globus-url-copy gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_sols/${CAL_OBSID}_solutions.tar file:`pwd`/cal_solutions.tar
  wait
  if [[ -e cal_solutions.tar ]]
   then
@@ -248,7 +248,7 @@ find . -name "PIE*png"|xargs tar -zcf pngs.tar.gz
 find . -name "*.png" -exec cp {} ${JOBDIR} \;
 cp PIE_${OBSID}.png ${JOBDIR}
 cp ./prefactor/cal_results/*png ${JOBDIR}
-find ./prefactor/cal_results/ -name "*npy"|xargs tar -cf numpys.tar
+find ./prefactor/cal_results/ -name "*npy"|xargs tar -cvf numpys.tar
 tar --append --file=numpys.tar pngs.tar.gz
 find . -name "*tcollector.out" | xargs tar -cf profile.tar
 find . -iname "*statistics.xml" -exec tar -rvf profile.tar {} \;
@@ -319,7 +319,7 @@ OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
 echo "copying the Results"
 #globus-url-copy file:`pwd`/instruments.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/instr_$OBSID.tar
 
-if [[ ! -z $( grep subtract ${PIPELINE}  ) ]]
+if [[ ! -z $( echo ${PIPELINE} | grep subtract ) ]]
    then
    OBSID="Init_"${OBSID}
    CAL_OBSID="2" #do this nicer
