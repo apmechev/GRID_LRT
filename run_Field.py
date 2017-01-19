@@ -55,7 +55,7 @@ def run_field(f_obj,cal_thresh=0.05):
 
     s1.start(f_obj.srms['targ'][0],threshold=1.) #just stages target and doesn't wait
     
-    calfile=subprocess.Popen(['uberftp','-ls','gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/numpy_'+f_obj.OBSIDs['cal']+".tar"],stdout=subprocess.PIPE)
+    calfile=subprocess.Popen(['uberftp','-ls','gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_sols/'+f_obj.OBSIDs['cal']+"_solutions.tar"],stdout=subprocess.PIPE)
     cal_results=calfile.communicate()[0] #Find whether the calibrator has been run before 
     print "cal resunts are"+cal_results
     if cal_results=="":
