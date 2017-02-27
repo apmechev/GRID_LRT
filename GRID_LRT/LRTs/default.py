@@ -4,6 +4,12 @@ import glob
 import shutil
 import itertools 
 import subprocess
+import yaml
+
+from GRID_LRT import srmlist
+import GRID_LRT.sandbox as sandbox
+import GRID_LRT.Token as Token
+
 
 import pdb
 class LRT(object):
@@ -173,13 +179,13 @@ class LRT(object):
         print ""
         print "You're running \033[33m SARA LRT1.5\033[0m, default"
         print ""
-        import srmlist
+        
         self.Srm_obj=srmlist.Srm_manager(OBSID=self.OBSID,stride=self.numpernode)
         self.Srm_obj.file_load(self.srmfile)
         self.srms=self.Srm_obj.srms
 
-    def prepare_sbx_from_config(sbxconfig,tokconfig):
-        import GRID_LRT.sandbox as sandbox
+    def prepare_sbx_from_config(self,sbxconfig,tokconfig):
+
         s=sandbox.Sandbox()
         s.parseconfig(sbxconfig)
         s.create_SBX_folder()
@@ -236,8 +242,6 @@ class LRT(object):
         '''Creates tokens and views in the PiCaS token pool or resubmits error tokens
         '''
         ##TODO: Refactor
-        sys.path.append(os.getcwd()+"/LRT/Tokens")
-        os.chdir(self.workdir+"/LRT/Tokens")
         if not hasattr(self, 'Srm_obj'):
            self.prepare_srms()
         try:
@@ -246,7 +250,8 @@ class LRT(object):
             print "\033[31m You haven't set $PICAS_USR or $PICAS_DB or $PICAS_USR_PWD! \n\n Exiting\033[0m"
             sys.exit()
 
-        import GRID_LRT.Token as Token
+        default_keys=yaml.load(open('config/tokens/pref_cal1_token.cfg','rb'))
+        _=default_keys.pop('_attachments')
         self.t_type=token_type
         th=Token.Token_Handler(uname=os.environ["PICAS_USR"],pwd=os.environ["PICAS_USR_PWD"],dbn=os.environ["PICAS_DB"],t_type=token_type)
         th.add_view("todo",'doc.lock == 0 && doc.done == 0')
@@ -263,10 +268,7 @@ class LRT(object):
                 th.reset_tokens(view_name='error')
             for ABN in abnlist:
                 th.delete_tokens(view_name='locked')
-                attachment=[open(attfile,'r'),os.path.basename(attfile)]
-                default_keys={"lofar_sw_dir":self.sw_dir+"/"+self.sw_ver,
-                              "OBSID":self.OBSID,
-                              "start_AB":ABN}
+                attachment=[open(attfile,'r'),os.path.basename(attfile)] 
                 token=th.create_token(keys=dict(itertools.chain(keys.iteritems(), 
                                       default_keys.iteritems())),
                                       append=self.OBSID+"_ABN"+str("%03d" % ABN),
@@ -282,7 +284,7 @@ class LRT(object):
 
         ##TODO: Use a dictionary for EVERY token (download srm.txt in pilot.py)
         if keys['pipeline']!='pref_targ2':
-            srmlist=self.Srm_obj.make_sbndict_from_file(self.srmfile)
+            srmlist=self.Srm_obj.make_sbndict_from_file(self.srmfile) 
             if self.resuberr:
                 th.reset_tokens(view_name='error')
             else:
@@ -291,12 +293,9 @@ class LRT(object):
                 num_token=0 #used to stride the start_SB
                 for SRM in srmlist:
                     attachment=[open(attfile,'r'),os.path.basename(attfile)]
-                    default_keys={"lofar_sw_dir":self.sw_dir+"/"+self.sw_ver,
-                                  "OBSID":self.OBSID,
-                                  "start_SB":SRM}
                     token=th.create_token(keys=dict(itertools.chain(keys.iteritems(), 
                                           default_keys.iteritems())),
-                                          append=self.OBSID+"_SB"+str("%03d" % SRM ),
+                                          append=self.OBSID+"_SB"+str("%03d" % int(SRM) ),
                                           attach=attachment)
                     with open('temp_abn','w') as tmp_abn_file:
                         for i in srmlist[SRM]:
@@ -312,7 +311,7 @@ class LRT(object):
         '''
         if self.resuberr: #return if resubmitting TODO: Check if any jdls are running, if so don't return
             return
-        os.chdir(self.workdir+"/LRT/Application")
+        os.chdir(self.workdir+"/GRID_LRT/Application")
         #TODO: Change avg_dmx's number of jobs to number of subbands
         dmx_jdl=self.jdl_file
         shutil.copy(dmx_jdl,'avg_dmx_with_variables.jdl')

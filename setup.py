@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='GRID_LRT',
-      version='0.9',
+      version='0.2',
       description='Grid LOFAR Reduction Tools',
       author='Alexandar Mechev',
       author_email='apmechev@strw.leidenuniv.nl',

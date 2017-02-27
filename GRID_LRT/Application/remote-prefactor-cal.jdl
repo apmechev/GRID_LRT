@@ -9,7 +9,7 @@
   Arguments = "run_remote_sandbox.sh $PICAS_DB $PICAS_USR $PICAS_USR_PWD ";
   Stdoutput = "parametricjob.out";
   StdError = "parametricjob.err";
-  InputSandbox = {"prefactor-sandbox/run_remote_sandbox.sh"};
+  InputSandbox = {"../Sandbox/launchers/run_remote_sandbox.sh"};
   OutputSandbox = {"parametricjob.out", "parametricjob.err"};
   DataAccessProtocol = {"gsiftp"};
   ShallowRetryCount = 5;

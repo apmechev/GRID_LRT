@@ -238,12 +238,12 @@ class pref_Step(processing_step):
         self.LRT.parsetfile = os.environ['PWD']+"/"+parset
         self.LRT.srmfile = os.environ['PWD']+"/"+srmfile[0]
 
-        self.LRT.prepare_sandbox()
+        self.LRT.prepare_sbx_from_config('config/sandboxes/prefactor_cal1_sbx.cfg','/home/apmechev/test/GRID_LRT/config/tokens/pref_cal1_token.cfg')
         self.LRT.jdlfile = "remote_prefactor.jdl"
         import itertools
         progress_keys = {'times': {}}
         progress_keys["times"]["queued"] = time.time()
-        s = self # why? #oh nvm, this hella cool
+        s = self 
         while True:
             try:
                 s = s.prev_step # adds the start times previous steps in token
