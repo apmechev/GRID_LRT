@@ -20,6 +20,7 @@ import os
 import ConfigParser
 import pdb
 import itertools
+import yaml
 
 if 'couchdb' not in sys.modules:
     import couchdb
@@ -263,6 +264,32 @@ function (key, values, rereduce) {
         self.db.update(to_update)
 
 
+
+
+#????
+class Token_Generator:
+
+    def __init__(self,config_file,uname="",pwd="",dbn='',t_type=None):
+        self._conf=config_file
+        self.load_configuration(config_file)
+        if t_type : self.type=t_type
+        print self.type
+        self.th=Token_Handler(t_type=self.type,uname=uname, pwd=pwd, dbn=dbn)   
+
+    def setVar(self, var):
+        for key, value in var.items():
+            if '^' not in value:
+                setattr(self, key, value)
+    
+    def load_configuration(self,conffile):
+        f=self._conf if conffile==None else conffile
+        opt=yaml.load(open(conffile,'rb'))
+        self.keys=opt
+        self.setVar(opt)
+
+
+
+###TEST:
 class View(object):
     def __init__(self, t_type='test', srv="https://picas-lofar.grid.sara.nl:6984", uname="", pwd="", dbn="", name="test_view"):
         self.name = name

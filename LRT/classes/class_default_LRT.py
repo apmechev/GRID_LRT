@@ -178,6 +178,19 @@ class LRT(object):
         self.Srm_obj.file_load(self.srmfile)
         self.srms=self.Srm_obj.srms
 
+    def prepare_sbx_from_config(sbxconfig,tokconfig):
+        import class_sandbox
+        s=class_sandbox.Sandbox()
+        s.parseconfig(sbxconfig)
+        s.create_SBX_folder()
+        s.enter_SBX_folder()
+        s.load_git_scripts()
+        s.copy_base_scripts()
+        s.check_token(tokconfig)
+        s.zip_SBX()
+        s.upload_SBX()
+        s.cleanup()
+ 
 
     def prepare_sandbox(self,sandboxdir="LRT/Application/sandbox"):
         '''Each job is contained in a sandbox and this function creates a

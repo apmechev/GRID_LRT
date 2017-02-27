@@ -84,7 +84,7 @@ class Srm_manager(object):
             SBN_files.append(os.path.basename(value))
         s_SBN=sorted(self.srms.keys())
         self.location=os.path.dirname(value)
-        return self.make_list(s_SBN,SBN_files)
+        return self.make_list(s_SBN,SBN_files,'SB')
 
 
     def make_list(self,SBs,files,append='SB'):
@@ -102,8 +102,8 @@ class Srm_manager(object):
                     abn_files.append(self.location+"/"+str([x for x in files if append+str("%03d" % (abn+abnum)) in x][0]))
                 except IndexError:
                     continue
-            ##TODO: SB021 has zero padding! 
-            self.ABN_list[abn]=abn_files
+            ##TODO: SB021 has zero padding!
+            self.ABN_list["%03d" % abn]=abn_files
         return self.ABN_list
 
 
