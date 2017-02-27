@@ -1,4 +1,4 @@
-import fields_LRT
+from GRID_LRT.LRTs import fields as fields_LRT
 import sys,math,subprocess
 
 
@@ -39,9 +39,10 @@ def run_field(f_obj,cal_thresh=0.05):
     s2=fields_LRT.Stage_step("Stage_cal")
     s3=fields_LRT.Stage_step("Stage_targ_full")
 
-    p1=fields_LRT.pref_Step("pref_cal")
-    p2=fields_LRT.pref_Step("pref_targ1")
-    p3=fields_LRT.pref_Step("pref_targ2")
+    p1=fields_LRT.pref_Step("pref_cal1")
+    p2=fields_LRT.pref_Step("pref_cal2")
+    p3=fields_LRT.pref_Step("pref_targ1")
+    p4=fields_LRT.pref_Step("pref_targ2")
 
 
 
@@ -51,7 +52,7 @@ def run_field(f_obj,cal_thresh=0.05):
     f_obj.add_step(s3)
     f_obj.add_step(p2)
     f_obj.add_step(p3)
-    
+    f_obj.add_step(p4)
 
     s1.start(f_obj.srms['targ'][0],threshold=1.) #just stages target and doesn't wait
     
@@ -61,14 +62,15 @@ def run_field(f_obj,cal_thresh=0.05):
     if cal_results=="":
         s2.start(f_obj.srms['cal'][0],threshold=0) #stages and waits for the calibrator 
         p1.start(f_obj.srms['cal'],f_obj.parsets['cal'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','244','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18','-j','remote-prefactor-cal.jdl'])
+        p2.start(f_obj.srms['cal'],f_obj.parsets['cal'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','244','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18','-j','remote-prefactor-cal.jdl'])
     else:
         s2.progress=1
         p1.progress=1
 
     s3.start(f_obj.srms['targ'][0],threshold=cal_thresh)#really waits for the target to be staged fully
     s3.start_time=s1.start_time #staging started with s1, gives realistic staging length 
-    p2.start(f_obj.srms['targ'],f_obj.parsets['targ'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','1','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18'],prev_step=p1,calobsid=f_obj.OBSIDs['cal'])      
-    p3.start(f_obj.srms['targ'],f_obj.parsets['targ2'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','10','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18','-j','remote-prefactor-targ2.jdl'],prev_step=p2,calobsid=f_obj.OBSIDs['cal'])
+    p3.start(f_obj.srms['targ'],f_obj.parsets['targ'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','1','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18'],prev_step=p1,calobsid=f_obj.OBSIDs['cal'])      
+    p4.start(f_obj.srms['targ'],f_obj.parsets['targ2'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','10','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18','-j','remote-prefactor-targ2.jdl'],prev_step=p2,calobsid=f_obj.OBSIDs['cal'])
 
 
 

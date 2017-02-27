@@ -7,7 +7,8 @@ import subprocess
 class Sandbox(object):
 
     def __init__(self,yamlfile=None):
-        self.base_dir=os.getcwd()+"/"
+        self.base_dir=os.getcwd()+"/GRID_LRT/Sandbox/"
+        self.return_dir=os.getcwd()
         self.SBXloc=None
         if yamlfile:
             self.parseconfig(yamflile)
@@ -29,11 +30,11 @@ class Sandbox(object):
         '''Makes an empty sandbox folder or removes previous one
         '''
         SBX_dir= directory if directory else self.options['sandbox']['name']
-        if not os.path.exists(SBX_dir):
-            os.makedirs(SBX_dir)
+        if not os.path.exists(self.base_dir+SBX_dir):
+            os.makedirs(self.base_dir+SBX_dir)
         else:
-            shutil.rmtree(SBX_dir)
-            os.makedirs(SBX_dir)
+            shutil.rmtree(self.base_dir+SBX_dir)
+            os.makedirs(self.base_dir+SBX_dir)
 
     def delete_SBX_folder(self,directory=None):
         '''Removes the sandbox folder and subfolders
@@ -41,13 +42,13 @@ class Sandbox(object):
         SBX_dir= directory if directory else self.options['sandbox']['name']
         if os.path.basename(os.getcwd())==self.options['sandbox']['name']:
             os.chdir(self.base_dir)
-        if os.path.exists(SBX_dir):
-            shutil.rmtree(SBX_dir)
+        if os.path.exists(self.base_dir+SBX_dir):
+            shutil.rmtree(self.base_dir+SBX_dir)
 
     def enter_SBX_folder(self,directory=None):
         SBX_dir= directory if directory else self.options['sandbox']['name']
-        if os.path.exists(SBX_dir):
-            os.chdir(SBX_dir)
+        if os.path.exists(self.base_dir+SBX_dir):
+            os.chdir(self.base_dir+SBX_dir)
        
     def load_git_scripts(self):
         '''Loads the git scripts into the sandbox folder. Top dir names
@@ -110,6 +111,7 @@ class Sandbox(object):
 
     def cleanup(self):
         self.delete_SBX_folder()
+        os.chdir(self.return_dir)
         pass
 
     def make_tokvar_dict(self):
