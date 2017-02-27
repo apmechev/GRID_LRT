@@ -1,0 +1,50 @@
+#Prefactor calibrator sandbox
+
+sandbox:
+    name: prefactor_targ1_sandbox
+    loc: "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/sandbox"
+    loc2: None
+    type: lofar_prefactor
+
+reduction_params:
+    OBSID: &OBS default
+    parset: default 
+    averaging:
+        frequency: 2
+        time: 2
+
+token:
+    token_type: &toktype default_token_type
+    exist : ['OBSID','CAL_OBSID','ABN'] #Force check if these fields exist in token
+    token_to_exe: #which fields in the token are passed to which parameters in executable
+        OBSID: obsid
+        CAL_OBSID: calobsid
+        lofar_sw_dir: lofdir
+        pipeline: pipetype
+    keys:
+        pipeline: pref_targ1 
+        ABN: &AB 000
+
+executable:
+    launcher:  #This is what is submitted to the queue
+        name: run_remote_sandbox.sh
+        params:
+            - $PICAS_DB
+            - $PICAS_USR 
+            - $PICAS_USR_PWD
+            - *toktype 
+    exe: 
+        name: master.sh
+        params: ["Targ_OBSID"] 
+
+results:
+    UL_loc: gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/
+    UL_pattern: 
+        - *OBS
+        - "/t1_"
+        - *OBS
+        - "_AB"
+        - *AB
+        - "_SB"
+        - *st_SB
+        - "_.tar.gz"

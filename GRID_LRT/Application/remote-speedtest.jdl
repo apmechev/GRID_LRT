@@ -1,0 +1,21 @@
+[
+ Type = "Job";
+ JobType = "Normal";
+ Executable = "/bin/sh";
+
+ Arguments = "run_remote_sandbox.sh $PICAS_DB $PICAS_USR $PICAS_USR_PWD";
+ Stdoutput = "parametricjob.out";
+ StdError = "parametricjob.err";
+ InputSandbox = {"speed_test/run_remote_sandbox.sh","speed_test/getOBSID.py"};
+ OutputSandbox = {"parametricjob.out", "parametricjob.err"};
+ DataAccessProtocol = {"gsiftp"};
+ ShallowRetryCount = 5;
+
+
+  SmpGranularity = 4;
+  CPUNumber = 4;
+
+
+  Requirements=(RegExp("mediummc",other.GlueCEUniqueID));
+
+]
