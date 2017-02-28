@@ -125,7 +125,7 @@ class Sandbox(object):
            if the token variables are all existing. If so, tokvar is created and put
            inside the SBX
         '''
-        token_vars=yaml.load(open(tok_cfg,'rb'))
+        token_vars=yaml.load(open(self.return_dir+"/"+tok_cfg,'rb'))
         for key in self.options['tokvar']:
             if key in token_vars.keys():
                 pass
