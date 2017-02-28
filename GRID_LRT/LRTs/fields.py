@@ -241,7 +241,6 @@ class pref_Step(processing_step):
         self.LRT.prepare_sbx_from_config('config/sandboxes/prefactor_cal1_sbx.cfg','/home/apmechev/test/GRID_LRT/config/tokens/pref_cal1_token.cfg')
         self.LRT.jdlfile = "remote_prefactor.jdl"
         import itertools
-        progress_keys = {'times': {}}
         progress_keys["times"]["queued"] = time.time()
         s = self 
         while True:
@@ -249,19 +248,13 @@ class pref_Step(processing_step):
                 s = s.prev_step # adds the start times previous steps in token
                 progress_keys["times"][s.name+"_start"] = s.start_time
             except:
-                break
-        other_keys = {"pipeline": self.name,
-                      "progress": 0,
-                      "status": "queued",
-                      "FREQ": "",
-                      "ABN": ""}
+                break 
         if 'targ' in self.name:
             if self.prev_pref_step.obsid:
-                other_keys['CAL_OBSID'] = self.prev_pref_step.obsid
+                progress_keys['CAL_OBSID'] = self.prev_pref_step.obsid
             else:
-                other_keys['CAL_OBSID'] = calobsid
-        all_keys = dict(itertools.chain(other_keys.iteritems(),
-                        progress_keys.iteritems()))
+                progress_keys['CAL_OBSID'] = calobsid
+        all_keys =progress_keys
         self.LRT.submit_to_picas(pref_type="_"+fieldname, add_keys=all_keys)
         self.LRT.start_jdl()
         return
