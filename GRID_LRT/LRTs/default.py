@@ -45,6 +45,8 @@ class LRT(object):
         print ""
         print "+=+=+=+= Default LRT Options +=+=+=+="
         print "(-r  or --resub-error-only)       - resubmit only error tokens "
+        print "(-s  or --sbx_config  )           - Location of sandbox configure file"
+        print "(-t  or --token_config )          - Location of Token Config file"
         print "(-i  or --ignore-unstaged)        - If any files unstaged, it doesn't exit but continue "
         print "(-n  or --num-per-node)           - Splits SRMS to have a certain nuber on each node "
         print "(-j  or --jdl)                    - specify .jdl file to run  " 
@@ -81,6 +83,23 @@ class LRT(object):
         if ("-r" in args[:-1] or ("--resub-error-only" in args[:-1])):
             print "\033[33mFlag set to resubmit only error tokens\033[0m"
             self.resuberr=True
+
+        if ("-s" in args[:-1] or ("--sbx_config" in args[:-1])):
+            try:
+                    idx=args.index("-s")
+            except:
+                    idx=args.index("--sbx_config")
+            self.sbxcfg=args[idx+1]
+
+        if ("-t" in args[:-1] or ("--token_config" in args[:-1])):
+            try:
+                    idx=args.index("-t")
+            except:
+                    idx=args.index("--token_config")
+            self.tokcfg=args[idx+1]
+
+        if self.tokcfg!=None and self.sbxcfg!=None:
+            self.prepare_sbx_from_config(self.sbxcfg,self.tokcfg)
 
         if ("-d" in args[:-1] or ("--software-dir" in args[:-1])):
             try:
