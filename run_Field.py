@@ -61,11 +61,12 @@ def run_field(f_obj,cal_thresh=0.05):
     print "cal resunts are"+cal_results
     if cal_results=="":
         s2.start(f_obj.srms['cal'][0],threshold=0) #stages and waits for the calibrator 
-        p1.start(f_obj.srms['cal'],f_obj.parsets['cal'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','244','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18','-j','remote-prefactor-cal.jdl'])
-        p2.start(f_obj.srms['cal'],f_obj.parsets['cal'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','244','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18','-j','remote-prefactor-cal.jdl'])
+        p1.start(f_obj.srms['cal'],f_obj.parsets['cal'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','1','-t','config/tokens/pref_cal1.cfg','-s','config/sandboxes/pref_cal1.cfg','-j','remote-prefactor-cal1.jdl'])
+        p2.start(f_obj.srms['cal'],f_obj.parsets['cal'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','244','-t','config/tokens/pref_cal2.cfg','-s','config/sandboxes/pref_cal2.cfg','-j','remote-prefactor-cal2.jdl'])
+
     else:
         s2.progress=1
-        p1.progress=1
+        p2.progress=1
 
     s3.start(f_obj.srms['targ'][0],threshold=cal_thresh)#really waits for the target to be staged fully
     s3.start_time=s1.start_time #staging started with s1, gives realistic staging length 
