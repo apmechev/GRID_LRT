@@ -7,7 +7,7 @@ from GRID_LRT import gsurl
 
 import pdb
 
-class Srm_manager(object):
+class srm_manager(object):
     def __init__(self,OBSID="",filename="",stride=1):
         """Initializes the srmlist object. The stride is how many tokens to make
             stride=1 makes token for each link, stride 10 groups by 10, etc
