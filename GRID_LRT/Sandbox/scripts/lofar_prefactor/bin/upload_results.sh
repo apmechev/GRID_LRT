@@ -16,9 +16,9 @@ echo "--------------------------------------------------------------------------
 
 
 function upload_results_cal1(){
- find . -name instrument |xargs tar -cvf instruments_${OBSID}_${STARTSB}.tar  
- find . -iname "FIELD" |grep work |xargs tar -rvf instruments_${OBSID}_${STARTSB}.tar 
- find . -iname "ANTENNA" |grep work |xargs tar -rvf instruments_${OBSID}_${STARTSB}.tar
+ find ${WORKDIR} -name "instrument" |xargs tar -cvf instruments_${OBSID}_${STARTSB}.tar  
+ find ${WORKDIR} -iname "FIELD" |grep work |xargs tar -rvf instruments_${OBSID}_${STARTSB}.tar 
+ find ${WORKDIR} -iname "ANTENNA" |grep work |xargs tar -rvf instruments_${OBSID}_${STARTSB}.tar
 
  uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_tables/${OBSID}
  globus-url-copy instruments_${OBSID}_${STARTSB}.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_tables/${OBSID}/instruments_${OBSID}_${STARTSB}.tar
