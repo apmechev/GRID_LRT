@@ -269,8 +269,9 @@ class LRT(object):
             print "\033[31m You haven't set $PICAS_USR or $PICAS_DB or $PICAS_USR_PWD! \n\n Exiting\033[0m"
             sys.exit()
 
-        default_keys=yaml.load(open('config/tokens/pref_cal1_token.cfg','rb'))
+        default_keys=yaml.load(open(self.tokcfg,'rb'))
         _=default_keys.pop('_attachments')
+        default_keys['OBSID']=self.OBSID
         self.t_type=token_type
         th=Token.Token_Handler(uname=os.environ["PICAS_USR"],pwd=os.environ["PICAS_USR_PWD"],dbn=os.environ["PICAS_DB"],t_type=token_type)
         th.add_view("todo",'doc.lock == 0 && doc.done == 0')
@@ -281,7 +282,7 @@ class LRT(object):
         #TODO: make token_holder object to store a LRT's tokens or just list?
 
         self.tokens=[]
-        if keys['pipeline']=='pref_targ2':
+        if default_keys['pipeline']=='pref_targ2':
             abnlist=self.Srm_obj.make_abndict_from_tokens(token_type)
             if self.resuberr:
                 th.reset_tokens(view_name='error')
@@ -302,7 +303,7 @@ class LRT(object):
 
 
         ##TODO: Use a dictionary for EVERY token (download srm.txt in pilot.py)
-        if keys['pipeline']!='pref_targ2':
+        if default_keys['pipeline']!='pref_targ2':
             srmlist=self.Srm_obj.make_sbndict_from_file(self.srmfile) 
             if self.resuberr:
                 th.reset_tokens(view_name='error')
@@ -311,6 +312,7 @@ class LRT(object):
                 th.delete_tokens(view_name=self.OBSID)
                 num_token=0 #used to stride the start_SB
                 for SRM in srmlist:
+                    default_keys['start_SB']=int(SRM)
                     attachment=[open(attfile,'r'),os.path.basename(attfile)]
                     token=th.create_token(keys=dict(itertools.chain(keys.iteritems(), 
                                           default_keys.iteritems())),

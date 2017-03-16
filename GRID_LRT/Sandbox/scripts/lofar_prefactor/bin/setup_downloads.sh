@@ -10,7 +10,7 @@ if [[ $? ==  127 ]]
  then 
     echo "setup_dl: globus-url-copy doesn't exist. ";exit 13
 fi
-
+touch srm.txt
 
 if [ ! -z $( echo $1 | grep init_sub ) ]
  then
