@@ -199,7 +199,7 @@ class LRT(object):
         print "You're running \033[33m SARA LRT1.5\033[0m, default"
         print ""
         
-        self.Srm_obj=srmlist.Srm_manager(OBSID=self.OBSID,stride=self.numpernode)
+        self.Srm_obj=srmlist.srm_manager(OBSID=self.OBSID,stride=self.numpernode)
         self.Srm_obj.file_load(self.srmfile)
         self.srms=self.Srm_obj.srms
 
