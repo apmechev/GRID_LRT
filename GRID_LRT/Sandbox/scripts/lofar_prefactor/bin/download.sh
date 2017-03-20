@@ -42,7 +42,7 @@ function dl_cal2(){
    uberftp -ls ${cal} >calfiles
    while read p; do tt=$( echo $p |awk '{print "'"$cal"'/"$NF'}| tr -d '\r'| tr -d '\n' ); globus-url-copy ${tt} ./; done < calfiles
    for i in `ls *tar`; do tar -xf $i &&rm $i; done
-   mv prefactor/workdir/Pre-Facet-Calibrator-1/* . 
+   find . -name "*${OBSID}*" -exec mv {} . \;   
 
 }
 
