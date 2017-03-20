@@ -76,8 +76,11 @@ class srm_manager(object):
 
     def make_sbndict_from_gsidir(self,location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/"):
         self.location=location
-        self.gsi_files=self.make_gsi_list(location)
-        return self.make_list([[1],[244]],self.gsi_files,"_")
+        gsi_files=self.make_gsi_list(location)
+        files=[]
+        for i in gsi_files:
+            files.append(i.split(location)[1])
+        return self.make_list([[1],[244]],files,"_")
 
     def make_sbndict_from_file(self,filename):
         '''Makes a Dictionary of ABNs taken from the completed tokens 
