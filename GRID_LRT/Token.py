@@ -250,6 +250,20 @@ function (key, values, rereduce) {
         v = self.db.view(self.t_type+"/"+view_name)
         return v
 
+    def iterate_over_dict(iterable={}, key='start_SB', file_upload='srm.txt'):
+        for key in iterable:
+
+            keys=dict(itertools.chain(token_keys.iteritems(),{"OBSID":"L345916","start_SB":str("%03d" % int(key) )}.iteritems()))
+            _=keys.pop('_attachments')
+            token=self.create_token(keys,append="L345916"+"_SB"+str("%03d" % int(key) ),attach=attachment)
+            with open('temp_abn','w') as tmp_abn_file:
+                for i in iterable[key]:
+                    tmp_abn_file.write("%s\n" % i)
+            with open('temp_abn','r') as tmp_abn_file:
+                self.add_attachment(token,tmp_abn_file,file_upload)
+            os.remove('temp_abn')
+ 
+
     def set_view_to_status(self, view_name, status):
         """Sets the status to all tokens in 'view' to 'status
             eg. Set all locked tokens to error or all error tokens to todo
@@ -263,84 +277,44 @@ function (key, values, rereduce) {
             to_update.append(document)
         self.db.update(to_update)
 
+class TokenSet(object):
+    def __init__(self,th=None,tok_config=None):
+        self.th=th
+        self.tokens=[]
+        if not tok_config:
+            self.token_keys={}
+        else:
+            with open(tok_config,'rb') as optfile:
+                self.token_keys=yaml.load(optfile)
+
+    def create_dict_tokens(self,iterable={},id_append="L345916",key_name='start_SB',file_upload=None):
+        for key in iterable:
+            keys=dict(itertools.chain(self.token_keys.iteritems(),{key_name:str("%03d" % int(key) )}.iteritems()))
+            _=keys.pop('_attachments')
+            token=self.th.create_token(keys,append=id_append+"_SB"+str("%03d" % int(key) ))
+            if file_upload:
+                with open('temp_abn','w') as tmp_abn_file:
+                    for i in iterable[key]:
+                        tmp_abn_file.write("%s\n" % i)
+                with open('temp_abn','r') as tmp_abn_file:
+                   self.th.add_attachment(token,tmp_abn_file,file_upload)
+                os.remove('temp_abn')
+            self.tokens.append(token)
+
+    def add_attach_to_list(self,attachment,tok_list=None):
+        if not tok_list: 
+            tok_list=self.tokens
+        for token in tok_list:
+            self.th.add_attachment(token, open(attachment,'r'),os.path.basename(attachment))
+
+    def add_keys_to_list(self,key,val,tok_list=None):
+        if not tok_list:
+            tok_list=self.tokens
+        to_update=[]
+        for token in tok_list:
+            document = self.th.db[token]
+            document[key] = str(val)
+            to_update.append(document)
+        self.th.db.update(to_update)
 
 
-
-#????
-class Token_Generator:
-
-    def __init__(self,config_file,uname="",pwd="",dbn='',t_type=None):
-        self._conf=config_file
-        self.load_configuration(config_file)
-        if t_type : self.type=t_type
-        print self.type
-        self.th=Token_Handler(t_type=self.type,uname=uname, pwd=pwd, dbn=dbn)   
-
-    def setVar(self, var):
-        for key, value in var.items():
-            if '^' not in value:
-                setattr(self, key, value)
-    
-    def load_configuration(self,conffile):
-        f=self._conf if conffile==None else conffile
-        opt=yaml.load(open(conffile,'rb'))
-        self.keys=opt
-        self.setVar(opt)
-
-
-
-###TEST:
-class View(object):
-    def __init__(self, t_type='test', srv="https://picas-lofar.grid.sara.nl:6984", uname="", pwd="", dbn="", name="test_view"):
-        self.name = name
-        self.t_type = t_type
-        self.Picas_User = uname
-        self.Picas_DB = dbn
-        self.Picas_Passwd = pwd
-        self.server = srv
-        self.db = self.get_db(self.Picas_User, self.Picas_Passwd, self.Picas_DB, self.server)
-        self.condition = "doc.lock==0"
-        self.emit = "doc._id"
-
-    def get_db(self, uname, pwd, dbn, srv):
-        """Logs into the Couchdb server and returns the database requested
-        """
-        server = couchdb.Server(srv)
-        server.resource.credentials = (uname, pwd)
-        db = server[dbn]
-        return db
-
-    def set_condition(self, condition):
-        self.condition = condition
-
-    def set_emit(self, emit):
-        self.emit = emit
-
-    def build_Map_Code(self, mapcode=""):
-        if mapcode == "":
-            mapcode = '''function(doc) {
-   if(doc.type == "%s") {
-       if (doc.lock == 0 && doc.done == 0){
-          emit('todo', 1);
-       }
-       if(doc.lock > 0 && doc.status=='downloading') {
-          emit('downloading', 1);
-       }
-       if(doc.lock > 0 && doc.status=='done') {
-          emit('done', 1);
-       }
-       if(doc.lock > 0 && doc.status=='error') {
-          emit('error', 1);
-       }
-       if(doc.lock > 0 && doc.status=='launched') {
-          emit('waiting', 1);
-       }
-       if(doc.lock > 0 && "launched" in doc.times && doc.status!='done' && doc.status!='error' && doc.status!='downloading' ) {
-          emit('running', 1);
-       }
-   }
-}'''
-        self.mapcode = str(mapcode % (self.t_type))
-
-    def build_reduce_code(self, reduce_code=""):
-        self.reducecode = reduce_code

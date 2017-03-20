@@ -74,6 +74,10 @@ class srm_manager(object):
         ABN_files=self.make_url_list(location)
         return self.make_list(s_ABN,ABN_files,"AB")
 
+    def make_sbndict_from_gsidir(self,location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/"):
+        self.location=location
+        self.gsi_files=self.make_gsi_list(location)
+        return self.make_list([[1],[244]],self.gsi_files,"_")
 
     def make_sbndict_from_file(self,filename):
         '''Makes a Dictionary of ABNs taken from the completed tokens 
@@ -135,6 +139,16 @@ class srm_manager(object):
         for url in tmp_urls:
             filenames.append(url.split()[-1].split(self.OBSID+"/")[1])    
         return sorted(filenames) 
+
+    def make_gsi_list(self,location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP"):
+        self.location=location
+        urls=subprocess.Popen(["uberftp","-ls",location+"/*"],
+                                stdout=subprocess.PIPE)
+        tmp_urls=urls.communicate()[0].split('\n')[:-1]
+        filenames=[]
+        for url in tmp_urls:
+            filenames.append(location+url.split()[-1].split("/")[-1])
+        return sorted(filenames)
 
 
     def check_OBSID(self):
