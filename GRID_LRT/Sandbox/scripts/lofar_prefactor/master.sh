@@ -83,7 +83,7 @@ for setupfile in `ls bin/* `; do source ${setupfile} ; done
 
 setup_LOFAR_env $LOFAR_PATH      ##Imported from setup_LOFAR_env.sh
 
-trap cleanup EXIT #This ensures the script cleans_up regardless of how and where it exits
+#trap cleanup EXIT #This ensures the script cleans_up regardless of how and where it exits
 
 print_info                      ##Imported from bin/print_worker_info
 
