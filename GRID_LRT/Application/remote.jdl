@@ -1,27 +1,27 @@
 [
   JobType="Parametric";
   ParameterStart=0;
-  ParameterStep=1;
-  Parameters=50;
+  ParameterStep=3;
+  Parameters=255;
 
   Executable = "/bin/sh";
 
-  Arguments = "run_remote_sandbox.sh surveys apmechev prQn98rQA pref_field_P049_41_557732";
+  Arguments = "run_remote_sandbox.sh $PICAS_DB $PICAS_USR $PICAS_USR_PWD ";
   Stdoutput = "parametricjob.out";
   StdError = "parametricjob.err";
-  InputSandbox = {"sandbox/run_remote_sandbox.sh","sandbox/couchdb.tar","sandbox/picas.tar","sandbox/getOBSID.py"};
+  InputSandbox = {"../Sandbox/launchers/run_remote_sandbox.sh"};
   OutputSandbox = {"parametricjob.out", "parametricjob.err"};
   DataAccessProtocol = {"gsiftp"};
-
+  ShallowRetryCount = 5;
 
   Requirements=(RegExp("mediummc",other.GlueCEUniqueID));
   #Requirements = (RegExp("mediummc",other.GlueCEUniqueID) || RegExp("rug.nl:8443/cream-pbs-medium",other.GlueCEUniqueID));
   #Requirements = (RegExp("mediummc",other.GlueCEUniqueID) || RegExp("nikhef.nl:8443/cream-pbs-medium",other.GlueCEUniqueID) || RegExp("rug.nl:8443/cream-pbs-medium",other.GlueCEUniqueID));
 
   # Just 4 cores on a single node
-  SmpGranularity = 3;
-  CPUNumber = 3;
+  SmpGranularity = 2;
+  CPUNumber = 2;
 
   #requirement for Nikhef high memory jobs
-  #CERequirements = "other.GlueHostMainMemoryRAMSize >= 8192";
+  #CERequirements = "other.GlueHostMainMemoryRAMSize >= 16192";
 ]
