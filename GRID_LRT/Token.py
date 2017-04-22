@@ -173,6 +173,15 @@ function (key, values, rereduce) {
         self.views['overview_total'] = overview_total_view
         overview_total_view.sync(self.db)
 
+    def add_status_views(self):
+        """ Adds the 'todo', locked, done and error views. the TODO view is necessary for the 
+        worker node to find an un-locked token
+        """
+        self.add_view(v_name="todo", cond='doc.lock ==  0 && doc.done == 0 ')
+        self.add_view(v_name="locked", cond='doc.lock > 0 && doc.done == 0 ')
+        self.add_view(v_name="done", cond='doc.status == "done" ')
+        self.add_view(v_name="error", cond='doc.status == "error" ')
+    
     def del_view(self, view_name="test_view"):
         '''Deletes the view with view name from the _design/${token_type} document
             and from the token_Handler's dict of views
@@ -183,7 +192,7 @@ function (key, values, rereduce) {
         self.db.update([db_views])
 
     def remove_Error(self):
-        '''Removes all tokens in the error view
+        ''' Removes all tokens in the error view
         '''
         cond = "doc.lock > 0 && doc.done > 0 && doc.output > 0"
         self.add_view(v_name="error", cond=cond)
@@ -250,20 +259,6 @@ function (key, values, rereduce) {
         v = self.db.view(self.t_type+"/"+view_name)
         return v
 
-    def iterate_over_dict(iterable={}, key='start_SB', file_upload='srm.txt'):
-        for key in iterable:
-
-            keys=dict(itertools.chain(token_keys.iteritems(),{"OBSID":"L345916","start_SB":str("%03d" % int(key) )}.iteritems()))
-            _=keys.pop('_attachments')
-            token=self.create_token(keys,append="L345916"+"_SB"+str("%03d" % int(key) ),attach=attachment)
-            with open('temp_abn','w') as tmp_abn_file:
-                for i in iterable[key]:
-                    tmp_abn_file.write("%s\n" % i)
-            with open('temp_abn','r') as tmp_abn_file:
-                self.add_attachment(token,tmp_abn_file,file_upload)
-            os.remove('temp_abn')
- 
-
     def set_view_to_status(self, view_name, status):
         """Sets the status to all tokens in 'view' to 'status
             eg. Set all locked tokens to error or all error tokens to todo
@@ -288,6 +283,8 @@ class TokenSet(object):
                 self.token_keys=yaml.load(optfile)
 
     def create_dict_tokens(self,iterable={},id_append="L345916",key_name='start_SB',file_upload=None):
+        '''
+        '''# TODO: Check if key_name is inside token_keys!
         for key in iterable:
             keys=dict(itertools.chain(self.token_keys.iteritems(),{key_name:str("%03d" % int(key) )}.iteritems()))
             _=keys.pop('_attachments')
@@ -302,6 +299,9 @@ class TokenSet(object):
             self.tokens.append(token)
 
     def add_attach_to_list(self,attachment,tok_list=None):
+        '''Adds an attachment to all the tokens in the TokenSet, or to another list 
+            of tokens if explicitly specified. 
+        '''
         if not tok_list: 
             tok_list=self.tokens
         for token in tok_list:
