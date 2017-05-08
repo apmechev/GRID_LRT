@@ -6,8 +6,8 @@ function tarlogs(){
 # tar --append --file=profile.tar output
 
  case "${PIPELINE}" in
-    pref_cal1) echo "" ;;
-    pref_cal2) tar_logs_cal2 ;;
+    ndppp_cal) echo "" ;;
+    ndppp_targ) tar_logs_targ ;;
     *) echo "Can't find PIPELINE type "; exit 12;;
  esac
 
@@ -15,13 +15,9 @@ function tarlogs(){
 }
 
 
-function tar_logs_cal2(){
+function tar_logs_targ(){
 
-find ./prefactor/cal_results/ -name "*npy"|xargs tar -cf calib_solutions.tar
-find ./prefactor/results/ -iname "*h5" -exec tar -rvf calib_solutions.tar {} \;
 
-echo "Numpy files found:"
-find . -name "*npy"
 
 
 }
