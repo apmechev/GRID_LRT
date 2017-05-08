@@ -3,7 +3,9 @@ import re
 import os
 import subprocess
 from GRID_LRT import gsurl
-
+import GRID_LRT.Staging.stage_all_LTA as stage_all
+import GRID_LRT.Staging.state_all as state_all
+import GRID_LRT.Staging.stager_access as sa
 
 import pdb
 
@@ -19,6 +21,7 @@ class srm_manager(object):
         self.stride = stride
         self.srms = {} #A dictionary of {SBN,surl} TODO: Maybe use ABN_list for all srms: tokens will be made with key:value
         self.ABN_list = {} #A dictionary of {SBN:[srm1,srm2,srm3]} 
+        self.stageIS=None
         if filename and OBSID: #With arbitrary # of srms per token
             self.file_load(filename, OBSID)
         elif filename:
@@ -185,16 +188,21 @@ class srm_manager(object):
 
 
     def state(self,printout=True): 
-        import GRID_LRT.Staging.state_all as state_all
         self.states=state_all.state_dict(self.srms,printout=printout)
         return self.states
 
 
     def stage(self):
-        import GRID_LRT.Staging.stage_all as stage_all
-        self.stages=stage_all.state_dict(self.srms)
+        self.stageID=stage_all.state_dict(self.srms)
 
 
+    def get_stage_status(self):
+        if not self.stageID:
+            self.stage()
+        print(str(sa.get_progress().get(str(self.stageID))['Percent done'])+" Percent Done")
+        self.percent_done=float(sa.get_progress().get(str(self.stageID))['Percent done'])
+        return stage_all.get_stage_status(self.stageID)       
+ 
     def fix_srms(self,path='srm:\/\/lofar-srm.fz-juelich.de:8443'):
         for key in self.srms:
             self.srms[key]=re.sub("//pnfs","/pnfs",self.srms[key])

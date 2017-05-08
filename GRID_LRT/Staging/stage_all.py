@@ -12,7 +12,7 @@
 #!/usr/bin/env python
 
 import pythonpath
-import gfal
+import gfal2 as gfal
 import time
 import re
 import sys
