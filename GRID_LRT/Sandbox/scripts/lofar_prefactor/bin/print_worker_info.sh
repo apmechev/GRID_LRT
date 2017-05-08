@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-function print_info(){
+function print_worker_info(){
 echo  ""
 echo  "-----------------------------------------------------------------------"
 echo  "Obtain information for the Worker Node and set the LOFAR environment"
