@@ -17,7 +17,7 @@
 
 #--- NEW SD ---
 JOBDIR=${PWD}
-OLD_PYTHON=$( which python)
+export OLD_PYTHON=$( which python)
 echo $OLD_PYTHON
 
 if [ -z "$TOKEN" ] || [  -z "$PICAS_USR" ] || [  -z "$PICAS_USR_PWD" ] || [  -z "$PICAS_DB" ]
@@ -105,7 +105,7 @@ echo "---------------------------"
 setup_downloads $PIPELINE
 
 download_files srm.txt $PIPELINE
-
+rm -rf srm.txt
 echo "Download finished, list contents"
 ls -l $PWD
 du -hs $PWD
@@ -124,6 +124,8 @@ fi
 #start_profile
 ls *MS
 chmod a+x lp_targ.sh
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'running'
+
 ./lp_targ.sh
 
 #stop_profile
@@ -135,8 +137,6 @@ process_output output
 # Make plots
 #
 ######################
-
-make_plots
 
 tarlogs 
 

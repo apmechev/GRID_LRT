@@ -5,11 +5,12 @@ function setup_sara_dir(){
 #TODO: Make this block just a git pull?
 cp download_srms.py $1
 cp *py $1
+cp *skymodel $1
 cp -r couchdb/ $1
 cp lp_targ.sh ${RUNDIR}
 
 cp srm.txt $1 #this is a fallthrough by taking the srm from the token not from the sandbox!
-
+rm srm.txt
 
 cd ${RUNDIR}
 

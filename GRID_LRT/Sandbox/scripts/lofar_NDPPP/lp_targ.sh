@@ -9,7 +9,7 @@ export LOGS_DIR=${PWD}/logs
 #cd ${WORK_DIR}
 
 ## bash stop on error ##
-set -e
+#set -e
 ## bash output things helpful for debugging ##
 set -x
 
@@ -25,7 +25,6 @@ ts=sb028
 # `printf "%1d" ${PBS_ARRAYID}`
 export START_SB=${STARTSB}
 echo $START_SB $OBSID
-ls srm.txt
 MS=${OBSID}_SAP000_SB${START_SB}_uv.MS
 LOGID=gaincal
 BADANTPARSET=ndppp.badant.sb028.parset # badantflag
@@ -34,7 +33,7 @@ FLAGPARSET=ndppp.usrflags.parset # usrflag
 MODEL=cyga_john.skymodel # calibrate
 CALTYPE=fulljones
 SOURCES= #CasA
-PARMDB=cyga_john_sb028_wbeam.parmdb # correct
+PARMDB=cyga_john_sb${START_SB}_wbeam.parmdb # correct
 NITER=10000
 MAXUV=12000
 THRESHOLD=0.1
@@ -76,6 +75,7 @@ filter.type       = filter
 filter.baseline   = CS* &
 filter.remove     = true
 EOF
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'filter'
 
 NDPPP ${PARSET} #> ${LOGS_DIR}/${LOGID}.filter.t${ts}.log 2>&1
 rm ${PARSET}
@@ -105,6 +105,8 @@ preflag1.type      = preflagger
 preflag1.corrtype  = auto
 EOF
 
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'initflag'
+
 NDPPP ${PARSET} #> ${LOGS_DIR}/${LOGID}.iniflag.t${ts}.log 2>&1
 rm ${PARSET}
 
@@ -118,16 +120,29 @@ fi
 if [ "$badantflag" = true ];
 then
 
-if [ -f ${BADANTPARSET} ];
-then
+#if [ -f ${BADANTPARSET} ];
+#then
 
-NDPPP ${BADANTPARSET} msin=${MS} > ${LOGS_DIR}/${LOGID}.badant.t${ts}.log 2>&1
+PARSET=badant.parset
+cat > ${PARSET} << EOF
+msin               = ${MS}
+msin.datacolumn    = DATA
+msout              =
+steps              = [badant1, badtime1]
+badant1.type       = preflagger
+badant1.baseline   = RS409HBA&*
+badtime1.type      = preflagger
+badtime1.abstime   = 2015/12/13/15:16:02..2015/12/13/15:16:04
+EOF
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'usrflag'
 
-else
+NDPPP ${PARSET} #> ${LOGS_DIR}/${LOGID}.badant.t${ts}.log 2>&1
 
-echo "No parset with user flags found."
+#else
 
-fi
+#echo "No parset with user flags found."
+
+#fi
 
 fi
 ################################## RFIFLAGGING  ####################################
@@ -143,11 +158,12 @@ msout            =
 steps            = [aoflag]
 aoflag.type      = aoflagger
 aoflag.autocorr  = FALSE
-aoflag.strategy  = /cvmfs/softdrive.nl/lofar_sw/LOFAR/2.20.2/lofar/release/share/rfistrategies/LBAdefault
+aoflag.strategy  = /cvmfs/softdrive.nl/lofar_sw/LOFAR/2.20.2/lofar/release/share/rfistrategies/HBAdefault
 aoflag.memorymax = ${MMAX}
 EOF
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'rfiflag1'
 
-NDPPP ${PARSET} > ${LOGS_DIR}/${LOGID}.rfiflag.t${ts}.log 2>&1
+NDPPP ${PARSET} # > ${LOGS_DIR}/${LOGID}.rfiflag.t${ts}.log 2>&1
 rm ${PARSET}
 
 fi
@@ -155,6 +171,7 @@ fi
 MSOUT=$(printf '%s\n' "${MS%.MS}_dmx.MS")
 if [ "$demix" = true ];
 then
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'demixing'
 
 PARSET=demix.t${ts}.parset
 cat > ${PARSET} << EOF
@@ -172,7 +189,7 @@ demixer.demixfreqstep   = 256 # One demix solution for whole SB
 demixer.demixtimestep   = 20
 EOF
 
-NDPPP ${PARSET} > ${LOGS_DIR}/${LOGID}.demix.t${ts}.log 2>&1
+NDPPP ${PARSET} # > ${LOGS_DIR}/${LOGID}.demix.t${ts}.log 2>&1
 rm ${PARSET}
 
 fi
@@ -195,11 +212,13 @@ msout            =
 steps            = [aoflag]
 aoflag.type      = aoflagger
 aoflag.autocorr  = FALSE
-aoflag.strategy  = /cvmfs/softdrive.nl/lofar_sw/LOFAR/2.20.2/lofar/release/share/rfistrategies/LBAdefault
+aoflag.strategy  = /cvmfs/softdrive.nl/lofar_sw/LOFAR/2.20.2/lofar/release/share/rfistrategies/HBAdefault
 aoflag.memorymax = ${MMAX}
 EOF
 
-NDPPP ${PARSET} > ${LOGS_DIR}/${LOGID}.rfiflag2.t${ts}.log 2>&1
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'rfiflag2'
+
+NDPPP ${PARSET} # > ${LOGS_DIR}/${LOGID}.rfiflag2.t${ts}.log 2>&1
 rm ${PARSET}
 
 fi
@@ -221,7 +240,9 @@ avg.freqstep     = 1
 avg.timestep     = 2
 EOF
 
-NDPPP ${PARSET} > ${LOGS_DIR}/${LOGID}.avgt.t${ts}.log 2>&1
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'averaging'
+
+NDPPP ${PARSET} #> ${LOGS_DIR}/${LOGID}.avgt.t${ts}.log 2>&1
 rm ${PARSET}
 fi
 
@@ -249,7 +270,7 @@ avg.freqstep     = 4
 avg.timestep     = 1
 EOF
 
-NDPPP ${PARSET} > ${LOGS_DIR}/${LOGID}.avgf.t${ts}.log 2>&1
+NDPPP ${PARSET} #> ${LOGS_DIR}/${LOGID}.avgf.t${ts}.log 2>&1
 rm ${PARSET}
 fi
 
@@ -278,8 +299,9 @@ aoflag.autocorr  = FALSE
 aoflag.strategy  = /cvmfs/softdrive.nl/lofar_sw/LOFAR/2.20.2/lofar/release/share/rfistrategies/HBAdefault
 aoflag.memorymax = ${MMAX}
 EOF
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'rfiflag3'
 
-NDPPP ${PARSET} > ${LOGS_DIR}/${LOGID}.rfiflag3.t${ts}.log 2>&1
+NDPPP ${PARSET} #> ${LOGS_DIR}/${LOGID}.rfiflag3.t${ts}.log 2>&1
 rm ${PARSET}
 
 fi
@@ -295,6 +317,7 @@ then
 
 if [ -f ${FLAGPARSET} ];
 then
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'usrflag'
 
 NDPPP ${FLAGPARSET} msin=${MS} > ${LOGS_DIR}/${LOGID}.usrflag.t${ts}.log 2>&1
 
@@ -309,6 +332,7 @@ fi
 if [ "$calibrate" = true ];
 then
 
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'calibrating'
 if [ -d ${MS}/skymod ];
 then
 rm -rf ${MS}/skymod
@@ -337,7 +361,7 @@ gaincal.propagatesolutions     = TRUE
 gaincal.usebeammodel           = TRUE
 EOF
 
-NDPPP ${PARSET} > ${LOGS_DIR}/${LOGID}.gaincal.t${ts}.log 2>&1
+NDPPP ${PARSET} #> ${LOGS_DIR}/${LOGID}.gaincal.t${ts}.log 2>&1
 rm ${PARSET}
 
 # Plot solutions
@@ -361,8 +385,9 @@ applycal.correction = gain
 applycal.parmdb     = ${PARMDB}
 #applycal.timeslotsperparmupdate = 100000
 EOF
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'applycal'
 
-NDPPP ${PARSET} > ${LOGS_DIR}/${LOGID}.applycal.t${ts}.log 2>&1
+NDPPP ${PARSET} #> ${LOGS_DIR}/${LOGID}.applycal.t${ts}.log 2>&1
 rm ${PARSET}
 
 ## set the parset and the model
@@ -406,7 +431,9 @@ aoflag.strategy  = /cvmfs/softdrive.nl/lofar_sw/LOFAR/2.20.2/lofar/release/share
 aoflag.memorymax = ${MMAX}
 EOF
 
-NDPPP ${PARSET} > ${LOGS_DIR}/${LOGID}.rfiflag4.t${ts}.log 2>&1
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'rfiflag4'
+
+NDPPP ${PARSET} #> ${LOGS_DIR}/${LOGID}.rfiflag4.t${ts}.log 2>&1
 rm ${PARSET}
 
 fi
@@ -439,6 +466,8 @@ fi
 
 if [ "$makemodel" = true ];
 then
+
+$OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'imaging'
 
 CASASCRIPT=importfits.casapy
 cat > ${CASASCRIPT} << EOF
