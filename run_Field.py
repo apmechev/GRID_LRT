@@ -70,8 +70,8 @@ def run_field(f_obj,cal_thresh=0.05):
 
     s3.start(f_obj.srms['targ'][0],threshold=cal_thresh)#really waits for the target to be staged fully
     s3.start_time=s1.start_time #staging started with s1, gives realistic staging length 
-    p3.start(f_obj.srms['targ'],f_obj.parsets['targ'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','1','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18'],prev_step=p1,calobsid=f_obj.OBSIDs['cal'])      
-    p4.start(f_obj.srms['targ'],f_obj.parsets['targ2'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','10','-d','/cvmfs/softdrive.nl/apmechev/lofar_prof','-v','2_18','-j','remote-prefactor-targ2.jdl'],prev_step=p2,calobsid=f_obj.OBSIDs['cal'])
+    p3.start(f_obj.srms['targ'],f_obj.parsets['targ'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','1','-d','/cvmfs/softdrive.nl/lofar_sw/LOFAR/','-v','2.20.2'],prev_step=p1,calobsid=f_obj.OBSIDs['cal'])      
+    p4.start(f_obj.srms['targ'],f_obj.parsets['targ2'],f_obj.OBSIDs['targ'],f_obj.name,args=['-n','10','-d','/cvmfs/softdrive.nl/lofar_sw/LOFAR/','-v','2.20.2','-j','remote-prefactor-targ2.jdl'],prev_step=p2,calobsid=f_obj.OBSIDs['cal'])
 
 
 
