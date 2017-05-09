@@ -61,8 +61,8 @@ def run_field(f_obj,cal_thresh=0.05):
     print "cal resunts are"+cal_results
     if cal_results=="":
         s2.start(f_obj.srms['cal'][0],threshold=0) #stages and waits for the calibrator 
-        p1.start(f_obj.srms['cal'],f_obj.parsets['cal'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','1','-t','config/tokens/pref_cal1.cfg','-s','config/sandboxes/pref_cal1.cfg','-j','remote-prefactor-cal1.jdl'])
-        p2.start(f_obj.srms['cal'],f_obj.parsets['cal'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','244','-t','config/tokens/pref_cal2.cfg','-s','config/sandboxes/pref_cal2.cfg','-j','remote-prefactor-cal2.jdl'])
+        p1.start(f_obj.srms['cal'],f_obj.parsets['cal1'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','1','-t','config/tokens/pref_cal1.cfg','-s','config/sandboxes/pref_cal1.cfg','-j','remote-prefactor-cal1.jdl'])
+        p2.start(f_obj.srms['cal'],f_obj.parsets['cal2'],f_obj.OBSIDs['cal'],f_obj.name,args=['-n','244','-t','config/tokens/pref_cal2.cfg','-s','config/sandboxes/pref_cal2.cfg','-j','remote-prefactor-cal2.jdl'])
 
     else:
         s2.progress=1
