@@ -40,7 +40,7 @@
 ! plotsols_script           = PREFACTOR_SCRATCH_DIR/prefactor/scripts/examine_npys.py
 ! fit_XYoffset_script       = PREFACTOR_SCRATCH_DIR/prefactor/scripts/find_cal_global_phaseoffset_losoto.py
 ! plotphases_script         = PREFACTOR_SCRATCH_DIR/prefactor/scripts/plot_solutions_all_stations.py
-! losoto_executable         = /cvmfs/softdrive.nl/apmechev/lofar_prof/2_18/local/release/bin/losoto
+! losoto_executable         = /cvmfs/softdrive.nl/lofar_sw/LOFAR/2.20.2/local/release/bin/losoto
 
 # number of processes to use per step per node
 ! num_proc_per_node        = 4
