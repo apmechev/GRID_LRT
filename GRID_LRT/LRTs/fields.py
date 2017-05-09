@@ -42,7 +42,7 @@ class Field(object):
         '''
         self.OBSIDs['targ'] = targ_OBSID
         self.OBSIDs['cal'] = self.find_cal_obsid(targ_OBSID)
-        (self.parsets['cal'], (self.parsets['targ'], self.parsets['targ2'])) =self.create_field_parsets(tim_avg, freq_avg,flags)
+        ((self.parsets['cal1'],self.parsets['cal2']) (self.parsets['targ'], self.parsets['targ2'])) =self.create_field_parsets(tim_avg, freq_avg,flags)
         self.srms['cal'] = self.findsrm('SKSP/srmfiles', self.OBSIDs['cal'])
         self.srms['targ'] = self.findsrm('SKSP/srmfiles', self.OBSIDs['targ'])
         time.sleep(3)
@@ -69,10 +69,10 @@ class Field(object):
         and averaging parameters, then write out to a field specific
         parsets (Fields are labeled as 'field_'+targ_obsid
         '''
-        orig_parsets = ("Pre-Facet-Calibrator.parset",
+        orig_parsets = ("Pre-Facet-Calibrator1.parset","Pre-Facet-Calibrator2.parset"
                         "Pre-Facet-Target-1.parset", "Pre-Facet-Target-2.parset")
         filedata = None
-        for tar_cal in [0, 1, 2]:
+        for tar_cal in [0, 1, 2, 3]:
             filename = orig_parsets[tar_cal]
             if tar_cal==0:
                 filedata = self.modify_parsets(tim_avg[tar_cal], freq_avg[tar_cal],flags, filename)
@@ -80,13 +80,15 @@ class Field(object):
                 filedata = self.modify_parsets(tim_avg[1], freq_avg[1], flags, filename)
             with open(os.path.splitext(filename)[0]+"_"+self.name+".parset", 'w') as file:
                 file.write(filedata)
-            if "Calibrator" in filename:
-                cal_parset = os.path.splitext(filename)[0]+"_"+self.name+".parset"
+            if "Calibrator-1" in filename:
+                cal1_parset = os.path.splitext(filename)[0]+"_"+self.name+".parset"
+            elif "Calibrator-2" in filename:
+                cal2_parset = os.path.splitext(filename)[0]+"_"+self.name+".parset"
             elif "Target-1" in filename:
                 targ_parset1 = os.path.splitext(filename)[0]+"_"+self.name+".parset"
             elif "Target-2" in filename:
                 targ_parset2 = os.path.splitext(filename)[0]+"_"+self.name+".parset"
-        return(cal_parset, (targ_parset1, targ_parset2))
+        return((cal1_parset,cal2_parset), (targ_parset1, targ_parset2))
 
 
     def modify_parsets(self, time, freq, flags, parset):
