@@ -1,9 +1,9 @@
 import sys,os
-sys.path.append(os.getcwd()+"/LRT/classes")
-import pdb
-import Token
 
-import class_default_LRT as LRT
+import pdb
+from GRID_LRT import Token
+
+from GRID_LRT.LRTs import default_LRT as LRT
 
 th=Token.Token_Handler(uname=os.environ["PICAS_USR"],pwd=os.environ["PICAS_USR_PWD"],dbn=os.environ["PICAS_DB"],t_type=sys.argv[1])
 
@@ -14,5 +14,5 @@ L.t_type=sys.argv[1]
 L.OBSID="resub"
 L.workdir=os.environ["PWD"]
 L.numpernode=1
-pdb.set_trace()
+
 L.start_jdl(len(num_to_sub))
