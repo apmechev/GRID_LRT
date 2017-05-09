@@ -67,9 +67,9 @@
 ! check_flagged_script     = PREFACTOR_SCRATCH_DIR/prefactor/scripts/check_unflagged_fraction.py
 ! structurefunction_script = PREFACTOR_SCRATCH_DIR/prefactor/scripts/getStructure_from_phases.py
 ! plotphases_script        = PREFACTOR_SCRATCH_DIR/prefactor/scripts/plot_solutions_all_stations.py
-! losoto_executable        = /cvmfs/softdrive.nl/apmechev/lofar_prof/2_18/local/release/bin/losoto
-! makesourcedb             = /cvmfs/softdrive.nl/apmechev/lofar_prof/2_18/lofar/release/bin/makesourcedb
-! flagging_strategy        = /cvmfs/softdrive.nl/apmechev/lofar_prof/2_18/lofar/release/share/rfistrategies/HBAdefault
+! losoto_executable        = /cvmfs/softdrive.nl/lofar_sw/LOFAR/2.20.2/local/release/bin/losoto
+! makesourcedb             = /cvmfs/softdrive.nl/lofar_sw/LOFAR/2.20.2/lofar/release/bin/makesourcedb 
+! flagging_strategy        = /cvmfs/softdrive.nl/lofar_sw/LOFAR/2.20.2/lofar/release/share/rfistrategies/HBAdefault
 
 # number of processes to use per step per node
 ! num_proc_per_node        = 6
@@ -140,7 +140,7 @@ dpppconcat.argument.msin.orderms          =  False   #/ concatenating data
 dpppconcat.argument.msout.datacolumn      =  DATA
 dpppconcat.argumentmsout.writefullresflag =  False
 dpppconcat.argument.msout.overwrite       = True
-dpppconcat.argument.steps                 =  [flag]      # run the aoflagger (this used to be an extra step)
+dpppconcat.argument.steps                 =  [count,flag]      # run the aoflagger (this used to be an extra step)
 dpppconcat.argument.flag.type             =  aoflagger
 dpppconcat.argument.flag.keepstatistics   =  false
 dpppconcat.argument.flag.memoryperc       =  10
