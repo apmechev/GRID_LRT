@@ -211,6 +211,7 @@ class LRT(object):
         s.enter_SBX_folder()
         s.load_git_scripts()
         s.copy_base_scripts()
+        s.options['tokvar']['parset']=self.parsetfile
         s.check_token(tokconfig)
         s.zip_SBX()
         s.upload_SBX()

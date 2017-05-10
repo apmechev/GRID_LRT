@@ -40,7 +40,7 @@ function dl_cal1(){
 function dl_cal2(){
    while read p; do tt=$( echo $p |awk '{print "'"$cal"'/"$NF'}| tr -d '\r'| tr -d '\n' ); globus-url-copy ${tt} ./; done < srm.txt
    for i in `ls *tar`; do tar -xf $i &&rm $i; done
-   find . -name "*${OBSID}*" -exec mv {} . \;   
+   find . -name "${OBSID}*ndppp_prep_cal" -exec mv {} . \;   
 
 }
 

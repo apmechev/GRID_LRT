@@ -42,7 +42,7 @@ class Field(object):
         '''
         self.OBSIDs['targ'] = targ_OBSID
         self.OBSIDs['cal'] = self.find_cal_obsid(targ_OBSID)
-        ((self.parsets['cal1'],self.parsets['cal2']) (self.parsets['targ'], self.parsets['targ2'])) =self.create_field_parsets(tim_avg, freq_avg,flags)
+        ((self.parsets['cal1'],self.parsets['cal2']), (self.parsets['targ'], self.parsets['targ2'])) =self.create_field_parsets(tim_avg, freq_avg,flags)
         self.srms['cal'] = self.findsrm('SKSP/srmfiles', self.OBSIDs['cal'])
         self.srms['targ'] = self.findsrm('SKSP/srmfiles', self.OBSIDs['targ'])
         time.sleep(3)
@@ -69,8 +69,8 @@ class Field(object):
         and averaging parameters, then write out to a field specific
         parsets (Fields are labeled as 'field_'+targ_obsid
         '''
-        orig_parsets = ("Pre-Facet-Calibrator1.parset","Pre-Facet-Calibrator2.parset"
-                        "Pre-Facet-Target-1.parset", "Pre-Facet-Target-2.parset")
+        orig_parsets = ("parsets/Pre-Facet-Calibrator-1.parset","parsets/Pre-Facet-Calibrator-2.parset",
+                        "parsets/Pre-Facet-Target-1.parset", "parsets/Pre-Facet-Target-2.parset")
         filedata = None
         for tar_cal in [0, 1, 2, 3]:
             filename = orig_parsets[tar_cal]
@@ -181,11 +181,11 @@ class Stage_step(processing_step):
         except Exception:
             return
         import re
-        import GRID_LRT.srmlist as srmlist
+        import GRID_LRT.srmlist as class_srmlist
         print self.start_time
         self.threshold = threshold
         self.srmfile = srmfile
-        self.srm1 = class_srmlist.Srm_manager(filename=self.srmfile)
+        self.srm1 = class_srmlist.srm_manager(filename=self.srmfile)
         self.srm1.file_load(filename=self.srmfile)
 
         locs = self.srm1.state()
@@ -234,6 +234,7 @@ class pref_Step(processing_step):
 
         processing_step.start(self)
         self.LRT = pref_LRT()
+        self.LRT.parsetfile = parset.split('/')[-1]
         self.LRT.parse_arguments(args+[srmfile, parset])
         self.obsid = OBSID
         self.LRT.OBSID = OBSID
@@ -286,6 +287,7 @@ class pref_Step(processing_step):
         server.resource.credentials = (os.environ['PICAS_USR'],
                                 os.environ['PICAS_USR_PWD'])
         db = server[os.environ['PICAS_DB']]
+        print("Checking "+str(len(self.LRT.tokens))+" tokens to see if they're done")
         for i in self.LRT.tokens:       # Checks all the launched tokens
             if db[i]['status'] != 'done': # if any of them are not done,returns
                 return                  # if all of the tokens are set to 'done'

@@ -1,6 +1,7 @@
 
 function setup_sara_dir(){
 
+cp *parset $1
 cp -r  $PWD/prefactor/ $1
 #TODO: Make this block just a git pull?
 cp download_srms.py $1
