@@ -293,7 +293,7 @@ class LRT(object):
                 attachment=[open(attfile,'r'),os.path.basename(attfile)] 
                 token=th.create_token(keys=dict(itertools.chain(keys.iteritems(), 
                                       default_keys.iteritems())),
-                                      append=self.OBSID+"_ABN"+str("%03d" % ABN),
+                                      append=self.OBSID+"_ABN"+str("%03d" % int(ABN)),
                                       attach=attachment)
                 with open('temp_abn','w') as tmp_abn_file:
                     for i in abnlist[ABN]:
