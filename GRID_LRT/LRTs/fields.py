@@ -101,8 +101,11 @@ class Field(object):
                               "! avg_timestep         = "+str(time), filedata)
             filedata = re.sub(r'\! avg_freqstep\s+=\s\S?',
                               "! avg_freqstep         = "+str(freq), filedata)
+            file_ending="MS"
+            if "Calibrator-2" in parset:
+                file_ending="dppp_prep_cal"
             filedata = re.sub(r'\! cal_input_pattern\s+=\s\S+',
-                              "! cal_input_pattern    = "+str(self.OBSIDs['cal'])+"*/",
+                              "! cal_input_pattern    = "+str(self.OBSIDs['cal'])+"*"+file_ending,
                             filedata) 
             filedata = re.sub(r'\! flag_baselines\s+=\s+\W\s+\S+\s+\W',
                               "! flag_baselines    = "+flags+ "\n",
