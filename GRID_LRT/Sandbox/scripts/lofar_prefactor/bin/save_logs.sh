@@ -8,12 +8,19 @@ function tarlogs(){
  case "${PIPELINE}" in
     pref_cal1) echo "" ;;
     pref_cal2) tar_logs_cal2 ;;
+    pref_targ[1-2]) target_tar ;;
     *) echo "Can't find PIPELINE type "; exit 12;;
  esac
 
 
 }
 
+function target_tar(){
+
+tar -zcvf results.tar.gz prefactor/results/L*
+
+
+}
 
 function tar_logs_cal2(){
 

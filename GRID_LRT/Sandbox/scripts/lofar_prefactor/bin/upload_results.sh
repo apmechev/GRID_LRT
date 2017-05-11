@@ -9,6 +9,8 @@ echo "--------------------------------------------------------------------------
  case "${PIPELINE}" in
     pref_cal1) upload_results_cal1 ;;
     pref_cal2) upload_results_cal2 ;;
+    pref_targ1) upload_results_targ1 ;;
+    pref_targ2) upload_results_targ2 ;;
     *) echo "Can't find PIPELINE type "; exit 12;;
  esac
 
@@ -32,6 +34,23 @@ function upload_results_cal2(){
         wait
 }
 
+
+function upload_results_targ1(){
+
+uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/${OBSID}
+globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/${OBSID}/t1_${OBSID}_AB${A_SBN}_SB${STARTSB}_.tar.gz
+
+
+}
+
+function upload_results_targ2(){
+
+   uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/${OBSID}
+   globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/${OBSID}/GSM_CAL_${OBSID}_ABN_${STARTSB}.tar.gz
+    wait
+   ./prefactor/scripts/plot_solutions_all_stations.py -p ${RUNDIR}/prefactor/results/$( ls -d ${RUNDIR}/prefactor/results/*ms )/instrument_directionindependent/ GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png
+
+}
 
 
 function upload_results_from_token(){

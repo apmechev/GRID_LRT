@@ -211,7 +211,7 @@ class LRT(object):
         s.enter_SBX_folder()
         s.load_git_scripts()
         s.copy_base_scripts()
-        s.options['tokvar']['parset']=self.parsetfile
+        s.options['tokvar']['_attachments']={self.parsetfile:"$PARSET",'srm.txt':'srm.txt'}
         s.check_token(tokconfig)
         s.zip_SBX()
         s.upload_SBX()
@@ -258,7 +258,7 @@ class LRT(object):
                 self.Srm_obj.stage()
 
 
-    def submit_to_picas(self,token_type="token",keys={},attfile=""):
+    def submit_to_picas(self,token_type="token",keys={},attfile="",cal_OBSID=None):
         '''Creates tokens and views in the PiCaS token pool or resubmits error tokens
         '''
         ##TODO: Refactor
@@ -273,6 +273,7 @@ class LRT(object):
         default_keys=yaml.load(open(self.tokcfg,'rb'))
         _=default_keys.pop('_attachments')
         default_keys['OBSID']=self.OBSID
+        if cal_OBSID: default_keys['CAL_OBSID']=cal_OBSID
         self.t_type=token_type
         th=Token.Token_Handler(uname=os.environ["PICAS_USR"],pwd=os.environ["PICAS_USR_PWD"],dbn=os.environ["PICAS_DB"],t_type=token_type)
         th.add_view("todo",'doc.lock == 0 && doc.done == 0')

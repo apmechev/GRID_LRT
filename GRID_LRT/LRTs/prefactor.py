@@ -74,8 +74,8 @@ class pref_LRT(LRT):
         print "+=+=+=+=+=++=+=+=+=+=+=+=+=\033[0m" 
 
 
-    def submit_to_picas(self,pref_type="",add_keys={}):
-        LRT.submit_to_picas(self,token_type="pref"+pref_type,keys=add_keys,attfile=self.parsetfile)
+    def submit_to_picas(self,pref_type="",add_keys={},cal_OBSID=None):
+        LRT.submit_to_picas(self,token_type="pref"+pref_type,keys=add_keys,attfile=self.parsetfile,cal_OBSID=cal_OBSID)
 
 
     def start_jdl(self):

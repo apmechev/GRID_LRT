@@ -22,9 +22,17 @@ if [ ! -z $( echo $1 | grep targ2 ) ]
   setup_targ2   
 fi
 
+
+if [ ! -z $( echo $1 | grep cal2 ) ]
+ then
+  setup_cal2
+fi
+
 echo "setup_dl: inal srms to download"
 cat srm.txt
 }
+
+
 
 
 function setup_init_sub(){
@@ -41,6 +49,19 @@ function setup_init_sub(){
   grep $STARTSB gsiftps_init.txt > srm-final.txt
 }
 
+function setup_cal2(){
+  echo ""
+
+  echo ""
+  echo "setup_dl: Setting download of instruments in OBSID ${OBSID}"
+  uberftp -ls -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_tables/${OBSID}/ |grep $OBSID |awk '{print "srm://srm.grid.sara.nl:8443"$NF}' > gsiftps_init.txt
+  echo "setup_dl: found these gsiftps associated with ${OBSID}"
+  cat gsiftps_init.txt
+  echo ""
+  #rm -rf srm*txt
+  #grep $STARTSB gsiftps_init.txt > srm-final.txt
+  mv gsiftps_init.txt srm.txt
+}
 
 function setup_targ2(){
 

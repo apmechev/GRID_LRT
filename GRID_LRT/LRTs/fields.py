@@ -238,6 +238,12 @@ class pref_Step(processing_step):
         processing_step.start(self)
         self.LRT = pref_LRT()
         self.LRT.parsetfile = parset.split('/')[-1]
+        if 'targ' in self.name:
+            if self.prev_pref_step.obsid:
+                self.CAL_OBSID = self.prev_pref_step.obsid
+            else:
+                self.CAL_OBSID = calobsid
+
         self.LRT.parse_arguments(args+[srmfile, parset])
         self.obsid = OBSID
         self.LRT.OBSID = OBSID
@@ -260,7 +266,7 @@ class pref_Step(processing_step):
             else:
                 progress_keys['CAL_OBSID'] = calobsid
         all_keys =progress_keys
-        self.LRT.submit_to_picas(pref_type="_"+fieldname, add_keys=all_keys)
+        self.LRT.submit_to_picas(pref_type="_"+fieldname, add_keys=all_keys,cal_OBSID=self.CAL_OBSID)
         self.LRT.start_jdl()
         return
 

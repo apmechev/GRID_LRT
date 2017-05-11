@@ -38,7 +38,8 @@ function dl_cal1(){
 }
 
 function dl_cal2(){
-   while read p; do tt=$( echo $p |awk '{print "'"$cal"'/"$NF'}| tr -d '\r'| tr -d '\n' ); globus-url-copy ${tt} ./; done < srm.txt
+#  while read p; do tt=$( echo $p |awk '{print "'"$cal"'/"$NF'}| tr -d '\r'| tr -d '\n' ); globus-url-copy ${tt} ./; done < srm.txt
+   sed 's?srm://srm.grid.sara.nl:8443?gsiftp://gridftp.grid.sara.nl:2811?g' $1 | xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
    for i in `ls *tar`; do tar -xf $i &&rm $i; done
    find . -name "${OBSID}*ndppp_prep_cal" -exec mv {} . \;   
 

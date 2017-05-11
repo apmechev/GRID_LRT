@@ -121,7 +121,7 @@ then
  download_cals $CAL_OBSID
 fi
 
-if [[ ! -z $( echo $PIPELINE |grep targ2 ) ]]
+if [[ ! -z $( echo $PIPELINE |grep targ1 ) ]]
   then
     runtaql 
 fi
