@@ -102,7 +102,7 @@ class Field(object):
             filedata = re.sub(r'\! avg_freqstep\s+=\s\S?',
                               "! avg_freqstep         = "+str(freq), filedata)
             filedata = re.sub(r'\! cal_input_pattern\s+=\s\S+',
-                              "! cal_input_pattern    = "+str(self.OBSIDs['cal'])+"*MS",
+                              "! cal_input_pattern    = "+str(self.OBSIDs['cal'])+"*/",
                             filedata) 
             filedata = re.sub(r'\! flag_baselines\s+=\s+\W\s+\S+\s+\W',
                               "! flag_baselines    = "+flags+ "\n",
