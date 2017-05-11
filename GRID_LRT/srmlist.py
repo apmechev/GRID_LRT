@@ -129,9 +129,10 @@ class srm_manager(object):
         v=th.db.view(th.t_type+"/"+"done")
         sbns=[]
         for x in v:
-            if th.db[x["id"]]["ABN"]=="":
-                continue
-            sbns.append((int(th.db[x["id"]]["ABN"]),th.db[x["id"]]["start_SB"]))
+            ifth.db[x["id"]["pipeline"]=='pref_targ1':
+                if th.db[x["id"]]["ABN"]=="":
+                    continue
+                sbns.append((int(th.db[x["id"]]["ABN"]),th.db[x["id"]]["start_SB"]))
         sorted_ABNs=sorted(sbns, key=lambda x: x[0])
         return sorted_ABNs
 
