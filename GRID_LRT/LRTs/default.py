@@ -290,6 +290,7 @@ class LRT(object):
                 th.reset_tokens(view_name='error')
             for ABN in abnlist:
                 th.delete_tokens(view_name='locked')
+                default_keys['start_SB']=int(ABN)
                 attachment=[open(attfile,'r'),os.path.basename(attfile)] 
                 token=th.create_token(keys=dict(itertools.chain(keys.iteritems(), 
                                       default_keys.iteritems())),
