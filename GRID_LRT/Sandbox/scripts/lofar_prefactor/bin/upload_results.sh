@@ -48,7 +48,7 @@ function upload_results_targ2(){
    uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/${OBSID}
    globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/${OBSID}/GSM_CAL_${OBSID}_ABN_${STARTSB}.tar.gz
     wait
-   ./prefactor/scripts/plot_solutions_all_stations.py -p ${RUNDIR}/prefactor/results/$( ls -d ${RUNDIR}/prefactor/results/*ms )/instrument_directionindependent/ GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png
+#   ./prefactor/scripts/plot_solutions_all_stations.py -p ${RUNDIR}/prefactor/results/$( ls -d ${RUNDIR}/prefactor/results/*ms )/instrument_directionindependent/ GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png
 
 }
 
