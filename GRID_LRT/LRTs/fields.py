@@ -237,6 +237,7 @@ class pref_Step(processing_step):
 
         processing_step.start(self)
         self.LRT = pref_LRT()
+        self.CAL_OBSID=None
         self.LRT.parsetfile = parset.split('/')[-1]
         if 'targ' in self.name:
             if self.prev_pref_step.obsid:
