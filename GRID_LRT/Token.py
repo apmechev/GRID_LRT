@@ -241,10 +241,10 @@ function (key, values, rereduce) {
             print "error getting attachment"
             return ""
         if "/" in filename:
-            savename = filename.replace("/", "_")
+            savefile = filename.replace("/", "_")
         if not savename:
-            savename = filename
-        with open(savename, 'w') as f:
+            savefile = savename
+        with open(savefile, 'w') as f:
             for line in attach:
                 f.write(line)
         return os.path.abspath(filename)
