@@ -242,12 +242,12 @@ function (key, values, rereduce) {
             return ""
         if "/" in filename:
             savefile = filename.replace("/", "_")
-        if not savename:
+        if savename!=None:
             savefile = savename
         with open(savefile, 'w') as f:
             for line in attach:
                 f.write(line)
-        return os.path.abspath(filename)
+        return os.path.abspath(savefile)
 
     def list_tokens_from_view(self, view_name):
         self.load_views()
