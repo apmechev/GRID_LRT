@@ -16,10 +16,8 @@ function download_files(){
 
 }
 
-
-
-
 function dl_targ1(){
+
    $OLD_PYTHON  wait_for_dl.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD}
    python ./download_srms.py $1 0 $( wc -l $1 | awk '{print $1}' ) || { echo "Download Failed!!"; exit 20; } #exit 20=> Download fails
    for i in `ls *tar`; do tar -xvf $i &&rm $i; done 
@@ -27,18 +25,20 @@ function dl_targ1(){
 }
 
 function dl_cal1(){
+
    if [[ ! -z $( cat $1 | grep juelich )  ]]; then 
-     sed 's?srm://lofar-srm.fz-juelich.de:8443?gsiftp://dcachepool11.fz-juelich.de:2811?g' $1 | xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
+     sed 's?srm://lofar-srm.fz-juelich.de:8443?gsiftp://lofar-gridftp.fz-juelich.de:2811?g' $1 | xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
    fi
    if [[ ! -z $( cat $1 | grep sara )  ]]; then
      sed 's?srm://srm.grid.sara.nl:8443?gsiftp://gridftp.grid.sara.nl:2811?g' $1 | xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
    fi
    wait
    for i in `ls *tar`; do tar -xf $i && rm -rf $i; done
+
 }
 
 function dl_cal2(){
-#  while read p; do tt=$( echo $p |awk '{print "'"$cal"'/"$NF'}| tr -d '\r'| tr -d '\n' ); globus-url-copy ${tt} ./; done < srm.txt
+
    sed 's?srm://srm.grid.sara.nl:8443?gsiftp://gridftp.grid.sara.nl:2811?g' $1 | xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
    for i in `ls *tar`; do tar -xf $i &&rm $i; done
    find . -name "${OBSID}*ndppp_prep_cal" -exec mv {} . \;   
@@ -46,9 +46,11 @@ function dl_cal2(){
 }
 
 function dl_targ2(){
+
    cat $1 | xargs -I{} globus-url-copy  {} $PWD/
    for i in `ls *gz`; do tar -zxf $i; done
    mv prefactor/results/L* ${RUNDIR}
+
 }
 
  

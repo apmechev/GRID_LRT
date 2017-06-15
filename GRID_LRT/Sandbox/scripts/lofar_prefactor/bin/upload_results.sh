@@ -18,25 +18,38 @@ echo "--------------------------------------------------------------------------
 
 
 function upload_results_cal1(){
+
+ find ${RUNDIR} -name "instrument"
  find ${RUNDIR} -name "instrument" |xargs tar -cvf instruments_${OBSID}_${STARTSB}.tar  
+ if [[ $? != 0 ]]; then
+    echo "instrument files not found!"
+    exit 99
+ fi
  find ${RUNDIR} -iname "FIELD" |grep work |xargs tar -rvf instruments_${OBSID}_${STARTSB}.tar 
  find ${RUNDIR} -iname "ANTENNA" |grep work |xargs tar -rvf instruments_${OBSID}_${STARTSB}.tar
 
  uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_tables/${OBSID}
- export SSB=$(printf %03d ${STARTSB})
- globus-url-copy instruments_${OBSID}_${STARTSB}.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_tables/${OBSID}/instruments_${OBSID}_${SSB}.tar
+#export SSB=$(printf %03d ${STARTSB})
+ globus-url-copy instruments_${OBSID}_${STARTSB}.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_tables/${OBSID}/instruments_${OBSID}_${STARTSB}.tar
 
 }
 
 function upload_results_cal2(){
 
-         globus-url-copy file:`pwd`/calib_solutions.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_sols/${OBSID}_solutions.tar
+  find ./prefactor/cal_results/ -name "*npy"|xargs tar -cf calib_solutions.tar
+  find ./prefactor/results/ -iname "*h5" -exec tar -rvf calib_solutions.tar {} \;
+
+  echo "Numpy files found:"
+  find . -name "*npy"
+  globus-url-copy file:`pwd`/calib_solutions.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_sols/${OBSID}_solutions.tar
         wait
 }
 
 
 function upload_results_targ1(){
 
+
+tar -zcvf results.tar.gz prefactor/results/L*
 uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/${OBSID}
 globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/${OBSID}/t1_${OBSID}_AB${A_SBN}_SB${STARTSB}_.tar.gz
 

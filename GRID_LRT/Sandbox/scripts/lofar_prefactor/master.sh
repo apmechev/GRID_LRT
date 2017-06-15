@@ -32,50 +32,6 @@ fi
 
 for setupfile in `ls bin/* `; do source ${setupfile} ; done
 
-#source bin/setup_lofar_env.sh
-#source bin/print_worker_info.sh
-#source bin/setup_downloads.sh 
-#source bin/setup_run_dir.sh
-#source bin/print_job_info.sh
-#source bin/download.sh
-#source bin/download_cal_sols.sh
-#source bin/targ2_process.sh
-#source bin/profile.sh
-#source bin/process.sh
-#source bin/process_prefactor_output.sh
-#source bin/plot.sh
-#source bin/save_logs.sh
-#source bin/upload_results.sh
-#source bin/cleanup.sh
-#source bin/modify_files.sh
-
-
-#TEMP=`getopt -o oclspTtduw: --long obsid:,calobsid:,lofdir:,startsb:,parset:,pipetype:,token:,picasdb:,picasuname:,picaspwd: -- "$@"`
-#if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 9 ; fi #exit 9=> master.sh got bad argument
-#
-#PARSET="Pre-Facet-Target.parset"
-#eval set -- "$TEMP"
-#echo $TEMP
-#while [ true ]
-#do
-#    case $1 in
-#    -o | --obsid ) OBSID="$2" ; shift  ;;
-#    -c | --calobsid ) CAL_OBSID="$2"; shift  ;;
-#    -l | --lofdir ) LOFAR_PATH="$2";shift ;;
-#    -s | --startsb) STARTSB="$2";shift ;;
-#    -p | --parset ) PARSET="$2"; shift  ;;
-#    -T | --pipetype ) PIPELINE="$2"; shift ;;
-#    -t | --token ) TOKEN="$2"; shift  ;;         #Put these in the env before so scripts aren't responsible for it, but the framework is???
-#    -d | --picasdb ) PICAS_DB="$2"; shift ;;     #..??????
-#    -u | --picasuname ) PICAS_USR="$2"; shift ;; #..??????
-#    -w | --picaspwd ) PICAS_USR_PWD="$2" ; shift ;;
-#    -- ) shift; break;;
-#    -*) echo "$0: error - unrecognized option $1" 1>&2; exit 8;; #exit 8=> Unknown argument
-#    * ) break;;
-#    esac
-#    shift
-#done
-
 
 ############################
 #Initialize the environment
@@ -85,7 +41,7 @@ setup_LOFAR_env $LOFAR_PATH      ##Imported from setup_LOFAR_env.sh
 
 #trap cleanup EXIT #This ensures the script cleans_up regardless of how and where it exits
 
-print_info                      ##Imported from bin/print_worker_info
+print_worker_info                      ##Imported from bin/print_worker_info
 
 if [[ -z "$PARSET" ]]; then
     ls "$PARSET"
@@ -131,11 +87,11 @@ fi
 #Starting processing
 #########
 
-#start_profile
+start_profile
 
 run_pipeline
 
-#stop_profile
+stop_profile
 
 process_output output
 
@@ -147,15 +103,7 @@ process_output output
 
 make_plots
 
-tarlogs 
-
 # - step3 finished check contents
-
-#more openTSDB_tcollector/logs/*
-#OBSID=$( echo $(head -1 srm.txt) |grep -Po "L[0-9]*" | head -1 )
-#echo "Saving profiling data to profile_"$OBSID_$( date  +%s )".tar.gz"
-#globus-url-copy file:`pwd`/profile.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/disk/profiling/profile_${OBSID}_$( date  +%s ).tar.gz &
-#wait
 
 upload_results
 

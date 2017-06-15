@@ -26,6 +26,6 @@ function replace_dirs(){
 
  echo "Pipeline type is "$pipelinetype
  echo "Adding $OBSID and $pipelinetype into the tcollector tags"
- sed -i "s?\[\]?\[\ \"obsid=${OBSID}\",\ \"pipeline=${pipelinetype}\"\]?g" openTSDB_tcollector/collectors/etc/config.py
+ sed -i "s?\[\]?\[\ \"obsid=${OBSID}\",\ \"pipeline=${pipelinetype}\"\]?g" tcollector/collectors/etc/config.py
 
 }

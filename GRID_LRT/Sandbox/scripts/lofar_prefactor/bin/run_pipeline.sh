@@ -1,8 +1,8 @@
 #!/bin/bash
 
-function run_pipeline(){
+function run_pipeline() {
 
-
+cd $RUNDIR
 echo ""
 echo "execute generic pipeline"
 $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'starting_generic_pipeline'
@@ -10,6 +10,10 @@ $OLD_PYTHON update_token_progress.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} $
 
 genericpipeline.py ${PWD}/${PARSET} -d -c pipeline.cfg > output  &
 wait # without wait, traps aren't caught
+if [[ $? != 0 ]]; then
+    echo "Processing error"
+    exit 99
+fi
 
 $OLD_PYTHON update_token_status.py ${PICAS_DB} ${PICAS_USR} ${PICAS_USR_PWD} ${TOKEN} 'processing_finished'
 

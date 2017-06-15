@@ -13,8 +13,7 @@ cp -r $PWD/piechart/* $1/piechart
 cp srm.txt $1 #this is a fallthrough by taking the srm from the token not from the sandbox!
 
 cp ${PARSET} $1
-cp -r $PWD/openTSDB_tcollector $1
-cp pipeline.cfg $1
+cp -r $PWD/tcollector $1
 cd ${RUNDIR}
 touch pipeline_status
 

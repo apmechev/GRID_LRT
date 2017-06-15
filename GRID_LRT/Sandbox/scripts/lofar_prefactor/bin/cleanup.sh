@@ -10,7 +10,7 @@ if [[ "$?" != "0" ]]; then
     echo "removing RunDir"
     rm -rf ${RUNDIR}
    fi
-   exit 21 #exit 21=> cannot upload final files
+   exit 1 #exit 21=> cannot upload final files
 fi
 echo ""
 

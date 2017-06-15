@@ -2,6 +2,10 @@
 
 #$1==output log
 function process_output(){
+ if [[ ! -f $1 ]]; then
+    echo  "output file not produced!"
+    exit 99
+ fi
  more $1
  if [[ $( grep "finished unsuccesfully" $1 ) > "" ]]
  then
