@@ -96,7 +96,7 @@ class Token_Handler:
         """
         db_views = self.db.get("_design/"+self.t_type)
         if db_views == None:
-            print "No views found in design document"
+            print("No views found in design document")
             return
         self.views = db_views["views"]
 
@@ -115,7 +115,7 @@ class Token_Handler:
             else:
                 if not document[key[0]] == key[1]:
                     continue
-            print "Deleting Token "+x['id']
+            print("Deleting Token "+x['id'])
             self.db.delete(document)
         #    self.tokens.pop(x['id'])
         # TODO:Pop tokens from self
@@ -238,7 +238,7 @@ function (key, values, rereduce) {
         try:
             attach = self.db.get_attachment(token, filename).read()
         except AttributeError:
-            print "error getting attachment"
+            print("error getting attachment")
             return ""
         if "/" in filename:
             savefile = filename.replace("/", "_")
@@ -254,7 +254,7 @@ function (key, values, rereduce) {
         if view_name in self.views:
             view = self.views[view_name]
         else:
-            print "View Named "+view_name+" Doesn't exist"
+            print("View Named "+view_name+" Doesn't exist")
             return
         v = self.db.view(self.t_type+"/"+view_name)
         return v
@@ -287,7 +287,7 @@ class TokenSet(object):
         '''# TODO: Check if key_name is inside token_keys!
         for key in iterable:
             keys=dict(itertools.chain(self.token_keys.iteritems(),{key_name:str("%03d" % int(key) )}.iteritems()))
-            _=keys.pop('_attachments')
+#            _=keys.pop('_attachments')
             token=self.th.create_token(keys,append=id_append+"_SB"+str("%03d" % int(key) ))
             if file_upload:
                 with open('temp_abn','w') as tmp_abn_file:
@@ -298,14 +298,15 @@ class TokenSet(object):
                 os.remove('temp_abn')
             self.tokens.append(token)
 
-    def add_attach_to_list(self,attachment,tok_list=None):
+    def add_attach_to_list(self,attachment,tok_list=None,name=None):
         '''Adds an attachment to all the tokens in the TokenSet, or to another list 
             of tokens if explicitly specified. 
         '''
+        if not name: name=attachment
         if not tok_list: 
             tok_list=self.tokens
         for token in tok_list:
-            self.th.add_attachment(token, open(attachment,'r'),os.path.basename(attachment))
+            self.th.add_attachment(token, open(attachment,'r'),os.path.basename(name))
 
     def add_keys_to_list(self,key,val,tok_list=None):
         if not tok_list:

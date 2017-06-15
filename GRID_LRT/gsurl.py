@@ -34,7 +34,7 @@ def make_list_of_surls(infile,stride):
             srmdict[(int(sbn),int(sbn))]=surl
             #srmdict[sbn]=surl
 
-    print 'created srmDICT from ', infile
+    print('created srmDICT from ', infile)
     return srmdict
 
 
@@ -43,10 +43,10 @@ def main(infile,stride=1):
 	outsrm		= 'srmlist'
 	outsbl		= 'subbandlist'
 	
-	print 'infile: ', infile
+	print( 'infile: ', infile)
 	
 	# START PROGRAM
-	print 'START GET SURL:', infile
+	print( 'START GET SURL:', infile)
 	
 	#open in file
 	f=open(infile, 'r')
@@ -80,8 +80,8 @@ def main(infile,stride=1):
 	srm.close()
 	sbl.close()
 	
-	print 'created srmlist from ', infile
-	print 'done'
+	print('created srmlist from ', infile)
+	print('done')
 
 if __name__=='__main__':
     if len(sys.argv)==3:

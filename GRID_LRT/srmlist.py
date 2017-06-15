@@ -125,7 +125,7 @@ class srm_manager(object):
         import Token
         th=Token.Token_Handler(uname=os.environ["PICAS_USR"],pwd=os.environ["PICAS_USR_PWD"],
                                 dbn=os.environ["PICAS_DB"],t_type=token_type)
-        print th.t_type
+        print(th.t_type)
         v=th.db.view(th.t_type+"/"+"done")
         sbns=[]
         for x in v:
@@ -169,7 +169,7 @@ class srm_manager(object):
                 line=txtfile.readline()
                 self.OBSID='L'+str(re.search("L(.+?)_",line).group(1))
             if self.OBSID=="":
-                print "Sorry. could not get OBSID"
+                print("Sorry. could not get OBSID")
                 raise KeyError
         found=False
 
@@ -184,7 +184,7 @@ class srm_manager(object):
                         [file1.write(x) for x in lines if self.OBSID in x]
                     self.filename=self.OBSID+".txt"
         if not found:
-            print "\033[31mOBSID not found in SRM file!\033[0m"
+            print("\033[31mOBSID not found in SRM file!\033[0m")
             sys.exit()
 
 
