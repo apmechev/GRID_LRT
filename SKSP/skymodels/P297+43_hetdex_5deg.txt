@@ -1,5 +1,0 @@
-FORMAT = Name, Type, Ra, Dec, I, Q, U, V, ReferenceFrequency='60e6', SpectralIndex='[0.0]', MajorAxis, MinorAxis, Orientation
-
-# the next lines define the sources
-1944.2+3904, GAUSSIAN, 19:44:13.78080000, +39.04.26.29200000, 21.9, , , , , [-0.7], 128.8, 90.4, 68.3
-1959.4+4044, GAUSSIAN, 19:59:26.92080000, +40.44.09.20400000, 19238.44, , , , , [-0.7], 113.2, 31.1, 108.3
