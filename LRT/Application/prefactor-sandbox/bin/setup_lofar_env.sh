@@ -33,11 +33,14 @@ function setup_softdrive_lofar(){
     . /cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/init_env_release.sh
     export PYTHONPATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
     LOFAR_PATH=/cvmfs/softdrive.nl/wjvriend/lofar_stack/2.16/
+    export LOFARDATAROOT=/cvmfs/softdrive.nl/lofar_sw/casa/casa-release-4.7.0-1-el6/data/
+
   else
     if [ -e "$1/init_env_release.sh" ]; then
       echo "setup_env: Initializing environment from ${1}"
       . ${1}/init_env_release.sh
       export PYTHONPATH=${1}/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:${1}/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
+
       export LOFARDATAROOT=/cvmfs/softdrive.nl/wjvriend/data
     else
         echo "setup_env: The environment script doesn't exist. check the path $1/init_env_release.sh again"

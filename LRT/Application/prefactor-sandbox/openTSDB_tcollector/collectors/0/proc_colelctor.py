@@ -82,24 +82,16 @@ def main(proc_names=[]):
                 if pid not in no_trace[pname]: 
                     try:
                         proc_trace=subprocess.Popen(["/cvmfs/softdrive.nl/apmechev/tools/proc_stat/proc_stat",'--pid', pid,'--metric',stepname],stdout=subprocess.PIPE)
-                        #proc_trace=subprocess.Popen(["/home/apmechev/procsamp/bin/Debug/procfs-sampler", pid],stdout=subprocess.PIPE)
-			#pdb.set_trace()
-			#ex("../../procfsamp "+pid+" &")
-                        no_trace[pname].append(pid)
                         procs.append(proc_trace)
                     except OSError:
                            sys.stderr.write("Launch error a@ proc Sampler")
 	stdout=[] 
-        for p in procs:
-	   #pdb.set_trace()
-           while True:
+        while None in [p.poll() for p in procs]:
+            for p in procs:
                line = p.stdout.readline()
-               stdout.append(line)
-               print line,
-               if line == '' and p.poll() != None:
-                   sys.stdout.flush()
-                   break
-	sys.stdout.flush()
+               print line
+               sys.stdout.flush()
+            sys.stdout.flush()
         time.sleep(collection_interval)
 
 if __name__ == "__main__":
