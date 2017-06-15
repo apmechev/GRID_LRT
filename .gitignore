@@ -1,2 +1,3 @@
 #ignore the config and srm lists to minimize clobbering
 *pyc
+GRID_LRT/Application/var.jdl
