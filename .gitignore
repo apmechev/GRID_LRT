@@ -1,13 +1,5 @@
 #ignore the config and srm lists to minimize clobbering
-
-master_setup.cfg
-srm*
 *.pyc 
+*pyc
+GRID_LRT/Application/var.jdl
 
-#ignore dataset folders to minimize clobbering there
-FAD_v7/Tokens/datasets/*
-FAD_v7/Staging/datasets/*
-
-#do not overwrite logs
-FAD_v7/Application/sandbox/log*
-FAD_v7/Application/jobIDs
