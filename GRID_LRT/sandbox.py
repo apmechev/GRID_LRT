@@ -57,6 +57,7 @@ class Sandbox(object):
         if os.path.basename(os.getcwd())!=self.options['sandbox']['name']:
             self.enter_SBX_folder()
         gits=self.options['sandbox']['git_scripts']
+        if not gits: return
         for git in gits:
             clone=subprocess.Popen(['git','clone',gits[git]['git_url'],git])
             clone.wait()
@@ -77,15 +78,20 @@ class Sandbox(object):
             subprocess.call('cp -r '+scripts_path+"/* "+self.base_dir+SBX_dir,shell=True)
 
 
-    def upload_SBX(self,SBXfile=None,loc=None): #TODO: Use UL/DL interfaces
+    def upload_SBX(self,SBXfile=None,loc=None,upload_name=None): #TODO: Use UL/DL interfaces
         if self.sandbox_exists(self.options['sandbox']['loc']+"/"+self.tarfile):
             self.delete_sandbox(self.options['sandbox']['loc']+"/"+self.tarfile)
+        upload_name=self.tarfile
+        if rename:
+            if not ".tar" in rename:
+                rename=rename+".tar"
+            upload_name=rename 
         if self.tarfile:
             upload=subprocess.Popen(['globus-url-copy',self.tarfile,
-                                    self.options['sandbox']['loc']+"/"+self.tarfile])
+                                    self.options['sandbox']['loc']+"/"+upload_name])
         upload.wait()
-        print("Uploaded sandbox to "+self.options['sandbox']['loc']+"/"+self.tarfile)
-        self.SBXloc=self.options['sandbox']['loc']+"/"+self.tarfile
+        print("Uploaded sandbox to "+self.options['sandbox']['loc']+"/"+upload_name)
+        self.SBXloc=self.options['sandbox']['loc']+"/"+upload_name
 
 
     def sandbox_exists(self,sbxfile):
