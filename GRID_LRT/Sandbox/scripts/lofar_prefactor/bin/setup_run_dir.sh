@@ -2,7 +2,13 @@
 function setup_sara_dir(){
 
 cp *parset $1
+cp pipeline.cfg prefactor/
+mkdir -p prefactor/rundir 
+mkdir -p prefactor/workdir
+mkdir -p prefactor/cal_results
+mkdir -p prefactor/results
 cp -r  $PWD/prefactor/ $1
+cp pipeline.cfg $1
 #TODO: Make this block just a git pull?
 cp download_srms.py $1
 cp *py $1

@@ -81,8 +81,8 @@ class Sandbox(object):
     def upload_SBX(self,SBXfile=None,loc=None,upload_name=None): #TODO: Use UL/DL interfaces
         if self.sandbox_exists(self.options['sandbox']['loc']+"/"+self.tarfile):
             self.delete_sandbox(self.options['sandbox']['loc']+"/"+self.tarfile)
-        upload_name=self.tarfile
-        if rename:
+        rename=self.tarfile
+        if not upload_name:
             if not ".tar" in rename:
                 rename=rename+".tar"
             upload_name=rename 
