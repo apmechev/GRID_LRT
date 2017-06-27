@@ -23,7 +23,7 @@ import itertools
 import yaml
 
 if 'couchdb' not in sys.modules:
-    import couchdb
+    from GRID_LRT import couchdb
 from couchdb.design import ViewDefinition
 
 

@@ -1,14 +1,20 @@
+#!/usr/bin/env python 
+"""Module to parse list of surls and create a dictionary with chunks
+of custom number of links (parameter stride, default=1)
+"""
 import os
 import re
 import sys
 import glob
 
-#--------------------------------------------------
-# Versioning.
-# Original: JBR Oonk (ASTRON/LEIDEN) Dec 2015
-#  - v2 added creation subbandlist alongside srmlist
-#  - v3 changed to account for for when file:/// is not given
-#--------------------------------------------------
+__author__ = "Raymond Oonk, Alexandar Mechev"
+__credits__ = ["Raymond Oonk", "Alexandar Mechev", "Natalie Danezi",
+                 "Timothy Shimwell"]
+__license__ = "GPL 3.0"
+__version__ = "0.1.1"
+__maintainer__ = "Alexandar Mechev"
+__email__ = "apmechev@strw.leidenuniv.nl"
+__status__ = "Production"
 
 # -------------------------------------------------
 # TO RUN: python gsurl.py infile
@@ -18,6 +24,9 @@ import glob
 #
 
 def make_list_of_surls(infile,stride):
+    """Makes a dictionary of surls given an input file and surls per item
+    
+    """
     f=open(infile, 'r')
     stridecount=0
     srmdict={}
@@ -26,7 +35,7 @@ def make_list_of_surls(infile,stride):
             stridecount+=1
             continue
         stridecount+=1
-        if not line in ['\n','\r\n','\r']:
+        if not line in ['\n','\r\n','\r']: #skips empty lines
             line=re.sub('//pnfs','/pnfs',line)
             surl=line.split()[0]
             tmp1=line.split('SB')[1]
@@ -39,6 +48,8 @@ def make_list_of_surls(infile,stride):
 
 
 def main(infile,stride=1):
+        """main() method for legacy compatibility 
+        """
 	#infile          = str(sys.argv[1])
 	outsrm		= 'srmlist'
 	outsbl		= 'subbandlist'

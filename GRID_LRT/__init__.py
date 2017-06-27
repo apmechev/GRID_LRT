@@ -1,1 +1,1 @@
-__all__ = ["LRTs.default",'sandbox','Token','gsurl']
+__all__ = ["LRTs.default",'sandbox','Token','gsurl','couchdb']
