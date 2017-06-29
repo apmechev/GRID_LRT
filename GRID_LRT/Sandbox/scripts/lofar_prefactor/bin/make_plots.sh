@@ -3,8 +3,8 @@
 function make_pie(){
 
 xmlfile=$( find . -name "*statistics.xml" 2>/dev/null)
-cp piechart/autopie.py .
-./autopie.py ${xmlfile} PIE_${OBSID}.png
+#cp piechart/autopie.py .
+./autopie.py ${xmlfile} PIE_${OBSID}_${PIPELINE}.png
 cp $! ${WORKDIR}
 
 }

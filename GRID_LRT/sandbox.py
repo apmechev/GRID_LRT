@@ -7,7 +7,7 @@ import subprocess
 class Sandbox(object):
 
     def __init__(self,yamlfile=None):
-        self.base_dir=os.getcwd()+"/GRID_LRT/Sandbox/"
+        self.base_dir=os.getcwd()+"/GRID_LRT/Sandbox/" #Find better way to get base dir
         self.return_dir=os.getcwd()
         self.SBXloc=None
         if yamlfile:

@@ -20,18 +20,18 @@ s.zip_SBX()
 s.upload_SBX()
 s.cleanup()
 
-srm=srmlist.srm_manager(stride=244)
+srm=srmlist.srm_manager(stride=844)
 #srm.file_load(srm_file)
 #_=srm.state()
 d=srm.make_sbndict_from_gsidir("gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/"+str(OBSID))
 #OBSID=srm.OBSID
 #OBSID="L570741"
-d={1:""}
+#d={1:""}
 
 uname=os.environ["PICAS_USR"]
 pwd=os.environ["PICAS_USR_PWD"]
 pdb=os.environ["PICAS_DB"]
-th=Token.Token_Handler(t_type="ddf_run1",uname=uname,pwd=pwd,dbn=pdb)
+th=Token.Token_Handler(t_type="ddf_Q_"+OBSID,uname=uname,pwd=pwd,dbn=pdb)
 th.add_overview_view()
 th.add_status_views()
 _=th.delete_tokens('todo')
@@ -44,7 +44,7 @@ ts=Token.TokenSet(th=th,tok_config=token_cfg)
 ts.create_dict_tokens(iterable=d,id_append=OBSID,file_upload='srm.txt')
 ts.add_keys_to_list("OBSID",OBSID)
 ts.add_attach_to_list('parsets/image1.cfg',name='parset.cfg')
-ts.add_attach_to_list('srm.txt',name='srm.txt')
+#ts.add_attach_to_list('srm.txt',name='srm.txt')
 
 th.views.keys()
 
