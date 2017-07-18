@@ -308,6 +308,11 @@ class TokenSet(object):
         for token in tok_list:
             self.th.add_attachment(token, open(attachment,'r'),os.path.basename(name))
 
+    def update_local_tokens(self):
+        for token in self.tokens:
+            token=th.db[token['_id']]
+        pass
+
     def add_keys_to_list(self,key,val,tok_list=None):
         if not tok_list:
             tok_list=self.tokens
