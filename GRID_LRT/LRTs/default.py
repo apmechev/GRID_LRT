@@ -10,8 +10,18 @@ from GRID_LRT import srmlist
 import GRID_LRT.sandbox as sandbox
 import GRID_LRT.Token as Token
 
-
 import pdb
+
+#class LRT_step(object):
+#
+#    def __init__(self):
+#        pass
+#
+#
+#
+#
+#
+
 class LRT(object):
     """
     The LRT class is created to be inherited and extended by different types of Lofar Reduction Tools

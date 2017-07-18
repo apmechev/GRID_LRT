@@ -31,7 +31,7 @@ d=srm.make_sbndict_from_gsidir("gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sar
 uname=os.environ["PICAS_USR"]
 pwd=os.environ["PICAS_USR_PWD"]
 pdb=os.environ["PICAS_DB"]
-th=Token.Token_Handler(t_type="ddf_Q_"+OBSID,uname=uname,pwd=pwd,dbn=pdb)
+th=Token.Token_Handler(t_type="ddf_"+OBSID,uname=uname,pwd=pwd,dbn=pdb)
 th.add_overview_view()
 th.add_status_views()
 _=th.delete_tokens('todo')

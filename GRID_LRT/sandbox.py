@@ -3,11 +3,13 @@ import shutil
 import sys
 import yaml
 import subprocess
+import GRID_LRT
 
 class Sandbox(object):
 
     def __init__(self,yamlfile=None):
-        self.base_dir=os.getcwd()+"/GRID_LRT/Sandbox/" #Find better way to get base dir
+        lrt_module_dir=os.path.abspath(GRID_LRT.__file__).split("__init__.py")[0]
+        self.base_dir=lrt_module_dir+"Sandbox/" 
         self.return_dir=os.getcwd()
         self.SBXloc=None
         if yamlfile:
@@ -86,6 +88,9 @@ class Sandbox(object):
             if not ".tar" in rename:
                 rename=rename+".tar"
             upload_name=rename 
+        upload_place=self.options['sandbox']['loc']
+        if loc is not None: upload_place=loc
+
         if self.tarfile:
             upload=subprocess.Popen(['globus-url-copy',self.tarfile,
                                     self.options['sandbox']['loc']+"/"+upload_name])
@@ -142,4 +147,25 @@ class Sandbox(object):
     def get_result_loc(self):
         return (self.options['results']['UL_loc'] +
                 "".join(self.options['results']['UL_pattern']))
+
+
+class SandboxBuilder(object):
+    
+    def __init__(self,sbx_config):
+        self.config=sbx_config
+        self.sandbox=Sandbox(sbx_config)
+
+    def build_sandbox(self):
+        self.sandbox.parseconfig(sbx_config)
+        self.sandbox.create_SBX_folder()
+        self.sandbox.enter_SBX_folder()
+        self.sandbox.copy_base_scripts()
+        self.sandbox.load_git_scripts()
+        self.sandbox.zip_SBX()
+       
+    def upload_sandbox(self):
+        self.sandbox.upload_SBX()
+        self.sandbox.cleanup()
+
+
 
