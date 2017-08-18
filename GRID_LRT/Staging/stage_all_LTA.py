@@ -18,7 +18,7 @@ import re
 import sys
 from string import strip
 from GRID_LRT.Staging import stager_access as sa
-from GRID_LRT.Staging.srmlist import srm_manager
+import GRID_LRT.Staging.srmlist 
 
 
 def process_surl_line(line):

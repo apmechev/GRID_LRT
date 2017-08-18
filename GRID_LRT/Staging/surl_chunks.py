@@ -23,25 +23,46 @@ __status__ = "Production"
 # parameters set by user when starting
 #
 
+def process_srm(srm_string):
+    """Small function to process the raw srmstring in file
+
+    """
+    if 'pnfs' not in srm_string:
+        return ""
+    line=re.sub('//pnfs','/pnfs',srm_string)
+    surl=line.split()[0]
+    tmp1=line.split('SB')[1]
+    sbn=tmp1.split('_')[0]
+    return surl
+
+    
+
 def make_list_of_surls(infile,stride):
     """Makes a dictionary of surls given an input file and surls per item
-    
+        DOESN'T Sort the file! 
     """
     f=open(infile, 'r')
     stridecount=0
     srmdict={}
-    for line in f:
-        if stridecount%int(stride) != 0:
-            stridecount+=1
-            continue
-        stridecount+=1
-        if not line in ['\n','\r\n','\r']: #skips empty lines
-            line=re.sub('//pnfs','/pnfs',line)
-            surl=line.split()[0]
-            tmp1=line.split('SB')[1]
-            sbn=tmp1.split('_')[0]
-            srmdict[(int(sbn),int(sbn))]=surl
-            #srmdict[sbn]=surl
+    srms=f.readlines()
+    x=len(srms)
+    num_chunks=(x)/stride+[1,0][x%stride==0]
+    curr_srm=0
+
+    for chunk in range(num_chunks-1):
+        srmdict[chunk*stride]=[]
+        for line in range(stride):
+            tmp_srm=process_srm(srms[curr_srm])
+            if tmp_srm!="" :
+                srmdict[chunk*stride].append(tmp_srm)
+            curr_srm+=1
+    srmdict[(num_chunks-1)*stride]=[] 
+
+    for remaining in range(x-curr_srm):
+        tmp_srm=process_srm(srms[curr_srm+remaining])
+        if tmp_srm!="" :
+            srmdict[(num_chunks-1)*stride].append(tmp_srm)
+        curr_srm+1
 
     print('created srmDICT from ', infile)
     return srmdict

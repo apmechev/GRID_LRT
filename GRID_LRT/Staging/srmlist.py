@@ -2,12 +2,13 @@ import sys
 import re
 import os
 import subprocess
-from GRID_LRT import gsurl
+from GRID_LRT.Staging import surl_chunks
 import GRID_LRT.Staging.stage_all_LTA as stage_all
 import GRID_LRT.Staging.state_all as state_all
 import GRID_LRT.Staging.stager_access as sa
 
 import pdb
+
 
 class srm_manager(object):
     def __init__(self,OBSID="",filename="",stride=1):
@@ -27,7 +28,6 @@ class srm_manager(object):
         elif filename:
             self.file_load(filename)
 
-
     def __iter__(self):
         self.keys=self.srms.keys()
         self.loc=0
@@ -45,7 +45,7 @@ class srm_manager(object):
 
     def file_load(self,filename,OBSID=""):
         """Loads a list of srms from a file by searching the file for 
-            1. The OBSID class is initiated
+            1. The OBSID class is initiated with
             2. The OBSID given by this function
             3. The first OBSID encountered in the file
             After, the script only loads the lines that contain the OBSID
@@ -56,8 +56,7 @@ class srm_manager(object):
             self.OBSID=OBSID
         self.check_OBSID()
         
-        sys.path.append('LRT/gsurl')
-        self.srms=gsurl.make_list_of_surls(self.filename,self.stride) 
+        self.srms=surl_chunks.make_list_of_surls(self.filename,self.stride) 
 
         f1=open(self.filename,'r').read()
         #TODO: make a srmlist class where fixsrms is builtin
@@ -88,7 +87,7 @@ class srm_manager(object):
     def make_sbndict_from_file(self,filename):
         '''Makes a Dictionary of ABNs taken from the completed tokens 
         '''
-        self.srms=gsurl.make_list_of_surls(filename,1)
+        self.srms=surl_chunks.make_list_of_surls(filename,1)
         SBN_files=[]
         for key, value in self.srms.iteritems():
             SBN_files.append(os.path.basename(value))

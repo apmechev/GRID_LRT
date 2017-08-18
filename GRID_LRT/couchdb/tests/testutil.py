@@ -8,7 +8,7 @@
 
 import random
 import sys
-from couchdb import client
+from GRID_LRT.couchdb import client
 
 class TempDatabaseMixin(object):
 
