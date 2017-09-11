@@ -1,10 +1,11 @@
-<<<<<<< HEAD
 import os
 import shutil
 import sys
 import yaml
 import subprocess
 import GRID_LRT
+#TODO: use tmp as a staging folder!
+#TODO: Upload to different locations/methods
 
 class Sandbox(object):
 
@@ -79,6 +80,18 @@ class Sandbox(object):
         scripts_path=self.base_dir+'/scripts/'+SBX_type
         if os.path.exists(scripts_path):
             subprocess.call('cp -r '+scripts_path+"/* "+self.base_dir+SBX_dir,shell=True)
+
+
+    def git_base_scripts(self,gitrepo=None):
+    '''Can pull the default scripts from a github repository
+    '''
+        SBX_dir = self.options['sandbox']['name']
+        scripts_path=self.base_dir+'/scripts/'+SBX_type
+        if os.path.exists(scripts_path):
+            clone=subprocess.Popen(['git','clone',gitrepo,'git_base_scripts')
+            clone.wait()
+            subprocess.call('mv '+'git_base_scripts'+"/* "+self.base_dir+SBX_dir,shell=True)
+
 
 
     def upload_SBX(self,SBXfile=None,loc=None,upload_name=None): #TODO: Use UL/DL interfaces

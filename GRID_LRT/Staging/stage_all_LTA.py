@@ -18,10 +18,14 @@ import re
 import sys
 from string import strip
 from GRID_LRT.Staging import stager_access as sa
-import GRID_LRT.Staging.srmlist 
+import pdb
 
 
 def process_surl_line(line):
+    """ Used to drop empty lines and to 
+        take the first argument of the srmfile (the srm:// link)
+    """
+
     if " " in line:
         line=line.split(" ")[0]
     if line =="/n":
@@ -32,9 +36,8 @@ def process_surl_line(line):
 def main(filename):
         file_loc=location(filename)
         rs,m=replace(file_loc)
-        f=open(filename,'r')
-        urls=f.readlines()
-        f.close()
+        with open(filename,'r') as f:
+            urls=f.readlines()
         return (process(urls,rs,m))
 
 def return_srmlist(filename):
@@ -46,7 +49,10 @@ def return_srmlist(filename):
         surls=[]
         for u in urls:
             u=process_surl_line(u)
-            surls.append(m.sub(rs,strip(u)))
+            if "managerv2?SFN" in u:
+                surls.append(m.sub(rs,strip(u)))
+            else:
+                surls.append(u)
         return surls
 
 def state_dict(srm_dict):
@@ -94,8 +100,10 @@ def replace(file_loc):
 def process(urls,repl_string,m):
 	surls=[]
 	for u in urls:
-	    surls.append(m.sub(repl_string,strip(u)))
-	
+            if not 'srm' in u:
+	        surls.append(m.sub(repl_string,strip(u)))
+            else:
+                surls.append(strip(u))
 	req={}
         print("Setting up "+str(len(surls))+" srms to stage")
         stageID=sa.stage(surls)
