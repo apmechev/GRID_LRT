@@ -73,11 +73,11 @@
 
 
 # number of processes to use per step per node
-! num_proc_per_node        = 2
+! num_proc_per_node        = 4
 # number of processes to use per step per node for tasks with high i/o (dppp or cp) or memory (eg calibration)
-! num_proc_per_node_limit  = 2
+! num_proc_per_node_limit  = 4
 # number of threads per process for NDPPP
-! max_dppp_threads         =  2
+! max_dppp_threads         =  4
 
 # set this to True if you want the pipeline run to continue if single bands fail
 ! error_tolerance           =  False
