@@ -136,7 +136,8 @@ class Sandbox(object):
 
         upload_place=gsiloc+self.options['sandbox']['loc']
         if loc is not None: upload_place=loc
-
+        print upload_place
+        
         if self.tarfile:
             upload=subprocess.Popen(['globus-url-copy',self.tarfile, gsiloc+
                                     self.options['sandbox']['loc']+"/"+upload_name])

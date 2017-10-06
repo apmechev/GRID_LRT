@@ -6,8 +6,93 @@ from GRID_LRT.Staging import surl_chunks
 import GRID_LRT.Staging.stage_all_LTA as stage_all
 import GRID_LRT.Staging.state_all as state_all
 import GRID_LRT.Staging.stager_access as sa
+from collections import deque
+
 
 import pdb
+
+
+class srmlist(list):
+    def __init__(self,checkOBSID=True):
+        self.LTA_location=None
+        self.OBSID=None
+        self.checkOBSID=checkOBSID
+
+    def check_location(self,item):
+            loc=''
+            if 'grid.sara.nl' in item: loc='sara'
+            if 'fz-juelich.de' in item: loc='juelich'
+            if 'lofar.psnc.pl' in item: loc='poznan'
+            return loc
+
+    def check_OBSID(self,item): 
+        tmp_OBSID=re.search('L[0-9][0-9][0-9][0-9][0-9][0-9]',item).group(0)
+        if not self.OBSID:
+            self.OBSID=tmp_OBSID
+        if self.checkOBSID and tmp_OBSID!=self.OBSID:
+            raise AttributeError("Different OBSID than previous items")
+
+    def append(self, item):
+        self.check_OBSID(item)
+        tmp_loc=self.check_location(item)
+        item=self.trim_spaces(item)  
+        if not self.LTA_location:
+            self.LTA_location=tmp_loc
+        elif self.LTA_location!=tmp_loc:
+            raise AttributeError("Appended srm link not the same location as previous links!")
+        if item in self:
+            return # don't add duplicate srms
+        super(srmlist, self).append(item)  #append the item to itself (the list)
+
+    def trim_spaces(self,item):
+        """Sometimes there are two fields in the incoming list. Only take the first
+        as long as it's fromatted properly
+        """
+        item=re.sub('//pnfs','/pnfs',item)
+        if self.LTA_location=='poznan':
+            item=re.sub('//lofar','/lofar',item)
+        if " " in item:
+            for potential_link in item.split(" "):
+                if 'srm://' in potential_link:
+                    return potential_link
+        else:
+            return item
+
+    def gsi_replace(self,item):
+        if self.LTA_location=='sara': return re.sub('srm://srm.grid.sara.nl:8443',
+                                            'gsiftp://gridftp.grid.sara.nl:2811',
+                                            item)
+        if self.LTA_location=='juelich': return re.sub("srm://lofar-srm.fz-juelich.de:8443","gsiftp://dcachepool12.fz-juelich.de:2811",item)
+        if self.LTA_location=='poznan': return re.sub("srm://lta-head.lofar.psnc.pl:8443",
+                                                    "gsiftp://door02.lofar.psnc.pl:2811",
+                                            item)
+
+    def http_replace(self,item):
+        if self.LTA_location=='sara': return re.sub('srm://',
+                        'https://lofar-download.grid.sara.nl/lofigrid/SRMFifoGet.py?surl=srm://'
+                        ,item)
+        if self.LTA_location=='juelich': return re.sub(
+                    "srm://",
+                    "https://lofar-download.fz-juelich.de/webserver-lofar/SRMFifoGet.py?surl=srm://",
+                    item)
+        if self.LTA_location=='poznan': return re.sub("srm://",
+                "https://lta-download.lofar.psnc.pl/lofigrid/SRMFifoGet.py?surl=srm://",item)
+
+    def gsi_links(self):
+        q = deque(self)
+        while q:
+            x = q.pop()
+            if x:
+                yield self.gsi_replace(x)
+
+    def http_links(self):
+        q = deque(self)
+        while q:
+            x = q.pop()
+            if x:
+                yield self.http_replace(x)
+
+
 
 
 class srm_manager(object):
@@ -187,7 +272,8 @@ class srm_manager(object):
             sys.exit()
 
 
-    def state(self,printout=True): 
+    def state(self,printout=True):
+        pdb.set_trace() 
         self.states=state_all.state_dict(self.srms,printout=printout)
         return self.states
 
@@ -204,10 +290,11 @@ class srm_manager(object):
         return stage_all.get_stage_status(self.stageID)       
  
     def fix_srms(self,path='srm:\/\/lofar-srm.fz-juelich.de:8443'):
-        for key in self.srms:
-            self.srms[key]=re.sub("//pnfs","/pnfs",self.srms[key])
-            if "poznan" in self.srms[key]:
-                self.srms[key]=re.sub("//lofar","/lofar",self.srms[key])
-            self.srms[key]=re.sub(path,'',self.srms[key].split()[0])
+        for chunk in self.srms:
+            for key in range(len(self.srms[chunk])):
+                self.srms[chunk][key]=re.sub("//pnfs","/pnfs",self.srms[chunk][key])
+                if "poznan" in self.srms[chunk][key]:
+                    self.srms[chunk][key]=re.sub("//lofar","/lofar",self.srms[chunk][key])
+                self.srms[chunk][key]=re.sub(path,'',self.srms[chunk][key].split()[0])
 
  

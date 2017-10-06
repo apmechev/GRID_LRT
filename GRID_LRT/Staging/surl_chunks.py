@@ -63,7 +63,6 @@ def make_list_of_surls(infile,stride):
         if tmp_srm!="" :
             srmdict[(num_chunks-1)*stride].append(tmp_srm)
         curr_srm+1
-
     print('created srmDICT from ', infile)
     return srmdict
 

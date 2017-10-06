@@ -33,15 +33,19 @@ def main(filename):
 
 def state_dict(srm_dict,printout=True):
         locs_options=['s','j','p']
-
-        line=srm_dict.itervalues().next() 
+ 
+        line=srm_dict.itervalues().next()[0]
         file_loc=[locs_options[i] for i in range(len(locs_options)) if ["sara" in line,"juelich" in line, not "sara" in line and not "juelich" in line][i] ==True][0]
         print file_loc
         rs,m=replace(file_loc)
         
         urls=[]
         for key, value in srm_dict.iteritems():
-            urls.append(value)
+            if isinstance(value, list):
+                for i in value:
+                    urls.append(i)
+            else:
+                urls.append(value)
         return process(urls,rs,m,printout)
 
 def location(filename):
