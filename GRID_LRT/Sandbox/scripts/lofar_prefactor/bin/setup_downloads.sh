@@ -77,6 +77,4 @@ function setup_targ2(){
   #grep $STARTSB gsiftps_init.txt > srm-final.txt
   cp srm.txt srm-final.txt
   sed -i "s?num_SBs_per_group.*=?num_SBs_per_group    = 10?g" *parset 
-
-
 }
