@@ -102,7 +102,10 @@ class Sandbox(object):
 
     def upload_SBX(self,SBXfile=None,loc=None,upload_name=None):
         self.upload_gsi_SBX(SBXfile,loc,upload_name)
-        self.upload_ssh_sandbox(SBXfile,loc,upload_name)
+        self.upload_gsi_SBX(SBXfile,
+                loc=' gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/sandbox',
+                upload_name)
+#        self.upload_ssh_sandbox(SBXfile,loc,upload_name)
 
     def upload_ssh_sandbox(self,SBXfile=None,loc=None,upload_name=None):
         gsiloc='/disks/ftphome/pub/apmechev/sandbox/'
