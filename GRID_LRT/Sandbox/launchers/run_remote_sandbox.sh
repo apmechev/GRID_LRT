@@ -35,8 +35,11 @@ trap '{ echo "Trap detected interrupt ..."; $OLD_PYTHON update_token_status.py $
 
 #launches script designed to lock token, download sandbox with 
 #token's OBSID and execute the master.sh in the sandbox
-/usr/bin/python getSBX.py $1 $2 $3 $4 &
-wait
+output=$( /usr/bin/python getSBX.py $1 $2 $3 $4 &)
+
 
 ls -l
 cat log*
+out=$(  echo $output| grep -Po "exit status is \([0-9][0-9]?[0-9]?" |grep -Po [0-9][0-9]?[0-9]? )
+
+exit $out
