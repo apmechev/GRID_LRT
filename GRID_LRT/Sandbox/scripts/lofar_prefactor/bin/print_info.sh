@@ -30,7 +30,7 @@ echo  "----------------------------------------------------------------------"
 echo "-"
 echo "w_info: hostname = "  $HOSTNAME
 echo "w_info: homedir = " $HOME
-
+echo "w_info: uname = " $( uname -r )
 echo "w_info: Job directory = " $PWD
 ls -l $PWD
 
