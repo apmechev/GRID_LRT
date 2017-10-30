@@ -288,7 +288,10 @@ class TokenSet(object):
         for key in iterable:
             keys=dict(itertools.chain(self.token_keys.iteritems(),{key_name:str("%03d" % int(key) )}.iteritems()))
 #            _=keys.pop('_attachments')
-            token=self.th.create_token(keys,append=id_append+"_SB"+str("%03d" % int(key) ))
+            pipeline=""
+            if 'pipeline' in keys:
+                pipeline="_"+keys['pipeline']
+            token=self.th.create_token(keys,append=id_append+pipeline+"_SB"+str("%03d" % int(key) ))
             if file_upload:
                 with open('temp_abn','w') as tmp_abn_file:
                     for i in iterable[key]:
