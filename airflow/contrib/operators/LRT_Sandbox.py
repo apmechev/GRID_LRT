@@ -29,6 +29,7 @@ from airflow.utils.decorators import apply_defaults
 from airflow.utils.file import TemporaryDirectory
 from airflow.utils.state import State
 import progressbar
+#logging.info(progressbar.__file__)
 import GRID_LRT.sandbox as Sandbox
 
 import pdb
@@ -46,8 +47,8 @@ class LRTSandboxOperator(BaseOperator):
     :type stageID: string
     :type output_encoding: output encoding of bash command
     """
-    template_fields = ('staging_command', 'env')
-    template_ext = ('.srm')
+    template_fields = ()
+    template_ext = ()
     ui_color = '#f0ede4'
 
     @apply_defaults
@@ -81,7 +82,9 @@ class LRTSandboxOperator(BaseOperator):
         self.status=State.SUCCESS
         logging.info("Successfully staged " +
                     str(self.progress['Percent done']) + " % of the files.")
-    
+
+    def get_SBXloc(self):
+        return self.SBX.SBXloc
 
     def on_kill(self):
         logging.warn('Sending SIGTERM signal to staging group')

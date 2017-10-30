@@ -21,7 +21,7 @@ from time import sleep
 import logging
 from subprocess import Popen, STDOUT, PIPE
 from tempfile import gettempdir, NamedTemporaryFile
-
+from xmlrpclib import ResponseError
 
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
@@ -29,6 +29,7 @@ from airflow.utils.decorators import apply_defaults
 from airflow.utils.file import TemporaryDirectory
 from airflow.utils.state import State
 from GRID_LRT.Staging import stager_access, stage_all_LTA
+from GRID_LRT.Staging import srmlist
 import progressbar
 
 import pdb
@@ -46,8 +47,8 @@ class LOFARStagingOperator(BaseOperator):
     :type stageID: string
     :type output_encoding: output encoding of bash command
     """
-    template_fields = ('staging_command', 'env')
-    template_ext = ('.srm')
+    template_fields = ()
+    template_ext = ()
     ui_color = '#f0ede4'
 
     @apply_defaults
@@ -80,18 +81,17 @@ class LOFARStagingOperator(BaseOperator):
 
     def execute(self, context):
         """
-        Execute the bash command in a temporary directory
-        which will be cleaned afterwards
+        Executes the staging command from the list of srms requested.
         """
         if not os.path.isfile(self.srmfile) and not hasattr(self.srms, '__iter__'):
             self.status=State.UPSTREAM_FAILED
             raise AirflowException("Input srmfile doesn't exist and srm list not a list")
 
         stager=self.stager
-        surl_list=[] #holds all the srms (both from file and list argument )
-        surl_list=self.build_srm_list(surl_list)
+        surl_list=srmlist.srmlist() #holds all the srms (both from file and list argument )
+        self.surl_list=self.build_srm_list(surl_list)
 
-        self.stage_Status=stager_access.stage(surl_list)
+        self.stage_Status=stager_access.stage(list(self.surl_list))
         logging.info("Successfully sent staging command for " + 
                        stager_access.get_progress()[str(self.stage_Status)]['File count']
                      + " files.")
@@ -109,6 +109,7 @@ class LOFARStagingOperator(BaseOperator):
             self.p_bar.update(100)
             return surl_list
         self.state==State.FAILED
+        return surl_list
 
     def build_srm_list(self,surl_list):
         """Allows the user to input a list of links dynamically 
@@ -123,10 +124,14 @@ class LOFARStagingOperator(BaseOperator):
             surl_list.append(srm)
         logging.debug(str(len(surl_list)) + " files up for staging. First srm is " +
                                 surl_list[0] + " and last one is " + surl_list[-1])
+        logging.debug("The OBSID is "+surl_list.OBSID)
         return surl_list
 
 
     def not_yet_started(self):
+        """
+        Checks the status of the staging
+        """
         if self.progress['Status'] == 'new':
             logging.debug("Stage status is 'new'")
             return True
@@ -145,8 +150,8 @@ class LOFARStagingOperator(BaseOperator):
         '''
         try:
             self.progress=stager_access.get_progress()[str(self.stage_Status)]
-        except KeyError: #After staging is done, the request gets deleted....
-            if int(self.progress['Percent done']) > 80:
+        except (KeyError, ResponseError): #After staging is done, the request gets deleted....
+            if int(self.progress['Percent done']) > 60:
                 self.success()
             else:
                 logging.warning("Staging request expired too quickly. This happens if the" +
@@ -179,6 +184,11 @@ class LOFARStagingOperator(BaseOperator):
         logging.info("Successfully staged " +
                     str(self.progress['Percent done']) + " % of the files.")
     
+    def return_OBSID(self):
+        """
+        Will return the OBSID as recorded by the srmlist class
+        """
+        return self.surl_list.OBSID
 
     def on_kill(self):
         logging.warn('Sending SIGTERM signal to staging group')
