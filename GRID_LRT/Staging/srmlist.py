@@ -92,6 +92,8 @@ class srmlist(list):
             if x:
                 yield self.http_replace(x)
 
+    def sbn_dict(self):
+        pass
 
 
 
@@ -159,7 +161,7 @@ class srm_manager(object):
         self.location=location
         s_ABN=self.get_ABN_list_from_token(token_type)
         ABN_files=self.make_url_list(location)
-        return self.make_list(s_ABN,ABN_files,"AB")
+        return self.make_dict(s_ABN,ABN_files,"AB")
 
     def make_sbndict_from_gsidir(self,location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/"):
         self.location=location
@@ -167,21 +169,21 @@ class srm_manager(object):
         files=[]
         for i in gsi_files:
             files.append(i.split(location)[1])
-        return self.make_list([[1],[244]],files,"_")
+        return self.make_dict([[1],[244]],files,"_")
 
     def make_sbndict_from_file(self,filename):
         '''Makes a Dictionary of ABNs taken from the completed tokens 
         '''
-        self.srms=surl_chunks.make_list_of_surls(filename,1)
+        self.srms=surl_chunks.make_dict_of_surls(filename,1)
         SBN_files=[]
         for key, value in self.srms.iteritems():
             SBN_files.append(os.path.basename(value))
         s_SBN=sorted(self.srms.keys())
         self.location=os.path.dirname(value)
-        return self.make_list(s_SBN,SBN_files,'SB')
+        return self.make_dict(s_SBN,SBN_files,'SB')
 
 
-    def make_list(self,SBs,files,append='SB'):
+    def make_dict(self,SBs,files,append='SB'):
         """Makes a dictionary of links keyed with the starting SBN, ABN
         """
         for chunk in range(0,(SBs[-1][0]-SBs[0][0])/self.stride+1):
@@ -272,8 +274,7 @@ class srm_manager(object):
             sys.exit()
 
 
-    def state(self,printout=True):
-        pdb.set_trace() 
+    def state(self,printout=True): 
         self.states=state_all.state_dict(self.srms,printout=printout)
         return self.states
 
