@@ -7,16 +7,21 @@ import GRID_LRT.Staging.stage_all_LTA as stage_all
 import GRID_LRT.Staging.state_all as state_all
 import GRID_LRT.Staging.stager_access as sa
 from collections import deque
-
+import re
+from math import ceil
+import types
 
 import pdb
+import warnings
 
 
 class srmlist(list):
-    def __init__(self,checkOBSID=True):
+    def __init__(self,checkOBSID=True,link=None):
         self.LTA_location=None
         self.OBSID=None
         self.checkOBSID=checkOBSID
+        if link:
+            self.append(link)
 
     def check_location(self,item):
             loc=''
@@ -92,8 +97,37 @@ class srmlist(list):
             if x:
                 yield self.http_replace(x)
 
-    def sbn_dict(self):
-        pass
+    def sbn_dict(self,pref="SB",suff="_"):
+        """
+        Returns a generator that creates a pair of SBN and link. Can be used to create dictionaries
+        """
+        srmdict = {}
+        for i in self:
+            m = None
+            m = re.search(pref+'(.+?)'+suff,i)
+            yield m.group(1),i
+
+
+
+def slice_dicts(srmdict,slice_size=10):
+    """
+    Returns a dict of lists that hold 10 SBNs, including empty spaces
+    Can take in a dictionary (or a generator) of pairs of SB#->link
+    """
+    if isinstance(srmdict, types.GeneratorType):
+        gen=srmdict
+        srmdict=dict(gen)
+
+    keys=sorted(srmdict.keys())
+    start=int(keys[0])
+    sliced={}
+    for chunk in range(start,ceil(len(keys)/float(slice_size))):
+        chunk_name=format(chunk*slice_size,'03')
+        sliced[chunk_name]=srmlist()
+        for i in range(slice_size):
+            if format(chunk*slice_size+i,'03') in srmdict.keys():
+                sliced[chunk_name].append(srmdict[format(chunk*slice_size+i,'03')])
+    return sliced
 
 
 
