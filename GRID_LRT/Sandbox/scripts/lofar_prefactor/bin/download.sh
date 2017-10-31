@@ -24,17 +24,22 @@ function dl_targ1(){
  
 }
 
+function download(){
+ dl_cal1 $1
+}
+
 function dl_cal1(){
 
    if [[ ! -z $( cat $1 | grep juelich )  ]]; then 
-     sed 's?srm://lofar-srm.fz-juelich.de:8443?gsiftp://lofar-gridftp.fz-juelich.de:2811?g' $1 | xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
+     sed -i 's?srm://lofar-srm.fz-juelich.de:8443?gsiftp://lofar-gridftp.fz-juelich.de:2811?g' $1  # xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
    fi
    if [[ ! -z $( cat $1 | grep sara )  ]]; then
-     sed 's?srm://srm.grid.sara.nl:8443?gsiftp://gridftp.grid.sara.nl:2811?g' $1 | xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
+     sed -i 's?srm://srm.grid.sara.nl:8443?gsiftp://gridftp.grid.sara.nl:2811?g' $1 #| xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
    fi
+   while read line; do echo $line| globus-url-copy  $line ${PWD}/ ; done < $1
    wait
    for i in `ls *tar`; do tar -xf $i && rm -rf $i; done
-
+   for i in `ls *gz`; do tar -zxf $i && rm -rf $i; done
 }
 
 function dl_cal2(){
