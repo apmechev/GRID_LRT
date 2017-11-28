@@ -28,9 +28,9 @@ function upload_results_cal1(){
  find ${RUNDIR} -iname "FIELD" |grep work |xargs tar -rvf instruments_${OBSID}_${STARTSB}.tar 
  find ${RUNDIR} -iname "ANTENNA" |grep work |xargs tar -rvf instruments_${OBSID}_${STARTSB}.tar
 
- uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_tables/${OBSID}
+ uberftp -mkdir ${RESULTS_DIR}/${OBSID}
 #export SSB=$(printf %03d ${STARTSB})
- globus-url-copy instruments_${OBSID}_${STARTSB}.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_tables/${OBSID}/instruments_${OBSID}_${STARTSB}.tar
+ globus-url-copy instruments_${OBSID}_${STARTSB}.tar ${RESULTS_DIR}/${OBSID}/instruments_${OBSID}_${STARTSB}.tar
 
 }
 
@@ -41,28 +41,23 @@ function upload_results_cal2(){
 
   echo "Numpy files found:"
   find . -name "*npy"
-  globus-url-copy file:`pwd`/calib_solutions.tar gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_sols/${OBSID}_solutions.tar
+  globus-url-copy file:`pwd`/calib_solutions.tar ${RESULTS_DIR}/${OBSID}_solutions.tar
         wait
 }
 
 
 function upload_results_targ1(){
 
-
 tar -zcvf results.tar.gz prefactor/results/L*
-uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/${OBSID}
-globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/${OBSID}/t1_${OBSID}_AB${A_SBN}_SB${STARTSB}_.tar.gz
-
-
+uberftp -mkdir ${RESULTS_DIR}/${OBSID}
+globus-url-copy file:`pwd`/results.tar.gz ${RESULTS_DIR}/${OBSID}/${OBSID}_AB${A_SBN}_SB${STARTSB}.tar.gz
 }
 
 function upload_results_targ2(){
 
-   uberftp -mkdir gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/${OBSID}
-   globus-url-copy file:`pwd`/results.tar.gz gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/${OBSID}/GSM_CAL_${OBSID}_ABN_${STARTSB}.tar.gz
+   uberftp -mkdir ${RESULTS_DIR}/${OBSID}
+   globus-url-copy file:`pwd`/results.tar.gz ${RESULTS_DIR}/${OBSID}/GSM_CAL_${OBSID}_ABN_${STARTSB}.tar.gz
     wait
-#   ./prefactor/scripts/plot_solutions_all_stations.py -p ${RUNDIR}/prefactor/results/$( ls -d ${RUNDIR}/prefactor/results/*ms )/instrument_directionindependent/ GSM_CAL_${OBSID}_ABN${STARTSB}_plot.png
-
 }
 
 

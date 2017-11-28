@@ -37,6 +37,7 @@ function setup_softdrive_lofar(){
     if [ -e "$1/init_env_release.sh" ]; then
       echo "setup_env: Initializing environment from ${1}"
       . ${1}/init_env_release.sh
+      source /cvmfs/softdrive.nl/lofar_sw/env/current_RMextract.sh 
       export PYTHONPATH=${1}/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg:${1}/local/release/lib/python2.7/site-packages/losoto-1.0.0-py2.7.egg/losoto:$PYTHONPATH
       export LOFARDATAROOT=/cvmfs/softdrive.nl/wjvriend/data
       export LOFAR_PATH=${1}

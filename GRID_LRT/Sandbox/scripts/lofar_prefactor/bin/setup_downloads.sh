@@ -41,7 +41,7 @@ function setup_init_sub(){
   echo "setup_dl: processing INITIAL-SUBTRACT Parset ${PARSET}"
   echo ""
   echo "setup_dl: Setting download of subbands in OBSID ${OBSID}"
-  uberftp -ls -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/ |grep $OBSID |awk '{print "srm://srm.grid.sara.nl:8443"$NF}' > gsiftps_init.txt
+  uberftp -ls -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/SKSP/pref_cal1/${OBSID} |awk '{print "srm://srm.grid.sara.nl:8443"$NF}' > gsiftps_init.txt
   echo "setup_dl: found these gsiftps associated with ${OBSID}"
   cat gsiftps_init.txt
   echo ""
@@ -54,7 +54,7 @@ function setup_cal2(){
 
   echo ""
   echo "setup_dl: Setting download of instruments in OBSID ${OBSID}"
-  uberftp -ls -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/cal_tables/${OBSID}/ |grep $OBSID |awk '{print "srm://srm.grid.sara.nl:8443"$NF}' > gsiftps_init.txt
+  uberftp -ls -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/SKSP/pref_cal1/${OBSID}/  |awk '{print "srm://srm.grid.sara.nl:8443"$NF}' > gsiftps_init.txt
   echo "setup_dl: found these gsiftps associated with ${OBSID}"
   cat gsiftps_init.txt
   echo ""
@@ -69,7 +69,7 @@ function setup_targ2(){
   echo "setup_dl: Doing GSMCal for ${OBSID}"
   echo ""
   echo "setup_dl: Setting download of subbands in OBSID ${OBSID}"
-  uberftp -ls -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/${OBSID}/t1* |grep $OBSID |awk '{print "srm://srm.grid.sara.nl:8443"$NF}' > gsiftps_init.txt
+  uberftp -ls -r gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/SKSP/pref_targ1/${OBSID}/ |awk '{print "srm://srm.grid.sara.nl:8443"$NF}' > gsiftps_init.txt
   echo "setup_dl: found these gsiftps associated with ${OBSID}"
   cat gsiftps_init.txt
   echo ""
