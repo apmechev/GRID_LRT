@@ -59,7 +59,7 @@ def replace(file_loc):
                 m=re.compile('/pnfs')
                 if file_loc=='j':
                         repl_string="srm://lofar-srm.fz-juelich.de:8443/srm/managerv2?SFN=/pnfs/"
-                        print("Staging in Juleich")
+                        print("Staging in Juelich")
                 elif file_loc=='s':
                         repl_string="srm://srm.grid.sara.nl:8443/srm/managerv2?SFN=/pnfs"
                         print("files are on SARA")
