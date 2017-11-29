@@ -12,6 +12,7 @@ __version__ = "1.0"
 import xmlrpclib
 import datetime
 from os.path import expanduser
+import pdb
 
 #---
 # Determine credentials and create proxy

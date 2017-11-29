@@ -4,7 +4,7 @@ import os
 import subprocess
 from GRID_LRT.Staging import surl_chunks
 import GRID_LRT.Staging.stage_all_LTA as stage_all
-import GRID_LRT.Staging.state_all as state_all
+#import GRID_LRT.Staging.state_all as state_all
 import GRID_LRT.Staging.stager_access as sa
 from collections import deque
 import re
@@ -62,6 +62,7 @@ class srmlist(list):
                     return potential_link
         else:
             return item
+
 
     def gsi_replace(self,item):
         if self.LTA_location=='sara': return re.sub('srm://srm.grid.sara.nl:8443',

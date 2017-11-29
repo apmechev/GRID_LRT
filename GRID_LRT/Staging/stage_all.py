@@ -11,6 +11,10 @@
 
 #!/usr/bin/env python
 
+###
+#This is the depreciated staging file that still uses gfal
+##
+
 import pythonpath
 import gfal2 as gfal
 import time
@@ -70,7 +74,9 @@ def replace(file_loc):
 
 
 def process(urls,repl_string,m):
-	surls=[]
+        print("Using a Depreceated Staging script stage_all.py!")              
+        sys.stderr.write('WARNING: Using depreciated Staging Script\n')
+        surls=[]
 	for u in urls:
 	    surls.append(m.sub(repl_string,strip(u)))
 	

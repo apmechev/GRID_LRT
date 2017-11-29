@@ -1,6 +1,7 @@
 #!/usr/bin/env python 
 """Module to parse list of surls and create a dictionary with chunks
 of custom number of links (parameter stride, default=1)
+DEPRECEATED by the srmlist class in Staging/srmlist.py
 """
 import os
 import re

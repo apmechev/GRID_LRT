@@ -7,8 +7,10 @@
 # you should have received as part of this distribution.
 
 """Python Token Class
-
->>> th=Token_Handler( t_type="token", srv="https://picas-lofar.grid.sara.nl:6984", uname="apmechev", pwd="alex", dbn="testdb")) 
+>>> from GRID_LRT.get_picas_credentials import picas_cred
+>>> pc=picas_cred()
+>>> 
+>>> th=Token.Token_Handler( t_type="test", srv="https://picas-lofar.grid.sara.nl:6984", uname=pc.user, pwd=pc.password, dbn=pc.database)
 >>> th.load_views()
 >>> th.views.keys()
 >>> th.reset_tokens(view_name='error')
@@ -48,7 +50,10 @@ class Token_Handler:
     """
 
     def __init__(self, t_type="token", srv="https://picas-lofar.grid.sara.nl:6984", uname="", pwd="", dbn=""):
-        self.t_type = t_type
+        if t_type:
+            self.t_type = t_type
+        else: 
+            raise Exception("t_type not defined!")
         self.Picas_User = uname
         self.Picas_DB = dbn
         self.Picas_Passwd = pwd
@@ -120,7 +125,7 @@ class Token_Handler:
         #    self.tokens.pop(x['id'])
         # TODO:Pop tokens from self
 
-    def add_view(self, v_name="test_view", cond='doc.lock > 0 && doc.done > 0 && doc.output < 0 '):
+    def add_view(self, v_name="test_view", cond='doc.lock > 0 && doc.done > 0 && doc.output < 0 ',emit_value='doc._id'):
         """Adds a view to the db, needs a view name and a condition. Emits all tokens with
             the type of the current Token_Handler
         """
@@ -128,12 +133,12 @@ class Token_Handler:
         function(doc) {
            if(doc.type == "%s") {
             if(%s) {
-              emit(doc._id, doc._id);
+              emit(doc._id, %s );
             }
           }
         }
         '''
-        view = ViewDefinition(self.t_type, v_name, generalViewCode % (self.t_type, cond))
+        view = ViewDefinition(self.t_type, v_name, generalViewCode % (self.t_type, cond, emit_value))
         self.views[v_name] = view
         view.sync(self.db)
 
