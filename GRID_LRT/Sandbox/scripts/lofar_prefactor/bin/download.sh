@@ -8,7 +8,7 @@ function download_files(){
 
  case "$2" in
     *cal1*) echo "downloading cal1 files"; dl_cal1 $1 ;;
-    *cal2*) echo "downloading cal_solutions"; dl_from_sara $1 ;;
+    *cal2*) echo "downloading cal_solutions"; dl_cal2 $1 ;;
     *targ1*) echo "downloading target1 SB"; dl_cal1 $1  ;;
     *targ2*) echo "Downloading targ1 solutions";dl_targ2 $1 ;;
     *) echo "Unsupported pipeline, nothing downloaded"; exit 20;; #exit 20=> wrong pipeline
@@ -31,18 +31,19 @@ function download(){
 function dl_cal1(){
 
    if [[ ! -z $( cat $1 | grep juelich )  ]]; then 
-     sed -i 's?srm://lofar-srm.fz-juelich.de:8443?gsiftp://lofar-gridftp.fz-juelich.de:2811?g' $1  
+     sed -i 's?srm://lofar-srm.fz-juelich.de:8443?gsiftp://lofar-gridftp.fz-juelich.de:2811?g' $1  # xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
    fi
    if [[ ! -z $( cat $1 | grep sara )  ]]; then
-     sed -i 's?srm://srm.grid.sara.nl:8443?gsiftp://gridftp.grid.sara.nl:2811?g' $1 
+     sed -i 's?srm://srm.grid.sara.nl:8443?gsiftp://gridftp.grid.sara.nl:2811?g' $1 #| xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
    fi
-   while read line; do echo $line| globus-url-copy  $line ${PWD}/ || { echo 'downloading failed' ; exit 21;  } ; done < sed '/^\s*$/d' $1 #trim empty lines
+   sed -i '/^\s*$/d' $1
+   while read line; do echo $line| globus-url-copy  $line ${PWD}/ || { echo 'downloading failed' ; exit 21;  } ; done < $1 #trim empty lines
    wait
-   for i in `ls *tar 2>/dev/null `; do tar -xf  $i && rm -rf $i; done
-   for i in `ls *gz  2>/dev/null `; do tar -zxf $i && rm -rf $i; done
+   for i in `ls *tar`; do tar -xf $i && rm -rf $i; done
+   for i in `ls *gz`; do tar -zxf $i && rm -rf $i; done
 }
 
-function dl_from_sara(){
+function dl_cal2(){
 
    sed 's?srm://srm.grid.sara.nl:8443?gsiftp://gridftp.grid.sara.nl:2811?g' $1 | xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 21; }
    for i in `ls *tar`; do tar -xf $i &&rm $i; done
