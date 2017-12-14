@@ -36,7 +36,8 @@ function dl_cal1(){
    if [[ ! -z $( cat $1 | grep sara )  ]]; then
      sed -i 's?srm://srm.grid.sara.nl:8443?gsiftp://gridftp.grid.sara.nl:2811?g' $1 #| xargs -I{} globus-url-copy -st 30 {} $PWD/ || { echo 'downloading failed' ; exit 20; }
    fi
-   while read line; do echo $line| globus-url-copy  $line ${PWD}/ || { echo 'downloading failed' ; exit 21;  } ; done < $1
+   sed -i '/^\s*$/d' $1
+   while read line; do echo $line| globus-url-copy  $line ${PWD}/ || { echo 'downloading failed' ; exit 21;  } ; done < $1 #trim empty lines
    wait
    for i in `ls *tar`; do tar -xf $i && rm -rf $i; done
    for i in `ls *gz`; do tar -zxf $i && rm -rf $i; done
