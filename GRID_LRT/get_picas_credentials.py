@@ -5,6 +5,7 @@
 import datetime
 from os.path import expanduser,isfile
 from os import environ, chmod
+import logging 
 
 __author__ = "Alexandar Mechev"
 __credits__ = ["Alexandar Mechev", "Natalie Danezi", "Timothy Shimwell", 
@@ -14,6 +15,24 @@ __version__ = "0.1.1"
 __maintainer__ = "Alexandar Mechev"
 __email__ = "apmechev@strw.leidenuniv.nl"
 __status__ = "Production"
+
+def infolog(string):
+    if not logging:
+        print("INFO: "+string)
+    else:
+        logging.info(string)
+
+def debuglog(string):
+    if not logging:
+        print("DEBUG: "+string)
+    else:
+        logging.debug(string)
+
+def warnlog(string):
+    if not logging:
+        print("WARNING: "+string)
+    else:
+        logging.warn(string)
 
 
 class picas_cred(object):
@@ -50,7 +69,7 @@ database=picas_database
             self.get_picas_creds_from_file(pic_file=source_file) 
         elif usr==None or pwd==None and dbn!=None:
                 if isfile(expanduser('~/.picasrc')):
-                    self.get_picas_creds()
+                    self.get_picas_creds_from_file('~/.picasrc')
                 else:
                     self.get_picas_creds_from_env()
         else:
@@ -67,7 +86,7 @@ database=picas_database
                                (default: ~/.picasrc)
         """
         with open(expanduser(pic_file),'r') as file:
-            print(datetime.datetime.now(), "picas_credentials: Parsing user credentials from", expanduser(pic_file))
+            infolog(str("picas_credentials: Parsing user credentials from "+str(expanduser(pic_file)))) 
             for line in file:
                 if line.startswith("user"):
                     self.user = line.split('=')[1].strip()
@@ -88,7 +107,7 @@ database=picas_database
             self.password=environ['PICAS_USR_PWD']
             self.database=environ['PICAS_DB']
         except KeyError:
-            print("PICAS Variable not in ENV!") 
+            warnlog("PICAS Variable not in ENV!") 
    
     def get_picas_creds(self):
         """ Automatically gets the PiCaS credentials
@@ -143,6 +162,7 @@ database=picas_database
 
 
 if __name__ == '__main__':    #code to execute if called from command-line
+    infolog("PiCaS_creds from main()")
     if isfile(expanduser('~/.picasrc')):
         pc=picas_cred(source_file='~/.picasrc')
         pc.put_picas_creds_in_env()
