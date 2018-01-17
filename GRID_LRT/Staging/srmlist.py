@@ -2,12 +2,135 @@ import sys
 import re
 import os
 import subprocess
-from GRID_LRT import gsurl
+from GRID_LRT.Staging import surl_chunks
 import GRID_LRT.Staging.stage_all_LTA as stage_all
-import GRID_LRT.Staging.state_all as state_all
+#import GRID_LRT.Staging.state_all as state_all
 import GRID_LRT.Staging.stager_access as sa
+from collections import deque
+import re
+from math import ceil
+import types
 
 import pdb
+import warnings
+
+
+class srmlist(list):
+    def __init__(self,checkOBSID=True,link=None):
+        self.LTA_location=None
+        self.OBSID=None
+        self.checkOBSID=checkOBSID
+        if link:
+            self.append(link)
+
+    def check_location(self,item):
+            loc=''
+            if 'grid.sara.nl' in item: loc='sara'
+            if 'fz-juelich.de' in item: loc='juelich'
+            if 'lofar.psnc.pl' in item: loc='poznan'
+            return loc
+
+    def check_OBSID(self,item): 
+        tmp_OBSID=re.search('L[0-9][0-9][0-9][0-9][0-9][0-9]',item).group(0)
+        if not self.OBSID:
+            self.OBSID=tmp_OBSID
+        if self.checkOBSID and tmp_OBSID!=self.OBSID:
+            raise AttributeError("Different OBSID than previous items")
+
+    def append(self, item):
+        self.check_OBSID(item)
+        tmp_loc=self.check_location(item)
+        item=self.trim_spaces(item)  
+        if not self.LTA_location:
+            self.LTA_location=tmp_loc
+        elif self.LTA_location!=tmp_loc:
+            raise AttributeError("Appended srm link not the same location as previous links!")
+        if item in self:
+            return # don't add duplicate srms
+        super(srmlist, self).append(item)  #append the item to itself (the list)
+
+    def trim_spaces(self,item):
+        """Sometimes there are two fields in the incoming list. Only take the first
+        as long as it's fromatted properly
+        """
+        item=re.sub('//pnfs','/pnfs',item)
+        if self.LTA_location=='poznan':
+            item=re.sub('//lofar','/lofar',item)
+        if " " in item:
+            for potential_link in item.split(" "):
+                if 'srm://' in potential_link:
+                    return potential_link
+        else:
+            return item
+
+
+    def gsi_replace(self,item):
+        if self.LTA_location=='sara': return re.sub('srm://srm.grid.sara.nl:8443',
+                                            'gsiftp://gridftp.grid.sara.nl:2811',
+                                            item)
+        if self.LTA_location=='juelich': return re.sub("srm://lofar-srm.fz-juelich.de:8443","gsiftp://dcachepool12.fz-juelich.de:2811",item)
+        if self.LTA_location=='poznan': return re.sub("srm://lta-head.lofar.psnc.pl:8443",
+                                                    "gsiftp://door02.lofar.psnc.pl:2811",
+                                            item)
+
+    def http_replace(self,item):
+        if self.LTA_location=='sara': return re.sub('srm://',
+                        'https://lofar-download.grid.sara.nl/lofigrid/SRMFifoGet.py?surl=srm://'
+                        ,item)
+        if self.LTA_location=='juelich': return re.sub(
+                    "srm://",
+                    "https://lofar-download.fz-juelich.de/webserver-lofar/SRMFifoGet.py?surl=srm://",
+                    item)
+        if self.LTA_location=='poznan': return re.sub("srm://",
+                "https://lta-download.lofar.psnc.pl/lofigrid/SRMFifoGet.py?surl=srm://",item)
+
+    def gsi_links(self):
+        q = deque(self)
+        while q:
+            x = q.pop()
+            if x:
+                yield self.gsi_replace(x)
+
+    def http_links(self):
+        q = deque(self)
+        while q:
+            x = q.pop()
+            if x:
+                yield self.http_replace(x)
+
+    def sbn_dict(self,pref="SB",suff="_"):
+        """
+        Returns a generator that creates a pair of SBN and link. Can be used to create dictionaries
+        """
+        srmdict = {}
+        for i in self:
+            m = None
+            m = re.search(pref+'(.+?)'+suff,i)
+            yield m.group(1),i
+
+
+
+def slice_dicts(srmdict,slice_size=10):
+    """
+    Returns a dict of lists that hold 10 SBNs, including empty spaces
+    Can take in a dictionary (or a generator) of pairs of SB#->link
+    """
+    if isinstance(srmdict, types.GeneratorType):
+        gen=srmdict
+        srmdict=dict(gen)
+
+    keys=sorted(srmdict.keys())
+    start=int(keys[0])
+    sliced={}
+    for chunk in range(start,ceil(len(keys)/float(slice_size))):
+        chunk_name=format(chunk*slice_size,'03')
+        sliced[chunk_name]=srmlist()
+        for i in range(slice_size):
+            if format(chunk*slice_size+i,'03') in srmdict.keys():
+                sliced[chunk_name].append(srmdict[format(chunk*slice_size+i,'03')])
+    return sliced
+
+
 
 class srm_manager(object):
     def __init__(self,OBSID="",filename="",stride=1):
@@ -27,7 +150,6 @@ class srm_manager(object):
         elif filename:
             self.file_load(filename)
 
-
     def __iter__(self):
         self.keys=self.srms.keys()
         self.loc=0
@@ -45,7 +167,7 @@ class srm_manager(object):
 
     def file_load(self,filename,OBSID=""):
         """Loads a list of srms from a file by searching the file for 
-            1. The OBSID class is initiated
+            1. The OBSID class is initiated with
             2. The OBSID given by this function
             3. The first OBSID encountered in the file
             After, the script only loads the lines that contain the OBSID
@@ -56,8 +178,7 @@ class srm_manager(object):
             self.OBSID=OBSID
         self.check_OBSID()
         
-        sys.path.append('LRT/gsurl')
-        self.srms=gsurl.make_list_of_surls(self.filename,self.stride) 
+        self.srms=surl_chunks.make_list_of_surls(self.filename,self.stride) 
 
         f1=open(self.filename,'r').read()
         #TODO: make a srmlist class where fixsrms is builtin
@@ -75,7 +196,7 @@ class srm_manager(object):
         self.location=location
         s_ABN=self.get_ABN_list_from_token(token_type)
         ABN_files=self.make_url_list(location)
-        return self.make_list(s_ABN,ABN_files,"AB")
+        return self.make_dict(s_ABN,ABN_files,"AB")
 
     def make_sbndict_from_gsidir(self,location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/"):
         self.location=location
@@ -83,21 +204,21 @@ class srm_manager(object):
         files=[]
         for i in gsi_files:
             files.append(i.split(location)[1])
-        return self.make_list([[1],[244]],files,"_")
+        return self.make_dict([[1],[244]],files,"_")
 
     def make_sbndict_from_file(self,filename):
         '''Makes a Dictionary of ABNs taken from the completed tokens 
         '''
-        self.srms=gsurl.make_list_of_surls(filename,1)
+        self.srms=surl_chunks.make_dict_of_surls(filename,1)
         SBN_files=[]
         for key, value in self.srms.iteritems():
             SBN_files.append(os.path.basename(value))
         s_SBN=sorted(self.srms.keys())
         self.location=os.path.dirname(value)
-        return self.make_list(s_SBN,SBN_files,'SB')
+        return self.make_dict(s_SBN,SBN_files,'SB')
 
 
-    def make_list(self,SBs,files,append='SB'):
+    def make_dict(self,SBs,files,append='SB'):
         """Makes a dictionary of links keyed with the starting SBN, ABN
         """
         for chunk in range(0,(SBs[-1][0]-SBs[0][0])/self.stride+1):
@@ -205,10 +326,11 @@ class srm_manager(object):
         return stage_all.get_stage_status(self.stageID)       
  
     def fix_srms(self,path='srm:\/\/lofar-srm.fz-juelich.de:8443'):
-        for key in self.srms:
-            self.srms[key]=re.sub("//pnfs","/pnfs",self.srms[key])
-            if "poznan" in self.srms[key]:
-                self.srms[key]=re.sub("//lofar","/lofar",self.srms[key])
-            self.srms[key]=re.sub(path,'',self.srms[key].split()[0])
+        for chunk in self.srms:
+            for key in range(len(self.srms[chunk])):
+                self.srms[chunk][key]=re.sub("//pnfs","/pnfs",self.srms[chunk][key])
+                if "poznan" in self.srms[chunk][key]:
+                    self.srms[chunk][key]=re.sub("//lofar","/lofar",self.srms[chunk][key])
+                self.srms[chunk][key]=re.sub(path,'',self.srms[chunk][key].split()[0])
 
  
