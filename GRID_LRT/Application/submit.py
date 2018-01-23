@@ -26,7 +26,7 @@ class jdl_launcher(object):
     Job_ID for the glite job. 
     """
 
-    def __init__(self,numjobs=1,token_type='t_test',wholenodes=False,*args,**kwargs):
+    def __init__(self,numjobs=1,token_type='t_test',wholenodes=False,parameter_step=4,*args,**kwargs):
         """The jdl_launcher class is initialized with the number of jobs, 
         the name of the PiCaS token type to run, and a flag to use the whole node.
         
@@ -43,6 +43,7 @@ class jdl_launcher(object):
             logging.warn("jdl_file with zero jobs!")
             numjobs=1
         self.numjobs=numjobs
+        self.parameter_step=parameter_step
         self.token_type=token_type
         if wholenodes:
             self.wholenodes='true'
@@ -76,7 +77,7 @@ class jdl_launcher(object):
         jdlfile="""[
   JobType="Parametric";
   ParameterStart=0;
-  ParameterStep=4;                                                                                       
+  ParameterStep=%d;                                                                                      
   Parameters= %d ;
   Executable = "/bin/sh";
 
@@ -92,7 +93,8 @@ class jdl_launcher(object):
   WholeNodes = %s ;
   SmpGranularity = %d;
   CPUNumber = %d;
-]"""%(  int(self.numjobs),
+]"""%(  int(self.parameter_step),
+        int(self.numjobs),
         str(creds.database),
         str(creds.user),
         str(creds.password),
