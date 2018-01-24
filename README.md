@@ -34,16 +34,16 @@ Installing:
 ============
 To use the package, it is recommended to install it using the setup.py script: 
 
-`
+```
 python setup.py build
-
 python setup.py install
-`
+```
+
 If you do not have permissions to write to the default Python package directory, you can use
 
-`
+```
 python setup.py install --perfix={PATH_WHERE_TO_INSTALL_PACKAGE}
-`
+```
 
 You have to make sure that this path 1. Exists, 2. Is in your PYTHONPATH and 3. Will be in your PYTHONPATH every time you enter your shell (add it to your ~/.bashrc)
 
@@ -54,28 +54,25 @@ Data Staging
 ------------
 In order to stage the data using the ASTRON LTA api, you need credentials to the [ASTRON LTA service](https://www.astron.nl/lofarwiki/doku.php?id=public:lta_howto#staging_data_prepare_for_download). These credentials need to be saved in a file on the lofar ui at ~/.stagingrc in the form 
 
-`user=uname
-
-password=pswd`
+```
+user=uname
+password=pswd
+```
 
 Staging requires a list of srms to be staged (typically srm.txt)
 
 It can be done with this set of commands:
 
-`
+```python 
 from GRID_LRT.Staging import stage_all_LTA
-
+from GRID_LRT.Staging import stager_access 
 stageID=stage_all_LTA.main('srm.txt') #Here is the path to your srm_file.
-
 print(stageID) # the stageID is your identifier to the staging system. You can poll it with:
-
-
 print(stage_all_LTA.get_stage_status(stageID)) # prints out a 'status' string
 
 statuses=stager_access.get_progress()
-
 print(statuses[stageID]) # More detailed information on your staging request
-`
+```
 
 Because of design choices at the Astron service, when your staging is complete, the last 2 commands above will fail! The get\_stage\_status function appears to return 'success' though.
 
