@@ -129,8 +129,10 @@ class srmlist(list):
         srmdict = {}
         for i in self:
             m = None
+            surl=srmlist()
+            surl.append(i)
             m = re.search(pref+'(.+?)'+suff,i)
-            yield m.group(1),i
+            yield m.group(1),surl
 
 
 
