@@ -9,8 +9,8 @@
 
 import unittest
 
-from couchdb.http import ResourceConflict, ResourceNotFound
-from couchdb.tests import testutil
+from GRID_LRT.couchdb.http import ResourceConflict, ResourceNotFound
+from GRID_LRT.couchdb.tests import testutil
 
 
 class CouchTests(testutil.TempDatabaseMixin, unittest.TestCase):
