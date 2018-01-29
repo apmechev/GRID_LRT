@@ -23,7 +23,7 @@ from GRID_LRT.Staging.srmlist import srmlist
 from string import strip
 import pdb
 
-def main(filename):
+def main(filename, printout=True):
 	file_loc=location(filename)
         rs,m=replace(file_loc)
         f=open(filename,'r')
@@ -32,10 +32,9 @@ def main(filename):
         for i in urls:
             s_list.append(i)
         f.close()
-        return (process(s_list,rs,m,True))
+        return (process(s_list,rs,m,printout))
 
-
-def state_dict(srm_dict,printout=True):
+def state_dict(srm_dict, printout=True):
         locs_options=['s','j','p']
 
         line=srm_dict.itervalues().next() 
@@ -83,7 +82,6 @@ def process(urls,repl_string,m,printout=True):
 	
 	mx=len(surls)
 	locality=[]
-        pdb.set_trace()
 	i=0
 	while i<mx:
 	    req={}
