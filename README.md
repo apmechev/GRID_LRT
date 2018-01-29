@@ -1,12 +1,3 @@
----
-author:
-- 'Alexandar P. Mechev, Raymond Oonk'
-title: |
-    GRID\_LRT: LOFAR Reduction Tools for The Dutch Grid\
-
-    A set of tools to reduce LOFAR Data: infrastructue and usage 
-...
-
 Due to the large computational requirements for LOFAR datasets,
 processing bulk data on the grid is required. This manual will detail
 the Dutch grid infrastructure, the submission process and the types of
@@ -76,6 +67,19 @@ print(statuses[stageID]) # More detailed information on your staging request
 
 Because of design choices at the Astron service, when your staging is complete, the last 2 commands above will fail! The get\_stage\_status function appears to return 'success' though.
 
+Creating a Sandbox
+--------------------
+
+In order to make processing portable, all scripts are archived in a 'sandbox', which is extracted to an empty temporary folder on the worker node. This architecture choice also makes it easy to test a clean environment on the login node or even your laptop. 
+
+
+
+PiCaS Tokens
+--------------------
+
+Job 'Tokens' are a way to define your jobs.  
+
+
 [Mooc](http://docs.surfsaralabs.nl/projects/grid/en/latest/Pages/Tutorials/MOOC/mooc.html#mooc-picas-client)
 
 [Utility](https://ganglia.surfsara.nl/?r=hour&cs=&ce=&c=GINA+Servers&h=&tab=ch&vn=&hide-hf=false&m=load_one&sh=1&z=small&hc=4&host_regex=&max_graphs=0&s=by+name)
@@ -83,19 +87,26 @@ Because of design choices at the Astron service, when your staging is complete, 
 Node-side processing
 ====================
 
-NDPPP Parset Execution fad\_LRT.py
-----------------------------------
+Now that the data is staged, jobs are defined, scripts are bundled and jobs submitted, here's what happens on the worker node:
 
-Custom Script Execution fad\_LRT.py
------------------------------------
-
-
-GRID Prefactor prefactor\_LRT.py
+Launching and Locking Tokens
 --------------------------------
 
 
-Surls, Staging and Storage of results
+Intermediate Storage
 =====================================
 
-LRT Architecture
-================
+
+Other
+=========================
+
+---                                                                                                      
+author:
+- 'Alexandar P. Mechev, Raymond Oonk'
+title: |
+    GRID\_LRT: LOFAR Reduction Tools for The Dutch Grid\
+
+    A set of tools to reduce LOFAR Data: infrastructue and usage 
+... 
+
+
