@@ -19,6 +19,7 @@ import gfal
 import time
 import re
 import sys
+from GRID_LRT.Staging.srmlist import srmlist
 from string import strip
 import pdb
 
@@ -27,8 +28,11 @@ def main(filename):
         rs,m=replace(file_loc)
         f=open(filename,'r')
         urls=f.readlines()
+        s_list=srmlist()
+        for i in urls:
+            s_list.append(i)
         f.close()
-        return (process(urls,rs,m,True))
+        return (process(s_list,rs,m,True))
 
 
 def state_dict(srm_dict,printout=True):
@@ -54,31 +58,32 @@ def location(filename):
 
 def replace(file_loc):
 	if file_loc=='p':
-		m=re.compile('/lofar')
-		repl_string="srm://lta-head.lofar.psnc.pl:8443/srm/managerv2?SFN=/lofar"
+		m=re.compile('8443')
+		repl_string="8443/srm/managerv2?SFN="
 		print("Files are in Poznan")
 	else:
-		m=re.compile('/pnfs')
+		m=re.compile('8443')
 		if file_loc=='j':
-			repl_string="srm://lofar-srm.fz-juelich.de:8443/srm/managerv2?SFN=/pnfs/"
+			repl_string="8443/srm/managerv2?SFN="
 			print("Files are in Juleich")
+                        print("State_check will fail!")
 		elif file_loc=='s':
-			repl_string="srm://srm.grid.sara.nl:8443/srm/managerv2?SFN=/pnfs"
-			print("files are on SARA")
+                    repl_string="8443/srm/managerv2?SFN="
+		    print("files are on SARA")
 		else:
 			sys.exit()
         return repl_string,m
    
 def process(urls,repl_string,m,printout=True): 
 	nf=100
-	surls=[]
+	surls=srmlist()
 	for u in urls:
-	    surls.append(m.sub(repl_string,strip(u)))
+	     surls.append(m.sub(repl_string,strip(u)))
 	#    surls.append(m.sub('srm://lofar-srm.fz-juelich.de:8443/srm/managerv2?SFN=/pnfs/',strip(u)))
 	
 	mx=len(surls)
 	locality=[]
-
+        pdb.set_trace()
 	i=0
 	while i<mx:
 	    req={}
