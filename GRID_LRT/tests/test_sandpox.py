@@ -7,7 +7,7 @@ class SandboxTest(unittest.TestCase):
 
     def setUp(self):
         self.PWD=os.getcwd()
-        self.sbxconf=os.getcwd()+'/config/sandboxes/test.cfg'
+        self.sbxconf=os.getcwd()+'/config/steps/test.cfg'
 #        os.chdir(self.PWD+"/GRID_LRT/Sandbox")
 
 
@@ -22,7 +22,7 @@ class SandboxTest(unittest.TestCase):
         s=sandbox.Sandbox()
         s.parseconfig(self.sbxconf)
         s.create_SBX_folder()
-        SBX_dir=s.options['sandbox']['name'] 
+        SBX_dir=s.sbx_def['name'] 
         self.assertTrue(os.path.exists(SBX_dir) & os.path.isdir(SBX_dir))
         s.cleanup()
 

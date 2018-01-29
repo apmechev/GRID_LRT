@@ -2,7 +2,7 @@ import sys
 import re
 import os
 import subprocess
-from GRID_LRT.Staging import surl_chunks
+#from GRID_LRT.Staging import surl_chunks
 import GRID_LRT.Staging.stage_all_LTA as stage_all
 #import GRID_LRT.Staging.state_all as state_all
 import GRID_LRT.Staging.stager_access as sa
@@ -70,7 +70,7 @@ class srmlist(list):
                                             item)
         if self.LTA_location=='juelich': return re.sub("srm://lofar-srm.fz-juelich.de:8443","gsiftp://dcachepool12.fz-juelich.de:2811",item)
         if self.LTA_location=='poznan': return re.sub("srm://lta-head.lofar.psnc.pl:8443",
-                                                    "gsiftp://door02.lofar.psnc.pl:2811",
+                                                    "gsiftp://gridftp.lofar.psnc.pl:2811",
                                             item)
 
     def http_replace(self,item):
