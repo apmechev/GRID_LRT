@@ -54,9 +54,9 @@ class srmlist(list):
         """Sometimes there are two fields in the incoming list. Only take the first
         as long as it's fromatted properly
         """
-        item=re.sub('//pnfs','/pnfs',item)
+        item=re.sub('//pnfs','/pnfs',"".join(item))
         if self.LTA_location=='poznan':
-            item=re.sub('//lofar','/lofar',item)
+            item=re.sub('//lofar','/lofar',"".join(item))
         if " " in item:
             for potential_link in item.split(" "):
                 if 'srm://' in potential_link:
