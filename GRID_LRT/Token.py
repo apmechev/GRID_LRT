@@ -263,6 +263,26 @@ function (key, values, rereduce) {
             return
         v = self.db.view(self.t_type+"/"+view_name)
         return v
+    
+    def clear_all_views(self):
+        """Iterates over all views in the design document 
+        and deletes all tokens from those views. Finally, removes
+        the views from the database"""
+        self.load_views()
+        for view in self.views.keys():
+            if view !='overview_total':
+                self.delete_tokens(view)
+            self.del_view(view)
+        self.load_views()
+        return self.views
+
+    def purge_tokens(self):
+        """ Deletes ALL tokens associated with this token_type
+        and removes all views. Also removes the design document from 
+        the database"""
+        self.clear_all_views()
+        del(self.db['_design/'+self.t_type])
+        return None
 
     def set_view_to_status(self, view_name, status):
         """Sets the status to all tokens in 'view' to 'status
