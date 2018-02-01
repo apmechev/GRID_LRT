@@ -38,6 +38,36 @@ python setup.py install --perfix={PATH_WHERE_TO_INSTALL_PACKAGE}
 
 You have to make sure that this path 1. Exists, 2. Is in your PYTHONPATH and 3. Will be in your PYTHONPATH every time you enter your shell (add it to your ~/.bashrc)
 
+Tutorial Notebook
+==============
+
+Best way to get acquainted with the software is with the tutorial notebook available at GRID\_LRT/tutorials/LRT\_demo.ipynb
+
+Setting up Jupyter on loui
+----------------
+
+```bash
+$> ssh loui.grid.sara.nl
+[10:42 me@loui ~] > mkdir ~/.jupyter
+[10:42 me@loui ~] > export PATH=/cvmfs/softdrive.nl/anatolid/anaconda-2-2.4.0/bin:$PATH
+[10:42 me@loui ~] > export LD_LIBRARY_PATH=/cvmfs/softdrive.nl/anatolid/anaconda-2-2.4.0/lib:$LD_LIBRARY_PATH
+[10:42 me@loui ~] > jupyter notebook password
+
+
+```
+
+Running a Jupyter notebook on loui
+---------------
+Assuming you have ssh login to loui, you can run this notebook on your own machine by using ssh port forwarding : 
+
+```bash
+$> ssh -L 8888:localhost:8888 loui.grid.sara.nl
+[10:42 me@loui ~] > source /home/apmechev/.init_jupyter
+```
+
+With that shell running, you can open the browser on your local machine and go to localhost:8888, and browse to the tutorials folder. 
+
+
 Grid job submission and queuing
 ===============================
 
