@@ -46,7 +46,7 @@ print_worker_info                      ##Imported from bin/print_worker_info
 if [[ -z "$PARSET" ]]; then
     ls "$PARSET"
     echo "not found"
-    exit 30  #exit 30=> Parset doesn't exist
+    exit 3  #exit 3=> Parset doesn't exist
 fi
 
 setup_run_dir                     #imported from bin/setup_run_dir.sh
