@@ -300,7 +300,7 @@ function (key, values, rereduce) {
 class TokenSet(object):
     def __init__(self,th=None,tok_config=None):
         self.th=th
-        self.tokens=[]
+        self.__tokens=[]
         if not tok_config:
             self.token_keys={}
         else:
@@ -324,7 +324,7 @@ class TokenSet(object):
                 with open('temp_abn','r') as tmp_abn_file:
                    self.th.add_attachment(token,tmp_abn_file,file_upload)
                 os.remove('temp_abn')
-            self.tokens.append(token)
+            self.__tokens.append(token)
 
     def add_attach_to_list(self,attachment,tok_list=None,name=None):
         '''Adds an attachment to all the tokens in the TokenSet, or to another list 
@@ -336,10 +336,18 @@ class TokenSet(object):
         for token in tok_list:
             self.th.add_attachment(token, open(attachment,'r'),os.path.basename(name))
 
+    @property
+    def tokens(self):
+        self.update_local_tokens()
+        return self.__tokens
+
     def update_local_tokens(self):
-        for token in self.tokens:
-            token=th.db[token['_id']]
-        pass
+        self.__tokens=[]
+        self.th.load_views()
+        for v in self.th.views.keys():
+            if v!='overview_total':
+                for t in self.th.list_tokens_from_view(v):
+                    self.__tokens.append(t['id'])
 
     def add_keys_to_list(self,key,val,tok_list=None):
         if not tok_list:
