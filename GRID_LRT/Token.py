@@ -314,6 +314,7 @@ class TokenSet(object):
         """ The TokenSet object is created with a TokenHandler Object, which is 
         responsible for the interface to the CouchDB views and Documents. This also ensures
         that only one job type is contained in a TokenSet. 
+
         Args:
             th (TokenHandler): The TokenHandler associated with the job tokens
             tok_config (str): Location of the token yaml file on the host FileSystem
@@ -334,13 +335,10 @@ class TokenSet(object):
             argument exists.
             
             Args:
-                iterable (dict): The dictionary which determines how many tokens
-                    will be created. The values  are attached to each token
+                iterable (dict): The dictionary which determines how many tokens will be created. The values  are attached to each token
                 id_append (str): Option to append the OBSID to each Token
-                key_name (str): The Token field which will hold the value 
-                    of the dictionary's keys for each Token
-                file_upload (str): The name of the file which to upload to the
-                    tokens (typically srm.txt)
+                key_name (str): The Token field which will hold the value of the dictionary's keys for each Token
+                file_upload (str): The name of the file which to upload to the tokens (typically srm.txt)
 
         """# TODO: Check if key_name is inside token_keys!
         for key in iterable:

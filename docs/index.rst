@@ -10,13 +10,8 @@ Welcome to GRID_LRT's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-GRID_LRT.Token module
---------------------
-.. automodule:: GRID_LRT.Token
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
+   installing
+   token
 
 GRID_LRT.Staging modules
 --------------------
