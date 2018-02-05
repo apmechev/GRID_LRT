@@ -91,7 +91,7 @@ todo_include_todos = True
 html_theme = "classic"
 html_theme_options = {
     "rightsidebar": "false",
-    "sidebarwidth": 480,
+    "sidebarwidth": 380,
     "relbarbgcolor": "black"
 }
 
