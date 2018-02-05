@@ -17,8 +17,6 @@ GRID_LRT.Token module
     :undoc-members:
     :inherited-members:
     :show-inheritance:
-    .. automethod:: __init__
-
 
 GRID_LRT.Staging modules
 --------------------
