@@ -41,12 +41,12 @@ class SrmlistTest(unittest.TestCase):
         with open(os.path.dirname(__file__)+'/srm_50_sara.txt','rb') as sfile:
             for line in sfile:
                 sl.append(line)
-        self.assertTrue(len(sl)==244)
+        self.assertTrue(len(sl)==51)
         gsiftps=[]
         for f in sl.gsi_links():
             self.assertTrue(f[:34]=='gsiftp://gridftp.grid.sara.nl:2811')
             gsiftps.append(f)
-        self.assertTrue(len(gsiftps)==244)
+        self.assertTrue(len(gsiftps)==51)
 
     def test_append_juelichrepeat(self):
         sl=srmlist()

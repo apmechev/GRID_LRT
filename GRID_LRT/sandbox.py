@@ -46,6 +46,7 @@ class Sandbox(object):
             shutil.rmtree(self.tmpdir)
             os.makedirs(self.tmpdir)
         self.enter_SBX_folder(self.tmpdir)
+        self.SBXloc=self.tmpdir
         return self.tmpdir
 
     def delete_SBX_folder(self,directory=None):
