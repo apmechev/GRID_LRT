@@ -37,8 +37,11 @@ except IOError:
     except IOError:
         print("No StagingRC file found")
 
-print datetime.datetime.now(), "stager_access: Creating proxy"
-proxy = xmlrpclib.ServerProxy("https://"+user+':'+passw+"@webportal.astron.nl/service-public/xmlrpc") 
+if user and passw:
+    print datetime.datetime.now(), "stager_access: Creating proxy"
+    proxy = xmlrpclib.ServerProxy("https://"+user+':'+passw+"@webportal.astron.nl/service-public/xmlrpc")
+else:
+    print("No User or Password exist. ")
 # ---
 
 def stage(surls):
