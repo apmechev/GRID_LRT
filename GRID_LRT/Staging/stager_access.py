@@ -26,13 +26,16 @@ try:
             if line.startswith("database_password"):
                 passw = line.split(':')[1].strip()
 except IOError:
-    with open(expanduser("~/.stagingrc"),'r') as file:
-        print datetime.datetime.now(), "stager_access: Parsing user credentials from", expanduser("~/.stagingrc")
-        for line in file:
-            if line.startswith("user"):
-                user = line.split('=')[1].strip()
-            if line.startswith("password"):
-                passw = line.split('=')[1].strip()
+    try:
+        with open(expanduser("~/.stagingrc"),'r') as file:
+            print datetime.datetime.now(), "stager_access: Parsing user credentials from", expanduser("~/.stagingrc")
+            for line in file:
+                if line.startswith("user"):
+                    user = line.split('=')[1].strip()
+                if line.startswith("password"):
+                    passw = line.split('=')[1].strip()
+    except IOError:
+        print("No StagingRC file found")
 
 print datetime.datetime.now(), "stager_access: Creating proxy"
 proxy = xmlrpclib.ServerProxy("https://"+user+':'+passw+"@webportal.astron.nl/service-public/xmlrpc") 
