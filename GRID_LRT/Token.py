@@ -6,7 +6,13 @@
 # This software is licensed as described in the file LICENSE.md, which
 # you should have received as part of this distribution.
 
-"""Python Token Class
+"""
+.. module:: GRID_LRT.Token 
+   :platform: Unix
+   :synopsis: Set of tools for manually and automatically creating tokens
+
+.. moduleauthor:: Alexandar Mechev <apmechev@gmail.com>
+
 >>> from GRID_LRT.get_picas_credentials import picas_cred
 >>> pc=picas_cred()
 >>> 
