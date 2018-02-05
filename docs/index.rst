@@ -17,14 +17,11 @@ GRID_LRT.Token module
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    .. automethod:: __init__
+
 
 GRID_LRT.Staging modules
 --------------------
-.. automodule:: GRID_LRT.Staging.stage_all
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
 .. automodule:: GRID_LRT.Staging.srmlist
     :members:
     :undoc-members:

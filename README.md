@@ -1,3 +1,6 @@
+[![Documentation Status](https://readthedocs.org/projects/grid-lrt/badge/?version=latest)](http://grid-lrt.readthedocs.io/en/latest/?badge=latest)
+
+
 Due to the large computational requirements for LOFAR datasets,
 processing bulk data on the grid is required. This manual will detail
 the Dutch grid infrastructure, the submission process and the types of
