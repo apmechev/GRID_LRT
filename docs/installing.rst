@@ -22,11 +22,14 @@ Download the latest version from ``https://www.github.com/apmechev/GRID_LRT``. T
     python setup.py build
     python setup.py install
 
-In the case that you do not have access to the python system libraries, you can use ``--prefix=`` to specify install folder
+In the case that you do not have access to the python system libraries, you can use ``--prefix=`` to specify install folder:
 
 .. code:: bash
+
     python setup.py build
     python setup.py install --prefix=/home/apmechev/software/python
+
+
 
 
 

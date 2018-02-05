@@ -12,26 +12,7 @@ Welcome to GRID_LRT's documentation!
 
    installing
    token
-
-GRID_LRT.Staging modules
---------------------
-.. automodule:: GRID_LRT.Staging.srmlist
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-
-.. automodule:: GRID_LRT.Staging.stage_all_LTA
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-
-.. automodule:: GRID_LRT.Staging.stager_access
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance
+   staging
 
 Indices and tables
 ==================

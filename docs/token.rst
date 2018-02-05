@@ -1,5 +1,5 @@
 
-GRID_LRT Token Module
+Token Module
 =================
 
 This module is responsible for interactions with CouchDB using the PiCaS token framework
