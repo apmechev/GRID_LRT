@@ -304,7 +304,21 @@ function (key, values, rereduce) {
         self.db.update(to_update)
 
 class TokenSet(object):
+    """ The TokenSet object can automatically create a group of tokens from a
+    yaml configuration file and a dictionary. It keeps track internally of
+    the set of tokens and allows users to batch attach files to the entire TokenSet or alter
+    fields of all tokens in the set. 
+
+    """
     def __init__(self,th=None,tok_config=None):
+        """ The TokenSet object is created with a TokenHandler Object, which is 
+        responsible for the interface to the CouchDB views and Documents. This also ensures
+        that only one job type is contained in a TokenSet. 
+        Args:
+            th (TokenHandler): The TokenHandler associated with the job tokens
+            tok_config (str): Location of the token yaml file on the host FileSystem
+
+        """
         self.th=th
         self.__tokens=[]
         if not tok_config:
@@ -313,9 +327,22 @@ class TokenSet(object):
             with open(tok_config,'rb') as optfile:
                 self.token_keys=yaml.load(optfile)['Token']
 
-    def create_dict_tokens(self,iterable={},id_append="L345916",key_name='start_SB',file_upload=None):
-        '''
-        '''# TODO: Check if key_name is inside token_keys!
+    def create_dict_tokens(self,iterable={},id_append="L000000",key_name='start_SB',file_upload=None):
+        """ A function that accepts a dictionary and creates a set of tokens equal to 
+            the number of entries (keys) of the dictionary. The values of the dict are
+            a list of strings that may be attached to each token if the 'file_upload' 
+            argument exists.
+            
+            Args:
+                iterable (dict): The dictionary which determines how many tokens
+                    will be created. The values  are attached to each token
+                id_append (str): Option to append the OBSID to each Token
+                key_name (str): The Token field which will hold the value 
+                    of the dictionary's keys for each Token
+                file_upload (str): The name of the file which to upload to the
+                    tokens (typically srm.txt)
+
+        """# TODO: Check if key_name is inside token_keys!
         for key in iterable:
             keys=dict(itertools.chain(self.token_keys.iteritems(),{key_name:str("%03d" % int(key) )}.iteritems()))
 #            _=keys.pop('_attachments')
