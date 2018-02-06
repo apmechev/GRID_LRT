@@ -139,7 +139,7 @@ class Sandbox(object):
 
         upload_place=gsiloc+self.sbx_def['loc']
         if loc is not None: upload_place=loc
-        print upload_place
+        print(upload_place)
         
         if self.tarfile:
             upload=subprocess.Popen(['globus-url-copy',self.tarfile, gsiloc+
@@ -160,13 +160,13 @@ class Sandbox(object):
 
     def delete_gsi_sandbox(self,sbxfile):
         deljob=subprocess.Popen(['uberftp','-rm',sbxfile],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        print "deleted old sandbox"
+        print("deleted old sandbox")
         return deljob.communicate()
 
 
     def zip_SBX(self,zipname=None):
         filename=zipname if zipname else self.sbx_def['name']+".tar"
-        print filename
+        print(filename)
         tar=subprocess.call('tar -cf '+filename+' *',shell=True)
         self.tarfile=filename
 

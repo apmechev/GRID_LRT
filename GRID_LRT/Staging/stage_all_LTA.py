@@ -101,7 +101,7 @@ def process(urls,repl_string,m):
 	surls=[]
 	for u in urls:
             if not 'srm' in u:
-	        surls.append(m.sub(repl_string,strip(u)))
+                surls.append(m.sub(repl_string,strip(u)))
             else:
                 surls.append(strip(u))
 	req={}
