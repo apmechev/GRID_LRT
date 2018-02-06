@@ -41,7 +41,8 @@ class SrmlistTest(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.dirname(__file__)+'/srm_50_sara.txt'))
         with open(os.path.dirname(__file__)+'/srm_50_sara.txt','rb') as sfile:
             for line in sfile:
-                self.assertTrue( line!=""  )
+                self.assertTrue( line!="")
+                self.assertTrue( line!=None)
                 sl.append(line)
         self.assertTrue(len(sl)==51)
         gsiftps=[]
