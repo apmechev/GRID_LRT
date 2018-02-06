@@ -328,7 +328,7 @@ class TokenSet(object):
         if not tok_config:
             self.token_keys={}
         else:
-            with open(tok_config,'rb') as optfile:
+            with open(tok_config,'r') as optfile:
                 self.token_keys=yaml.load(optfile)['Token']
 
     def create_dict_tokens(self,iterable={},id_append="L000000",key_name='start_SB',file_upload=None):

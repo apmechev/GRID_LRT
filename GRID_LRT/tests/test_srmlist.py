@@ -39,7 +39,7 @@ class SrmlistTest(unittest.TestCase):
     def test_gsiftp_sara(self):
         sl=srmlist()
         self.assertTrue(os.path.exists(os.path.dirname(__file__)+'/srm_50_sara.txt'))
-        with open(os.path.dirname(__file__)+'/srm_50_sara.txt','rb') as sfile:
+        with open(os.path.dirname(__file__)+'/srm_50_sara.txt','r') as sfile:
             for line in sfile:
                 self.assertTrue( line!="")
                 self.assertTrue( line!=None)

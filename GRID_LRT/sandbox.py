@@ -24,7 +24,7 @@ class Sandbox(object):
 
     def parseconfig(self,yamlfile):
         try:
-            with open(yamlfile,'rb') as optfile:
+            with open(yamlfile,'r') as optfile:
                 opts_f=yaml.load(optfile)
         except yaml.YAMLError as exc:
             print(exc)
