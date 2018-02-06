@@ -13,9 +13,9 @@
 >>> doc_id, doc_rev = db.save({'type': 'Person', 'name': 'John Doe'})
 >>> doc = db[doc_id]
 >>> doc['type']
-'Person'
+u'Person'
 >>> doc['name']
-'John Doe'
+u'John Doe'
 >>> del db[doc.id]
 >>> doc.id in db
 False
@@ -29,10 +29,11 @@ import os
 from types import FunctionType
 from inspect import getsource
 from textwrap import dedent
-import re
 import warnings
+import sys
+import socket
 
-from GRID_LRT.couchdb import http, json
+from GRID_LRT.couchdb import http, json, util
 
 __all__ = ['Server', 'Database', 'Document', 'ViewResults', 'Row']
 __docformat__ = 'restructuredtext en'
@@ -44,7 +45,9 @@ DEFAULT_BASE_URL = os.environ.get('COUCHDB_URL', 'http://localhost:5984/')
 class Server(object):
     """Representation of a CouchDB server.
 
-    >>> server = Server()
+    >>> server = Server() # connects to the local_server
+    >>> remote_server = Server('http://example.com:5984/')
+    >>> secure_remote_server = Server('https://username:password@example.com:5984/')
 
     This class behaves like a dictionary of databases. For example, to get a
     list of database names on the server, you can simply iterate over the
@@ -76,12 +79,13 @@ class Server(object):
         :param full_commit: turn on the X-Couch-Full-Commit header
         :param session: an http.Session instance or None for a default session
         """
-        if isinstance(url, basestring):
+        if isinstance(url, util.strbase):
             self.resource = http.Resource(url, session or http.Session())
         else:
             self.resource = url # treat as a Resource object
         if not full_commit:
             self.resource.headers['X-Couch-Full-Commit'] = 'false'
+        self._version_info = None
 
     def __contains__(self, name):
         """Return whether the server contains a database with the specified
@@ -93,7 +97,7 @@ class Server(object):
         try:
             self.resource.head(name)
             return True
-        except http.ResourceNotFound:
+        except (socket.error, http.ResourceNotFound):
             return False
 
     def __iter__(self):
@@ -111,8 +115,11 @@ class Server(object):
         try:
             self.resource.head()
             return True
-        except:
+        except (socket.error, http.ResourceNotFound):
             return False
+
+    def __bool__(self):
+        return self.__nonzero__()
 
     def __repr__(self):
         return '<%s %r>' % (type(self).__name__, self.resource.url)
@@ -159,6 +166,18 @@ class Server(object):
         :rtype: `unicode`"""
         status, headers, data = self.resource.get_json()
         return data['version']
+
+    def version_info(self):
+        """The version of the CouchDB server as a tuple of ints.
+
+        Note that this results in a request being made only at the first call.
+        Afterwards the result will be cached.
+
+        :rtype: `tuple(int, int, int)`"""
+        if self._version_info is None:
+            version = self.version()
+            self._version_info = tuple(map(int, version.split('.')))
+        return self._version_info
 
     def stats(self, name=None):
         """Server statistics.
@@ -223,6 +242,81 @@ class Server(object):
         status, headers, data = self.resource.post_json('_replicate', data)
         return data
 
+    def add_user(self, name, password, roles=None):
+        """Add regular user in authentication database.
+
+        :param name: name of regular user, normally user id
+        :param password: password of regular user
+        :param roles: roles of regular user
+        :return: (id, rev) tuple of the registered user
+        :rtype: `tuple`
+        """
+        user_db = self['_users']
+        return user_db.save({
+            '_id': 'org.couchdb.user:' + name,
+            'name': name,
+            'password': password,
+            'roles': roles or [],
+            'type': 'user',
+        })
+
+    def remove_user(self, name):
+        """Remove regular user in authentication database.
+
+        :param name: name of regular user, normally user id
+        """
+        user_db = self['_users']
+        doc_id = 'org.couchdb.user:' + name
+        del user_db[doc_id]
+
+    def login(self, name, password):
+        """Login regular user in couch db
+
+        :param name: name of regular user, normally user id
+        :param password: password of regular user
+        :return: authentication token
+        """
+        status, headers, _ = self.resource.post_json('_session', {
+            'name': name,
+            'password': password,
+        })
+        if sys.version_info[0] > 2:
+            cookie = headers._headers[0][1]
+        else:
+            cookie = headers.headers[0].split(';')[0]
+        pos = cookie.find('=')
+        return cookie[pos + 1:]
+
+    def logout(self, token):
+        """Logout regular user in couch db
+
+        :param token: token of login user
+        :return: True if successfully logout
+        :rtype: bool
+        """
+        header = {
+            'Accept': 'application/json',
+            'Cookie': 'AuthSession=' + token,
+        }
+        status, _, _ = self.resource.delete_json('_session', headers=header)
+        return status == 200
+
+    def verify_token(self, token):
+        """Verify user token
+
+        :param token: authentication token
+        :return: True if authenticated ok
+        :rtype: bool
+        """
+        try:
+            status, _, _ = self.resource.get_json('_session', {
+                'Accept': 'application/json',
+                'Cookie': 'AuthSession=' + token,
+            })
+        except http.Unauthorized:
+            return False
+        return status == 200
+
 
 class Database(object):
     """Representation of a database on a CouchDB server.
@@ -239,18 +333,18 @@ class Database(object):
 
     >>> doc = db[doc_id]
     >>> doc                 #doctest: +ELLIPSIS
-    <Document '...'@... {...}>
+    <Document u'...'@... {...}>
 
     Documents are represented as instances of the `Row` class, which is
     basically just a normal dictionary with the additional attributes ``id`` and
     ``rev``:
 
     >>> doc.id, doc.rev     #doctest: +ELLIPSIS
-    ('...', ...)
+    (u'...', ...)
     >>> doc['type']
-    'Person'
+    u'Person'
     >>> doc['name']
-    'John Doe'
+    u'John Doe'
 
     To update an existing document, you use item access, too:
 
@@ -269,10 +363,16 @@ class Database(object):
     2
 
     >>> del server['python-tests']
+
+    If you need to connect to a database with an unverified or self-signed SSL
+    certificate, you can re-initialize your ConnectionPool as follows (only
+    applicable for Python 2.7.9+):
+
+    >>> db.resource.session.disable_ssl_verification()
     """
 
     def __init__(self, url, name=None, session=None):
-        if isinstance(url, basestring):
+        if isinstance(url, util.strbase):
             if not url.startswith('http'):
                 url = DEFAULT_BASE_URL + url
             self.resource = http.Resource(url, session)
@@ -310,8 +410,11 @@ class Database(object):
         try:
             self.resource.head()
             return True
-        except:
+        except http.ResourceNotFound:
             return False
+
+    def __bool__(self):
+        return self.__nonzero__()
 
     def __delitem__(self, id):
         """Remove the document with the specified ID from the database.
@@ -357,6 +460,14 @@ class Database(object):
             self.info()
         return self._name
 
+    @property
+    def security(self):
+        return self.resource.get_json('_security')[2]
+
+    @security.setter
+    def security(self, doc):
+        self.resource.put_json('_security', body=doc)
+
     def create(self, data):
         """Create a new document in the database with a random ID that is
         generated by the server.
@@ -389,7 +500,7 @@ class Database(object):
 
         If doc has no _id then the server will allocate a random ID and a new
         document will be created. Otherwise the doc's _id will be used to
-        identity the document to create or update. Trying to update an existing
+        identify the document to create or update. Trying to update an existing
         document with an incorrect _rev will raise a ResourceConflict exception.
 
         Note that it is generally better to avoid saving documents with no _id
@@ -476,7 +587,7 @@ class Database(object):
         :rtype: `str`
         :since: 0.6
         """
-        if not isinstance(src, basestring):
+        if not isinstance(src, util.strbase):
             if not isinstance(src, dict):
                 if hasattr(src, 'items'):
                     src = dict(src.items())
@@ -485,7 +596,7 @@ class Database(object):
                                     type(src))
             src = src['_id']
 
-        if not isinstance(dest, basestring):
+        if not isinstance(dest, util.strbase):
             if not isinstance(dest, dict):
                 if hasattr(dest, 'items'):
                     dest = dict(dest.items())
@@ -500,7 +611,7 @@ class Database(object):
 
         _, _, data = self.resource._request('COPY', src,
                                             headers={'Destination': dest})
-        data = json.decode(data.read())
+        data = json.decode(data.read().decode('utf-8'))
         return data['rev']
 
     def delete(self, doc):
@@ -519,10 +630,10 @@ class Database(object):
         >>> doc2 = db['johndoe']
         >>> doc2['age'] = 42
         >>> db['johndoe'] = doc2
-        >>> db.delete(doc)
+        >>> db.delete(doc) # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
           ...
-        ResourceConflict: ('conflict', 'Document update conflict.')
+        ResourceConflict: (u'conflict', u'Document update conflict.')
 
         >>> del server['python-tests']
 
@@ -624,7 +735,7 @@ class Database(object):
                  of the `default` argument if the attachment is not found
         :since: 0.4.1
         """
-        if isinstance(id_or_doc, basestring):
+        if isinstance(id_or_doc, util.strbase):
             id = id_or_doc
         else:
             id = id_or_doc['_id']
@@ -669,9 +780,79 @@ class Database(object):
         }, rev=doc['_rev'])
         doc['_rev'] = data['rev']
 
+    def find(self, mango_query, wrapper=None):
+        """Execute a mango find-query against the database.
+
+        Note: only available for CouchDB version >= 2.0.0
+
+        More information on the `mango_query` structure can be found here:
+          http://docs.couchdb.org/en/master/api/database/find.html#find-selectors
+
+        >>> server = Server()
+        >>> db = server.create('python-tests')
+        >>> db['johndoe'] = dict(type='Person', name='John Doe')
+        >>> db['maryjane'] = dict(type='Person', name='Mary Jane')
+        >>> db['gotham'] = dict(type='City', name='Gotham City')
+        >>> mango = {'selector': {'type': 'Person'},
+        ...          'fields': ['name'],
+        ...          'sort':[{'name': 'asc'}]}
+        >>> for row in db.find(mango):                          # doctest: +SKIP
+        ...    print(row['name'])                               # doctest: +SKIP
+        John Doe
+        Mary Jane
+        >>> del server['python-tests']
+
+        :param mango_query: a dictionary describing criteria used to select
+                            documents
+        :param wrapper: an optional callable that should be used to wrap the
+                        resulting documents
+        :return: the query results as a list of `Document` (or whatever `wrapper` returns)
+        """
+        status, headers, data = self.resource.post_json('_find', mango_query)
+        return map(wrapper or Document, data.get('docs', []))
+
+    def explain(self, mango_query):
+        """Explain a mango find-query.
+
+        Note: only available for CouchDB version >= 2.0.0
+
+        More information on the `mango_query` structure can be found here:
+          http://docs.couchdb.org/en/master/api/database/find.html#db-explain
+
+        >>> server = Server()
+        >>> db = server.create('python-tests')
+        >>> db['johndoe'] = dict(type='Person', name='John Doe')
+        >>> db['maryjane'] = dict(type='Person', name='Mary Jane')
+        >>> db['gotham'] = dict(type='City', name='Gotham City')
+        >>> mango = {'selector': {'type': 'Person'}, 'fields': ['name']}
+        >>> db.explain(mango)                          #doctest: +ELLIPSIS +SKIP
+        {...}
+        >>> del server['python-tests']
+
+        :param mango_query: a `dict` describing criteria used to select
+                            documents
+        :return: the query results as a list of `Document` (or whatever
+                 `wrapper` returns)
+        :rtype: `dict`
+        """
+        _, _, data = self.resource.post_json('_explain', mango_query)
+        return data
+
+    def index(self):
+        """Get an object to manage the database indexes.
+
+        :return: an `Indexes` object to manage the databes indexes
+        :rtype: `Indexes`
+        """
+        return Indexes(self.resource('_index'))
+
+
+
     def query(self, map_fun, reduce_fun=None, language='javascript',
               wrapper=None, **options):
         """Execute an ad-hoc query (a "temp view") against the database.
+
+        Note: not supported for CouchDB version >= 2.0.0
 
         >>> server = Server()
         >>> db = server.create('python-tests')
@@ -683,17 +864,17 @@ class Database(object):
         ...         emit(doc.name, null);
         ... }'''
         >>> for row in db.query(map_fun):
-        ...     print row.key
+        ...     print(row.key)
         John Doe
         Mary Jane
 
         >>> for row in db.query(map_fun, descending=True):
-        ...     print row.key
+        ...     print(row.key)
         Mary Jane
         John Doe
 
         >>> for row in db.query(map_fun, key='John Doe'):
-        ...     print row.key
+        ...     print(row.key)
         John Doe
 
         >>> del server['python-tests']
@@ -705,7 +886,7 @@ class Database(object):
         :param wrapper: an optional callable that should be used to wrap the
                         result rows
         :param options: optional query string parameters
-        :return: the view reults
+        :return: the view results
         :rtype: `ViewResults`
         """
         return TemporaryView(self.resource('_temp_view'), map_fun,
@@ -723,10 +904,10 @@ class Database(object):
         ...     Document(type='Person', name='Mary Jane'),
         ...     Document(type='City', name='Gotham City')
         ... ]):
-        ...     print repr(doc) #doctest: +ELLIPSIS
-        (True, '...', '...')
-        (True, '...', '...')
-        (True, '...', '...')
+        ...     print(repr(doc)) #doctest: +ELLIPSIS
+        (True, u'...', u'...')
+        (True, u'...', u'...')
+        (True, u'...', u'...')
 
         >>> del server['python-tests']
 
@@ -808,7 +989,7 @@ class Database(object):
         >>> db['gotham'] = dict(type='City', name='Gotham City')
 
         >>> for row in db.view('_all_docs'):
-        ...     print row.id
+        ...     print(row.id)
         gotham
 
         >>> del server['python-tests']
@@ -853,21 +1034,27 @@ class Database(object):
         if limit is not None and limit <= 0:
             raise ValueError('limit must be 1 or more')
         while True:
+
             loop_limit = min(limit or batch, batch)
             # Get rows in batches, with one extra for start of next batch.
             options['limit'] = loop_limit + 1
             rows = list(self.view(name, wrapper, **options))
+
             # Yield rows from this batch.
             for row in itertools.islice(rows, loop_limit):
                 yield row
+
             # Decrement limit counter.
             if limit is not None:
                 limit -= min(len(rows), batch)
+
             # Check if there is nothing else to yield.
             if len(rows) <= batch or (limit is not None and limit == 0):
                 break
+
             # Update options with start keys for next loop.
-            options.update(startkey=rows[-1]['key'], startkey_docid=rows[-1]['id'])
+            options.update(startkey=rows[-1]['key'],
+                           startkey_docid=rows[-1]['id'], skip=0)
 
     def show(self, name, docid=None, **options):
         """Call a 'show' function.
@@ -908,7 +1095,10 @@ class Database(object):
         :param name: the name of the update handler function in the format
                      ``designdoc/updatename``.
         :param docid: optional ID of a document to pass to the update handler.
-        :param options: optional query string parameters.
+        :param options: additional (optional) params to pass to the underlying
+                        http resource handler, including ``headers``, ``body``,
+                        and ```path```. Other arguments will be treated as
+                        query string params. See :class:`couchdb.http.Resource`
         :return: (headers, body) tuple, where headers is a dict of headers
                  returned from the list function and body is a readable
                  file-like instance
@@ -923,12 +1113,17 @@ class Database(object):
         return headers, body
 
     def _changes(self, **opts):
-        _, _, data = self.resource.get('_changes', **opts)
+        # use streaming `get` and `post` methods
+        if opts.get('filter') == '_selector':
+            selector = opts.pop('_selector', None)
+            _, _, data = self.resource.post('_changes', selector, **opts)
+        else:
+            _, _, data = self.resource.get('_changes', **opts)
         lines = data.iterchunks()
         for ln in lines:
             if not ln: # skip heartbeats
                 continue
-            doc = json.decode(ln)
+            doc = json.decode(ln.decode('utf-8'))
             if 'last_seq' in doc: # consume the rest of the response if this
                 for ln in lines:  # was the last line, allows conn reuse
                     pass
@@ -942,7 +1137,12 @@ class Database(object):
         """
         if opts.get('feed') == 'continuous':
             return self._changes(**opts)
-        _, _, data = self.resource.get_json('_changes', **opts)
+
+        if opts.get('filter') == '_selector':
+            selector = opts.pop('_selector', None)
+            _, _, data = self.resource.post_json('_changes', selector, **opts)
+        else:
+            _, _, data = self.resource.get_json('_changes', **opts)
         return data
 
 
@@ -984,7 +1184,8 @@ class Document(dict):
 
         :rtype: basestring
         """
-        return self['_id']
+        return self.get('_id')
+
 
     @property
     def rev(self):
@@ -992,14 +1193,14 @@ class Document(dict):
 
         :rtype: basestring
         """
-        return self['_rev']
+        return self.get('_rev')
 
 
 class View(object):
     """Abstract representation of a view or query."""
 
     def __init__(self, url, wrapper=None, session=None):
-        if isinstance(url, basestring):
+        if isinstance(url, util.strbase):
             self.resource = http.Resource(url, session)
         else:
             self.resource = url
@@ -1071,7 +1272,7 @@ def _encode_view_options(options):
     retval = {}
     for name, value in options.items():
         if name in ('key', 'startkey', 'endkey') \
-                or not isinstance(value, basestring):
+                or not isinstance(value, util.strbase):
             value = json.encode(value)
         retval[name] = value
     return retval
@@ -1117,7 +1318,7 @@ class ViewResults(object):
 
     >>> people = results[['Person']:['Person','ZZZZ']]
     >>> for person in people:
-    ...     print person.value
+    ...     print(person.value)
     John Doe
     Mary Jane
     >>> people.total_rows, people.offset
@@ -1128,7 +1329,7 @@ class ViewResults(object):
     can still return multiple rows:
 
     >>> list(results[['City', 'Gotham City']])
-    [<Row id='gotham', key=['City', 'Gotham City'], value='Gotham City'>]
+    [<Row id=u'gotham', key=[u'City', u'Gotham City'], value=u'Gotham City'>]
 
     >>> del server['python-tests']
     """
@@ -1136,7 +1337,7 @@ class ViewResults(object):
     def __init__(self, view, options):
         self.view = view
         self.options = options
-        self._rows = self._total_rows = self._offset = None
+        self._rows = self._total_rows = self._offset = self._update_seq = None
 
     def __repr__(self):
         return '<%s %r %r>' % (type(self).__name__, self.view, self.options)
@@ -1165,6 +1366,7 @@ class ViewResults(object):
         self._rows = [wrapper(row) for row in data['rows']]
         self._total_rows = data.get('total_rows')
         self._offset = data.get('offset', 0)
+        self._update_seq = data.get('update_seq')
 
     @property
     def rows(self):
@@ -1200,12 +1402,26 @@ class ViewResults(object):
             self._fetch()
         return self._offset
 
+    @property
+    def update_seq(self):
+        """The database update sequence that the view reflects.
+
+        The update sequence is included in the view result only when it is
+        explicitly requested using the `update_seq=true` query option.
+        Otherwise, the value is None.
+
+        :rtype: `int` or `NoneType` depending on the query options
+        """
+        if self._rows is None:
+            self._fetch()
+        return self._update_seq
+
 
 class Row(dict):
     """Representation of a row as returned by database views."""
 
     def __repr__(self):
-        keys = 'id', 'key', 'error', 'value'
+        keys = 'id', 'key', 'doc', 'error', 'value'
         items = ['%s=%r' % (k, self[k]) for k in keys if k in self]
         return '<%s %s>' % (type(self).__name__, ', '.join(items))
 
@@ -1237,3 +1453,111 @@ class Row(dict):
         doc = self.get('doc')
         if doc:
             return Document(doc)
+
+
+class Indexes(object):
+    """Manage indexes in CouchDB 2.0.0 and later.
+
+    More information here:
+        http://docs.couchdb.org/en/2.0.0/api/database/find.html#db-index
+    """
+
+    def __init__(self, url, session=None):
+        if isinstance(url, util.strbase):
+            self.resource = http.Resource(url, session)
+        else:
+            self.resource = url
+
+    def __setitem__(self, ddoc_name, index):
+        """Add an index to the database.
+
+        >>> server = Server()
+        >>> db = server.create('python-tests')
+        >>> db['johndoe'] = dict(type='Person', name='John Doe')
+        >>> db['maryjane'] = dict(type='Person', name='Mary Jane')
+        >>> db['gotham'] = dict(type='City', name='Gotham City')
+        >>> idx = db.index()
+        >>> idx['foo', 'bar'] = [{'type': 'asc'}]                #doctest: +SKIP
+        >>> list(idx)                                           #doctest: +SKIP
+        [{'ddoc': None,
+          'def': {'fields': [{'_id': 'asc'}]},
+          'name': '_all_docs',
+          'type': 'special'},
+         {'ddoc': '_design/foo',
+          'def': {'fields': [{'type': 'asc'}]},
+          'name': 'bar',
+          'type': 'json'}]
+        >>> idx[None, None] = [{'type': 'desc'}]      #doctest: +SKIP
+        >>> list(idx)                                 #doctest: +SKIP, +ELLIPSIS
+        [{'ddoc': None,
+          'def': {'fields': [{'_id': 'asc'}]},
+          'name': '_all_docs',
+          'type': 'special'},
+         {'ddoc': '_design/...',
+          'def': {'fields': [{'type': 'desc'}]},
+          'name': '...',
+          'type': 'json'},
+         {'ddoc': '_design/foo',
+          'def': {'fields': [{'type': 'asc'}]},
+          'name': 'bar',
+          'type': 'json'}]
+        >>> del server['python-tests']
+
+        :param index: `list` of indexes to create
+        :param ddoc_name: `tuple` or `list` containing first the name of the
+                          design document, in which the index will be created,
+                          and second name of the index. Both can be `None`.
+        """
+        query = {'index': {'fields': index}}
+        ddoc, name = ddoc_name  # expect ddoc / name to be a slice or list
+        if ddoc:
+            query['ddoc'] = ddoc
+        if name:
+            query['name'] = name
+        self.resource.post_json(body=query)
+
+    def __delitem__(self, ddoc_name):
+        """Remove an index from the database.
+
+        >>> server = Server()
+        >>> db = server.create('python-tests')
+        >>> db['johndoe'] = dict(type='Person', name='John Doe')
+        >>> db['maryjane'] = dict(type='Person', name='Mary Jane')
+        >>> db['gotham'] = dict(type='City', name='Gotham City')
+        >>> idx = db.index()
+        >>> idx['foo', 'bar'] = [{'type': 'asc'}]                #doctest: +SKIP
+        >>> del idx['foo', 'bar']                                #doctest: +SKIP
+        >>> list(idx)                                            #doctest: +SKIP
+        [{'ddoc': None,
+          'def': {'fields': [{'_id': 'asc'}]},
+          'name': '_all_docs',
+          'type': 'special'}]
+        >>> del server['python-tests']
+
+        :param ddoc: name of the design document containing the index
+        :param name: name of the index that is to be removed
+        :return: `dict` containing the `id`, the `name` and the `result` of
+                 creating the index
+        """
+        self.resource.delete_json([ddoc_name[0], 'json', ddoc_name[1]])
+
+    def _list(self):
+        _, _, data = self.resource.get_json()
+        return data
+
+    def __iter__(self):
+        """Iterate all indexes of the associated database.
+
+        >>> server = Server()
+        >>> db = server.create('python-tests')
+        >>> idx = db.index()
+        >>> list(idx)                                            #doctest: +SKIP
+        [{'ddoc': None,
+          'def': {'fields': [{'_id': 'asc'}]},
+          'name': '_all_docs',
+          'type': 'special'}]
+        >>> del server['python-tests']
+
+        :return: iterator yielding `dict`'s describing each index
+        """
+        return iter(self._list()['indexes'])

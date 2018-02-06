@@ -10,7 +10,7 @@
 and encoding JSON data.
 
 This module currently supports the following JSON modules:
- - ``simplejson``: http://code.google.com/p/simplejson/
+ - ``simplejson``: https://github.com/simplejson/simplejson
  - ``cjson``: http://pypi.python.org/pypi/python-cjson
  - ``json``: This is the version of ``simplejson`` that is bundled with the
    Python standard library since version 2.6
@@ -20,19 +20,20 @@ The default behavior is to use ``simplejson`` if installed, and otherwise
 fallback to the standard library module. To explicitly tell CouchDB-Python
 which module to use, invoke the `use()` function with the module name::
 
-    from couchdb import json
+    from GRID_LRT.couchdb import json
     json.use('cjson')
 
 In addition to choosing one of the above modules, you can also configure
 CouchDB-Python to use custom decoding and encoding functions::
 
-    from couchdb import json
+    from GRID_LRT.couchdb import json
     json.use(decode=my_decode, encode=my_encode)
 
 """
 
 __all__ = ['decode', 'encode', 'use']
 
+from GRID_LRT.couchdb import util
 import warnings
 import os
 
@@ -91,7 +92,7 @@ def use(module=None, decode=None, encode=None):
     """
     global _decode, _encode, _initialized, _using
     if module is not None:
-        if not isinstance(module, basestring):
+        if not isinstance(module, util.strbase):
             module = module.__name__
         if module not in ('cjson', 'json', 'simplejson'):
             raise ValueError('Unsupported JSON module %s' % module)
@@ -124,7 +125,12 @@ def _initialize():
     def _init_stdlib():
         global _decode, _encode
         json = __import__('json', {}, {})
-        _decode = lambda string, loads=json.loads: loads(string)
+
+        def _decode(string_, loads=json.loads):
+            if isinstance(string_, util.btype):
+                string_ = string_.decode("utf-8")
+            return loads(string_)
+
         _encode = lambda obj, dumps=json.dumps: \
             dumps(obj, allow_nan=False, ensure_ascii=False)
 

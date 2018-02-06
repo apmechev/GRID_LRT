@@ -22,7 +22,7 @@ class SandboxTest(unittest.TestCase):
         s=sandbox.Sandbox()
         s.parseconfig(self.sbxconf)
         s.create_SBX_folder()
-        SBX_dir=s.sbx_def['name'] 
+        SBX_dir=s.SBXloc
         self.assertTrue(os.path.exists(SBX_dir) & os.path.isdir(SBX_dir))
         s.cleanup()
 

@@ -11,14 +11,15 @@
 file.
 """
 
+from __future__ import print_function
 from base64 import b64encode
 from optparse import OptionParser
 import sys
 
-from couchdb import __version__ as VERSION
-from couchdb import json
-from couchdb.client import Database
-from couchdb.multipart import read_multipart
+from GRID_LRT.couchdb import __version__ as VERSION
+from GRID_LRT.couchdb import json
+from GRID_LRT.couchdb.client import Database
+from GRID_LRT.couchdb.multipart import read_multipart
 
 
 def load_db(fileobj, dburl, username=None, password=None, ignore_errors=False):
@@ -36,7 +37,7 @@ def load_db(fileobj, dburl, username=None, password=None, ignore_errors=False):
                     doc['_attachments'] = {}
                 else:
                     doc['_attachments'][headers['content-id']] = {
-                        'data': b64encode(payload),
+                        'data': b64encode(payload).decode('ascii'),
                         'content_type': headers['content-type'],
                         'length': len(payload)
                     }
@@ -45,13 +46,13 @@ def load_db(fileobj, dburl, username=None, password=None, ignore_errors=False):
             doc = json.decode(payload)
 
         del doc['_rev']
-        print>>sys.stderr, 'Loading document %r' % docid
+        print('Loading document %r' % docid, file=sys.stderr)
         try:
             db[docid] = doc
-        except Exception, e:
+        except Exception as e:
             if not ignore_errors:
                 raise
-            print>>sys.stderr, 'Error: %s' % e
+            print('Error: %s' % e, file=sys.stderr)
 
 
 def main():

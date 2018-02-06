@@ -11,17 +11,21 @@
 from base64 import b64encode
 from cgi import parse_header
 from email import header
+
 try:
     from hashlib import md5
 except ImportError:
     from md5 import new as md5
-import sys
+
+import uuid
+
+from GRID_LRT.couchdb import util
 
 __all__ = ['read_multipart', 'write_multipart']
 __docformat__ = 'restructuredtext en'
 
 
-CRLF = '\r\n'
+CRLF = b'\r\n'
 
 
 def read_multipart(fileobj, boundary=None):
@@ -48,16 +52,16 @@ def read_multipart(fileobj, boundary=None):
     buf = []
     outer = in_headers = boundary is None
 
-    next_boundary = boundary and '--' + boundary + '\n' or None
-    last_boundary = boundary and '--' + boundary + '--\n' or None
+    next_boundary = boundary and ('--' + boundary + '\n').encode('ascii') or None
+    last_boundary = boundary and ('--' + boundary + '--\n').encode('ascii') or None
 
     def _current_part():
-        payload = ''.join(buf)
-        if payload.endswith('\r\n'):
+        payload = b''.join(buf)
+        if payload.endswith(b'\r\n'):
             payload = payload[:-2]
-        elif payload.endswith('\n'):
+        elif payload.endswith(b'\n'):
             payload = payload[:-1]
-        content_md5 = headers.get('content-md5')
+        content_md5 = headers.get(b'content-md5')
         if content_md5:
             h = b64encode(md5(payload).digest())
             if content_md5 != h:
@@ -66,11 +70,11 @@ def read_multipart(fileobj, boundary=None):
 
     for line in fileobj:
         if in_headers:
-            line = line.replace(CRLF, '\n')
-            if line != '\n':
-                name, value = [item.strip() for item in line.split(':', 1)]
-                name = name.lower()
-                value, charset = header.decode_header(value)[0]
+            line = line.replace(CRLF, b'\n')
+            if line != b'\n':
+                name, value = [item.strip() for item in line.split(b':', 1)]
+                name = name.lower().decode('ascii')
+                value, charset = header.decode_header(value.decode('utf-8'))[0]
                 if charset is None:
                     headers[name] = value
                 else:
@@ -90,7 +94,7 @@ def read_multipart(fileobj, boundary=None):
                             yield part
                         return
 
-        elif line.replace(CRLF, '\n') == next_boundary:
+        elif line.replace(CRLF, b'\n') == next_boundary:
             # We've reached the start of a new part, as indicated by the
             # boundary
             if headers:
@@ -102,7 +106,7 @@ def read_multipart(fileobj, boundary=None):
                 del buf[:]
             in_headers = True
 
-        elif line.replace(CRLF, '\n') == last_boundary:
+        elif line.replace(CRLF, b'\n') == last_boundary:
             # We're done with this multipart envelope
             break
 
@@ -118,7 +122,7 @@ class MultipartWriter(object):
     def __init__(self, fileobj, headers=None, subtype='mixed', boundary=None):
         self.fileobj = fileobj
         if boundary is None:
-            boundary = self._make_boundary()
+            boundary = '==' + uuid.uuid4().hex + '=='
         self.boundary = boundary
         if headers is None:
             headers = {}
@@ -128,29 +132,32 @@ class MultipartWriter(object):
         self._write_headers(headers)
 
     def open(self, headers=None, subtype='mixed', boundary=None):
-        self.fileobj.write('--')
-        self.fileobj.write(self.boundary)
+        self.fileobj.write(b'--')
+        self.fileobj.write(self.boundary.encode('utf-8'))
         self.fileobj.write(CRLF)
         return MultipartWriter(self.fileobj, headers=headers, subtype=subtype,
                                boundary=boundary)
 
     def add(self, mimetype, content, headers=None):
-        self.fileobj.write('--')
-        self.fileobj.write(self.boundary)
+        self.fileobj.write(b'--')
+        self.fileobj.write(self.boundary.encode('utf-8'))
         self.fileobj.write(CRLF)
         if headers is None:
             headers = {}
-        if isinstance(content, unicode):
-            ctype, params = parse_header(mimetype)
+
+        ctype, params = parse_header(mimetype)
+        if isinstance(content, util.utype):
             if 'charset' in params:
                 content = content.encode(params['charset'])
             else:
                 content = content.encode('utf-8')
                 mimetype = mimetype + ';charset=utf-8'
+
         headers['Content-Type'] = mimetype
         if content:
             headers['Content-Length'] = str(len(content))
-            headers['Content-MD5'] = b64encode(md5(content).digest())
+            hash = b64encode(md5(content).digest()).decode('ascii')
+            headers['Content-MD5'] = hash
         self._write_headers(headers)
         if content:
             # XXX: throw an exception if a boundary appears in the content??
@@ -158,30 +165,20 @@ class MultipartWriter(object):
             self.fileobj.write(CRLF)
 
     def close(self):
-        self.fileobj.write('--')
-        self.fileobj.write(self.boundary)
-        self.fileobj.write('--')
+        self.fileobj.write(b'--')
+        self.fileobj.write(self.boundary.encode('ascii'))
+        self.fileobj.write(b'--')
         self.fileobj.write(CRLF)
-
-    def _make_boundary(self):
-        try:
-            from uuid import uuid4
-            return '==' + uuid4().hex + '=='
-        except ImportError:
-            from random import randrange
-            token = randrange(sys.maxint)
-            format = '%%0%dd' % len(repr(sys.maxint - 1))
-            return '===============' + (format % token) + '=='
 
     def _write_headers(self, headers):
         if headers:
             for name in sorted(headers.keys()):
                 value = headers[name]
-                if isinstance(value, unicode):
-                    value = str(header.make_header([(value, 'utf-8')]))
-                self.fileobj.write(name)
-                self.fileobj.write(': ')
-                self.fileobj.write(value)
+                if value.encode('ascii', 'ignore') != value.encode('utf-8'):
+                    value = header.make_header([(value, 'utf-8')]).encode()
+                self.fileobj.write(name.encode('utf-8'))
+                self.fileobj.write(b': ')
+                self.fileobj.write(value.encode('utf-8'))
                 self.fileobj.write(CRLF)
         self.fileobj.write(CRLF)
 
@@ -200,13 +197,13 @@ def write_multipart(fileobj, subtype='mixed', boundary=None):
     envelope you call the ``add(mimetype, content, [headers])`` method for
     every part, and finally call the ``close()`` method.
 
-    >>> from StringIO import StringIO
+    >>> from GRID_LRT.couchdb.util import StringIO
 
     >>> buf = StringIO()
     >>> envelope = write_multipart(buf, boundary='==123456789==')
-    >>> envelope.add('text/plain', 'Just testing')
+    >>> envelope.add('text/plain', b'Just testing')
     >>> envelope.close()
-    >>> print buf.getvalue().replace('\r\n', '\n')
+    >>> print(buf.getvalue().replace(b'\r\n', b'\n').decode('utf-8'))
     Content-Type: multipart/mixed; boundary="==123456789=="
     <BLANKLINE>
     --==123456789==
@@ -228,10 +225,10 @@ def write_multipart(fileobj, subtype='mixed', boundary=None):
     >>> buf = StringIO()
     >>> envelope = write_multipart(buf, boundary='==123456789==')
     >>> part = envelope.open(boundary='==abcdefghi==')
-    >>> part.add('text/plain', 'Just testing')
+    >>> part.add('text/plain', u'Just testing')
     >>> part.close()
     >>> envelope.close()
-    >>> print buf.getvalue().replace('\r\n', '\n') #:doctest +ELLIPSIS
+    >>> print(buf.getvalue().replace(b'\r\n', b'\n').decode('utf-8')) #:doctest +ELLIPSIS
     Content-Type: multipart/mixed; boundary="==123456789=="
     <BLANKLINE>
     --==123456789==
@@ -240,7 +237,7 @@ def write_multipart(fileobj, subtype='mixed', boundary=None):
     --==abcdefghi==
     Content-Length: 12
     Content-MD5: nHmX4a6el41B06x2uCpglQ==
-    Content-Type: text/plain
+    Content-Type: text/plain;charset=utf-8
     <BLANKLINE>
     Just testing
     --==abcdefghi==--

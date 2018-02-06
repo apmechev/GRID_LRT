@@ -7,11 +7,11 @@
 # you should have received as part of this distribution.
 
 from decimal import Decimal
-import doctest
 import unittest
 
-from couchdb import design, mapping
-from couchdb.tests import testutil
+from GRID_LRT.couchdb import design, mapping
+from GRID_LRT.couchdb.tests import testutil
+from datetime import datetime
 
 class DocumentTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
 
@@ -59,7 +59,7 @@ class DocumentTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         try:
             post.id = 'foo_bar'
             self.fail('Excepted AttributeError')
-        except AttributeError, e:
+        except AttributeError as e:
             self.assertEqual('id can only be set on new documents', e.args[0])
 
     def test_batch_update(self):
@@ -83,6 +83,15 @@ class DocumentTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
     def test_old_datetime(self):
         dt = mapping.DateTimeField()
         assert dt._to_python('1880-01-01T00:00:00Z')
+
+    def test_datetime_with_microseconds(self):
+        dt = mapping.DateTimeField()
+        assert dt._to_python('2016-06-09T21:21:49.739248Z')
+
+    def test_datetime_to_json(self):
+        dt = mapping.DateTimeField()
+        d = datetime.now()
+        assert dt._to_json(d)
 
     def test_get_has_default(self):
         doc = mapping.Document()
@@ -243,6 +252,12 @@ class WrappingTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
                                  include_docs=True)
         self.assertEqual(type(results.rows[0]), self.Item)
 
+    def test_wrapped_view(self):
+        self.Item().store(self.db)
+        results = self.db.view('_all_docs', wrapper=self.Item._wrap_row)
+        doc = results.rows[0]
+        self.db.delete(doc)
+
     def test_query(self):
         self.Item().store(self.db)
         results = self.Item.query(self.db, all_map_func, None)
@@ -253,7 +268,7 @@ class WrappingTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(doctest.DocTestSuite(mapping))
+    suite.addTest(testutil.doctest_suite(mapping))
     suite.addTest(unittest.makeSuite(DocumentTestCase, 'test'))
     suite.addTest(unittest.makeSuite(ListFieldTestCase, 'test'))
     suite.addTest(unittest.makeSuite(WrappingTestCase, 'test'))

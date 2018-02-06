@@ -8,7 +8,7 @@
 
 """Mapping from raw JSON data structures to Python objects and vice versa.
 
->>> from couchdb import Server
+>>> from GRID_LRT.couchdb import Server
 >>> server = Server()
 >>> db = server.create('python-tests')
 
@@ -16,7 +16,7 @@ To define a document mapping, you declare a Python class inherited from
 `Document`, and add any number of `Field` attributes:
 
 >>> from datetime import datetime
->>> from couchdb.mapping import Document, TextField, IntegerField, DateTimeField
+>>> from GRID_LRT.couchdb.mapping import Document, TextField, IntegerField, DateTimeField
 >>> class Person(Document):
 ...     name = TextField()
 ...     age = IntegerField()
@@ -65,7 +65,8 @@ from datetime import date, datetime, time
 from decimal import Decimal
 from time import strptime, struct_time
 
-from couchdb.design import ViewDefinition
+from GRID_LRT.couchdb.design import ViewDefinition
+from GRID_LRT.couchdb import util
 
 __all__ = ['Mapping', 'Document', 'Field', 'TextField', 'FloatField',
            'IntegerField', 'LongField', 'BooleanField', 'DecimalField',
@@ -106,7 +107,7 @@ class Field(object):
         instance._data[self.name] = value
 
     def _to_python(self, value):
-        return unicode(value)
+        return util.utype(value)
 
     def _to_json(self, value):
         return self._to_python(value)
@@ -127,9 +128,10 @@ class MappingMeta(type):
         d['_fields'] = fields
         return type.__new__(cls, name, bases, d)
 
+MappingMetaClass = MappingMeta('MappingMetaClass', (object,), {})
 
-class Mapping(object):
-    __metaclass__ = MappingMeta
+
+class Mapping(MappingMetaClass):
 
     def __init__(self, **values):
         self._data = {}
@@ -200,14 +202,14 @@ class ViewField(object):
     >>> Person.by_name
     <ViewDefinition '_design/people/_view/by_name'>
     
-    >>> print Person.by_name.map_fun
+    >>> print(Person.by_name.map_fun)
     function(doc) {
         emit(doc.name, doc);
     }
     
     That property can be used as a function, which will execute the view.
     
-    >>> from couchdb import Database
+    >>> from GRID_LRT.couchdb import Database
     >>> db = Database('python-tests')
     
     >>> Person.by_name(db, count=3)
@@ -235,7 +237,7 @@ class ViewField(object):
     >>> Person.by_name
     <ViewDefinition '_design/people/_view/by_name'>
 
-    >>> print Person.by_name.map_fun
+    >>> print(Person.by_name.map_fun)
     def by_name(doc):
         yield doc['name'], doc
     """
@@ -292,9 +294,10 @@ class DocumentMeta(MappingMeta):
                     attrval.name = attrname
         return MappingMeta.__new__(cls, name, bases, d)
 
+DocumentMetaClass = DocumentMeta('DocumentMetaClass', (object,), {})
 
-class Document(Mapping):
-    __metaclass__ = DocumentMeta
+
+class Document(DocumentMetaClass, Mapping):
 
     def __init__(self, id=None, **values):
         Mapping.__init__(self, **values)
@@ -403,12 +406,14 @@ class Document(Mapping):
             return cls.wrap(doc)
         data = row['value']
         data['_id'] = row['id']
+        if 'rev' in data:  # When data is client.Document
+            data['_rev'] = data['rev']
         return cls.wrap(data)
 
 
 class TextField(Field):
     """Mapping field for string values."""
-    _to_python = unicode
+    _to_python = util.utype
 
 
 class FloatField(Field):
@@ -423,7 +428,7 @@ class IntegerField(Field):
 
 class LongField(Field):
     """Mapping field for long integer values."""
-    _to_python = long
+    _to_python = util.ltype
 
 
 class BooleanField(Field):
@@ -438,7 +443,7 @@ class DecimalField(Field):
         return Decimal(value)
 
     def _to_json(self, value):
-        return unicode(value)
+        return util.utype(value)
 
 
 class DateField(Field):
@@ -454,7 +459,7 @@ class DateField(Field):
     """
 
     def _to_python(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, util.strbase):
             try:
                 value = date(*strptime(value, '%Y-%m-%d')[:3])
             except ValueError:
@@ -469,22 +474,32 @@ class DateField(Field):
 
 class DateTimeField(Field):
     """Mapping field for storing date/time values.
-    
+
     >>> field = DateTimeField()
     >>> field._to_python('2007-04-01T15:30:00Z')
     datetime.datetime(2007, 4, 1, 15, 30)
-    >>> field._to_json(datetime(2007, 4, 1, 15, 30, 0, 9876))
+    >>> field._to_python('2007-04-01T15:30:00.009876Z')
+    datetime.datetime(2007, 4, 1, 15, 30, 0, 9876)
+    >>> field._to_json(datetime(2007, 4, 1, 15, 30, 0))
     '2007-04-01T15:30:00Z'
+    >>> field._to_json(datetime(2007, 4, 1, 15, 30, 0, 9876))
+    '2007-04-01T15:30:00.009876Z'
     >>> field._to_json(date(2007, 4, 1))
     '2007-04-01T00:00:00Z'
     """
 
     def _to_python(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, util.strbase):
             try:
-                value = value.split('.', 1)[0] # strip out microseconds
-                value = value.rstrip('Z') # remove timezone separator
-                value = datetime(*strptime(value, '%Y-%m-%dT%H:%M:%S')[:6])
+                split_value = value.split('.') # strip out microseconds
+                if len(split_value) == 1:   # No microseconds provided
+                    value = split_value[0]
+                    value = value.rstrip('Z')  #remove timezone separator
+                    value = datetime.strptime(value, '%Y-%m-%dT%H:%M:%S')
+                else:
+                    value = value.rstrip('Z')
+                    value = datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%f')
+
             except ValueError:
                 raise ValueError('Invalid ISO date/time %r' % value)
         return value
@@ -494,12 +509,12 @@ class DateTimeField(Field):
             value = datetime.utcfromtimestamp(timegm(value))
         elif not isinstance(value, datetime):
             value = datetime.combine(value, time(0))
-        return value.replace(microsecond=0).isoformat() + 'Z'
+        return value.isoformat() + 'Z'
 
 
 class TimeField(Field):
     """Mapping field for storing times.
-    
+
     >>> field = TimeField()
     >>> field._to_python('15:30:00')
     datetime.time(15, 30)
@@ -510,7 +525,7 @@ class TimeField(Field):
     """
 
     def _to_python(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, util.strbase):
             try:
                 value = value.split('.', 1)[0] # strip out microseconds
                 value = time(*strptime(value, '%H:%M:%S')[3:6])
@@ -527,7 +542,7 @@ class TimeField(Field):
 class DictField(Field):
     """Field type for nested dictionaries.
     
-    >>> from couchdb import Server
+    >>> from GRID_LRT.couchdb import Server
     >>> server = Server()
     >>> db = server.create('python-tests')
 
@@ -554,7 +569,7 @@ class DictField(Field):
     >>> post.author.email
     u'john@doe.com'
     >>> post.extra
-    {'foo': 'bar'}
+    {u'foo': u'bar'}
 
     >>> del server['python-tests']
     """
@@ -580,7 +595,7 @@ class DictField(Field):
 class ListField(Field):
     """Field type for sequences of other fields.
 
-    >>> from couchdb import Server
+    >>> from GRID_LRT.couchdb import Server
     >>> server = Server()
     >>> db = server.create('python-tests')
 
@@ -604,11 +619,11 @@ class ListField(Field):
     >>> post = Post.load(db, post.id)
     >>> comment = post.comments[0]
     >>> comment['author']
-    'myself'
+    u'myself'
     >>> comment['content']
-    'Bla bla'
+    u'Bla bla'
     >>> comment['time'] #doctest: +ELLIPSIS
-    '...T...Z'
+    u'...T...Z'
 
     >>> del server['python-tests']
     """
@@ -661,16 +676,24 @@ class ListField(Field):
             return str(self.list)
 
         def __unicode__(self):
-            return unicode(self.list)
+            return util.utype(self.list)
 
         def __delitem__(self, index):
-            del self.list[index]
+            if isinstance(index, slice):
+                self.__delslice__(index.start, index.stop)
+            else:
+                del self.list[index]
 
         def __getitem__(self, index):
+            if isinstance(index, slice):
+                return self.__getslice__(index.start, index.stop)
             return self.field._to_python(self.list[index])
 
         def __setitem__(self, index, value):
-            self.list[index] = self.field._to_json(value)
+            if isinstance(index, slice):
+                self.__setslice__(index.start, index.stop, value)
+            else:
+                self.list[index] = self.field._to_json(value)
 
         def __delslice__(self, i, j):
             del self.list[i:j]

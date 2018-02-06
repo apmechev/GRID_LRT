@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import sys
-#import couchdb
-if not 'couchdb' in sys.modules:
-        import couchdb
+import couchdb
 
 class PackageTestCase(unittest.TestCase):
 
@@ -14,7 +11,7 @@ class PackageTestCase(unittest.TestCase):
             'Server', 'Database', 'Document',
             # couchdb.http
             'HTTPError', 'PreconditionFailed', 'ResourceNotFound',
-            'ResourceConflict', 'ServerError', 'Unauthorized',
+            'ResourceConflict', 'ServerError', 'Unauthorized', 'Forbidden',
             'Resource', 'Session'
         ])
         exported = set(e for e in dir(couchdb) if not e.startswith('_'))

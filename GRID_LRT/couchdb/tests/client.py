@@ -7,19 +7,16 @@
 # you should have received as part of this distribution.
 
 from datetime import datetime
-import doctest
 import os
 import os.path
 import shutil
-from StringIO import StringIO
 import time
 import tempfile
 import threading
 import unittest
-import urlparse
 
-from couchdb import client, http
-from couchdb.tests import testutil
+from GRID_LRT.couchdb import client, http, util
+from GRID_LRT.couchdb.tests import testutil
 
 
 class ServerTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
@@ -45,7 +42,7 @@ class ServerTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
 
     def test_server_vars(self):
         version = self.server.version()
-        self.assertTrue(isinstance(version, basestring))
+        self.assertTrue(isinstance(version, util.strbase))
         config = self.server.config()
         self.assertTrue(isinstance(config, dict))
         tasks = self.server.tasks()
@@ -118,6 +115,40 @@ class ServerTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         assert type(ls) == list
         ls = self.server.uuids(count=10)
         assert type(ls) == list and len(ls) == 10
+
+    def test_235_unicode_server(self):
+
+        url = client.DEFAULT_BASE_URL
+        if not isinstance(url, util.utype):
+            url = url.decode('utf-8')
+
+        server = client.Server(url)
+        dbname = 'couchdb-python/test-235-unicode-server'
+        db = server.create(dbname)
+        try:
+            db.update([{'foo': u'\ua000'}])
+        finally:
+            server.delete(dbname)
+
+    def test_basic_auth(self):
+        url = "http://root:password@localhost:5984/"
+        server = client.Server(url)
+        dbname = 'couchdb-python/test_basic_auth'
+        self.assertRaises(http.Unauthorized, server.create, dbname)
+
+    def test_user_management(self):
+        url = client.DEFAULT_BASE_URL
+        if not isinstance(url, util.utype):
+            url = url.decode('utf-8')
+
+        server = client.Server(url)
+        try:
+            server.add_user('foo', 'secret', roles=['hero'])
+            token = server.login('foo', 'secret')
+            self.assertTrue(server.verify_token(token))
+            self.assertTrue(server.logout(token))
+        finally:
+            server.remove_user('foo')
 
 
 class DatabaseTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
@@ -218,7 +249,7 @@ class DatabaseTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         self.assertEqual(revs[0]['_rev'], new_rev)
         self.assertEqual(revs[1]['_rev'], old_rev)
         gen = self.db.revisions('crap')
-        self.assertRaises(StopIteration, lambda: gen.next())
+        self.assertRaises(StopIteration, lambda: next(gen))
 
         self.assertTrue(self.db.compact())
         while self.db.info()['compact_running']:
@@ -245,9 +276,9 @@ class DatabaseTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         self.assertEqual(len('Foo bar'), attachment['length'])
         self.assertEqual('text/plain', attachment['content_type'])
 
-        self.assertEqual('Foo bar',
+        self.assertEqual(b'Foo bar',
                          self.db.get_attachment(doc, 'foo.txt').read())
-        self.assertEqual('Foo bar',
+        self.assertEqual(b'Foo bar',
                          self.db.get_attachment('foo', 'foo.txt').read())
 
         old_rev = doc['_rev']
@@ -259,7 +290,7 @@ class DatabaseTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         doc = {'bar': 42}
         self.db['foo'] = doc
         old_rev = doc['_rev']
-        fileobj = StringIO('Foo bar baz')
+        fileobj = util.StringIO(b'Foo bar baz')
 
         self.db.put_attachment(doc, fileobj, 'foo.txt')
         self.assertNotEqual(old_rev, doc['_rev'])
@@ -269,9 +300,9 @@ class DatabaseTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         self.assertEqual(len('Foo bar baz'), attachment['length'])
         self.assertEqual('text/plain', attachment['content_type'])
 
-        self.assertEqual('Foo bar baz',
+        self.assertEqual(b'Foo bar baz',
                          self.db.get_attachment(doc, 'foo.txt').read())
-        self.assertEqual('Foo bar baz',
+        self.assertEqual(b'Foo bar baz',
                          self.db.get_attachment('foo', 'foo.txt').read())
 
         old_rev = doc['_rev']
@@ -321,7 +352,7 @@ class DatabaseTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         doc = {}
         self.db['foo'] = doc
         self.db.put_attachment(doc, '{}', 'test.json', 'application/json')
-        self.assertEqual(self.db.get_attachment(doc, 'test.json').read(), '{}')
+        self.assertEqual(self.db.get_attachment(doc, 'test.json').read(), b'{}')
 
     def test_include_docs(self):
         doc = {'foo': 42, 'bar': 40}
@@ -338,10 +369,93 @@ class DatabaseTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         for i in range(1, 6):
             self.db.save({'i': i})
         res = list(self.db.query('function(doc) { emit(doc.i, null); }',
-                                 keys=range(1, 6, 2)))
+                                 keys=list(range(1, 6, 2))))
         self.assertEqual(3, len(res))
         for idx, i in enumerate(range(1, 6, 2)):
             self.assertEqual(i, res[idx].key)
+
+    def test_find(self):
+        if self.server.version_info()[0] < 2:
+            return
+
+        docs = [
+            dict(type='Person', name='John Doe'),
+            dict(type='Person', name='Mary Jane'),
+            dict(type='City', name='Gotham City')
+        ]
+        self.db.update(docs)
+        # the sort needs an index over `name`, the selector selects by `type`
+        idx = self.db.index()
+        idx['foo', 'bar'] = [{'type': 'asc'}, {'name': 'asc'}]
+
+        res = list(self.db.find(
+            {
+                'selector': {
+                    'type': 'Person'
+                },
+                'fields': ['name'],
+                # we need to specify the complete index here
+                'sort': [{'type': 'asc'}, {'name': 'asc'}]
+            }
+        ))
+        self.assertEqual(2, len(res))
+        expect = ['John Doe', 'Mary Jane']
+        for i, doc in enumerate(res):
+            self.assertEqual(set(['name']), doc.keys())
+            self.assertEqual(expect[i], doc['name'])
+
+    def test_explain(self):
+        if self.server.version_info()[0] < 2:
+            return
+        mango = {'selector': {'type': 'Person'}, 'fields': ['name']}
+        res = self.db.explain(mango)
+
+        self.assertEqual(['name'], res['fields'])
+        self.assertEqual({'type': {'$eq': 'Person'}}, res['selector'])
+        self.assertEqual(0, res['skip'])
+        self.assertEqual(self.db.name, res['dbname'])
+
+    def test_index(self):
+        if self.server.version_info()[0] < 2:
+            return
+
+        res = list(self.db.index())
+        self.assertEqual(1, len(res))
+        self.assertEqual({'ddoc': None, 'def': {'fields': [{'_id': 'asc'}]},
+                          'name': '_all_docs', 'type': 'special'},
+                         res[0])
+
+    def test_add_index(self):
+        if self.server.version_info()[0] < 2:
+            return
+
+        idx = self.db.index()
+        idx['foo', 'bar'] = [{'type': 'asc'}]
+        idxs = list(idx)
+
+        self.assertEqual(2, len(idxs))
+        for i in idxs:
+            if i['ddoc'] is not None:  # special `_all_docs` index
+                self.assertEqual({'ddoc': '_design/foo',
+                                  'def': {'fields': [{'type': 'asc'}]},
+                                  'name': 'bar',
+                                  'type': 'json'},
+                                 i)
+                return
+        self.failed()
+
+    def test_remove_index(self):
+        if self.server.version_info()[0] < 2:
+            return
+
+        idx = self.db.index()
+        idx['foo', 'bar'] = [{'type': 'asc'}]
+        res = list(idx)
+        self.assertEqual(2, len(res))
+        del idx['foo', 'bar']
+
+        res = list(idx)
+        self.assertEqual(1, len(res))
 
     def test_bulk_update_conflict(self):
         docs = [
@@ -441,7 +555,7 @@ class DatabaseTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
     def test_changes(self):
         self.db['foo'] = {'bar': True}
         self.assertEqual(self.db.changes(since=0)['last_seq'], 1)
-        first = self.db.changes(feed='continuous').next()
+        first = next(self.db.changes(feed='continuous'))
         self.assertEqual(first['seq'], 1)
         self.assertEqual(first['id'], 'foo')
 
@@ -449,7 +563,7 @@ class DatabaseTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         # Consume an entire changes feed to read the whole response, then check
         # that the HTTP connection made it to the pool.
         list(self.db.changes(feed='continuous', timeout=0))
-        scheme, netloc = urlparse.urlsplit(client.DEFAULT_BASE_URL)[:2]
+        scheme, netloc = util.urlsplit(client.DEFAULT_BASE_URL)[:2]
         self.assertTrue(self.db.resource.session.connection_pool.conns[(scheme, netloc)])
 
     def test_changes_releases_conn_when_lastseq(self):
@@ -459,12 +573,34 @@ class DatabaseTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         for obj in self.db.changes(feed='continuous', timeout=0):
             if 'last_seq' in obj:
                 break
-        scheme, netloc = urlparse.urlsplit(client.DEFAULT_BASE_URL)[:2]
+        scheme, netloc = util.urlsplit(client.DEFAULT_BASE_URL)[:2]
         self.assertTrue(self.db.resource.session.connection_pool.conns[(scheme, netloc)])
 
     def test_changes_conn_usable(self):
         # Consume a changes feed to get a used connection in the pool.
         list(self.db.changes(feed='continuous', timeout=0))
+        # Try using the connection again to make sure the connection was left
+        # in a good state from the previous request.
+        self.assertTrue(self.db.info()['doc_count'] == 0)
+
+    def test_changes_conn_usable_selector(self):
+        if self.server.version_info()[0] < 2:
+            return
+        # Consume a changes feed to get a used connection in the pool.
+        list(self.db.changes(feed='continuous',
+                             filter='_selector',
+                             timeout=0,
+                             _selector={'selector': {}}))
+        # Try using the connection again to make sure the connection was left
+        # in a good state from the previous request.
+        self.assertTrue(self.db.info()['doc_count'] == 0)
+
+    def test_changes_usable_selector(self):
+        if self.server.version_info()[0] < 2:
+            return
+        # Consume a changes feed to get a used connection in the pool.
+        list(self.db.changes(filter='_selector',
+                             _selector={'selector': {}}))
         # Try using the connection again to make sure the connection was left
         # in a good state from the previous request.
         self.assertTrue(self.db.info()['doc_count'] == 0)
@@ -486,13 +622,18 @@ class DatabaseTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         doc = {'now': datetime.now()}
         self.assertRaises(TypeError, self.db.save, doc)
 
+    def test_security(self):
+        security = self.db.security
+        self.assertEqual(security, {})
+        security['members'] = {'names': ['test'], 'roles': []}
+        self.db.security = security
+
 
 class ViewTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
 
     def test_row_object(self):
 
         row = list(self.db.view('_all_docs', keys=['blah']))[0]
-        self.assertEqual(repr(row), "<Row key='blah', error='not_found'>")
         self.assertEqual(row.id, None)
         self.assertEqual(row.key, 'blah')
         self.assertEqual(row.value, None)
@@ -502,7 +643,7 @@ class ViewTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         row = list(self.db.view('_all_docs', keys=['xyz']))[0]
         self.assertEqual(row.id, 'xyz')
         self.assertEqual(row.key, 'xyz')
-        self.assertEqual(row.value.keys(), ['rev'])
+        self.assertEqual(list(row.value.keys()), ['rev'])
         self.assertEqual(row.error, None)
 
     def test_view_multi_get(self):
@@ -515,7 +656,7 @@ class ViewTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
             }
         }
 
-        res = list(self.db.view('test/multi_key', keys=range(1, 6, 2)))
+        res = list(self.db.view('test/multi_key', keys=list(range(1, 6, 2))))
         self.assertEqual(3, len(res))
         for idx, i in enumerate(range(1, 6, 2)):
             self.assertEqual(i, res[idx].key)
@@ -595,6 +736,11 @@ class ViewTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         view = client.PermanentView(self.db.resource('_all_docs').url, '_all_docs')
         self.assertEqual(len(list(view)), 1)
 
+    def test_update_seq(self):
+        self.db['foo'] = {}
+        rows = self.db.view('_all_docs', update_seq=True)
+        self.assertEqual(rows.update_seq, 1)
+
     def test_tmpview_repr(self):
         mapfunc = "function(doc) {emit(null, null);}"
         view = client.TemporaryView(self.db.resource('_temp_view'), mapfunc)
@@ -667,27 +813,27 @@ class ShowListTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         self.db.update([{'_id': '1', 'name': 'one'}, {'_id': '2', 'name': 'two'}])
 
     def test_show_urls(self):
-        self.assertEqual(self.db.show('_design/foo/_show/bar')[1].read(), 'null:<default>')
-        self.assertEqual(self.db.show('foo/bar')[1].read(), 'null:<default>')
+        self.assertEqual(self.db.show('_design/foo/_show/bar')[1].read(), b'null:<default>')
+        self.assertEqual(self.db.show('foo/bar')[1].read(), b'null:<default>')
 
     def test_show_docid(self):
-        self.assertEqual(self.db.show('foo/bar')[1].read(), 'null:<default>')
-        self.assertEqual(self.db.show('foo/bar', '1')[1].read(), '1:<default>')
-        self.assertEqual(self.db.show('foo/bar', '2')[1].read(), '2:<default>')
+        self.assertEqual(self.db.show('foo/bar')[1].read(), b'null:<default>')
+        self.assertEqual(self.db.show('foo/bar', '1')[1].read(), b'1:<default>')
+        self.assertEqual(self.db.show('foo/bar', '2')[1].read(), b'2:<default>')
 
     def test_show_params(self):
-        self.assertEqual(self.db.show('foo/bar', r='abc')[1].read(), 'null:abc')
+        self.assertEqual(self.db.show('foo/bar', r='abc')[1].read(), b'null:abc')
 
     def test_list(self):
-        self.assertEqual(self.db.list('foo/list', 'foo/by_id')[1].read(), '1\r\n2\r\n')
-        self.assertEqual(self.db.list('foo/list', 'foo/by_id', include_header='true')[1].read(), 'id\r\n1\r\n2\r\n')
+        self.assertEqual(self.db.list('foo/list', 'foo/by_id')[1].read(), b'1\r\n2\r\n')
+        self.assertEqual(self.db.list('foo/list', 'foo/by_id', include_header='true')[1].read(), b'id\r\n1\r\n2\r\n')
 
     def test_list_keys(self):
-        self.assertEqual(self.db.list('foo/list', 'foo/by_id', keys=['1'])[1].read(), '1\r\n')
+        self.assertEqual(self.db.list('foo/list', 'foo/by_id', keys=['1'])[1].read(), b'1\r\n')
 
     def test_list_view_params(self):
-        self.assertEqual(self.db.list('foo/list', 'foo/by_name', startkey='o', endkey='p')[1].read(), '1\r\n')
-        self.assertEqual(self.db.list('foo/list', 'foo/by_name', descending=True)[1].read(), '2\r\n1\r\n')
+        self.assertEqual(self.db.list('foo/list', 'foo/by_name', startkey='o', endkey='p')[1].read(), b'1\r\n')
+        self.assertEqual(self.db.list('foo/list', 'foo/by_name', descending=True)[1].read(), b'2\r\n1\r\n')
 
 
 class UpdateHandlerTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
@@ -719,13 +865,13 @@ class UpdateHandlerTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         self.db.update([{'_id': 'existed', 'name': 'bar'}])
 
     def test_empty_doc(self):
-        self.assertEqual(self.db.update_doc('foo/bar')[1].read(), 'empty doc')
+        self.assertEqual(self.db.update_doc('foo/bar')[1].read(), b'empty doc')
 
     def test_new_doc(self):
-        self.assertEqual(self.db.update_doc('foo/bar', 'new')[1].read(), 'new doc')
+        self.assertEqual(self.db.update_doc('foo/bar', 'new')[1].read(), b'new doc')
 
     def test_update_doc(self):
-        self.assertEqual(self.db.update_doc('foo/bar', 'existed')[1].read(), 'hello doc')
+        self.assertEqual(self.db.update_doc('foo/bar', 'existed')[1].read(), b'hello doc')
 
 
 class ViewIterationTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
@@ -733,7 +879,7 @@ class ViewIterationTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
     num_docs = 100
 
     def docfromnum(self, num):
-        return {'_id': unicode(num), 'num': int(num / 2)}
+        return {'_id': util.utype(num), 'num': int(num / 2)}
 
     def docfromrow(self, row):
         return {'_id': row['id'], 'num': row['key']}
@@ -744,18 +890,18 @@ class ViewIterationTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
                       'views': {'nums': {'map': 'function(doc) {emit(doc.num, null);}'},
                                 'nulls': {'map': 'function(doc) {emit(null, null);}'}}}
         self.db.save(design_doc)
-        self.db.update([self.docfromnum(num) for num in xrange(self.num_docs)])
+        self.db.update([self.docfromnum(num) for num in range(self.num_docs)])
 
     def test_allrows(self):
         rows = list(self.db.iterview('test/nums', 10))
         self.assertEqual(len(rows), self.num_docs)
         self.assertEqual([self.docfromrow(row) for row in rows],
-                         [self.docfromnum(num) for num in xrange(self.num_docs)])
+                         [self.docfromnum(num) for num in range(self.num_docs)])
 
     def test_batchsizes(self):
         # Check silly _batch values.
-        self.assertRaises(ValueError, self.db.iterview('test/nums', 0).next)
-        self.assertRaises(ValueError, self.db.iterview('test/nums', -1).next)
+        self.assertRaises(ValueError, lambda: next(self.db.iterview('test/nums', 0)))
+        self.assertRaises(ValueError, lambda: next(self.db.iterview('test/nums', -1)))
         # Test various _batch sizes that are likely to cause trouble.
         self.assertEqual(len(list(self.db.iterview('test/nums', 1))), self.num_docs)
         self.assertEqual(len(list(self.db.iterview('test/nums', int(self.num_docs / 2)))), self.num_docs)
@@ -764,34 +910,38 @@ class ViewIterationTestCase(testutil.TempDatabaseMixin, unittest.TestCase):
         self.assertEqual(len(list(self.db.iterview('test/nums', self.num_docs))), self.num_docs)
         self.assertEqual(len(list(self.db.iterview('test/nums', self.num_docs + 1))), self.num_docs)
 
+    def test_batchsizes_with_skip(self):
+        self.assertEqual(
+            len(list(self.db.iterview('test/nums', self.num_docs // 10, skip=self.num_docs // 2))),
+            self.num_docs // 2)
+
     def test_limit(self):
         # limit=0 doesn't make sense for iterview.
-        self.assertRaises(ValueError, self.db.iterview('test/nums', 10, limit=0).next)
+        self.assertRaises(ValueError, lambda: next(self.db.iterview('test/nums', 10, limit=0)))
         # Test various limit sizes that are likely to cause trouble.
         for limit in [1, int(self.num_docs / 4), self.num_docs - 1, self.num_docs,
                       self.num_docs + 1]:
             self.assertEqual([self.docfromrow(doc) for doc in self.db.iterview('test/nums', 10, limit=limit)],
-                             [self.docfromnum(x) for x in xrange(min(limit, self.num_docs))])
+                             [self.docfromnum(x) for x in range(min(limit, self.num_docs))])
         # Test limit same as batch size, in case of weird edge cases.
         limit = int(self.num_docs / 4)
         self.assertEqual([self.docfromrow(doc) for doc in self.db.iterview('test/nums', limit, limit=limit)],
-                         [self.docfromnum(x) for x in xrange(limit)])
+                         [self.docfromnum(x) for x in range(limit)])
 
     def test_descending(self):
         self.assertEqual([self.docfromrow(doc) for doc in self.db.iterview('test/nums', 10, descending=True)],
-                         [self.docfromnum(x) for x in xrange(self.num_docs - 1, -1, -1)])
+                         [self.docfromnum(x) for x in range(self.num_docs - 1, -1, -1)])
         self.assertEqual([self.docfromrow(doc) for doc in self.db.iterview('test/nums', 10, limit=int(self.num_docs / 4), descending=True)],
-                         [self.docfromnum(x) for x in xrange(self.num_docs - 1, int(self.num_docs * 3 / 4) - 1, -1)])
+                         [self.docfromnum(x) for x in range(self.num_docs - 1, int(self.num_docs * 3 / 4) - 1, -1)])
 
     def test_startkey(self):
         self.assertEqual([self.docfromrow(doc) for doc in self.db.iterview('test/nums', 10, startkey=int(self.num_docs / 2) - 1)],
-                         [self.docfromnum(x) for x in xrange(self.num_docs - 2, self.num_docs)])
+                         [self.docfromnum(x) for x in range(self.num_docs - 2, self.num_docs)])
         self.assertEqual([self.docfromrow(doc) for doc in self.db.iterview('test/nums', 10, startkey=1, descending=True)],
-                         [self.docfromnum(x) for x in xrange(3, -1, -1)])
+                         [self.docfromnum(x) for x in range(3, -1, -1)])
 
     def test_nullkeys(self):
         self.assertEqual(len(list(self.db.iterview('test/nulls', 10))), self.num_docs)
-
 
 def suite():
     suite = unittest.TestSuite()
@@ -801,7 +951,7 @@ def suite():
     suite.addTest(unittest.makeSuite(ShowListTestCase, 'test'))
     suite.addTest(unittest.makeSuite(UpdateHandlerTestCase, 'test'))
     suite.addTest(unittest.makeSuite(ViewIterationTestCase, 'test'))
-    suite.addTest(doctest.DocTestSuite(client))
+    suite.addTest(testutil.doctest_suite(client))
     return suite
 
 

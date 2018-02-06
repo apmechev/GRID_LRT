@@ -16,7 +16,7 @@ import sys
 import traceback
 from types import FunctionType
 
-from couchdb import json
+from GRID_LRT.couchdb import json, util
 
 __all__ = ['main', 'run']
 __docformat__ = 'restructuredtext en'
@@ -24,26 +24,28 @@ __docformat__ = 'restructuredtext en'
 log = logging.getLogger('couchdb.view')
 
 
-def run(input=sys.stdin, output=sys.stdout):
+def run(input=sys.stdin, output=None):
     r"""CouchDB view function handler implementation for Python.
 
     :param input: the readable file-like object to read input from
     :param output: the writable file-like object to write output to
     """
     functions = []
+    if output is None:
+        output = sys.stdout if sys.version_info[0] < 3 else sys.stdout.buffer
 
     def _writejson(obj):
         obj = json.encode(obj)
-        if isinstance(obj, unicode):
+        if isinstance(obj, util.utype):
             obj = obj.encode('utf-8')
         output.write(obj)
-        output.write('\n')
+        output.write(b'\n')
         output.flush()
 
     def _log(message):
-        if not isinstance(message, basestring):
+        if not isinstance(message, util.strbase):
             message = json.encode(message)
-        _writejson({'log': message})
+        _writejson(['log', message])
 
     def reset(config=None):
         del functions[:]
@@ -53,20 +55,20 @@ def run(input=sys.stdin, output=sys.stdout):
         string = BOM_UTF8 + string.encode('utf-8')
         globals_ = {}
         try:
-            exec string in {'log': _log}, globals_
-        except Exception, e:
-            return {'error': {
-                'id': 'map_compilation_error',
-                'reason': e.args[0]
-            }}
-        err = {'error': {
-            'id': 'map_compilation_error',
-            'reason': 'string must eval to a function '
+            util.pyexec(string, {'log': _log}, globals_)
+        except Exception as e:
+            return ['error',
+                'map_compilation_error',
+                e.args[0]
+            ]
+        err = ['error',
+            'map_compilation_error',
+            'string must eval to a function '
                       '(ex: "def(doc): return 1")'
-        }}
+        ]
         if len(globals_) != 1:
             return err
-        function = globals_.values()[0]
+        function = list(globals_.values())[0]
         if type(function) is not FunctionType:
             return err
         functions.append(function)
@@ -77,7 +79,7 @@ def run(input=sys.stdin, output=sys.stdout):
         for function in functions:
             try:
                 results.append([[key, value] for key, value in function(doc)])
-            except Exception, e:
+            except Exception as e:
                 log.error('runtime error in map function: %s', e,
                           exc_info=True)
                 results.append([])
@@ -89,22 +91,22 @@ def run(input=sys.stdin, output=sys.stdout):
         args = cmd[1]
         globals_ = {}
         try:
-            exec code in {'log': _log}, globals_
-        except Exception, e:
+            util.pyexec(code, {'log': _log}, globals_)
+        except Exception as e:
             log.error('runtime error in reduce function: %s', e,
                       exc_info=True)
-            return {'error': {
-                'id': 'reduce_compilation_error',
-                'reason': e.args[0]
-            }}
-        err = {'error': {
-            'id': 'reduce_compilation_error',
-            'reason': 'string must eval to a function '
+            return ['error',
+                'reduce_compilation_error',
+                e.args[0]
+            ]
+        err = ['error',
+            'reduce_compilation_error',
+            'string must eval to a function '
                       '(ex: "def(keys, values): return 1")'
-        }}
+        ]
         if len(globals_) != 1:
             return err
-        function = globals_.values()[0]
+        function = list(globals_.values())[0]
         if type(function) is not FunctionType:
             return err
 
@@ -118,7 +120,7 @@ def run(input=sys.stdin, output=sys.stdout):
                 keys, vals = zip(*args)
             else:
                 keys, vals = [], []
-        if function.func_code.co_argcount == 3:
+        if util.funcode(function).co_argcount == 3:
             results = function(keys, vals, rereduce)
         else:
             results = function(keys, vals)
@@ -139,7 +141,7 @@ def run(input=sys.stdin, output=sys.stdout):
             try:
                 cmd = json.decode(line)
                 log.debug('Processing %r', cmd)
-            except ValueError, e:
+            except ValueError as e:
                 log.error('Error: %s', e, exc_info=True)
                 return 1
             else:
@@ -148,7 +150,7 @@ def run(input=sys.stdin, output=sys.stdout):
                 _writejson(retval)
     except KeyboardInterrupt:
         return 0
-    except Exception, e:
+    except Exception as e:
         log.error('Error: %s', e, exc_info=True)
         return 1
 
@@ -175,14 +177,14 @@ Options:
   --debug               enable debug logging; requires --log-file to be
                         specified
 
-Report bugs via the web at <http://code.google.com/p/couchdb-python>.
+Report bugs via the web at <https://github.com/djc/couchdb-python/issues>.
 """
 
 
 def main():
     """Command-line entry point for running the view server."""
     import getopt
-    from couchdb import __version__ as VERSION
+    from GRID_LRT.couchdb import __version__ as VERSION
 
     try:
         option_list, argument_list = getopt.gnu_getopt(
@@ -218,7 +220,7 @@ def main():
             sys.stdout.flush()
             sys.exit(0)
 
-    except getopt.GetoptError, error:
+    except getopt.GetoptError as error:
         message = '%s\n\nTry `%s --help` for more information.\n' % (
             str(error), os.path.basename(sys.argv[0])
         )

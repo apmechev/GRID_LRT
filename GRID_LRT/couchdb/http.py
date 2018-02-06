@@ -14,76 +14,33 @@ standard library.
 from base64 import b64encode
 from datetime import datetime
 import errno
-from httplib import BadStatusLine, HTTPConnection, HTTPSConnection
 import socket
 import time
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 import sys
+import ssl
+
 try:
     from threading import Lock
 except ImportError:
     from dummy_threading import Lock
-import urllib
-from urlparse import urlsplit, urlunsplit
-from email.Utils import parsedate
+
+try:
+    from http.client import BadStatusLine, HTTPConnection, HTTPSConnection
+except ImportError:
+    from httplib import BadStatusLine, HTTPConnection, HTTPSConnection
+
+try:
+    from email.Utils import parsedate
+except ImportError:
+    from email.utils import parsedate
 
 from GRID_LRT.couchdb import json
+from GRID_LRT.couchdb import util
 
 __all__ = ['HTTPError', 'PreconditionFailed', 'ResourceNotFound',
-           'ResourceConflict', 'ServerError', 'Unauthorized', 'RedirectLimit',
-           'Session', 'Resource']
+           'ResourceConflict', 'ServerError', 'Unauthorized', 'Forbidden',
+           'RedirectLimit', 'Session', 'Resource']
 __docformat__ = 'restructuredtext en'
-
-
-if sys.version < '2.6':
-
-    class TimeoutMixin:
-        """Helper mixin to add timeout before socket connection"""
-
-        # taken from original python2.5 httplib source code with timeout setting added
-        def connect(self):
-            """Connect to the host and port specified in __init__."""
-            msg = "getaddrinfo returns an empty list"
-            for res in socket.getaddrinfo(self.host, self.port, 0,
-                                          socket.SOCK_STREAM):
-                af, socktype, proto, canonname, sa = res
-                try:
-                    self.sock = socket.socket(af, socktype, proto)
-                    if self.debuglevel > 0:
-                        print "connect: (%s, %s)" % (self.host, self.port)
-
-                    # setting socket timeout
-                    self.sock.settimeout(self.timeout)
-
-                    self.sock.connect(sa)
-                except socket.error, msg:
-                    if self.debuglevel > 0:
-                        print 'connect fail:', (self.host, self.port)
-                    if self.sock:
-                        self.sock.close()
-                    self.sock = None
-                    continue
-                break
-            if not self.sock:
-                raise socket.error, msg
-
-    _HTTPConnection = HTTPConnection
-    _HTTPSConnection = HTTPSConnection
-
-    class HTTPConnection(TimeoutMixin, _HTTPConnection):
-        def __init__(self, *a, **k):
-            timeout = k.pop('timeout', None)
-            _HTTPConnection.__init__(self, *a, **k)
-            self.timeout = timeout
-
-    class HTTPSConnection(TimeoutMixin, _HTTPSConnection):
-        def __init__(self, *a, **k):
-            timeout = k.pop('timeout', None)
-            _HTTPSConnection.__init__(self, *a, **k)
-            self.timeout = timeout
 
 
 if sys.version < '2.7':
@@ -97,7 +54,7 @@ if sys.version < '2.7':
 
         Based on code originally copied from Python 2.7's httplib module.
         """
-        
+
         def endheaders(self, message_body=None):
             if self.__dict__['_HTTPConnection__state'] == _CS_REQ_STARTED:
                 self.__dict__['_HTTPConnection__state'] = _CS_REQ_SENT
@@ -157,6 +114,12 @@ class Unauthorized(HTTPError):
     """
 
 
+class Forbidden(HTTPError):
+    """Exception raised when the request requires an authorisation that the
+    current user does not have.
+    """
+
+
 class RedirectLimit(Exception):
     """Exception raised when a request is redirected more often than allowed
     by the maximum number of redirections.
@@ -167,9 +130,29 @@ CHUNK_SIZE = 1024 * 8
 
 class ResponseBody(object):
 
-    def __init__(self, resp, callback):
+    def __init__(self, resp, conn_pool, url, conn):
         self.resp = resp
-        self.callback = callback
+        self.chunked = self.resp.msg.get('transfer-encoding') == 'chunked'
+        self.conn_pool = conn_pool
+        self.url = url
+        self.conn = conn
+
+    def __del__(self):
+        if not self.chunked:
+            self.close()
+        else:
+            self.resp.close()
+            if self.conn:
+                # Since chunked responses can be infinite (i.e. for
+                # feed=continuous), and we want to avoid leaking sockets
+                # (even if just to prevent ResourceWarnings when running
+                # the test suite on Python 3), we'll close this connection
+                # eagerly. We can't get it into the clean state required to
+                # put it back into the ConnectionPool (since we don't know
+                # when it ends and we can only do blocking reads). Finding
+                # out whether it might in fact end would be relatively onerous
+                # and require a layering violation.
+                self.conn.close()
 
     def read(self, size=None):
         bytes = self.resp.read(size)
@@ -177,27 +160,45 @@ class ResponseBody(object):
             self.close()
         return bytes
 
+    def _release_conn(self):
+        self.conn_pool.release(self.url, self.conn)
+        self.conn_pool, self.url, self.conn = None, None, None
+
     def close(self):
         while not self.resp.isclosed():
-            self.resp.read(CHUNK_SIZE)
-        if self.callback:
-            self.callback()
-            self.callback = None
+            chunk = self.resp.read(CHUNK_SIZE)
+            if not chunk:
+                self.resp.close()
+        if self.conn:
+            self._release_conn()
 
     def iterchunks(self):
-        assert self.resp.msg.get('transfer-encoding') == 'chunked'
+        assert self.chunked
+        buffer = []
         while True:
+
             if self.resp.isclosed():
                 break
+
             chunksz = int(self.resp.fp.readline().strip(), 16)
             if not chunksz:
                 self.resp.fp.read(2) #crlf
                 self.resp.close()
-                self.callback()
+                self._release_conn()
                 break
+
             chunk = self.resp.fp.read(chunksz)
-            for ln in chunk.splitlines():
-                yield ln
+            for ln in chunk.splitlines(True):
+
+                end = ln == b'\n' and not buffer # end of response
+                if not ln or end:
+                    break
+
+                buffer.append(ln)
+                if ln.endswith(b'\n'):
+                    yield b''.join(buffer)
+                    buffer = []
+
             self.resp.fp.read(2) #crlf
 
 
@@ -237,9 +238,23 @@ class Session(object):
         self.cache = cache
         self.max_redirects = max_redirects
         self.perm_redirects = {}
-        self.connection_pool = ConnectionPool(timeout)
+
+        self._disable_ssl_verification = False
+        self._timeout = timeout
+        self.connection_pool = ConnectionPool(
+            self._timeout,
+            disable_ssl_verification=self._disable_ssl_verification)
+
         self.retry_delays = list(retry_delays) # We don't want this changing on us.
         self.retryable_errors = set(retryable_errors)
+
+    def disable_ssl_verification(self):
+        """Disable verification of SSL certificates and re-initialize the
+        ConnectionPool. Only applicable on Python 2.7.9+ as previous versions
+        of Python don't verify SSL certs."""
+        self._disable_ssl_verification = True
+        self.connection_pool = ConnectionPool(self._timeout,
+            disable_ssl_verification=self._disable_ssl_verification)
 
     def request(self, method, url, body=None, headers=None, credentials=None,
                 num_redirects=0):
@@ -260,14 +275,14 @@ class Session(object):
                 if etag:
                     headers['If-None-Match'] = etag
 
-        if (body is not None and not isinstance(body, basestring) and
+        if (body is not None and not isinstance(body, util.strbase) and
                 not hasattr(body, 'read')):
             body = json.encode(body).encode('utf-8')
             headers.setdefault('Content-Type', 'application/json')
 
         if body is None:
             headers.setdefault('Content-Length', '0')
-        elif isinstance(body, basestring):
+        elif isinstance(body, util.strbase):
             headers.setdefault('Content-Length', str(len(body)))
         else:
             headers['Transfer-Encoding'] = 'chunked'
@@ -276,24 +291,25 @@ class Session(object):
         if authorization:
             headers['Authorization'] = authorization
 
-        path_query = urlunsplit(('', '') + urlsplit(url)[2:4] + ('',))
+        path_query = util.urlunsplit(('', '') + util.urlsplit(url)[2:4] + ('',))
         conn = self.connection_pool.get(url)
 
         def _try_request_with_retries(retries):
             while True:
                 try:
                     return _try_request()
-                except socket.error, e:
+                except socket.error as e:
                     ecode = e.args[0]
                     if ecode not in self.retryable_errors:
                         raise
                     try:
-                        delay = retries.next()
+                        delay = next(retries)
                     except StopIteration:
                         # No more retries, raise last socket error.
                         raise e
-                    time.sleep(delay)
-                    conn.close()
+                    finally:
+                        time.sleep(delay)
+                        conn.close()
 
         def _try_request():
             try:
@@ -303,18 +319,24 @@ class Session(object):
                 if body is None:
                     conn.endheaders()
                 else:
-                    if isinstance(body, str):
-                        conn.endheaders(body)
+                    if isinstance(body, util.strbase):
+                        if isinstance(body, util.utype):
+                            conn.endheaders(body.encode('utf-8'))
+                        else:
+                            conn.endheaders(body)
                     else: # assume a file-like object and send in chunks
                         conn.endheaders()
                         while 1:
                             chunk = body.read(CHUNK_SIZE)
                             if not chunk:
                                 break
-                            conn.send(('%x\r\n' % len(chunk)) + chunk + '\r\n')
-                        conn.send('0\r\n\r\n')
+                            if isinstance(chunk, util.utype):
+                                chunk = chunk.encode('utf-8')
+                            status = ('%x\r\n' % len(chunk)).encode('utf-8')
+                            conn.send(status + chunk + b'\r\n')
+                        conn.send(b'0\r\n\r\n')
                 return conn.getresponse()
-            except BadStatusLine, e:
+            except BadStatusLine as e:
                 # httplib raises a BadStatusLine when it cannot read the status
                 # line saying, "Presumably, the server closed the connection
                 # before sending a valid response."
@@ -333,7 +355,7 @@ class Session(object):
             self.connection_pool.release(url, conn)
             status, msg, data = cached_resp
             if data is not None:
-                data = StringIO(data)
+                data = util.StringIO(data)
             return status, msg, data
         elif cached_resp:
             self.cache.remove(url)
@@ -346,6 +368,14 @@ class Session(object):
             if num_redirects > self.max_redirects:
                 raise RedirectLimit('Redirection limit exceeded')
             location = resp.getheader('location')
+
+            # in case of relative location: add scheme and host to the location
+            location_split = util.urlsplit(location)
+
+            if not location_split[0]:
+                orig_url_split = util.urlsplit(url)
+                location = util.urlunsplit(orig_url_split[:2] + location_split[2:])
+
             if status == 301:
                 self.perm_redirects[url] = location
             elif status == 303:
@@ -364,22 +394,21 @@ class Session(object):
             self.connection_pool.release(url, conn)
 
         # Buffer small non-JSON response bodies
-        elif int(resp.getheader('content-length', sys.maxint)) < CHUNK_SIZE:
+        elif int(resp.getheader('content-length', sys.maxsize)) < CHUNK_SIZE:
             data = resp.read()
             self.connection_pool.release(url, conn)
 
         # For large or chunked response bodies, do not buffer the full body,
         # and instead return a minimal file-like object
         else:
-            data = ResponseBody(resp,
-                                lambda: self.connection_pool.release(url, conn))
+            data = ResponseBody(resp, self.connection_pool, url, conn)
             streamed = True
 
         # Handle errors
         if status >= 400:
             ctype = resp.getheader('content-type')
             if data is not None and 'application/json' in ctype:
-                data = json.decode(data)
+                data = json.decode(data.decode('utf-8'))
                 error = data.get('error'), data.get('reason')
             elif method != 'HEAD':
                 error = resp.read()
@@ -388,6 +417,8 @@ class Session(object):
                 error = ''
             if status == 401:
                 raise Unauthorized(error)
+            elif status == 403:
+                raise Forbidden(error)
             elif status == 404:
                 raise ResourceNotFound(error)
             elif status == 409:
@@ -402,7 +433,7 @@ class Session(object):
             self.cache.put(url, (status, resp.msg, data))
 
         if not streamed and data is not None:
-            data = StringIO(data)
+            data = util.StringIO(data)
 
         return status, resp.msg, data
 
@@ -431,21 +462,32 @@ class Cache(object):
         self.by_url.pop(url, None)
 
     def _clean(self):
-        ls = sorted(self.by_url.iteritems(), key=cache_sort)
+        ls = sorted(self.by_url.items(), key=cache_sort)
         self.by_url = dict(ls[-self.keep_size:])
+
+
+class InsecureHTTPSConnection(HTTPSConnection):
+    """Wrapper class to create an HTTPSConnection without SSL verification
+    (the default behavior in Python < 2.7.9). See:
+    https://docs.python.org/2/library/httplib.html#httplib.HTTPSConnection"""
+    if sys.version_info >= (2, 7, 9):
+        def __init__(self, *a, **k):
+            k['context'] = ssl._create_unverified_context()
+            HTTPSConnection.__init__(self, *a, **k)
 
 
 class ConnectionPool(object):
     """HTTP connection pool."""
 
-    def __init__(self, timeout):
+    def __init__(self, timeout, disable_ssl_verification=False):
         self.timeout = timeout
+        self.disable_ssl_verification = disable_ssl_verification
         self.conns = {} # HTTP connections keyed by (scheme, host)
         self.lock = Lock()
 
     def get(self, url):
 
-        scheme, host = urlsplit(url, 'http', False)[:2]
+        scheme, host = util.urlsplit(url, 'http', False)[:2]
 
         # Try to reuse an existing connection.
         self.lock.acquire()
@@ -463,7 +505,10 @@ class ConnectionPool(object):
             if scheme == 'http':
                 cls = HTTPConnection
             elif scheme == 'https':
-                cls = HTTPSConnection
+                if self.disable_ssl_verification:
+                    cls = InsecureHTTPSConnection
+                else:
+                    cls = HTTPSConnection
             else:
                 raise ValueError('%s is not a supported scheme' % scheme)
             conn = cls(host, timeout=self.timeout)
@@ -472,7 +517,7 @@ class ConnectionPool(object):
         return conn
 
     def release(self, url, conn):
-        scheme, host = urlsplit(url, 'http', False)[:2]
+        scheme, host = util.urlsplit(url, 'http', False)[:2]
         self.lock.acquire()
         try:
             self.conns.setdefault((scheme, host), []).append(conn)
@@ -488,6 +533,8 @@ class ConnectionPool(object):
 class Resource(object):
 
     def __init__(self, url, session, headers=None):
+        if sys.version_info[0] == 2 and isinstance(url, util.utype):
+            url = url.encode('utf-8') # kind of an ugly hack for issue 235
         self.url, self.credentials = extract_credentials(url)
         if session is None:
             session = Session()
@@ -534,7 +581,10 @@ class Resource(object):
         all_headers = self.headers.copy()
         all_headers.update(headers or {})
         if path is not None:
-            url = urljoin(self.url, path, **params)
+            if isinstance(path, list):
+                url = urljoin(self.url, *path, **params)
+            else:
+                url = urljoin(self.url, path, **params)
         else:
             url = urljoin(self.url, **params)
         return self.session.request(method, url, body=body,
@@ -544,8 +594,8 @@ class Resource(object):
     def _request_json(self, method, path=None, body=None, headers=None, **params):
         status, headers, data = self._request(method, path, body=body,
                                               headers=headers, **params)
-        if 'application/json' in headers.get('content-type'):
-            data = json.decode(data.read())
+        if 'application/json' in headers.get('content-type', ''):
+            data = json.decode(data.read().decode('utf-8'))
         return status, headers, data
 
 
@@ -553,7 +603,7 @@ class Resource(object):
 def extract_credentials(url):
     """Extract authentication (user name and password) credentials from the
     given URL.
-    
+
     >>> extract_credentials('http://localhost:5984/_config/')
     ('http://localhost:5984/_config/', None)
     >>> extract_credentials('http://joe:secret@localhost:5984/_config/')
@@ -561,27 +611,34 @@ def extract_credentials(url):
     >>> extract_credentials('http://joe%40example.com:secret@localhost:5984/_config/')
     ('http://localhost:5984/_config/', ('joe@example.com', 'secret'))
     """
-    parts = urlsplit(url)
+    parts = util.urlsplit(url)
     netloc = parts[1]
     if '@' in netloc:
         creds, netloc = netloc.split('@')
-        credentials = tuple(urllib.unquote(i) for i in creds.split(':'))
+        credentials = tuple(util.urlunquote(i) for i in creds.split(':'))
         parts = list(parts)
         parts[1] = netloc
     else:
         credentials = None
-    return urlunsplit(parts), credentials
+    return util.urlunsplit(parts), credentials
 
 
 def basic_auth(credentials):
+    """Generates authorization header value for given credentials.
+    >>> basic_auth(('root', 'relax'))
+    b'Basic cm9vdDpyZWxheA=='
+    >>> basic_auth(None)
+    >>> basic_auth(())
+    """
     if credentials:
-        return 'Basic %s' % b64encode('%s:%s' % credentials)
+        token = b64encode(('%s:%s' % credentials).encode('utf-8'))
+        return ('Basic %s' % token.strip().decode('utf-8')).encode('ascii')
 
 
 def quote(string, safe=''):
-    if isinstance(string, unicode):
+    if isinstance(string, util.utype):
         string = string.encode('utf-8')
-    return urllib.quote(string, safe)
+    return util.urlquote(string, safe)
 
 
 def urlencode(data):
@@ -589,10 +646,10 @@ def urlencode(data):
         data = data.items()
     params = []
     for name, value in data:
-        if isinstance(value, unicode):
+        if isinstance(value, util.utype):
             value = value.encode('utf-8')
         params.append((name, value))
-    return urllib.urlencode(params)
+    return util.urlencode(params)
 
 
 def urljoin(base, *path, **query):

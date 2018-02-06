@@ -17,12 +17,10 @@ CouchDB versions.
 Use 'python replicate.py --help' to get more detailed usage instructions.
 """
 
-from couchdb import http, client
+from GRID_LRT.couchdb import http, client, util
 import optparse
 import sys
 import time
-import urllib
-import urlparse
 import fnmatch
 
 def findpath(parser, s):
@@ -33,7 +31,7 @@ def findpath(parser, s):
     if not s.startswith('http'):
         return client.DEFAULT_BASE_URL, s
 
-    bits = urlparse.urlparse(s)
+    bits = util.urlparse(s)
     res = http.Resource('%s://%s/' % (bits.scheme, bits.netloc), None)
     parts = bits.path.split('/')[1:]
     if parts and not parts[-1]:
@@ -42,7 +40,7 @@ def findpath(parser, s):
     cut = None
     for i in range(0, len(parts) + 1):
         try:
-            data = res.get_json(parts[:i])[2]
+            data = res.get_json('/'.join(parts[:i]))[2]
         except Exception:
             data = None
         if data and 'couchdb' in data:
@@ -83,41 +81,46 @@ def main():
 
     if '*' in tpath:
         raise parser.error('invalid target path: must be single db or empty')
-    elif '*' in spath and tpath:
-        raise parser.error('target path must be empty with multiple sources')
 
     all = sorted(i for i in source if i[0] != '_') # Skip reserved names.
     if not spath:
         raise parser.error('source database must be specified')
 
-    databases = [(i, i) for i in all if fnmatch.fnmatchcase(i, spath)]
-    if not databases:
+    sources = [i for i in all if fnmatch.fnmatchcase(i, spath)]
+    if not sources:
         raise parser.error("no source databases match glob '%s'" % spath)
+
+    if len(sources) > 1 and tpath:
+        raise parser.error('target path must be empty with multiple sources')
+    elif len(sources) == 1:
+        databases = [(sources[0], tpath)]
+    else:
+        databases = [(i, i) for i in sources]
 
     # do the actual replication
 
     for sdb, tdb in databases:
 
         start = time.time()
-        print sdb, '->', tdb,
+        print(sdb, '->', tdb)
         sys.stdout.flush()
 
         if tdb not in target:
             target.create(tdb)
-            print "created",
+            sys.stdout.write("created")
             sys.stdout.flush()
 
-        sdb = '%s%s' % (sbase, urllib.quote(sdb, ''))
+        sdb = '%s%s' % (sbase, util.urlquote(sdb, ''))
         if options.continuous:
             target.replicate(sdb, tdb, continuous=options.continuous)
         else:
             target.replicate(sdb, tdb)
-        print '%.1fs' % (time.time() - start)
+        print('%.1fs' % (time.time() - start))
         sys.stdout.flush()
 
     if options.compact:
         for (sdb, tdb) in databases:
-            print 'compact', tdb
+            print('compact', tdb)
             target[tdb].compact()
 
 if __name__ == '__main__':

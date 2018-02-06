@@ -6,10 +6,25 @@
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution.
 
+import doctest
 import random
+import re
 import sys
-from GRID_LRT.couchdb import client                                                                      
 
+from GRID_LRT.couchdb import client
+
+class Py23DocChecker(doctest.OutputChecker):
+    def check_output(self, want, got, optionflags):
+        if sys.version_info[0] > 2:
+            want = re.sub("u'(.*?)'", "'\\1'", want)
+            want = re.sub('u"(.*?)"', '"\\1"', want)
+        else:
+            want = re.sub("b'(.*?)'", "'\\1'", want)
+            want = re.sub('b"(.*?)"', '"\\1"', want)
+        return doctest.OutputChecker.check_output(self, want, got, optionflags)
+
+def doctest_suite(mod):
+    return doctest.DocTestSuite(mod, checker=Py23DocChecker())
 
 class TempDatabaseMixin(object):
 
@@ -29,7 +44,7 @@ class TempDatabaseMixin(object):
             self.temp_dbs = {}
         # Find an unused database name
         while True:
-            name = 'couchdb-python/%d' % random.randint(0, sys.maxint)
+            name = 'couchdb-python/%d' % random.randint(0, sys.maxsize)
             if name not in self.temp_dbs:
                 break
         db = self.server.create(name)
