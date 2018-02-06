@@ -104,7 +104,7 @@ def process(urls,repl_string,m):
                 surls.append(m.sub(repl_string,strip(u)))
             else:
                 surls.append(strip(u))
-	req={}
+        req={}
         print("Setting up "+str(len(surls))+" srms to stage")
         stageID=sa.stage(surls)
 
