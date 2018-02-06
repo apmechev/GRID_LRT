@@ -16,7 +16,7 @@
 import time
 import re
 import sys
-from string import strip
+strip = lambda x:x.strip()
 from GRID_LRT.Staging import stager_access as sa
 import pdb
 
