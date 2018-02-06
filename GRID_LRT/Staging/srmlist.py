@@ -32,7 +32,7 @@ class srmlist(list):
 
     def check_OBSID(self,item): 
         tmp_OBSID=re.search('L[0-9][0-9][0-9][0-9][0-9][0-9]',
-                "".join(item)).group(0)
+                "".join(str(v) for v in item)).group(0)
         if not self.OBSID:
             self.OBSID=tmp_OBSID
         if self.checkOBSID and tmp_OBSID!=self.OBSID:
