@@ -9,7 +9,10 @@
 
 __version__ = "1.0"
 
-import xmlrpclib
+try:
+    import xmlrpclib
+except ImportError:
+    import xmlrpc.client as xmlrpclib
 import datetime
 from os.path import expanduser
 
