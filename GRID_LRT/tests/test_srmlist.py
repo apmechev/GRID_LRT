@@ -43,7 +43,6 @@ class SrmlistTest(unittest.TestCase):
             for line in sfile:
                 self.assertTrue( line!="")
                 self.assertTrue( line!=None)
-                print(line,type(line))
                 sl.append(line)
         self.assertTrue(len(sl)==51)
         gsiftps=[]
