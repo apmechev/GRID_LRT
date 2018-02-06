@@ -11,7 +11,7 @@
 
 #!/usr/bin/env python
 
-import pythonpath
+#import pythonpath
 #import gfal2 as gfal
 import time
 import re
