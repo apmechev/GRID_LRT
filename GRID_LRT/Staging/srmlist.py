@@ -49,9 +49,9 @@ class srmlist(list):
             return ""
         return link
 
-
     def check_OBSID(self,item):
         link=self.stringify_item(item)
+        print(link)
         tmp_OBSID=re.search('L[0-9][0-9][0-9][0-9][0-9][0-9]',
                 link).group(0)
         if not self.OBSID:
