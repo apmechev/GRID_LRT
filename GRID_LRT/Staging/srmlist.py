@@ -24,6 +24,7 @@ class srmlist(list):
             self.append(link)
 
     def check_location(self,item):
+        tmp_loc=""
         if type(item) ==str:
             tmp_loc = self.check_str_location(item)
         elif type(item) == srmlist:
