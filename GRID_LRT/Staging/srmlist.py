@@ -24,15 +24,30 @@ class srmlist(list):
             self.append(link)
 
     def check_location(self,item):
-            loc=''
-            if 'grid.sara.nl' in item: loc='sara'
-            if 'fz-juelich.de' in item: loc='juelich'
-            if 'lofar.psnc.pl' in item: loc='poznan'
-            return loc
+        if type(item) ==str:
+            tmp_loc = self.check_str_location(item)
+        elif type(item) == srmlist:
+            for i in item:
+                tmp_loc = self.check_str_location(i)
+        return tmp_loc
 
-    def check_OBSID(self,item): 
+    def check_str_location(self,item):
+        loc=''
+        if 'grid.sara.nl' in item: loc='sara'
+        if 'fz-juelich.de' in item: loc='juelich'
+        if 'lofar.psnc.pl' in item: loc='poznan'
+        return loc
+
+    def check_OBSID(self,item):
+        if type(item) == str:
+            link=item.strip('\n')
+            link=item.strip('\r')
+        elif type(item) == srmlist :
+            link="".join(str(v) for v in item)
+        else:
+            return
         tmp_OBSID=re.search('L[0-9][0-9][0-9][0-9][0-9][0-9]',
-                "".join(str(v) for v in item)).group(0)
+                link).group(0)
         if not self.OBSID:
             self.OBSID=tmp_OBSID
         if self.checkOBSID and tmp_OBSID!=self.OBSID:
