@@ -39,14 +39,19 @@ class srmlist(list):
         if 'lofar.psnc.pl' in item: loc='poznan'
         return loc
 
-    def check_OBSID(self,item):
+    def stringify_item(self,item):
         if type(item) == str:
             link=item.strip('\n')
             link=item.strip('\r')
         elif type(item) == srmlist :
             link="".join(str(v) for v in item)
         else:
-            return
+            return ""
+        return link
+
+
+    def check_OBSID(self,item):
+        link=self.stringify_item(item)
         tmp_OBSID=re.search('L[0-9][0-9][0-9][0-9][0-9][0-9]',
                 link).group(0)
         if not self.OBSID:
@@ -59,7 +64,7 @@ class srmlist(list):
             return
         self.check_OBSID(item)
         tmp_loc=self.check_location(item)
-        item=self.trim_spaces(item)  
+        item=self.trim_spaces(self.stringify_item(item))
         if not self.LTA_location:
             self.LTA_location=tmp_loc
         elif self.LTA_location!=tmp_loc:
