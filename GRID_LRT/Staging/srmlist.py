@@ -55,6 +55,8 @@ class srmlist(list):
             raise AttributeError("Different OBSID than previous items")
 
     def append(self, item):
+        if item == None or item == "":
+            return
         self.check_OBSID(item)
         tmp_loc=self.check_location(item)
         item=self.trim_spaces(item)  
