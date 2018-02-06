@@ -19,7 +19,7 @@ user = None
 passw = None
 try:
     with open(expanduser("~/.awe/Environment.cfg"),'r') as file:
-        print datetime.datetime.now(), "stager_access: Parsing user credentials from", expanduser("~/.awe/Environment.cfg")
+        print(datetime.datetime.now(), "stager_access: Parsing user credentials from", expanduser("~/.awe/Environment.cfg"))
         for line in file:
             if line.startswith("database_user"):
                 user = line.split(':')[1].strip()
@@ -28,7 +28,7 @@ try:
 except IOError:
     try:
         with open(expanduser("~/.stagingrc"),'r') as file:
-            print datetime.datetime.now(), "stager_access: Parsing user credentials from", expanduser("~/.stagingrc")
+            print(datetime.datetime.now(), "stager_access: Parsing user credentials from", expanduser("~/.stagingrc"))
             for line in file:
                 if line.startswith("user"):
                     user = line.split('=')[1].strip()
@@ -38,7 +38,7 @@ except IOError:
         print("No StagingRC file found")
 
 if user and passw:
-    print datetime.datetime.now(), "stager_access: Creating proxy"
+    print(datetime.datetime.now(), "stager_access: Creating proxy")
     proxy = xmlrpclib.ServerProxy("https://"+user+':'+passw+"@webportal.astron.nl/service-public/xmlrpc")
 else:
     print("No User or Password exist. ")
@@ -85,10 +85,10 @@ def prettyprint(dictionary, indent=""):
         for key in sorted(dictionary.keys()):
            item = dictionary.get(key)
            if type(item) is dict:
-              print indent+'+ ' +str(key)
+              print(indent+'+ ' +str(key))
               prettyprint(item, indent=indent+'  ')
            else:
-              print indent+'- '+str(key),'\t -> \t',str(item)
+              print(indent+'- '+str(key),'\t -> \t',str(item))
     else:
-	    print "stager_access: This prettyprint takes a dict only!"
+	    print("stager_access: This prettyprint takes a dict only!")
 
