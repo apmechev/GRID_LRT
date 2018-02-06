@@ -316,8 +316,11 @@ class TokenSet(object):
         that only one job type is contained in a TokenSet. 
 
         Args:
-            th (TokenHandler): The TokenHandler associated with the job tokens
-            tok_config (str): Location of the token yaml file on the host FileSystem
+            :param th: The TokenHandler associated with the job tokens        
+            :type th: GRID_LRT.Token.TokenHandler
+            :param tok_config: Location of the token yaml file on the host FileSystem
+            :type tok_config: str
+            :raises: AttributeError, KeyError
 
         """
         self.th=th
@@ -335,10 +338,14 @@ class TokenSet(object):
             argument exists.
             
             Args:
-                iterable (dict): The dictionary which determines how many tokens will be created. The values  are attached to each token
-                id_append (str): Option to append the OBSID to each Token
-                key_name (str): The Token field which will hold the value of the dictionary's keys for each Token
-                file_upload (str): The name of the file which to upload to the tokens (typically srm.txt)
+                :param iterable: The dictionary which determines how many tokens will be created. The values  are attached to each token
+                :type iterable: dict
+                :param id_append: Option to append the OBSID to each Token
+                :type id_append: str
+                :param key_name: The Token field which will hold the value of the dictionary's keys for each Token
+                :type key_name: str
+                :param file_upload: The name of the file which to upload to the tokens (typically srm.txt)
+                :type file_upload: str
 
         """# TODO: Check if key_name is inside token_keys!
         for key in iterable:

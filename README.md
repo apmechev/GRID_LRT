@@ -1,5 +1,5 @@
 [![Documentation Status](https://readthedocs.org/projects/grid-lrt/badge/?version=latest)](http://grid-lrt.readthedocs.io/en/latest/?badge=latest)
-
+[![Build Status](https://travis-ci.org/apmechev/GRID_LRT.svg?branch=master)](https://travis-ci.org/apmechev/GRID_LRT)
 
 Due to the large computational requirements for LOFAR datasets,
 processing bulk data on the grid is required. This manual will detail
