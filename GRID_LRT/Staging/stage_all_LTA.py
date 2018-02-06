@@ -108,7 +108,7 @@ def process(urls,repl_string,m):
     print("Setting up "+str(len(surls))+" srms to stage")
     stageID=sa.stage(surls)
 
-    print "staged with stageID ", stageID	
+    print("staged with stageID ", stageID)
     return stageID
 
 def get_stage_status(stageID):
