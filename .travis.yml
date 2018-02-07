@@ -10,9 +10,9 @@ services:
       - couchdb
 # command to install dependencies
 before_install:
-    - sudo apt-get -qq update
-    - sudo apt-get install -y gfal2* libgfal2-2 libgfal2-dev libgfal-srm-ifce1
-    - pip install gfal2-python 
+      #    - sudo apt-get -qq update
+      #    - sudo apt-get install -y gfal2* libgfal2-2 libgfal2-dev libgfal-srm-ifce1
+      #    - pip install gfal2-python 
     - pip install pyyaml
 script:
   - nosetests
