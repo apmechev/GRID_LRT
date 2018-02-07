@@ -172,7 +172,7 @@ def slice_dicts(srmdict,slice_size=10):
     Returns a dict of lists that hold 10 SBNs (by default). 
     Missing Subbands are treated as empty spaces, if you miss SB009, 
     the list will include  9 items from SB000 to SB008, and next will start at SB010"""
-        srmdict=dict(srmdict)
+    srmdict=dict(srmdict)
 
     keys=sorted(srmdict.keys())
     start=int(keys[0])
