@@ -16,6 +16,14 @@ import warnings
 
 
 class srmlist(list):
+    """
+    The srmlist class is an extension of Python lists that can hold a list of
+    srm links to data on GRID Storage (LOFAR Archive, Intermediate Storage, etc).
+
+    In addition to the regular list capabilities, it also has internal checks for the
+    location and the OBSID of the data. When a new item is appended, these checks are 
+    done automatically. Checking OBSID is an optional argument set to True by default.  
+    """
     def __init__(self,checkOBSID=True,link=None):
         self.LTA_location=None
         self.OBSID=None
@@ -161,12 +169,10 @@ class srmlist(list):
 
 def slice_dicts(srmdict,slice_size=10):
     """
-    Returns a dict of lists that hold 10 SBNs, including empty spaces
-    Can take in a dictionary (or a generator) of pairs of SB#->link
-    """
-    if isinstance(srmdict, types.GeneratorType):
-        gen=srmdict
-        srmdict=dict(gen)
+    Returns a dict of lists that hold 10 SBNs (by default). 
+    Missing Subbands are treated as empty spaces, if you miss SB009, 
+    the list will include  9 items from SB000 to SB008, and next will start at SB010"""
+        srmdict=dict(srmdict)
 
     keys=sorted(srmdict.keys())
     start=int(keys[0])
