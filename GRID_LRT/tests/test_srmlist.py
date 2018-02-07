@@ -1,4 +1,5 @@
 from GRID_LRT.Staging.srmlist import srmlist
+from GRID_LRT.Staging.srmlist import slice_dicts
 import os 
 import glob
 import unittest
@@ -85,6 +86,28 @@ class SrmlistTest(unittest.TestCase):
 
     def test_parse_srmfile(self):
         pass
+
+    def test_split_dict_1(self):
+        sl=srmlist()
+        self.assertTrue(os.path.exists(os.path.dirname(__file__)+'/srm_50_sara.txt'))
+        with open(os.path.dirname(__file__)+'/srm_50_sara.txt','r') as sfile:
+            for line in sfile:
+                sl.append(line)
+        self.assertTrue(len(sl)==51)
+        s_dict=slice_dicts(sl.sbn_dict(),slice_size=1)
+        self.assertTrue(len(s_dict.keys())==51)
+
+
+    def test_split_dict_10(self):
+        sl=srmlist()
+        self.assertTrue(os.path.exists(os.path.dirname(__file__)+'/srm_50_sara.txt'))
+        with open(os.path.dirname(__file__)+'/srm_50_sara.txt','r') as sfile:
+            for line in sfile:
+                sl.append(line)
+        self.assertTrue(len(sl)==51)
+        s_dict=slice_dicts(sl.sbn_dict(),slice_size=10)
+        self.assertTrue(len(s_dict.keys())==6)
+
 
 if __name__ == '__main__':
     unittest.main() 

@@ -25,6 +25,7 @@ class SandboxTest(unittest.TestCase):
         SBX_dir=s.SBXloc
         self.assertTrue(os.path.exists(SBX_dir) & os.path.isdir(SBX_dir))
         s.cleanup()
+        self.assertTrue(not((os.path.exists(SBX_dir))))
 
 #    def test_creating_deleting_sbx_yml(self):
 #        '''Testing creating and deleting folders during cleanup
