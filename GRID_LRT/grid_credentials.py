@@ -3,7 +3,7 @@ import subprocess
 def check_uberftp():
     p=subprocess.Popen(['which', 'uberftp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     o=p.communicate()
-    if o[0]=='' and o[1]=='':
+    if o[0].decode() == '' and o[1].decode() =='':
         return False
     return True
 
