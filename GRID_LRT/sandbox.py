@@ -5,11 +5,13 @@ import yaml
 import tempfile
 import subprocess
 import GRID_LRT
+from GRID_LRT import grid_credentials
 #TODO: Upload to different locations/methods
 
 class Sandbox(object):
 
     def __init__(self,cfgfile=None):
+        grid_credentials.GRID_credentials_enabled()
         lrt_module_dir=os.path.abspath(GRID_LRT.__file__).split("__init__.py")[0]
         self.base_dir=lrt_module_dir+"Sandbox/" 
         self.return_dir=os.getcwd()

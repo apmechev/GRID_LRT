@@ -8,6 +8,7 @@ from GRID_LRT.get_picas_credentials import picas_cred as pc
 import os
 import subprocess
 import GRID_LRT
+from GRID_LRT import grid_credentials
 
 
 class job_launcher(object):
@@ -39,6 +40,7 @@ class jdl_launcher(object):
             wholenodes(Boolean): Whether to reserve the entire node. Default is F
             NCPU (int, optional): Number of CPUs to use for each job. Default is 1
         """
+        grid_credentials.GRID_credentials_enabled()
         if numjobs<1:
             logging.warn("jdl_file with zero jobs!")
             numjobs=1
