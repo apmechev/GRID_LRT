@@ -20,10 +20,12 @@ import time
 import re
 import sys
 from GRID_LRT.Staging.srmlist import srmlist
+from GRID_LRT import grid_credentials
 from string import strip
 import pdb
 
 def main(filename, printout=True):
+        grid_credentials.GRID_credentials_enabled()
 	file_loc=location(filename)
         rs,m=replace(file_loc)
         f=open(filename,'r')
