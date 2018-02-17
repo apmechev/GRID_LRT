@@ -1,17 +1,16 @@
-from subprocess import Popen,PIPE
+import subprocess
 
 def check_uberftp():
-    p=Popen(['which', 'uberftp'],stdout=PIPE,stderr=PIPE)
+    p=subprocess.Popen(['which', 'uberftp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     o=p.communicate()
     if o[0]=='' and o[1]=='':
         return False
     return True
 
-
 def GRID_credentials_enabled():
-    if not check_uberftp():
+    if check_uberftp()==False:
         return False
-    p=Popen(['uberftp','-ls','gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox'],stdout=PIPE, stderr=PIPE)
+    p=subprocess.Popen(['uberftp','-ls','gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox'],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     res=p.communicate()
     if 'Failed to acquire credentials.'in res[1]:
         raise Exception("Grid Credentials expired! Run 'startGridSession lofar:/lofar/user/sksp' in the shell")
