@@ -37,9 +37,6 @@ class Sandbox(object):
     def create_SBX_folder(self,directory=None):
         '''Makes an empty sandbox folder or removes previous one
         '''
-#        SBX_dir= directory if directory else self.sbx_def['name']
-#        tmp_dir=self.base_dir+SBX_dir
-#       if not SBX_dir:
         SBX_dir=tempfile.mkdtemp()
         self.tmpdir=SBX_dir
         if not os.path.exists(self.tmpdir):
@@ -107,7 +104,6 @@ class Sandbox(object):
     def upload_SBX(self,SBXfile=None,loc=None,upload_name=None):
         self.upload_gsi_SBX(SBXfile,loc,upload_name)
         self.upload_gsi_SBX(SBXfile,upload_name=upload_name,loc=' gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/sandbox')
-#        self.upload_ssh_sandbox(SBXfile,loc,upload_name)
 
     def upload_ssh_sandbox(self,SBXfile=None,loc=None,upload_name=None):
         gsiloc='/disks/ftphome/pub/apmechev/sandbox/'
@@ -211,9 +207,9 @@ class Sandbox(object):
         self.make_tokvar_dict()
         self.zip_SBX()
        
-    def upload_sandbox(self):
-        self.upload_SBX()
-        self.upload_ssh_sandbox()
+    def upload_sandbox(self,upload_name=None):
+        self.upload_SBX(upload_name=upload_name)
+        self.upload_ssh_sandbox(upload_name=upload_name)
         self.cleanup()
 
 
