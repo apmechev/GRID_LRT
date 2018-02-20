@@ -14,9 +14,9 @@ before_install:
       #    - sudo apt-get install -y gfal2* libgfal2-2 libgfal2-dev libgfal-srm-ifce1
       #    - pip install gfal2-python 
     - sudo apt-get install globus-gass-copy-progs voms-clients -y
-    - sudo add-apt-repository 'deb http://repository.egi.eu/sw/production/cas/1/current egi-igtf core' -y
-    - sudo apt-get update -q
-    - sudo apt-get install ca-policy-egi-core -y
+    - sudo add-apt-repository -y 'deb http://repository.egi.eu/sw/production/cas/1/current egi-igtf core' 
+    - sudo apt-get -qq update 
+    - sudo apt-get -y install ca-policy-egi-core 
     - pip install pyyaml
 script:
   - nosetests
