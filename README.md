@@ -1,6 +1,7 @@
 [![Documentation Status](https://readthedocs.org/projects/grid-lrt/badge/?version=latest)](http://grid-lrt.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://travis-ci.org/apmechev/GRID_LRT.svg?branch=master)](https://travis-ci.org/apmechev/GRID_LRT)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![PyPI version](https://badge.fury.io/py/GRID-LRT.svg)](https://badge.fury.io/py/GRID-LRT)
 [![alt text](http://apmechev.com/img/git_repos/GRID_LRT_clones.svg "github clones since 2017-01-25")](https://github.com/apmechev/github_clones_badge)
 
 
@@ -29,7 +30,20 @@ Requirements:
 
 Installing:
 ============
-To use the package, it is recommended to install it using the setup.py script: 
+
+Installing with pip
+---------
+
+The GRID LOFAR Reduction Tools are now available through pip:
+
+```bash
+pip install GRID_LRT
+
+```
+
+Manual build
+------
+Alternatively you should use the setup.py script to install the tools:
 
 ```
 python setup.py build
@@ -43,6 +57,8 @@ python setup.py install --perfix={PATH_WHERE_TO_INSTALL_PACKAGE}
 ```
 
 You have to make sure that this path 1. Exists, 2. Is in your PYTHONPATH and 3. Will be in your PYTHONPATH every time you enter your shell (add it to your ~/.bashrc)
+
+
 
 Tutorial Notebook
 ==============

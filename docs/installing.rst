@@ -2,7 +2,7 @@
 Installation
 ************
 
-Via Python Package (coming soon)
+Via Python Package Index 
 ==================
 
 Install the package (or add it to your ``requirements.txt`` file):
