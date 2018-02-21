@@ -370,7 +370,7 @@ class TokenSet(object):
         '''
         if not name: name=attachment
         if not tok_list: 
-            tok_list=self.tokens
+            tok_list=self.__tokens
         for token in tok_list:
             self.th.add_attachment(token, open(attachment,'r'),os.path.basename(name))
 
@@ -389,7 +389,7 @@ class TokenSet(object):
 
     def add_keys_to_list(self,key,val,tok_list=None):
         if not tok_list:
-            tok_list=self.tokens
+            tok_list=self.__tokens
         to_update=[]
         for token in tok_list:
             document = self.th.db[token]
