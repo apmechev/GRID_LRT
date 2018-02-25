@@ -1,3 +1,4 @@
+import pdb
 import os
 import shutil
 import sys
@@ -25,11 +26,8 @@ class Sandbox(object):
                 self.cleanup()
 
     def parseconfig(self,yamlfile):
-        try:
-            with open(yamlfile,'r') as optfile:
-                opts_f=yaml.load(optfile)
-        except yaml.YAMLError as exc:
-            print(exc)
+        with open(yamlfile,'r') as optfile:
+            opts_f=yaml.load(optfile)
         self.sbx_def=opts_f['Sandbox']
         self.shell_vars=opts_f['Shell_variables']
         self.tok_vars=opts_f['Token']
@@ -82,7 +80,26 @@ class Sandbox(object):
                 checkout.wait()
             os.chdir(self.tmpdir+"/")
 
+    def copy_github_scripts(self):
+        pdb.set_trace()
+        SBX_type = self.sbx_def['github']['branch']
+        SBX_dir = self.sbx_def['name']
+        subprocess.call('git clone  ' +self.sbx_def['github']['location']+" "+ self.tmpdir,shell=True)
+        os.chdir(self.tmpdir+" GRID_Sandbox")
+        subprocess.call('git checkout origin '+self.sbx_def['github']['branch'])
+        subprocess.call('mv * '+ self.tmpdir)
+        os.chdir(self.tmpdir)
+        os.remove(self.tmpdir+'/GRID_Sandbox')
+            
+
+
     def copy_base_scripts(self,basetype=None):
+        if 'github' in self.sbx_def:
+            self.copy_github_scripts()
+        else:
+            self.copy_local_scripts(basetype)
+
+    def copy_local_scripts(self,basetype):
         SBX_type = basetype if basetype else self.sbx_def['type']
         SBX_dir = self.sbx_def['name']
         scripts_path=self.base_dir+'/scripts/'+SBX_type
@@ -206,7 +223,8 @@ class Sandbox(object):
         self.load_git_scripts()
         self.make_tokvar_dict()
         self.zip_SBX()
-       
+
+
     def upload_sandbox(self,upload_name=None):
         self.upload_SBX(upload_name=upload_name)
         self.upload_ssh_sandbox(upload_name=upload_name)
