@@ -83,13 +83,9 @@ class Sandbox(object):
     def copy_github_scripts(self):
         SBX_type = self.sbx_def['github']['branch']
         SBX_dir = self.sbx_def['name']
-        subprocess.call('git clone  ' +self.sbx_def['github']['location']+" "+ self.tmpdir,shell=True)
-        os.chdir(self.tmpdir+" GRID_Sandbox")
+        subprocess.call('git clone  ' +self.sbx_def['github']['location']+" "+ self.tmpdir,shell=True) 
         subprocess.call('git checkout origin '+self.sbx_def['github']['branch'])
-        subprocess.call('mv * '+ self.tmpdir)
-        os.chdir(self.tmpdir)
-        os.remove(self.tmpdir+'/GRID_Sandbox')
-            
+         
 
 
     def copy_base_scripts(self,basetype=None):
