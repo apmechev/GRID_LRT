@@ -81,7 +81,6 @@ class Sandbox(object):
             os.chdir(self.tmpdir+"/")
 
     def copy_github_scripts(self):
-        pdb.set_trace()
         SBX_type = self.sbx_def['github']['branch']
         SBX_dir = self.sbx_def['name']
         subprocess.call('git clone  ' +self.sbx_def['github']['location']+" "+ self.tmpdir,shell=True)
