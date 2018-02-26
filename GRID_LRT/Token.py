@@ -269,7 +269,29 @@ function (key, values, rereduce) {
             return
         v = self.db.view(self.t_type+"/"+view_name)
         return v
-    
+   
+    def archive_tokens(self,delete_on_save=False):
+        """Archives all tokens and attachments into a folder
+
+        """
+        os.mkdir(self.t_type)
+        os.chdir(self.t_type)
+        self.load_views()
+        for view in self.views.keys():
+            if view=='overview_total':
+                continue 
+            for token in self.list_tokens_from_view(view):
+                print(token)
+                self.archive_a_token(token['id'],delete_on_save)
+
+
+    def archive_a_token(self,token_ID,delete=False):
+        data=self.db[token_ID]
+        yaml.dump(data,open(token_ID+".dump",'w'))
+        for f in self.list_attachments(token_ID):
+            fname=f.replace('/','-')
+            self.get_attachment(token_ID,f,token_ID+"_attachment_"+str(fname))
+
     def clear_all_views(self):
         """Iterates over all views in the design document 
         and deletes all tokens from those views. Finally, removes
