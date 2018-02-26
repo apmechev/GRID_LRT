@@ -18,14 +18,14 @@ class Sandbox(object):
         self.return_dir=os.getcwd()
         self.SBXloc=None
         if cfgfile:
-            self.parseconfig(cfgfile)
+            self.__parseconfig(cfgfile)
 
     def __exit__(self):
         if 'remove_when_done' in self.sbx_def.keys():
             if self.sbx_def['remove_when_done']==True:
-                self.cleanup()
+                self.__cleanup()
 
-    def parseconfig(self,yamlfile):
+    def __parseconfig(self,yamlfile):
         with open(yamlfile,'r') as optfile:
             opts_f=yaml.load(optfile)
         self.sbx_def=opts_f['Sandbox']
@@ -42,7 +42,7 @@ class Sandbox(object):
         else:
             shutil.rmtree(self.tmpdir)
             os.makedirs(self.tmpdir)
-        self.enter_SBX_folder(self.tmpdir)
+        self.__enter_SBX_fonder(self.tmpdir)
         self.SBXloc=self.tmpdir
         return self.tmpdir
 
@@ -55,7 +55,7 @@ class Sandbox(object):
         if os.path.exists(self.tmpdir):
             shutil.rmtree(self.tmpdir)
 
-    def enter_SBX_folder(self,directory=None):
+    def __enter_SBX_fonder(self,directory=None):
         SBX_dir= directory if directory else self.sbx_def['name']
         if os.path.exists(self.base_dir+SBX_dir):
             os.chdir(self.base_dir+SBX_dir)
@@ -65,7 +65,7 @@ class Sandbox(object):
             are defined in the yaml, not by the git name
         '''
         if os.path.basename(os.getcwd())!=self.tmpdir:
-            self.enter_SBX_folder(self.tmpdir)
+            self.__enter_SBX_fonder(self.tmpdir)
         gits=self.sbx_def['git_scripts']
         if not gits: return
         for git in gits:
@@ -80,17 +80,20 @@ class Sandbox(object):
                 checkout.wait()
             os.chdir(self.tmpdir+"/")
 
-    def copy_github_scripts(self):
-        SBX_type = self.sbx_def['github']['branch']
+    def copy_git_scripts(self):
+        SBX_type = self.sbx_def['git']['branch']
         SBX_dir = self.sbx_def['name']
-        subprocess.call('git clone  ' +self.sbx_def['github']['location']+" "+ self.tmpdir,shell=True) 
-        subprocess.call('git checkout origin '+self.sbx_def['github']['branch'])
-         
-
+        print("Checking out Sanbox repository")
+        print("")
+        subprocess.call('git clone   ' +self.sbx_def['git']['location']+ " "+ self.tmpdir,shell=True) 
+        os.chdir(self.tmpdir)
+        checkout=subprocess.Popen(['git','checkout',self.sbx_def['git']['branch']])
+        checkout.wait()
+        print("")
 
     def copy_base_scripts(self,basetype=None):
-        if 'github' in self.sbx_def:
-            self.copy_github_scripts()
+        if 'git' in self.sbx_def:
+            self.copy_git_scripts()
         else:
             self.copy_local_scripts(basetype)
 
@@ -103,7 +106,7 @@ class Sandbox(object):
 
 
     def git_base_scripts(self,gitrepo=None):
-        ''' Can pull the default scripts from a github repository
+        ''' Can pull the default scripts from a git repository
             
     '''
         SBX_dir = self.sbx_def['name']
@@ -156,8 +159,7 @@ class Sandbox(object):
                                     self.sbx_def['loc']+"/"+upload_name])
         upload.wait()
         print("Uploaded sandbox to "+gsiloc+self.sbx_def['loc']+"/"+upload_name)
-        self.SBXloc=self.sbx_def['loc']+"/"+upload_name
-        
+        self.SBXloc=self.sbx_def['loc']+"/"+upload_name 
 
 
     def sandbox_exists(self,sbxfile):
@@ -181,7 +183,7 @@ class Sandbox(object):
         self.tarfile=filename
 
 
-    def cleanup(self):
+    def __cleanup(self):
         self.delete_SBX_folder()
         os.chdir(self.return_dir)
         pass
@@ -211,9 +213,13 @@ class Sandbox(object):
  
 
     def build_sandbox(self,sbx_config):
-        self.parseconfig(sbx_config)
+        """A comprehensive function that builds a Sandbox from a configuration file and creates a 
+        sandbox tarfile. 
+           
+        """
+        self.__parseconfig(sbx_config)
         self.create_SBX_folder()
-        self.enter_SBX_folder()
+        self.__enter_SBX_fonder()
         self.copy_base_scripts()
         self.load_git_scripts()
         self.make_tokvar_dict()
@@ -223,7 +229,5 @@ class Sandbox(object):
     def upload_sandbox(self,upload_name=None):
         self.upload_SBX(upload_name=upload_name)
         self.upload_ssh_sandbox(upload_name=upload_name)
-        self.cleanup()
-
-
-
+        if self.sbx_def['remove_when_done'] == 'True':
+            self.__cleanup()
