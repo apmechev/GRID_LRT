@@ -18,14 +18,14 @@ class Sandbox(object):
         self.return_dir=os.getcwd()
         self.SBXloc=None
         if cfgfile:
-            self.__parseconfig(cfgfile)
+            self.parseconfig(cfgfile)
 
     def __exit__(self):
         if 'remove_when_done' in self.sbx_def.keys():
             if self.sbx_def['remove_when_done']==True:
                 self.__cleanup()
 
-    def __parseconfig(self,yamlfile):
+    def parseconfig(self,yamlfile):
         with open(yamlfile,'r') as optfile:
             opts_f=yaml.load(optfile)
         self.sbx_def=opts_f['Sandbox']
@@ -42,7 +42,7 @@ class Sandbox(object):
         else:
             shutil.rmtree(self.tmpdir)
             os.makedirs(self.tmpdir)
-        self.__enter_SBX_fonder(self.tmpdir)
+        self.enter_SBX_fonder(self.tmpdir)
         self.SBXloc=self.tmpdir
         return self.tmpdir
 
@@ -55,7 +55,7 @@ class Sandbox(object):
         if os.path.exists(self.tmpdir):
             shutil.rmtree(self.tmpdir)
 
-    def __enter_SBX_fonder(self,directory=None):
+    def enter_SBX_fonder(self,directory=None):
         SBX_dir= directory if directory else self.sbx_def['name']
         if os.path.exists(self.base_dir+SBX_dir):
             os.chdir(self.base_dir+SBX_dir)
@@ -65,7 +65,7 @@ class Sandbox(object):
             are defined in the yaml, not by the git name
         '''
         if os.path.basename(os.getcwd())!=self.tmpdir:
-            self.__enter_SBX_fonder(self.tmpdir)
+            self.enter_SBX_fonder(self.tmpdir)
         gits=self.sbx_def['git_scripts']
         if not gits: return
         for git in gits:
@@ -183,7 +183,7 @@ class Sandbox(object):
         self.tarfile=filename
 
 
-    def __cleanup(self):
+    def cleanup(self):
         self.delete_SBX_folder()
         os.chdir(self.return_dir)
         pass
@@ -217,9 +217,9 @@ class Sandbox(object):
         sandbox tarfile. 
            
         """
-        self.__parseconfig(sbx_config)
+        self.parseconfig(sbx_config)
         self.create_SBX_folder()
-        self.__enter_SBX_fonder()
+        self.enter_SBX_fonder()
         self.copy_base_scripts()
         self.load_git_scripts()
         self.make_tokvar_dict()
@@ -230,4 +230,4 @@ class Sandbox(object):
         self.upload_SBX(upload_name=upload_name)
         self.upload_ssh_sandbox(upload_name=upload_name)
         if self.sbx_def['remove_when_done'] == 'True':
-            self.__cleanup()
+            self.cleanup()
