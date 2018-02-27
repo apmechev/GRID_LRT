@@ -4,7 +4,7 @@
 function process_output(){
  if [[ ! -f $1 ]]; then
     echo  "output file not produced!"
-    exit 99
+    exit 90 # exit 90 => No output file exists
  fi
  more $1
  if [[ $( grep "finished unsuccesfully" $1 ) > "" ]]
@@ -22,18 +22,18 @@ function process_output(){
    if [[ $( grep "bad_alloc" $1 ) > "" ]]
    then
         echo "Prefactor crashed because of bad_alloc. Not enough memory"
-        exit 16 #exit 16=> Bad_alloc error in prefactor
+        exit 98 #exit 98=> Bad_alloc error in prefactor
    fi
    if [[ $( grep "-9" $1 ) > "" ]]
    then
         echo "Prefactor crashed because of dppp: Not enough memory"
-        exit 15 #exit 15=> dppp memory error in prefactor
+        exit 97 #exit 97=> dppp memory error in prefactor
    fi
 
    if [[ $( grep "RegularFileIO" $1 ) > "" ]]
    then
         echo "Prefactor crashed because of bad download"
-        exit 17 #exit 17=> Files not downloaded fully
+        exit 96 #exit 96=> Files not downloaded fully
    fi
 
    exit 99 #exit 99=> generic prefactor error

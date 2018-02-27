@@ -280,8 +280,7 @@ function (key, values, rereduce) {
         for view in self.views.keys():
             if view=='overview_total':
                 continue 
-            for token in self.list_tokens_from_view(view):
-                print(token)
+            for token in self.list_tokens_from_view(view): 
                 self.archive_a_token(token['id'],delete_on_save)
 
 
