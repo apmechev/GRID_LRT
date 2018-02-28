@@ -5,13 +5,17 @@ from setuptools import setup
 import os
 
 setup(name='GRID_LRT',
-      packages=['GRID_LRT','GRID_LRT/Staging', 'GRID_LRT/Application', 'GRID_LRT/couchdb'],
-      version='0.2.1',
+      packages=['GRID_LRT'], #,'GRID_LRT/Staging', 'GRID_LRT/Application', 'GRID_LRT/couchdb'],
+      version='0.2.3',
       setup_requires=[
         'pyyaml', 
           ],
       tests_require=[
         'pytest', 
+          ],
+      data_files = [("Config_files",['config/bash_file.cfg','config/NDPPP_parset.cfg',"config/tutorial.cfg"]),
+                    ("License",["LICENSE.md"]),
+                    ("Sandbox_Files",["GRID_LRT/Sandbox/launchers/run_remote_sandbox.sh"])
           ],
       description='GRID LOFAR Reduction Tools',
       long_description="Software that encapsulates LOFAR processing and allows the use of High Throughput Distributed processing available at SURFsara and other European Grid Initiative locations.",
@@ -33,12 +37,6 @@ setup(name='GRID_LRT',
       'Programming Language :: Python :: 3',
       'Programming Language :: Python :: 3.2',
       'Programming Language :: Python :: 3.3',
-      'Programming Language :: Python :: 3.4',],
- 
-      data_files = [(root, [os.path.abspath(os.path.join(root, f)) for f in files])
-                             for root, dirs, files in os.walk('GRID_LRT/Sandbox')]+ 
-                    [("", ["LICENSE.md"])]+
-                    [(root, [os.path.abspath(os.path.join(root, f)) for f in files])
-                                    for root, dirs, files in os.walk('config')]
+      'Programming Language :: Python :: 3.4'] 
      )
 
