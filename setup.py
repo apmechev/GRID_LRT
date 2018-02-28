@@ -6,7 +6,7 @@ import os
 
 setup(name='GRID_LRT',
       packages=['GRID_LRT','GRID_LRT/Staging', 'GRID_LRT/Application', 'GRID_LRT/couchdb'],
-      version='0.2.0',
+      version='0.2.1',
       setup_requires=[
         'pyyaml', 
           ],
@@ -36,6 +36,9 @@ setup(name='GRID_LRT',
       'Programming Language :: Python :: 3.4',],
  
       data_files = [(root, [os.path.abspath(os.path.join(root, f)) for f in files])
-                  for root, dirs, files in os.walk('GRID_LRT/Sandbox')],
+                             for root, dirs, files in os.walk('GRID_LRT/Sandbox')]+ 
+                    [("", ["LICENSE.txt"])]+
+                    [(root, [os.path.abspath(os.path.join(root, f)) for f in files])
+                                    for root, dirs, files in os.walk('config')]
      )
 
