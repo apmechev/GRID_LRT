@@ -9,6 +9,7 @@ import logging
 from urllib.parse import urlparse
 from time import sleep
 import re
+import os
 import sys
 import subprocess
 import pdb
@@ -26,8 +27,8 @@ from airflow.utils.decorators import apply_defaults
 
 class Check_staged(BaseOperator):
     """
-    Runs a sql statement until a criteria is met. It will keep trying until
-    sql returns no row, or if the first cell in (0, '0', '').
+    TODO: srmls -l on the base directory and parse locality instead of looping!
+
 
     :param conn_id: The connection to run the sensor against
     :type conn_id: string
@@ -41,43 +42,58 @@ class Check_staged(BaseOperator):
     @apply_defaults
     def __init__(self, 
             srmfile=None, 
-            success_threshold=0.9, 
-            timeout=60*60*24*4, 
+            success_threshold=0.9,  
             *args, **kwargs):
         if srmfile:
             self.srmfile=srmfile
         else:
             raise ValueError("srmfile not defined") 
         self.threshold=success_threshold
-        super(Check_staged, self).__init__(timeout=timeout, *args, **kwargs)
+        super(Check_staged, self).__init__(*args, **kwargs)
 
     def execute(self, context):
-        staging_statuses=self.parse_srm_statuses(self.srmfile)
-        if self.count_successes > self.threshold:
-            return self.srmfile
-        return ''
+        srm_dir=self.determine_srm_root_dir(self.srmfile)
+        if 'sara' in srm_dir: 
+            logging.warning("Cannot count staged files on SURFsara, staging anyways")
+            return {'staged':False,'srmfile':self.srmfile}
+        staging_statuses=self.check_srm_status(srm_dir)
+        if self.count_successes(staging_statuses) > self.threshold:
+            return {'staged':True,'srmfile':self.srmfile}
+        return {'staged':False,'srmfile':self.srmfile}
 
-    def check_srm_status(self,srm):
-        g_proc = subprocess.Popen(['srmls','-l', srm] ,
+
+    def determine_srm_root_dir(self,srmfile):
+        """
+        Uses os and path to determine the root dir of [THE FIRST] srm link in the file
+        """
+        srmlink=""
+        for line in open(srmfile).readlines():
+            if line:
+                srmlink=line
+                break
+        srmdir=os.path.dirname(srmlink.split()[0])
+        if srmdir=="":
+            raise ValueError("SRM directory cannot be empty")
+        logging.info("Found SRM directory: "+str(srmdir))
+        return srmdir
+
+    def check_srm_status(self,srmdir):
+        """Checks the status of all srm links in the folder given. 
+        Returns a list of localities
+        """
+        g_proc = subprocess.Popen(['srmls','-l', srmdir] ,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out=g_proc.communicate()
         if out[1]!='':
             raise RuntimeError('srmls failed')
-        result=[s for s in out[0].split('\n') if 'locality' in s][0]
-        stage_status_index=result.index(':')+1
-        return result[stage_status_index:]
+        localities=[i.split(':')[1] 
+                    for i in out[0].split('\n') 
+                    if 'locality' in i] 
+        return localities[1:]  # The first element is the locality of the folder
                     
-
-    def parse_srm_statuses(self,srmfile): 
-        _list_of_statuses=[]
-        for line in open(srmfile).readlines()[:20]:
-            if line:
-                _list_of_statuses.append(self.check_srm_status(line.split()[0]))
-        return _list_of_statuses
-
-
     def count_successes(self,status_list):
         suc=sum(st=='ONLINE_AND_NEARLINE' for st in status_list)
         fail=sum(st=='NEARLINE' for st in status_list)
+        logging.info(str(suc/float(suc+fail))+ " of the files are staged")
         return suc/float(suc+fail)
         

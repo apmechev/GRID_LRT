@@ -47,6 +47,7 @@ class gliteSensor(BaseSensorOperator):
             *args, **kwargs):
         self.submit_task= submit_task
         self.threshold=success_threshold
+        self.glite_status='Waiting'
         super(gliteSensor, self).__init__(poke_interval=poke_interval,
                 timeout=timeout, *args, **kwargs)
 
@@ -57,26 +58,37 @@ class gliteSensor(BaseSensorOperator):
         logging.info('Poking glite job: ' + self.jobID)
         g_proc = subprocess.Popen(['glite-wms-job-status', self.jobID] ,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        g_result=g_proc.communicate()
+        g_result=g_proc.communicate() 
         self.parse_glite_jobs(g_result[0])
         if not 'Done' in self.job_status:
+            if 'Abort' in self.job_status:
+                raise Exception("Job aborted from commandline")
             return False
         else:
             exit_codes=self.count_successes(g_result[0])
             success_rate=exit_codes.count('0')/float(len(exit_codes))
             logging.info(str(success_rate)+" of jobs completed ok")
             if (success_rate < self.threshold):
-                logging.error("Less than "+str(self.threshold)+" jobs finished ok!")
-                raise RuntimeError("Not enough jobs completed ok on the grid! Only "+str(exit_codes.count('0'))+" jobs completed ok")
+                logging.warn("Less than "+str(self.threshold)+" jobs finished ok!")
             return True
 
     def parse_glite_jobs(self,jobs): 
-        self.job_status=jobs.split('Current Status:')[1].split()[0]
+        try:
+            self.job_status=jobs.split('Current Status:')[1].split()[0]
+        except:
+            logging.info(jobs)
         logging.debug("Current job status is "+str(self.job_status))
+        if self.glite_status=='Waiting' and self.job_status=='Running':
+            self.glite_status='Running'
+        if self.glite_status=='Running' and self.job_status=='Waiting':
+            self.glite_status='Completed'
+
 
     def count_successes(self,jobs):
         exit_codes=[] 
         for job_result in jobs.split('Exit code:'):
             exit_codes.append(job_result.split()[0])
+        if len(exit_codes)==len(jobs):
+            self.job_status='Done'
         return exit_codes[2:]
         

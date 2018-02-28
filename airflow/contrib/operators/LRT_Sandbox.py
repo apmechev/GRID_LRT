@@ -28,7 +28,7 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.utils.file import TemporaryDirectory
 from airflow.utils.state import State
-import progressbar
+#import progressbar
 #logging.info(progressbar.__file__)
 import GRID_LRT.sandbox as Sandbox
 
@@ -36,8 +36,7 @@ import pdb
 
 class LRTSandboxOperator(BaseOperator):
     """
-    Execute a stage command using the LOFAR API. Input is either file with srms
-        a list of srms or both.
+    Operator that uploads a LOFAR 'sandbox' to GRID storage
 
     :param srmfile: the name of the file holding a list of srm files to stage
     :type srmfile: string
@@ -49,7 +48,7 @@ class LRTSandboxOperator(BaseOperator):
     """
     template_fields = ()
     template_ext = ()
-    ui_color = '#f0ede4'
+    ui_color = '#42f4a4'
 
     @apply_defaults
     def __init__(
@@ -60,17 +59,19 @@ class LRTSandboxOperator(BaseOperator):
             *args, **kwargs):
 
         super(LRTSandboxOperator, self).__init__(*args, **kwargs)
-        self.sbx_config=sbx_config
+        self.sbx_config = sbx_config
         self.tok_config = tok_config  
         self.SBX=Sandbox.Sandbox(cfgfile=sbx_config)
         self.output_encoding = output_encoding
         self.state=State.QUEUED
-        self.p_bar=progressbar.ProgressBar()
+#        self.p_bar=progressbar.ProgressBar()
 
     def execute(self, context):
         """
-        Execute the bash command in a temporary directory
-        which will be cleaned afterwards
+        Launches the task. Leverages the sandbox class to build
+        a sandbox using a configuration file. Sandbox is uploaded to 
+        the respective storage. Xcom returned is the location of the
+        Sandbox
         """
         SBXlocs=[]
         self.SBX.build_sandbox(self.sbx_config)        

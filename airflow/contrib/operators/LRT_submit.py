@@ -28,7 +28,7 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.utils.file import TemporaryDirectory
 from airflow.utils.state import State
-import progressbar
+#import progressbar #TODO: Either add progressbar to install or ignore this
 #logging.info(progressbar.__file__)
 import GRID_LRT.Application.submit as submit
 import GRID_LRT.Token as Token
@@ -57,16 +57,18 @@ class LRTSubmit(BaseOperator):
             self,
             token_task,
             NCPU=2,
+            parameter_step=4,
             run_location='sara',
             output_encoding='utf-8',
             *args, **kwargs):
 
         super(LRTSubmit, self).__init__(*args, **kwargs)
         self.token_task = token_task 
-        self.location=run_location
-        self.NCPU=NCPU
+        self.location = run_location
+        self.parameter_step = parameter_step
+        self.NCPU = NCPU
         self.output_encoding = output_encoding
-        self.state=State.QUEUED
+        self.state = State.QUEUED
 
     def execute(self, context):
         """
@@ -74,12 +76,13 @@ class LRTSubmit(BaseOperator):
         which will be cleaned afterwards
         """
         pc=get_picas_credentials.picas_cred()
-        self.token_id=context['task_instance'].xcom_pull(task_ids=self.token_task)
+        self.token_id=context['task_instance'].xcom_pull(task_ids=self.token_task)['token_id']
         
         if self.token_id==None:
             raise RuntimeError("Could not get the token list from the "+str(self.token_task)+ " task")
 
-        self.initialilze_submitter(location=self.location,NCPU=self.NCPU)
+        self.initialilze_submitter(location = self.location,
+                NCPU = self.NCPU, parameter_step = self.parameter_step)
         pc=get_picas_credentials.picas_cred()
         th=Token.Token_Handler(t_type=self.token_id,
                     uname=pc.user,pwd=pc.password,dbn=pc.database)
@@ -104,7 +107,7 @@ class LRTSubmit(BaseOperator):
 
 
     def get_token_list(self,context):
-        token_id=context['task_instance'].xcom_pull(task_ids=self.token_task)
+        token_id=context['task_instance'].xcom_pull(task_ids=self.token_task)['token_id']
 
 
     def on_kill(self):
