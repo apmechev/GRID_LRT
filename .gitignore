@@ -9,6 +9,7 @@ src/*.egg-info
 develop-eggs
 dist
 GRID_LRT.egg-info/
+build/
 
 docs/Makefile
 docs/_build

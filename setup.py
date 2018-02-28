@@ -37,7 +37,7 @@ setup(name='GRID_LRT',
  
       data_files = [(root, [os.path.abspath(os.path.join(root, f)) for f in files])
                              for root, dirs, files in os.walk('GRID_LRT/Sandbox')]+ 
-                    [("", ["LICENSE.txt"])]+
+                    [("", ["LICENSE.md"])]+
                     [(root, [os.path.abspath(os.path.join(root, f)) for f in files])
                                     for root, dirs, files in os.walk('config')]
      )
