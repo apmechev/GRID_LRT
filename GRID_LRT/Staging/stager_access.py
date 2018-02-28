@@ -15,6 +15,7 @@ except ImportError:
     import xmlrpc.client as xmlrpclib
 import datetime
 from os.path import expanduser
+import pdb
 
 #---
 # Determine credentials and create proxy
@@ -47,6 +48,27 @@ else:
     print("No User or Password exist. ")
 # ---
 
+class HandleXMLRPCException(object):
+    """ Decorator class for all stager_access functions that catches the exception
+    thrown by xmlrpc and replaces the password with [REDACTED]
+    """
+    func = None
+    def __init__(self, replacement="[REDACTED]"):
+        self.replacement = replacement
+
+    def __call__(self, *args, **kwargs):
+        if self.func is None:
+            self.func = args[0]
+            return self
+        try:
+            return self.func(*args, **kwargs)
+        except xmlrpclib.ProtocolError as err:
+            pdb.set_trace()
+            if passw in err.url:
+                err.url=err.url.replace(passw,self.replacement)
+            raise(err)
+
+@HandleXMLRPCException()
 def stage(surls):
     """ Stage list of SURLs """
     if isinstance(surls, str):
@@ -54,30 +76,38 @@ def stage(surls):
     stageid = proxy.LtaStager.add_getid(surls)
     return stageid
 
+@HandleXMLRPCException()
 def get_status(stageid):
     """ Get status of request with given ID """
     return proxy.LtaStager.getstatus(stageid)
 
+@HandleXMLRPCException()
 def abort(stageid):
     """ Abort running request / release data of a finished request with given ID """
     return proxy.LtaStager.abort(stageid)
 
+@HandleXMLRPCException()
 def get_surls_online(stageid):
     """ Get a list of all files that are already online for a running request with given ID  """
     return proxy.LtaStager.getstagedurls(stageid)
 
+@HandleXMLRPCException()
 def get_srm_token(stageid):
     """ Get the SRM request token for direct interaction with the SRM site via Grid/SRM tools """
     return proxy.LtaStager.gettoken(stageid)
 
+@HandleXMLRPCException()
 def reschedule(stageid):
     """ Reschedule a request with a given ID, e.g. after it was put on hold due to maintenance """
     return proxy.LtaStager.reschedule(stageid)
 
+@HandleXMLRPCException()
 def get_progress():
     """ Get a detailed list of all running requests and their current progress. As a normal user, this only returns your own requests.  """
     return proxy.LtaStager.getprogress()
 
+
+@HandleXMLRPCException()
 def get_storage_info():
     """ Get storage information of the different LTA sites, e.g. to check available disk pool space. Requires support role permissions. """
     return proxy.LtaStager.getsrmstorageinfo()
