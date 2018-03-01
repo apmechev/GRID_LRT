@@ -19,7 +19,11 @@ before_install:
     - sudo mkdir -p /etc/grid-security/certificates/
     - sudo apt-get -y --allow-unauthenticated install ca-policy-egi-core 
     - pip install pyyaml
+    - pip install codecov
 script:
   - nosetests
+
+after_success:
+  - codecov
   - codecov
 # # command to run tests
