@@ -21,4 +21,5 @@ before_install:
     - pip install pyyaml
 script:
   - nosetests
+  - codecov
 # # command to run tests
