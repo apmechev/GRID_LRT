@@ -21,7 +21,7 @@ before_install:
     - pip install pyyaml
     - pip install codecov
 script:
-  - nosetests
+    - nosetests --with-coverage
 
 after_success:
   - codecov
