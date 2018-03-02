@@ -7,7 +7,8 @@ class SandboxTest(unittest.TestCase):
 
     def setUp(self):
         self.PWD=os.getcwd()
-        self.sbxconf=self.assertTrue(os.path.exists(os.path.dirname(__file__)+'/sandbox_config_NDPPP_from_git.cfg'))
+        self.assertTrue(os.path.exists(os.path.dirname(__file__)+'/sandbox_config_NDPPP_from_git.cfg'))
+        self.sbxconf=os.path.dirname(__file__)+'/sandbox_config_NDPPP_from_git.cfg'
 #        os.chdir(self.PWD+"/GRID_LRT/Sandbox")
 
 
