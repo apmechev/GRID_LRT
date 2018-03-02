@@ -25,5 +25,5 @@ script:
 
 after_success:
   - codecov
-  - codecov
+
 # # command to run tests

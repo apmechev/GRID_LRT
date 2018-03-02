@@ -5,7 +5,7 @@ from setuptools import setup
 import os
 
 setup(name='GRID_LRT',
-      packages=['GRID_LRT'], #,'GRID_LRT/Staging', 'GRID_LRT/Application', 'GRID_LRT/couchdb'],
+      packages=['GRID_LRT', 'GRID_LRT/Staging', 'GRID_LRT/Application', 'GRID_LRT/couchdb'],
       version='0.2.3',
       setup_requires=[
         'pyyaml', 
