@@ -33,12 +33,12 @@ def process_surl_line(line):
     return line
 
 
-def main(filename):
+def main(filename,test=False):
     file_loc=location(filename)
     rs,m=replace(file_loc)
     with open(filename,'r') as f:
         urls=f.readlines()
-    return (process(urls,rs,m))
+    return (process(urls,rs,m,test))
 
 def return_srmlist(filename):
     file_loc=location(filename)
@@ -97,7 +97,7 @@ def replace(file_loc):
 
 
 
-def process(urls,repl_string,m):
+def process(urls,repl_string,m,test=False):
     surls=[]
     for u in urls:
         if not 'srm' in u:
@@ -106,6 +106,8 @@ def process(urls,repl_string,m):
             surls.append(strip(u))
     req={}
     print("Setting up "+str(len(surls))+" srms to stage")
+    if test:
+        return
     stageID=sa.stage(surls)
 
     print("staged with stageID ", stageID)

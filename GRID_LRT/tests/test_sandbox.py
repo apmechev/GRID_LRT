@@ -7,7 +7,7 @@ class SandboxTest(unittest.TestCase):
 
     def setUp(self):
         self.PWD=os.getcwd()
-        self.sbxconf=os.getcwd()+'/config/steps/test.cfg'
+        self.sbxconf=self.assertTrue(os.path.exists(os.path.dirname(__file__)+'/sandbox_config_NDPPP_from_git.cfg'))
 #        os.chdir(self.PWD+"/GRID_LRT/Sandbox")
 
 
@@ -26,6 +26,11 @@ class SandboxTest(unittest.TestCase):
         self.assertTrue(os.path.exists(SBX_dir) & os.path.isdir(SBX_dir))
         s.cleanup()
         self.assertTrue(not((os.path.exists(SBX_dir))))
+
+    def test_autobuild(self):
+        s=sandbox.Sandbox()
+        s.build_sandbox(self.sbxconf)
+
 
 #    def test_creating_deleting_sbx_yml(self):
 #        '''Testing creating and deleting folders during cleanup
