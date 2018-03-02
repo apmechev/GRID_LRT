@@ -14,6 +14,7 @@ try:
 except ImportError:
     import xmlrpc.client as xmlrpclib
 import datetime
+import os
 from os.path import expanduser
 import pdb
 
@@ -40,6 +41,12 @@ except IOError:
                     passw = line.split('=')[1].strip()
     except IOError:
         print("No StagingRC file found")
+
+try: 
+    user = os.environ['LOFAR_LTA_USER']
+    passw = os.environ['LOFAR_LTA_PWD']
+except:
+    print("LOFAR LTA USER/PASSW not in environment!")
 
 if user and passw:
     print(datetime.datetime.now(), "stager_access: Creating proxy")
