@@ -190,7 +190,7 @@ class Sandbox(object):
 
     def make_tokvar_dict(self):
         tokvardict=self.shell_vars
-        yaml.dump(tokvardict,open('tokvar.cfg','wb'))
+        yaml.dump(tokvardict,open('tokvar.cfg','w'))
         pass
 
     def check_token(self):
