@@ -30,5 +30,5 @@ GRID_LRT.Staging.stager_access
     :members:
     :undoc-members:
     :inherited-members:
-    :show-inheritance
+    :show-inheritance:
 

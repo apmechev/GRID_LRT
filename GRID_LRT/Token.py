@@ -11,15 +11,18 @@
    :platform: Unix
    :synopsis: Set of tools for manually and automatically creating tokens
 
-.. moduleauthor:: Alexandar Mechev <apmechev@gmail.com>
+.. moduleauthor:: Alexandar Mechev <apmechev@strw.leidenuniv.nl>
 
+>>> #Example creation of a token of token_type 'test'
 >>> from GRID_LRT.get_picas_credentials import picas_cred
->>> pc=picas_cred()
+>>> pc=picas_cred() #Gets picas_credentials
 >>> 
->>> th=Token.Token_Handler( t_type="test", srv="https://picas-lofar.grid.sara.nl:6984", uname=pc.user, pwd=pc.password, dbn=pc.database)
->>> th.load_views()
+>>> th=Token.Token_Handler( t_type="test", srv="https://picas-lofar.grid.sara.nl:6984", uname=pc.user, pwd=pc.password, dbn=pc.database) #creates object to 'handle' Tokens
+>>> th.add_overview_view()
+>>> th.add_status_views() #Adds 'todo', 'done', 'locked' and 'error' views
+>>> th.load_views() 
 >>> th.views.keys()
->>> th.reset_tokens(view_name='error')
+>>> th.reset_tokens(view_name='error') # resets all tokens in 'error' view
 >>> th.set_view_to_status(view_name='done','processed')
 """
 
@@ -37,7 +40,7 @@ from couchdb.design import ViewDefinition
 
 __author__ = "Alexandar P. Mechev"
 __copyright__ = "2016 Alexandar P. Mechev"
-__credits__ = ["Alexandar P. Mechev", "Natalie Danezi"]
+__credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
 __license__ = "GPL"
 __version__ = "3.0.0"
 __maintainer__ = "Alexandar P. Mechev"
@@ -69,7 +72,19 @@ class Token_Handler:
         self.tokens = {}
 
     def get_db(self, uname, pwd, dbn, srv):
-        """Logs into the Couchdb server and returns the database requested
+        """Logs into the Couchdb server and returns the database requested. Returns a couchDB database object
+        Args:
+                :param uname: The username to log into CouchDB with
+                :type uname: str
+                :param pwd: The CouchDB password 
+                :type pwd: str
+                :param dbn: The CouchDB Database Name 
+                :type dbn: str
+                :param srv: URL of the CouchDB Server
+                :type srv: str
+ 
+        Returns:
+                :returns: a CouchDB database instance
         """
         server = couchdb.Server(srv)
         server.resource.credentials = (uname, pwd)
@@ -81,6 +96,18 @@ class Token_Handler:
             user requested keys through the dict keys{}
             ie t1.create_token(keys = {"OBSID":"L123458","freq_res":4,"time_res":4,},append="L123458")
             attach is [file_handle,"name of attachment"]
+
+        Args:
+            :param keys: A dictionary of keys, which will be uploaded to the CouchDB document.
+                The supported values for a key are str,int,float and dict
+            :type keys: dict
+            :param append: A string which is appended to the end of the tokenID, useful for
+                adding an OBSID for example
+            :type append: str
+            :param attach: A 2-item list of file to be attached to the token. The first value is the file handle and the second is a string with the attachment name. ex: [open('/home/apmechev/file.txt','r'),"file.txt"]
+            :type attach: list
+        Returns:
+            :returns: A string with the token ID
         '''
         default_keys = {
             '_id': 't_'+self.t_type+"_",
@@ -100,6 +127,7 @@ class Token_Handler:
         return keys['_id']  # returns the token ID
 
     def append_id(self, keys, app=""):
+        """ Helper function that appends a string to the token ID"""
         keys["_id"] += app
 
     def load_views(self):
@@ -149,25 +177,28 @@ class Token_Handler:
         view.sync(self.db)
 
     def add_overview_view(self):
+        """ Helper function that creates the Map-reduce view which makes it easy to count
+            the number of jobs in the 'locked','todo','downloading','error' and 'running' states
+        """
         overviewMapCode = '''
 function(doc) {
    if(doc.type == "%s") {
        if (doc.lock == 0 && doc.done == 0){
           emit('todo', 1);
        }
-       if(doc.lock > 0 && doc.status=='downloading') {
+       if(doc.lock > 0 && doc.status == 'downloading' ) {
           emit('downloading', 1);
        }
-       if(doc.lock > 0 && doc.status=='done') {
+       if(doc.lock > 0 && doc.done > 0 ) {
           emit('done', 1);
        }
-       if(doc.lock > 0 && doc.status=='error') {
+       if(doc.lock > 0 && doc.output!= 0 ) {
           emit('error', 1);
        }
-       if(doc.lock > 0 && doc.status=='launched') {
+       if(doc.lock > 0 && doc.status == 'launched' ) {
           emit('waiting', 1);
        }
-       if(doc.lock > 0 && "starting_generic_pipeline" in doc.times && doc.status!='done' && doc.status!='error' && doc.status!='downloading' ) {
+       if(doc.lock > 0  && doc.done==0 && doc.status!='downloading' ) {
           emit('running', 1);
        }
    }
@@ -240,12 +271,19 @@ function (key, values, rereduce) {
         return (to_update)
 
     def add_attachment(self, token, filehandle, filename="test"):
+        """Uploads an attachment to a token
+        """
         self.db.put_attachment(self.db[token], filehandle, filename)
 
     def list_attachments(self, token):
+        """Lists all of the filenames attached to a couchDB token
+        """
         return self.db[token]["_attachments"].keys()
 
     def get_attachment(self, token, filename, savename=None):
+        """Downloads an attachment from a CouchDB token. Optionally
+            a save name can be specified. 
+        """
         try:
             attach = self.db.get_attachment(token, filename).read()
         except AttributeError:
