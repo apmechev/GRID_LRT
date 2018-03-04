@@ -11,7 +11,7 @@ Location: GRID_LRT/Token.py
 TokenHandler
 ------
 
-.. autoclass:: GRID_LRT.Token.TokenHandler
+.. autoclass:: GRID_LRT.Token.Token_Handler
     :members: 
     :undoc-members:
 
