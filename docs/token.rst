@@ -11,14 +11,14 @@ Location: GRID_LRT/Token.py
 TokenHandler
 ------
 
-.. autoclas:: GRID_LRT.Token.TokenHandler
+.. autoclass:: GRID_LRT.Token.TokenHandler
     :members: 
     :undoc-members:
 
 TokenSet
 ------
 
-.. autoclas:: GRID_LRT.Token.TokenSet
+.. autoclass:: GRID_LRT.Token.TokenSet
     :members: 
     :undoc-members:
 
