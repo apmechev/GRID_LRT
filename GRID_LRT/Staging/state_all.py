@@ -31,6 +31,22 @@ def main(filename, verbose=True):
     """Main function that takes in a file name and returns a list of tuples of 
     filenames and staging statuses. The input file can be both srm:// and gsiftp:// links.
 
+    Args:
+        :param filename: The filename holding the links whose have to be checked
+        :type filename: str
+        :param verbose: A toggle to turn off printing out the status of each file. True by default will print everything out
+        :type verbose: bool
+
+    Returns:
+        :ret results: A list of tuples containing the file_name and the State
+
+    Usage: 
+
+    >>> from GRID_LRT.Staging import state_all
+    >>> filename='/home/apmechev/GRIDTOOLS/GRID_LRT/GRID_LRT/tests/srm_50_sara.txt'
+    >>> results=state_all.main(filename)
+    >>> results=state_all.main(filename, verbose=False)
+
     """
     grid_credentials.GRID_credentials_enabled() # Check if credenitals enabled
     s_list=load_file_into_srmlist(filename)
@@ -53,10 +69,13 @@ def load_file_into_srmlist(filename):
 def check_status(surl, verbose=True):
     """ Obtain the status of a file from the given surl.
     Args:
-        surl (str): the SURL pointing to the file.
-        verbose (bool): print the status to the terminal.
+        :param surl : the SURL pointing to the file.
+        :type surl: str
+        :parame verbose: print the status to the terminal.
+        :type verbose: bool
     Returns:
-        status (str): the file status as stored in the 'user.status' attribute.
+        : (filename, status) : a tuple containing the file  and status as 
+            stored in the 'user.status' attribute.
     """
     context = gfal.creat_context()
     status = context.getxattr(surl, 'user.status')
@@ -72,6 +91,13 @@ def check_status(surl, verbose=True):
 def percent_staged(results):
     """Takes list of tuples of (srm, status) and counts the percentage of files
     that are staged (0->1) and retunrs this percentage as float
+
+    Usage:
+    
+    >>> from GRID_LRT.Staging import state_all
+    >>> filename='/home/apmechev/GRIDTOOLS/GRID_LRT/GRID_LRT/tests/srm_50_sara.txt'
+    >>> results=state_all.main(filename, verbose=False)
+    >>> state_all.percent_staged(results)
 
     """
     total_files=len(results)
