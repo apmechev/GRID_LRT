@@ -15,105 +15,74 @@
 #!/usr/bin/env python
 
 import pythonpath
-import gfal
-import time
-import re
+import gfal2 as gfal
 import sys
 from GRID_LRT.Staging.srmlist import srmlist
 from GRID_LRT import grid_credentials
-from string import strip
 import pdb
+from collections import Counter
 
-def main(filename, printout=True):
-        grid_credentials.GRID_credentials_enabled()
-	file_loc=location(filename)
-        rs,m=replace(file_loc)
-        f=open(filename,'r')
-        urls=f.readlines()
-        s_list=srmlist()
-        for i in urls:
-            s_list.append(i)
-        f.close()
-        return (process(s_list,rs,m,printout))
 
-def state_dict(srm_dict, printout=True):
-        locs_options=['s','j','p']
+def main(filename, verbose=True):
+    """Main function that takes in a file name and returns a list of tuples of 
+    filenames and staging statuses. The input file can be both srm:// and gsiftp:// links.
 
-        line=srm_dict.itervalues().next() 
-        file_loc=[locs_options[i] for i in range(len(locs_options)) if ["sara" in line,"juelich" in line, not "sara" in line and not "juelich" in line][i] ==True][0]
-        print file_loc
-        rs,m=replace(file_loc)
-        
-        urls=[]
-        for key, value in srm_dict.iteritems():
-            urls.append(value)
-        return process(urls,rs,m,printout)
+    """
+    grid_credentials.GRID_credentials_enabled() # Check if credenitals enabled
+    s_list=load_file_into_srmlist(filename)
+    print("files are at "+s_list.LTA_location)
+    results=[]
+    for i in s_list.gfal_links():
+        results.append(check_status(i,verbose))
+    return results
 
-def location(filename):
-	locs_options=['s','j','p']
-	with open(filename,'r') as f:
-		line=f.readline()
-	 
-	file_loc=[locs_options[i] for i in range(len(locs_options)) if ["sara" in line,"juelich" in line, not "sara" in line and not "juelich" in line][i] ==True]
-	return file_loc[0]
+def load_file_into_srmlist(filename):
+    """Helper function that loads a file into an srmlist object (will be
+    added to the actual srmlist class later)
 
-def replace(file_loc):
-	if file_loc=='p':
-		m=re.compile('8443')
-		repl_string="8443/srm/managerv2?SFN="
-		print("Files are in Poznan")
-	else:
-		m=re.compile('8443')
-		if file_loc=='j':
-			repl_string="8443/srm/managerv2?SFN="
-			print("Files are in Juleich")
-                        print("State_check will fail!")
-		elif file_loc=='s':
-                    repl_string="8443/srm/managerv2?SFN="
-		    print("files are on SARA")
-		else:
-			sys.exit()
-        return repl_string,m
-   
-def process(urls,repl_string,m,printout=True): 
-	nf=100
-	surls=srmlist()
-	for u in urls:
-	     surls.append(m.sub(repl_string,strip(u)))
-	#    surls.append(m.sub('srm://lofar-srm.fz-juelich.de:8443/srm/managerv2?SFN=/pnfs/',strip(u)))
+    """
+    s=srmlist()
+    for i in open(filename,'r').read().split():
+        s.append(i)
+    return s
+
+def check_status(surl, verbose=True):
+    """ Obtain the status of a file from the given surl.
+    Args:
+        surl (str): the SURL pointing to the file.
+        verbose (bool): print the status to the terminal.
+    Returns:
+        status (str): the file status as stored in the 'user.status' attribute.
+    """
+    context = gfal.creat_context()
+    status = context.getxattr(surl, 'user.status')
+    filename = surl.split('/')[-1]
+    if status=='ONLINE_AND_NEARLINE' or status=='ONLINE':
+        color="\033[32m"
+    else :
+        color="\033[31m"
+    if verbose:
+        print('{:s} is {:s}{:s}\033[0m'.format(filename, color,status))
+    return (filename, status)
+
+def percent_staged(results):
+    """Takes list of tuples of (srm, status) and counts the percentage of files
+    that are staged (0->1) and retunrs this percentage as float
+
+    """
+    total_files=len(results)
+    counts = Counter(x[1] for x in results)
+    staged=counts['ONLINE_AND_NEARLINE']+counts['ONLINE']
+    unstaged=counts['NEARLINE']
+    print(str(float(staged/total_files)*100)+" percent of files staged")
+    return float(staged/total_files)
+
+if __name__ == '__main__':
+    surl = sys.argv[1]
+    if (surl.lower()).startswith('srm://'):
+        # Single file.
+        check_status(surl)
+    else:
+        # Assume a file list.
+        check_status_file(surl)
 	
-	mx=len(surls)
-	locality=[]
-	i=0
-	while i<mx:
-	    req={}
-	    mxi=min(i+nf,mx)
-	    s=surls[i:mxi]
-	    req.update({'surls':s})
-	    req.update({'setype':'srmv2'})
-	    req.update({'no_bdii_check':1})
-	    req.update({'srmv2_lslevels':1})
-	    req.update({'protocols':['gsiftp']})
-	    a,b,c=gfal.gfal_init(req)
-	    a,b,c=gfal.gfal_ls(b)
-	    a,b,c=gfal.gfal_get_results(b)
-	    for j in range(0,len(c)):
-	       if c[j]['status']!=0:
-                        print "\033[31mSURL "+c[j]['surl']+" not OK! Will Skip this one "+"\033[0m"
-                        continue
-               if c[j]['locality']=='NEARLINE':
-			colour="\033[31m"
-	       else:
-			colour="\033[32m"
-               if printout:
-	                print str(j)+c[j]['surl']+" "+colour+c[j]['locality']+"\033[0m"
-	       locality.append([c[j]['surl'],c[j]['locality']])
-	    i=i+nf
-	    time.sleep(1)	
-        return locality
-
-if __name__=='__main__':
-	if len(sys.argv)==2:
-		sys.exit(main(sys.argv[1]))
-	else: 
-		sys.exit(main('files'))

@@ -100,15 +100,29 @@ class srmlist(list):
         """
         if('srm://') in item:
             return(re.sub('8443','8443/srm/managerv2?SFN=',item))
-
+        elif('gsiftp://') in item:
+            return(self.srm_replace(item))
+    
+    def srm_replace(self,item):
+        if self.LTA_location=='sara': return re.sub('gsiftp://gridftp.grid.sara.nl:2811',
+                                    'srm://srm.grid.sara.nl:8443',
+                                    item)
+        if self.LTA_location=='juelich': return re.sub("gsiftp://dcachepool12.fz-juelich.de:2811",
+                                                "srm://lofar-srm.fz-juelich.de:8443",
+                                                item)
+        if self.LTA_location=='poznan': return re.sub("gsiftp://gridftp.lofar.psnc.pl:2811",
+                                                "srm://lta-head.lofar.psnc.pl:8443",
+                                                item)
+    
+    
     def gsi_replace(self,item):
         if self.LTA_location=='sara': return re.sub('srm://srm.grid.sara.nl:8443',
-                                             'gsiftp://gridftp.grid.sara.nl:2811',
+                                              'gsiftp://gridftp.grid.sara.nl:2811',
                                             item)
         if self.LTA_location=='juelich': return re.sub("srm://lofar-srm.fz-juelich.de:8443","gsiftp://dcachepool12.fz-juelich.de:2811",item)
         if self.LTA_location=='poznan': return re.sub("srm://lta-head.lofar.psnc.pl:8443",
                                                     "gsiftp://gridftp.lofar.psnc.pl:2811",
-                                            item)
+                                             item)
 
     def http_replace(self,item):
         if self.LTA_location=='sara': return re.sub('srm://',
