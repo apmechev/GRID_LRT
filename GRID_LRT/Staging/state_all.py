@@ -15,7 +15,11 @@
 #!/usr/bin/env python
 
 import pythonpath
-import gfal2 as gfal
+try:
+    import gfal2 as gfal
+except ImportError:
+    print("GFAL CANNOT BE IMPORTED")
+    pass
 import sys
 from GRID_LRT.Staging.srmlist import srmlist
 from GRID_LRT import grid_credentials
