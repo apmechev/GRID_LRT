@@ -59,6 +59,19 @@ class Token_Handler:
     """
 
     def __init__(self, t_type="token", srv="https://picas-lofar.grid.sara.nl:6984", uname="", pwd="", dbn=""):
+        """
+        >>> #Example creation of a token of token_type 'test'
+        >>> from GRID_LRT.get_picas_credentials import picas_cred
+        >>> pc=picas_cred() #Gets picas_credentials
+        >>> 
+        >>> th=Token.Token_Handler( t_type="test", srv="https://picas-lofar.grid.sara.nl:6984", uname=pc.user, pwd=pc.password, dbn=pc.database ) #creates object to 'handle' Tokens
+        >>> th.add_overview_view()
+        >>> th.add_status_views() #Adds 'todo', 'done', 'locked' and 'error' views
+        >>> th.load_views() 
+        >>> th.views.keys()
+        >>> th.reset_tokens(view_name='error') # resets all tokens in 'error' view
+        >>> th.set_view_to_status(view_name='done','processed')
+        """
         if t_type:
             self.t_type = t_type
         else: 

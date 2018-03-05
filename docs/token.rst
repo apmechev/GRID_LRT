@@ -7,7 +7,11 @@ This module is responsible for interactions with CouchDB using the PiCaS token f
 Token.py
 ==========
 Location: GRID_LRT/Token.py
+Imports: 
+    from GRID_LRT.Token import Token_Handler
+    from GRID_LRT.Token import TokenSet
 
+Class Documentation:
 TokenHandler
 ------
 
