@@ -10,7 +10,19 @@ from GRID_LRT import grid_credentials
 #TODO: Upload to different locations/methods
 
 class Sandbox(object):
+    """ A set of functions to create a sandbox from a configuration file. Uploads to grid storage
+        and ssh-copies to a remote ftp server as a fallback location. 
 
+        Usage with a .cfg file:
+
+        >>> from GRID_LRT import sandbox
+        >>> s=sandbox.Sandbox()
+        >>> s.build_sandbox('config/bash_file.cfg')
+        >>> s.upload_sandbox()
+
+        This will build the sandbox according to the recipy in bash_file.cfg and upload it to grid
+        storage
+    """
     def __init__(self,cfgfile=None):
         grid_credentials.GRID_credentials_enabled()
         lrt_module_dir=os.path.abspath(GRID_LRT.__file__).split("__init__.py")[0]
