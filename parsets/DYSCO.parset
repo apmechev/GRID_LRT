@@ -1,0 +1,4 @@
+msin                    = L234028_SB486_uv.dppp.MS
+msout                   = L234028_SB486_uv.dppp.MS.fa
+msout.storagemanager    = dysco 
+steps                   = []
