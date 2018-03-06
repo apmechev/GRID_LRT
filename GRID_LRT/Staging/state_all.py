@@ -46,6 +46,8 @@ def main(filename, verbose=True):
     >>> filename='/home/apmechev/GRIDTOOLS/GRID_LRT/GRID_LRT/tests/srm_50_sara.txt'
     >>> results=state_all.main(filename)
     >>> results=state_all.main(filename, verbose=False)
+    >>> results[0]
+    ('L229507_SB150_uv.dppp.MS_f6fc7fc5.tar', 'ONLINE_AND_NEARLINE')
 
     """
     grid_credentials.GRID_credentials_enabled() # Check if credenitals enabled
@@ -68,11 +70,13 @@ def load_file_into_srmlist(filename):
 
 def check_status(surl, verbose=True):
     """ Obtain the status of a file from the given surl.
+
     Args:
         :param surl : the SURL pointing to the file.
         :type surl: str
         :parame verbose: print the status to the terminal.
         :type verbose: bool
+
     Returns:
         : (filename, status) : a tuple containing the file  and status as 
             stored in the 'user.status' attribute.
