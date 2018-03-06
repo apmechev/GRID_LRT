@@ -202,10 +202,10 @@ function(doc) {
        if(doc.lock > 0 && doc.status == 'downloading' ) {
           emit('downloading', 1);
        }
-       if(doc.lock > 0 && doc.done > 0 ) {
+       if(doc.lock > 0 && doc.done > 0 && doc.output == 0 ) {
           emit('done', 1);
        }
-       if(doc.lock > 0 && doc.output!= 0 ) {
+       if(doc.lock > 0 && doc.output != 0 ) {
           emit('error', 1);
        }
        if(doc.lock > 0 && doc.status == 'launched' ) {
@@ -403,7 +403,7 @@ class TokenSet(object):
             with open(tok_config,'r') as optfile:
                 self.token_keys=yaml.load(optfile)['Token']
 
-    def create_dict_tokens(self,iterable={},id_append="L000000",key_name='start_SB',file_upload=None):
+    def create_dict_tokens(self,iterable={},id_append="L000000",key_name='STARTSB',file_upload=None):
         """ A function that accepts a dictionary and creates a set of tokens equal to 
             the number of entries (keys) of the dictionary. The values of the dict are
             a list of strings that may be attached to each token if the 'file_upload' 
