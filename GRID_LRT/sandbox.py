@@ -151,10 +151,6 @@ class Sandbox(object):
     def upload_gsi_SBX(self,SBXfile=None,loc=None,upload_name=None): #TODO: Use UL/DL interfaces
         """ Uploads the sandbox to the relative folders
         """
-        gsiloc='gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/'
-        if self.sandbox_exists(gsiloc+self.sbx_def['loc']+"/"+self.tarfile):
-            self.delete_gsi_sandbox(gsiloc+self.sbx_def['loc']+"/"+self.tarfile)
-
         rename=self.tarfile
 
         if not upload_name:
@@ -165,6 +161,11 @@ class Sandbox(object):
         upload_place=gsiloc+self.sbx_def['loc']
         if loc is not None: upload_place=loc
         print(upload_place)
+        gsiloc='gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/'
+
+        if self.sandbox_exists(gsiloc+self.sbx_def['loc']+"/"+self.tarfile):
+            self.delete_gsi_sandbox(gsiloc+self.sbx_def['loc']+"/"+self.tarfile)
+
         
         if self.tarfile:
             upload=subprocess.Popen(['globus-url-copy',self.tarfile, gsiloc+
