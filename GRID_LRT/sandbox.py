@@ -164,8 +164,8 @@ class Sandbox(object):
         if loc is not None: upload_place=loc
         print(upload_place) 
 
-        if self.sandbox_exists(gsiloc+self.sbx_def['loc']+"/"+self.tarfile):
-            self.delete_gsi_sandbox(gsiloc+self.sbx_def['loc']+"/"+self.tarfile)
+        if self.sandbox_exists(gsiloc+self.sbx_def['loc']+"/"+upload_name):
+            self.delete_gsi_sandbox(gsiloc+self.sbx_def['loc']+"/"+upload_name)
 
         
         if self.tarfile:
