@@ -16,7 +16,7 @@
 ! avg_timestep         = 4   # averaging step needed to average the data to 4 seconds time resolution
 ! avg_freqstep         = 4   # averaging step needed to average the data to 4 ch/SB frequency resolution
 # where to find the calibrator data
-! cal_input_path       = PREFACTOR_SCRATCH_DIR
+! cal_input_path       = PREFACTOR_SCRATCH_DIR/Input
 ! cal_input_pattern    = *dppp_prep_cal
 # Path to the skymodels for the Calibrator
 ! calibrator_path_skymodel  = PREFACTOR_SCRATCH_DIR/prefactor/skymodels/

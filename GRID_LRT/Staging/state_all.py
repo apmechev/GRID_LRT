@@ -72,7 +72,7 @@ def check_status(surl, verbose=True):
     """ Obtain the status of a file from the given surl.
 
     Args:
-        :param surl : the SURL pointing to the file.
+        :param surl: the SURL pointing to the file.
         :type surl: str
         :parame verbose: print the status to the terminal.
         :type verbose: bool
