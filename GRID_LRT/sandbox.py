@@ -84,10 +84,10 @@ class Sandbox(object):
             clone=subprocess.Popen(['git','clone',gits[git]['git_url'],self.tmpdir+"/"+git])
             clone.wait()
             os.chdir(self.tmpdir+"/"+git)
-            if 'branch' in self.sbx_def['git_scripts'].keys():
+            if 'branch' in self.sbx_def['git_scripts'][git].keys():
                 checkout=subprocess.Popen(['git','checkout',gits[git]['branch']])
                 checkout.wait()
-            if 'commit' in self.sbx_def['git_scripts'].keys():
+            if 'commit' in self.sbx_def['git_scripts'][git].keys():
                 checkout=subprocess.Popen(['git','checkout',gits[git]['commit']])
                 checkout.wait()
             os.chdir(self.tmpdir+"/")

@@ -23,7 +23,7 @@ then
  git checkout testpy3
  cd ../
 else  #move this to testpy3
- wget https://github.com/apmechev/GRID_picastools/archive/master.zip
+ wget -O master.zip https://github.com/apmechev/GRID_picastools/archive/testpy3.zip 
  unzip master.zip -d p_tools_git/ 
 fi
 
