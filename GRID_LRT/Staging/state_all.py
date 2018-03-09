@@ -78,7 +78,7 @@ def check_status(surl, verbose=True):
         :type verbose: bool
 
     Returns:
-        : (filename, status) : a tuple containing the file  and status as 
+        :(filename, status): a tuple containing the file  and status as 
             stored in the 'user.status' attribute.
     """
     context = gfal.creat_context()
