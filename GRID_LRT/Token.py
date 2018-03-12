@@ -403,7 +403,7 @@ class TokenSet(object):
             with open(tok_config,'r') as optfile:
                 self.token_keys=yaml.load(optfile)['Token']
 
-    def create_dict_tokens(self,iterable={},id_append="L000000",key_name='STARTSB',file_upload=None):
+    def create_dict_tokens(self,iterable={},id_prefix='SB',id_append="L000000",key_name='STARTSB',file_upload=None):
         """ A function that accepts a dictionary and creates a set of tokens equal to 
             the number of entries (keys) of the dictionary. The values of the dict are
             a list of strings that may be attached to each token if the 'file_upload' 
@@ -426,7 +426,7 @@ class TokenSet(object):
             pipeline=""
             if 'pipeline' in keys:
                 pipeline="_"+keys['pipeline']
-            token=self.th.create_token(keys,append=id_append+pipeline+"_SB"+str("%03d" % int(key) ))
+            token=self.th.create_token(keys,append=id_append+pipeline+"_"+id_prefix+str("%03d" % int(key) ))
             if file_upload:
                 with open('temp_abn','w') as tmp_abn_file:
                     for i in iterable[key]:
