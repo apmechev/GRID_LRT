@@ -235,7 +235,7 @@ function (key, values, rereduce) {
         self.add_view(v_name="todo", cond='doc.lock ==  0 && doc.done == 0 ')
         self.add_view(v_name="locked", cond='doc.lock > 0 && doc.done == 0 ')
         self.add_view(v_name="done", cond='doc.status == "done" ')
-        self.add_view(v_name="error", cond='doc.status == "error" ')
+        self.add_view(v_name="error", cond='doc.status == "error" ', emit_value2='doc.output')
     
     def del_view(self, view_name="test_view"):
         '''Deletes the view with view name from the _design/${token_type} document
