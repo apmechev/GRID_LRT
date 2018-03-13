@@ -36,8 +36,13 @@ GRID_LRT.Staging.state_all
 GRID_LRT.Staging.stager_access
 -------------------- 
 .. automodule:: GRID_LRT.Staging.stager_access
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
+
+    .. autofunction::  stage(surls)
+    .. autofunction::  get_status(stageid)
+    .. autofunction::  get_surls_online(stageid)
+    .. autofunction::  get_srm_token(stageid)
+    .. autofunction::  reschedule(stageid)
+    .. autofunction::  get_progress()
+    .. autofunction::  get_storage_info() 
+
 
