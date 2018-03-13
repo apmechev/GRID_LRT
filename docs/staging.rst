@@ -41,12 +41,12 @@ GRID_LRT.Staging.stager_access
     :inherited-members:
     :show-inheritance:
 
-    .. automethod::  stage(surls)
-    .. automethod::  get_status(stageid)
-    .. automethod::  get_surls_online(stageid)
-    .. automethod::  get_srm_token(stageid)
-    .. automethod::  reschedule(stageid)
-    .. automethod::  get_progress()
-    .. automethod::  get_storage_info() 
+    .. autofunction::  stage(surls)
+    .. autofunction::  get_status(stageid)
+    .. autofunction::  get_surls_online(stageid)
+    .. autofunction::  get_srm_token(stageid)
+    .. autofunction::  reschedule(stageid)
+    .. autofunction::  get_progress()
+    .. autofunction::  get_storage_info() 
 
 
