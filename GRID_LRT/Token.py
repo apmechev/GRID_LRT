@@ -285,6 +285,15 @@ function (key, values, rereduce) {
 
     def add_attachment(self, token, filehandle, filename="test"):
         """Uploads an attachment to a token
+
+        Args:
+            :param token: The Token _id as recorded in the CouchDB database 
+            :type token: str
+            :param filehandle: the file handle to the file which to upload open(filepath,'r')
+            :type tok_config: os.file()
+            :param filename: The name of the attachment 
+            :type tok_config: str
+
         """
         self.db.put_attachment(self.db[token], filehandle, filename)
 
@@ -336,6 +345,7 @@ function (key, values, rereduce) {
 
 
     def archive_a_token(self,token_ID,delete=False):
+        "Dumps the token data into a yaml file and saves the attachments"
         data=self.db[token_ID]
         yaml.dump(data,open(token_ID+".dump",'w'))
         for f in self.list_attachments(token_ID):
