@@ -1,4 +1,4 @@
-# This is the Stager API wrapper module for the Lofar LTA staging service.
+
 #
 # It uses an xmlrpc proxy to talk and authenticate to the remote service. Your account credentials will be read from
 # the awlofar catalog Environment.cfg, if present or can be provided in a .stagingrc file in your home directory. 
@@ -60,10 +60,12 @@ class HandleXMLRPCException(object):
     thrown by xmlrpc and replaces the password with [REDACTED]
     """
     func = None
+    
     def __init__(self, replacement="[REDACTED]"):
         self.replacement = replacement
 
     def __call__(self, *args, **kwargs):
+        self.__doc__ = self.func.__doc__
         if self.func is None:
             self.func = args[0]
             return self
