@@ -13,9 +13,9 @@ setup(name='GRID_LRT',
       tests_require=[
         'pytest', 
           ],
-      data_files = [("Config_files",['config/bash_file.cfg','config/NDPPP_parset.cfg',"config/tutorial.cfg"]),
-                    ("License",["LICENSE.md"]),
-                    ("Sandbox_Files",["GRID_LRT/Sandbox/launchers/run_remote_sandbox.sh"])
+      data_files = [("../config",['config/bash_file.cfg','config/NDPPP_parset.cfg',"config/tutorial.cfg"]),
+                    ("../License",["LICENSE.md"]),
+                    ("../sandbox",["GRID_LRT/Sandbox/launchers/run_remote_sandbox.sh"])
           ],
       description='GRID LOFAR Reduction Tools',
       long_description="Software that encapsulates LOFAR processing and allows the use of High Throughput Distributed processing available at SURFsara and other European Grid Initiative locations.",
