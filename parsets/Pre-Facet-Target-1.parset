@@ -20,9 +20,9 @@
 ! avg_timestep         = 4   # averaging step needed to average the data to 4 seconds time resolution
 ! avg_freqstep         = 4   # averaging step needed to average the data to 4 ch/SB frequency resolution
 # where to find the target data
-! target_input_path    = PREFACTOR_SCRATCH_DIR
-! cal_input_pattern    = a
-! target_input_pattern = a 
+! target_input_path    = PREFACTOR_SCRATCH_DIR/Input
+! cal_input_pattern    = *MS
+! target_input_pattern = *MS
 # path to the skymodel for the phase-only calibration of the target
 ! target_skymodel      = PREFACTOR_SCRATCH_DIR/prefactor/skymodels/tgss_skymodel.txt
 # download the phase-only calibration skymodel from TGSS
