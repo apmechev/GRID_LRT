@@ -1,4 +1,3 @@
-
 #
 # It uses an xmlrpc proxy to talk and authenticate to the remote service. Your account credentials will be read from
 # the awlofar catalog Environment.cfg, if present or can be provided in a .stagingrc file in your home directory. 
@@ -56,29 +55,11 @@ else:
     print("No User or Password exist. ")
 # ---
 
-#class HandleXMLRPCException(object):
-#    """ Decorator class for all stager_access functions that catches the exception
-#    thrown by xmlrpc and replaces the password with [REDACTED]
-#    """
-#    func = None
-#    
-#    def __init__(self, replacement="[REDACTED]"):
-#        self.replacement = replacement
-#
-#    def __call__(self, *args, **kwargs):
-#        self.__doc__ = self.func.__doc__
-#        if self.func is None:
-#            self.func = args[0]
-#            return self
-#        try:
-#            return self.func(*args, **kwargs)
-#        except xmlrpclib.ProtocolError as err:
-#            pdb.set_trace()
-#            if passw in err.url:
-#                err.url=err.url.replace(passw,self.replacement)
-#            raise(err)
-
 def HandleXMLRPCException(f):
+    """ Exception handler that stops xmlrpclib.ProtocolError
+    from printing out the username and password to the terminal
+
+    """
     @wraps(f)
     def wrapper(*args, **kwds):
         try:
@@ -92,15 +73,35 @@ def HandleXMLRPCException(f):
 
 @HandleXMLRPCException
 def stage(surls):
-    """ Stage list of SURLs """
+    """ Stage list of SURLs or a string holding a single SURL
+    
+    Args:
+        :param surls: Either a list of strings or a string holding a single surl to stage
+        :type surls: either a list() or a str()
+    
+    Returns:
+        :stageid: An integer which is used to refer to the stagig request when polling 
+        the API for a staging status
+    """
+    staged_surls=[]
     if isinstance(surls, str):
-        surls = [surls]
-    stageid = proxy.LtaStager.add_getid(surls)
+        staged_surls = [surls]
+    for i in surls:
+        staged_surls.append(str(i))
+    stageid = proxy.LtaStager.add_getid(staged_surls)
     return stageid
 
 @HandleXMLRPCException
 def get_status(stageid):
-    """ Get status of request with given ID """
+    """ Get status of request with given ID 
+    
+    Args: 
+        :param stageid: The id of the staging request which you want the status of
+        :type stageid: int
+        
+    Returns:
+        :status: A string describing the staging status: 'new', 'scheduled', 'in progress' or 'success'
+        """
     return proxy.LtaStager.getstatus(stageid)
 
 @HandleXMLRPCException
