@@ -17,6 +17,7 @@ This package is built by Alexandar Mechev and the LOFAR e-infra group at Leiden 
    token
    staging
    sandbox
+   errors
 
 Indices and tables
 ==================
