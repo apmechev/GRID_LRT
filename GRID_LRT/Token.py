@@ -96,7 +96,7 @@ class Token_Handler:
         :param srv: URL of the CouchDB Server
         :type srv: str
         :return: A CouchDB Database Object
-        :rtype: class:`~couchdb.client.Database` 
+        :rtype: :class:`~couchdb.client.Database` 
         """
         server = couchdb.Server(srv)
         server.resource.credentials = (uname, pwd)
