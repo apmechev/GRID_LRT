@@ -86,18 +86,16 @@ class Token_Handler:
 
     def get_db(self, uname, pwd, dbn, srv):
         """Logs into the Couchdb server and returns the database requested. Returns a couchDB database object
-        Args:
-            :param uname: The username to log into CouchDB with
-            :type uname: str
-            :param pwd: The CouchDB password 
-            :type pwd: str
-            :param dbn: The CouchDB Database Name 
-            :type dbn: str
-            :param srv: URL of the CouchDB Server
-            :type srv: str
- 
-        Returns:
-            :returns: a CouchDB database instance
+
+        :param uname: The username to log into CouchDB with
+        :type uname: str
+        :param pwd: The CouchDB password 
+        :type pwd: str
+        :param dbn: The CouchDB Database Name 
+        :type dbn: str
+        :param srv: URL of the CouchDB Server
+        :type srv: str
+        :rtype: couchdb.Database
         """
         server = couchdb.Server(srv)
         server.resource.credentials = (uname, pwd)
