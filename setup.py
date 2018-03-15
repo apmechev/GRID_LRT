@@ -6,16 +6,16 @@ import os
 
 setup(name='GRID_LRT',
       packages=['GRID_LRT', 'GRID_LRT/Staging', 'GRID_LRT/Application', 'GRID_LRT/couchdb'],
-      version='0.2.3',
+      version='0.2.4',
       setup_requires=[
         'pyyaml', 
           ],
       tests_require=[
         'pytest', 
           ],
-      data_files = [("../config",['config/bash_file.cfg','config/NDPPP_parset.cfg',"config/tutorial.cfg"]),
-                    ("../License",["LICENSE.md"]),
-                    ("../sandbox",["GRID_LRT/Sandbox/launchers/run_remote_sandbox.sh"])
+      include_package_data=True,
+      data_files = [("config",['config/bash_file.cfg','config/NDPPP_parset.cfg',"config/tutorial.cfg", "config/steps/pref_cal1.cfg"]), 
+                    ("sandbox",["GRID_LRT/data/launchers/run_remote_sandbox.sh"])
           ],
       description='GRID LOFAR Reduction Tools',
       long_description="Software that encapsulates LOFAR processing and allows the use of High Throughput Distributed processing available at SURFsara and other European Grid Initiative locations.",
