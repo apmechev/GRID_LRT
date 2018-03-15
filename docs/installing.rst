@@ -27,13 +27,13 @@ In the case that you do not have access to the python system libraries, you can 
 .. code:: bash
 
     python setup.py build
-    python setup.py install --prefix=/home/apmechev/software/python
+    python setup.py install --prefix=${HOME}/software/python
 
 
 .. note::  NOTE: you need to have your pythonpath containing 
 
-    - "/home/apmechev/software/python/lib/python$(PYTHON_VERSION)/site_packages" 
+        "${HOME}/software/python/lib/python[2.6|2.7|3.4]/site_packages" 
 
-    - and that folder needs to exist beforehand or setuptools will complain
+        and that folder needs to exist beforehand or setuptools will complain
 
 
