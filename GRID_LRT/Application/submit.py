@@ -73,7 +73,7 @@ class jdl_launcher(object):
             """
         creds=pc()  # Get credentials, get launch file to send to workers
         self.launch_file=str("/".join((GRID_LRT.__file__.split("/")[:-1]))+
-                        "/Sandbox/launchers/run_remote_sandbox.sh")
+                        "/data/launchers/run_remote_sandbox.sh")
         if not os.path.exists(self.launch_file):
             raise IOError("Launch file doesn't exist! "+self.launch_file)
         jdlfile="""[
