@@ -30,6 +30,10 @@ In the case that you do not have access to the python system libraries, you can 
     python setup.py install --prefix=/home/apmechev/software/python
 
 
-NOTE: you need to have your pythonpath containing "/home/apmechev/software/python/lib/python$(PYTHON_VERSION)/site_packages" and that folder needs to exist beforehand or setuptools will complain
+.. note::  NOTE: you need to have your pythonpath containing 
+
+    - "/home/apmechev/software/python/lib/python$(PYTHON_VERSION)/site_packages" 
+
+    - and that folder needs to exist beforehand or setuptools will complain
 
 
