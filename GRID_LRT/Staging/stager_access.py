@@ -75,13 +75,9 @@ def HandleXMLRPCException(f):
 def stage(surls):
     """ Stage list of SURLs or a string holding a single SURL
     
-    Args:
-        :param surls: Either a list of strings or a string holding a single surl to stage
-        :type surls: either a list() or a str()
-    
-    Returns:
-        :stageid: An integer which is used to refer to the stagig request when polling 
-        the API for a staging status
+    :param surls: Either a list of strings or a string holding a single surl to stage
+    :type surls: either a list() or a str()
+    :return: An integer which is used to refer to the stagig request when polling the API for a staging status
     """
     staged_surls=[]
     if isinstance(surls, str):
