@@ -14,7 +14,7 @@ setup(name='GRID_LRT',
         'pytest', 
           ],
       include_package_data=True,
-      data_files = [("config",['config/bash_file.cfg','config/NDPPP_parset.cfg',"config/tutorial.cfg", "config/steps/pref_cal1.cfg"]), 
+      data_files = [("config",['GRID_LRT/data/config/bash_file.cfg','GRID_LRT/data/config/NDPPP_parset.cfg',"GRID_LRT/data/config/tutorial.cfg", "GRID_LRT/data/config/steps/pref_cal1.cfg"]), 
                     ("sandbox",["GRID_LRT/data/launchers/run_remote_sandbox.sh"])
           ],
       description='GRID LOFAR Reduction Tools',
