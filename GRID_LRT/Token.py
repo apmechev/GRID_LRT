@@ -156,6 +156,7 @@ class Token_Handler:
         """Deletes tokens from view view_name
             exits if the view doesn't exist
             User can select which tokens within the view to delete
+
             >>> t1.delete_tokens("todo",["OBSID","L123456"]) #Only deletes tokens with OBSID key = L123456
             >>> t1.delete_tokens("error") # Deletes all error tokens
 
@@ -273,9 +274,10 @@ function (key, values, rereduce) {
     def reset_tokens(self, view_name="test_view", key=["", ""], del_attach=False):
         """ resets all tokens in a view, optionally can reset all tokens in a view
             who have key-value pairs matched by key[0],key[1]
-            t1.reset_token("error")
-            t1.reset_token("error",key=["OBSID","L123456"])
-            t1.reset_token("error",key=["scrub_count",6])
+            
+            >>> t1.reset_token("error")
+            >>> t1.reset_token("error",key=["OBSID","L123456"])
+            >>> t1.reset_token("error",key=["scrub_count",6])
         """
         v = self.list_tokens_from_view(view_name)
         to_update = []
