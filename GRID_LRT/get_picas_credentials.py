@@ -11,9 +11,9 @@ __author__ = "Alexandar Mechev"
 __credits__ = ["Alexandar Mechev", "Natalie Danezi", "Timothy Shimwell", 
                 "Raymond Oonk"]
 __license__ = "GPL 3.0"
-__version__ = "0.1.1"
+__version__ = "0.2.4"
 __maintainer__ = "Alexandar Mechev"
-__email__ = "apmechev@strw.leidenuniv.nl"
+__email__ = "LOFAR@apmechev.com"
 __status__ = "Production"
 
 def infolog(string):

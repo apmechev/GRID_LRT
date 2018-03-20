@@ -1,3 +1,0 @@
-include config/*.cfg
-include config/steps/*.cfg
-include parsets/*.parset

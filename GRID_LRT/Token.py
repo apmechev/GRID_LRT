@@ -11,7 +11,7 @@
    :platform: Unix
    :synopsis: Set of tools for manually and automatically creating tokens
 
-.. moduleauthor:: Alexandar Mechev <apmechev@strw.leidenuniv.nl>
+.. moduleauthor:: Alexandar Mechev <LOFAR@apmechev.com>
 
 >>> #Example creation of a token of token_type 'test'
 >>> from GRID_LRT.get_picas_credentials import picas_cred
@@ -41,11 +41,11 @@ from couchdb.design import ViewDefinition
 __author__ = "Alexandar P. Mechev"
 __copyright__ = "2016 Alexandar P. Mechev"
 __credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
-__license__ = "GPL"
-__version__ = "3.0.0"
+__license__ = "GPL 3.0"
+__version__ = "0.2.4"
 __maintainer__ = "Alexandar P. Mechev"
-__email__ = "apmechev@strw.leidenuniv.nl"
-__status__ = "Development"
+__email__ = "LOFAR@apmechev.com"
+__status__ = "Production"
 
 
 class Token_Handler:
@@ -104,11 +104,7 @@ class Token_Handler:
         return db
 
     def create_token(self, keys={}, append="", attach=[]):
-        '''Creates a token, appends string to token ID if requested and adds
-            user requested keys through the dict keys{}
-            ie t1.create_token(keys = {"OBSID":"L123458","freq_res":4,"time_res":4,},append="L123458")
-            attach is [file_handle,"name of attachment"]
-
+        '''Creates a token, appends string to token ID if requested and adds user requested keys through the dict keys{} 
 
         :param keys: A dictionary of keys, which will be uploaded to the CouchDB document.
             The supported values for a key are str,int,float and dict
@@ -154,7 +150,9 @@ class Token_Handler:
 
     def delete_tokens(self, view_name="test_view", key=["", ""]):
         """Deletes tokens from view view_name
+
             exits if the view doesn't exist
+
             User can select which tokens within the view to delete
 
             >>> t1.delete_tokens("todo",["OBSID","L123456"]) #Only deletes tokens with OBSID key = L123456
@@ -179,8 +177,7 @@ class Token_Handler:
         # TODO:Pop tokens from self
 
     def add_view(self, view_name="test_view", cond='doc.lock > 0 && doc.done > 0 && doc.output < 0 ',emit_value='doc._id',emit_value2='doc._id'):
-        """Adds a view to the db, needs a view name and a condition. Emits all tokens with
-            the type of Token_Handler.t_type, that also match the condition
+        """Adds a view to the db, needs a view name and a condition. Emits all tokens with the type of Token_Handler.t_type, that also match the condition
 
         :param view_name: The name of the new view to be created
         :type view_name: str
