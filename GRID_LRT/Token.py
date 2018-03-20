@@ -109,17 +109,17 @@ class Token_Handler:
             ie t1.create_token(keys = {"OBSID":"L123458","freq_res":4,"time_res":4,},append="L123458")
             attach is [file_handle,"name of attachment"]
 
-        Args:
-            :param keys: A dictionary of keys, which will be uploaded to the CouchDB document.
-                The supported values for a key are str,int,float and dict
-            :type keys: dict
-            :param append: A string which is appended to the end of the tokenID, useful for
-                adding an OBSID for example
-            :type append: str
-            :param attach: A 2-item list of file to be attached to the token. The first value is the file handle and the second is a string with the attachment name. ex: [open('/home/apmechev/file.txt','r'),"file.txt"]
-            :type attach: list
-        Returns:
-            :returns: A string with the token ID
+
+        :param keys: A dictionary of keys, which will be uploaded to the CouchDB document.
+            The supported values for a key are str,int,float and dict
+        :type keys: dict
+        :param append: A string which is appended to the end of the tokenID, useful for
+            adding an OBSID for example
+        :type append: str
+        :param attach: A 2-item list of file to be attached to the token. The first value is the file handle and the second is a string with the attachment name. ex: [open('/home/apmechev/file.txt','r'),"file.txt"]
+        :type attach: list
+        :return: A string with the token ID
+        :rtype: str
         '''
         default_keys = {
             '_id': 't_'+self.t_type+"_",
@@ -143,7 +143,8 @@ class Token_Handler:
         keys["_id"] += app
 
     def load_views(self):
-        """Helper function to get the current views on the database
+        """Helper function to get the current views on the database. 
+        Updates the internal self.views variable
         """
         db_views = self.db.get("_design/"+self.t_type)
         if db_views == None:
@@ -155,8 +156,13 @@ class Token_Handler:
         """Deletes tokens from view view_name
             exits if the view doesn't exist
             User can select which tokens within the view to delete
-            t1.delete_tokens("todo",["OBSID","L123456"])
-            t1.delete_tokens("error")
+            >>> t1.delete_tokens("todo",["OBSID","L123456"]) #Only deletes tokens with OBSID key = L123456
+            >>> t1.delete_tokens("error") # Deletes all error tokens
+
+        :param view_name: Name of the view from which to delete tokens
+        :type view_name: str
+        :param key: key-value pair that selects which tokens to delete (by default empty == delete all token)
+        :type key: list
         """
         v = self.list_tokens_from_view(view_name)
         for x in v:
@@ -171,9 +177,18 @@ class Token_Handler:
         #    self.tokens.pop(x['id'])
         # TODO:Pop tokens from self
 
-    def add_view(self, v_name="test_view", cond='doc.lock > 0 && doc.done > 0 && doc.output < 0 ',emit_value='doc._id',emit_value2='doc._id'):
+    def add_view(self, view_name="test_view", cond='doc.lock > 0 && doc.done > 0 && doc.output < 0 ',emit_value='doc._id',emit_value2='doc._id'):
         """Adds a view to the db, needs a view name and a condition. Emits all tokens with
-            the type of the current Token_Handler
+            the type of Token_Handler.t_type, that also match the condition
+
+        :param view_name: The name of the new view to be created
+        :type view_name: str
+        :param cond: A string containing the condition which all tokens of the view must match. It can include boolean operators '>', '<'and '&&'. The token's fields are refered to as 'doc.field'
+        :type cond: str
+        :param emit_value: The (first) emit value that is returne by the view. If you look on couchdb/request the tokens from the view, you'll get two values. This will be the first (typically the token's ID)
+        :type emit_value: str
+        :param emit_value2: The second emit value. You can thus return the token's ID and its status for example
+        :type emit_value2: str
         """
         generalViewCode = '''
         function(doc) {
@@ -184,8 +199,8 @@ class Token_Handler:
           }
         }
         '''
-        view = ViewDefinition(self.t_type, v_name, generalViewCode % (self.t_type, cond, emit_value, emit_value2))
-        self.views[v_name] = view
+        view = ViewDefinition(self.t_type, view_name, generalViewCode % (self.t_type, cond, emit_value, emit_value2))
+        self.views[vew_name] = view
         view.sync(self.db)
 
     def add_overview_view(self):
@@ -239,6 +254,9 @@ function (key, values, rereduce) {
     def del_view(self, view_name="test_view"):
         '''Deletes the view with view name from the _design/${token_type} document
             and from the token_Handler's dict of views
+
+        :param view_name: The name of the view which should be removed
+        :type view_name: str
         '''
         db_views = self.db.get("_design/"+self.t_type)
         db_views["views"].pop(view_name, None)
