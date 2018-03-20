@@ -7,6 +7,8 @@ import tempfile
 import subprocess
 import GRID_LRT
 from GRID_LRT import grid_credentials
+import warnings
+warnings.simplefilter('default')
 #TODO: Upload to different locations/methods
 
 class Sandbox(object):
@@ -17,7 +19,7 @@ class Sandbox(object):
 
         >>> from GRID_LRT import sandbox
         >>> s=sandbox.Sandbox()
-        >>> s.build_sandbox('config/bash_file.cfg')
+        >>> s.build_sandbox('GRID_LRT/data/config/bash_file.cfg')
         >>> s.upload_sandbox()
 
         This will build the sandbox according to the recipy in bash_file.cfg and upload it to grid
@@ -26,7 +28,7 @@ class Sandbox(object):
     def __init__(self,cfgfile=None):
         grid_credentials.GRID_credentials_enabled()
         lrt_module_dir=os.path.abspath(GRID_LRT.__file__).split("__init__.py")[0]
-        self.base_dir=lrt_module_dir+"Sandbox/" 
+        self.base_dir=lrt_module_dir+"data//" 
         self.return_dir=os.getcwd()
         self.SBXloc=None
         if cfgfile:
@@ -110,6 +112,9 @@ class Sandbox(object):
             self.copy_local_scripts(basetype)
 
     def copy_local_scripts(self,basetype):
+        warnings.warn(
+                "Copy Local scripts is now deprecated!",
+                DeprecationWarning)
         SBX_type = basetype if basetype else self.sbx_def['type']
         SBX_dir = self.sbx_def['name']
         scripts_path=self.base_dir+'/scripts/'+SBX_type
