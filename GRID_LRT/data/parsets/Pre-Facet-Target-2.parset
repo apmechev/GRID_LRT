@@ -21,8 +21,8 @@
 ! avg_freqstep         = 4   # averaging step needed to average the data to 4 ch/SB frequency resolution
 # where to find the target data
 ! target_input_path    = PREFACTOR_SCRATCH_DIR/Input
-! cal_input_pattern    = a
-! target_input_pattern = a 
+! cal_input_pattern    = *.ms 
+! target_input_pattern = *.ms
 # path to the skymodel for the phase-only calibration of the target
 ! target_skymodel      = PREFACTOR_SCRATCH_DIR/prefactor/skymodels/P15_hetdex_5deg.txt
 # download the phase-only calibration skymodel from TGSS
