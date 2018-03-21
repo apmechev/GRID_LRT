@@ -198,7 +198,7 @@ class Token_Handler:
         }
         '''
         view = ViewDefinition(self.t_type, view_name, generalViewCode % (self.t_type, cond, emit_value, emit_value2))
-        self.views[vew_name] = view
+        self.views[view_name] = view
         view.sync(self.db)
 
     def add_overview_view(self):
