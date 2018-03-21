@@ -244,10 +244,10 @@ function (key, values, rereduce) {
         """ Adds the 'todo', locked, done and error views. the TODO view is necessary for the 
         worker node to find an un-locked token
         """
-        self.add_view(v_name="todo", cond='doc.lock ==  0 && doc.done == 0 ')
-        self.add_view(v_name="locked", cond='doc.lock > 0 && doc.done == 0 ')
-        self.add_view(v_name="done", cond='doc.status == "done" ')
-        self.add_view(v_name="error", cond='doc.status == "error" ', emit_value2='doc.output')
+        self.add_view(view_name="todo", cond='doc.lock ==  0 && doc.done == 0 ')
+        self.add_view(view_name="locked", cond='doc.lock > 0 && doc.done == 0 ')
+        self.add_view(view_name="done", cond='doc.status == "done" ')
+        self.add_view(view_name="error", cond='doc.status == "error" ', emit_value2='doc.output')
     
     def del_view(self, view_name="test_view"):
         '''Deletes the view with view name from the _design/${token_type} document
@@ -265,7 +265,7 @@ function (key, values, rereduce) {
         ''' Removes all tokens in the error view
         '''
         cond = "doc.lock > 0 && doc.done > 0 && doc.output > 0"
-        self.add_view(v_name="error", cond=cond)
+        self.add_view(view_name="error", cond=cond)
         self.delete_token("error")
 
     def reset_tokens(self, view_name="test_view", key=["", ""], del_attach=False):
