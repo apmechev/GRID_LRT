@@ -17,8 +17,8 @@
 ### parameters you will need to adjust.
 # parameters you will need to adjust.
 # averaging for the target data
-! avg_timestep         = 4   # averaging step needed to average the data to 4 seconds time resolution
-! avg_freqstep         = 4   # averaging step needed to average the data to 4 ch/SB frequency resolution
+! avg_timestep         = 8   # averaging step needed to average the data to 4 seconds time resolution
+! avg_freqstep         = 8   # averaging step needed to average the data to 4 ch/SB frequency resolution
 # where to find the target data
 ! target_input_path    = PREFACTOR_SCRATCH_DIR/Input
 ! cal_input_pattern    = *MS
