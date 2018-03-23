@@ -15,10 +15,11 @@ class JdlsubmitTest(unittest.TestCase):
     def test_make_tempfile(self):
         launcher = submit.jdl_launcher()
         file_path = launcher.make_temp_jdlfile()
-        self.asserTrue(os.path.exists(file_path))
+        self.assertTrue(os.path.exists(file_path))
     
     def test_launch_raises_error(self):
         launcher=submit.jdl_launcher()
+        l = launcher.make_temp_jdlfile()
         self.assertRaises(RuntimeError, launcher.launch)
 
     def test_default_args(self):
