@@ -22,13 +22,24 @@ class Sandbox(object):
         >>> s.build_sandbox('GRID_LRT/data/config/bash_file.cfg')
         >>> s.upload_sandbox()
 
-        This will build the sandbox according to the recipy in bash_file.cfg and upload it to grid
+        This will build the sandbox according to the recipe in bash_file.cfg and upload it to grid
         storage
     """
     def __init__(self,cfgfile=None):
+        """ Creates a 'sandbox' object which builds and uploads the sanbox. An optional 
+        argument is the configuration file which is a yaml file specifying the repositories
+        to include, the type of the sanbox, and its name. 
+
+        Example configuration files are included in GRID_LRT/data/config.
+
+        :param cfgfile: The name of the configuration file to build a sandbox from
+        :type cfgfile: str
+
+
+        """
         grid_credentials.GRID_credentials_enabled()
         lrt_module_dir=os.path.abspath(GRID_LRT.__file__).split("__init__.py")[0]
-        self.base_dir=lrt_module_dir+"data//" 
+        self.base_dir=lrt_module_dir+"data/" 
         self.return_dir=os.getcwd()
         self.SBXloc=None
         if cfgfile:
@@ -40,6 +51,14 @@ class Sandbox(object):
                 self.__cleanup()
 
     def parseconfig(self,yamlfile):
+        """Helper function to parse the sandbox configuration options
+        from the yaml .cfg file. Loads the options in a dictionary
+        stored in an internal variable
+
+        :param yamlfile: The name of the sandbox configuration file
+        :type yamlfile: str
+
+        """
         with open(yamlfile,'r') as optfile:
             opts_f=yaml.load(optfile)
         self.sbx_def=opts_f['Sandbox']
