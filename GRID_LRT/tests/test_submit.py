@@ -21,7 +21,7 @@ class JdlsubmitTest(unittest.TestCase):
         launcher=submit.jdl_launcher()
         l = launcher.make_temp_jdlfile()
         with launcher:
-            self.assertRaises(RuntimeError, launcher.launch)
+            self.assertRaises(OSError, launcher.launch) #Will raise OSerror if glite-wms-job-submit doesn't exist
 
     def test_default_args(self):
         launcher=submit.jdl_launcher()
