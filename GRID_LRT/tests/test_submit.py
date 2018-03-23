@@ -12,6 +12,15 @@ class JdlsubmitTest(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_make_tempfile(self):
+        launcher = submit.jdl_launcher()
+        file_path = launcher.make_temp_jdlfile()
+        self.asserTrue(os.path.exists(file_path))
+    
+    def test_launch_raises_error(self):
+        launcher=submit.jdl_launcher()
+        self.assertRaises(RuntimeError, launcher.launch)
+
     def test_default_args(self):
         launcher=submit.jdl_launcher()
         self.assertTrue(launcher.numjobs==1)
