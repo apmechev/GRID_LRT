@@ -228,8 +228,8 @@ class Sandbox(object):
 
     def make_tokvar_dict(self):
         tokvardict=self.shell_vars
-        yaml.dump(tokvardict,open('tokvar.cfg','w'))
-        pass
+        with open('tokvar.cfg','w') as dumpfile:
+            yaml.dump(tokvardict, dumpfile) 
 
     def check_token(self):
         '''This function does the necessary linkage between the sandbox and token
