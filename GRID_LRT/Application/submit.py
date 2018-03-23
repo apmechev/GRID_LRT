@@ -110,7 +110,7 @@ class jdl_launcher(object):
 
     def make_temp_jdlfile(self):
         self.temp_file=tempfile.NamedTemporaryFile(delete=False)
-        with self.temp_file as t_file_obj:
+        with open(self.temp_file.name, 'w') as t_file_obj:
             for i in self.build_jdl_file():
                 t_file_obj.write(i)
         return self.temp_file
