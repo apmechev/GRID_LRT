@@ -32,6 +32,7 @@ import ConfigParser
 import pdb
 import itertools
 import yaml
+import time
 
 if 'couchdb' not in sys.modules:
     from GRID_LRT import couchdb
@@ -125,7 +126,8 @@ class Token_Handler:
             'hostname': '',
             'scrub_count': 0,
             'output': ""
-        }
+            'created': time.time()
+            } 
         keys = dict(itertools.chain(keys.iteritems(), default_keys.iteritems()))
         self.append_id(keys, append)
         self.tokens[keys["_id"]] = keys
