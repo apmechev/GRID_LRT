@@ -125,7 +125,7 @@ class Token_Handler:
             'done': 0,
             'hostname': '',
             'scrub_count': 0,
-            'output': ""
+            'output': "",
             'created': time.time()
             } 
         keys = dict(itertools.chain(keys.iteritems(), default_keys.iteritems()))
