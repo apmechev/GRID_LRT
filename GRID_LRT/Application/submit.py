@@ -89,7 +89,7 @@ class jdl_launcher(object):
   InputSandbox = {"%s"};
   OutputSandbox = {"parametricjob.out", "parametricjob.err"};
   DataAccessProtocol = {"gsiftp"};
-  ShallowRetryCount = 5;
+  ShallowRetryCount = 0;
 
   Requirements=(RegExp("%s",other.GlueCEUniqueID));
   WholeNodes = %s ;
