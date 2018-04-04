@@ -203,6 +203,47 @@ class Token_Handler:
         self.views[view_name] = view
         view.sync(self.db)
 
+    def add_mapreduce_view(self, view_name="test_mapred_view", cond='doc.PIPELINE_STEP == "pref_cal1" '):
+        overviewMapCode = '''
+function(doc) {
+   if(doc.type == "%s" )
+      if(%s){
+        {
+       if (doc.lock == 0 && doc.done == 0){
+          emit('todo', 1);
+       }
+       if(doc.lock > 0 && doc.status == 'downloading' ) {
+          emit('downloading', 1);
+       }
+       if(doc.lock > 0 && doc.done > 0 && doc.output == 0 ) {
+          emit('done', 1);
+       }
+       if(doc.lock > 0 && doc.output != 0 ) {
+          emit('error', 1);
+       }
+       if(doc.lock > 0 && doc.status == 'launched' ) {
+          emit('waiting', 1);
+       }
+       if(doc.lock > 0  && doc.done==0 && doc.status!='downloading' ) {
+          emit('running', 1);
+       }
+     }
+   }
+}
+'''
+        overviewReduceCode = '''
+function (key, values, rereduce) {
+   return sum(values);
+}
+'''
+        overview_total_view = ViewDefinition(self.t_type, view_name,
+                                             overviewMapCode % (self.t_type, cond),
+                                             overviewReduceCode)
+        self.views['overview_total'] = overview_total_view
+        overview_total_view.sync(self.db)
+
+
+
     def add_overview_view(self):
         """ Helper function that creates the Map-reduce view which makes it easy to count
             the number of jobs in the 'locked','todo','downloading','error' and 'running' states
