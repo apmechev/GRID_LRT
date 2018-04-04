@@ -204,6 +204,12 @@ class Token_Handler:
         view.sync(self.db)
 
     def add_mapreduce_view(self, view_name="test_mapred_view", cond='doc.PIPELINE_STEP == "pref_cal1" '):
+        """
+        While the overview_view is applied to all the tokens in the design document, this 'mapreduce' view
+        is useful if instead of regular view, you want to filter the tokens and display the user with 
+        a 'mini-oververview' view. This way you can check the status of a subset of the tokens.
+
+        """
         overviewMapCode = '''
 function(doc) {
    if(doc.type == "%s" )
