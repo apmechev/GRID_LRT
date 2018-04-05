@@ -58,7 +58,7 @@ class jdl_launcher(object):
         if "queue" in kwargs:
             self.queue=kwargs['queue']
         else:
-            self.queue="mediummc"
+            self.queue="creamce.lofar.psnc.pl:8443/cream-slurm-lofar"
         self.temp_file=None
 
     def __enter__(self):
@@ -81,12 +81,13 @@ class jdl_launcher(object):
   ParameterStart=0;
   ParameterStep=%d;                                                                                      
   Parameters= %d ;
-  Executable = "/bin/sh";
+  Executable = "run_remote_sandbox.sh";
 
-  Arguments = "run_remote_sandbox.sh %s %s %s %s ";
+  Arguments = " %s %s %s %s ";
   Stdoutput = "parametricjob.out";
   StdError = "parametricjob.err";
   InputSandbox = {"%s"};
+  OutputSandboxBaseDestURI = "gsiftp://creamce.lofar.psnc.pl/tmp/";
   OutputSandbox = {"parametricjob.out", "parametricjob.err"};
   DataAccessProtocol = {"gsiftp"};
   ShallowRetryCount = 0;
