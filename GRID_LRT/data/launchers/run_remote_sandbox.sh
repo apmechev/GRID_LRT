@@ -15,7 +15,8 @@ set -x
 
 #Clones the picas tools repository which interfaces with the token pool
 #uses wget if no git
-rm -rf [!run]*
+
+
 if type git &> /dev/null
 then
  git clone https://github.com/apmechev/GRID_picastools.git p_tools_git
