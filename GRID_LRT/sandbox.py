@@ -111,6 +111,7 @@ class Sandbox(object):
             if 'commit' in self.sbx_def['git_scripts'][git].keys():
                 checkout=subprocess.Popen(['git','checkout',gits[git]['commit']])
                 checkout.wait()
+            shutil.rmtree('.git/')
             os.chdir(self.tmpdir+"/")
 
     def copy_git_scripts(self):
