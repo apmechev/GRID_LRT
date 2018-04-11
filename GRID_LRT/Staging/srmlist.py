@@ -99,7 +99,7 @@ class srmlist(list):
         For each item, it creates a valid link for the gfal staging scripts
         """
         if('srm://') in item:
-            return(re.sub('8443','8443/srm/managerv2?SFN=',item))
+            return(re.sub(':8443',':8443/srm/managerv2?SFN=',item))
         elif('gsiftp://') in item:
             return(self.srm_replace(item))
     
