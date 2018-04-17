@@ -49,6 +49,20 @@ __email__ = "LOFAR@apmechev.com"
 __status__ = "Production"
 
 
+def reset_all_tokens(token_type,picas_creds):
+    th=Token_Handler(t_type=token_type, 
+            uname=picas_creds.user, pwd=picas_creds.password, dbn=picas_creds.database)
+    th.load_views()
+    for view in th.views.keys():
+        if view !='overview_total':
+            th.reset_tokens(view)
+
+def purge_tokens(token_type,picas_creds):
+    th=Token_Handler(t_type=token_type,
+            uname=picas_creds.user, pwd=picas_creds.password, dbn=picas_creds.database)
+    th.load_views()
+    th.purge_tokens()
+
 class Token_Handler:
     """
 
