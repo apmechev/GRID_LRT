@@ -169,7 +169,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'GRID_LRT', u'GRID_LRT Documentation',
-     author, 'GRID_LRT', 'One line description of project.',
+     author, 'GRID_LRT', 'Distributing LOFAR processing on the Dutch Grid infrastructure',
      'Miscellaneous'),
 ]
 
