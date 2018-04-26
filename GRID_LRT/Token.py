@@ -408,7 +408,12 @@ function (key, values, rereduce) {
             return
         v = self.db.view(self.t_type+"/"+view_name)
         return v
-   
+  
+    def archive_tokens_from_view(self,viewname,delete_on_save=False):
+         for token in self.list_tokens_from_view(viewname):
+             self.archive_a_token(token['id'],delete_on_save)
+
+
     def archive_tokens(self,delete_on_save=False):
         """Archives all tokens and attachments into a folder
 
@@ -419,8 +424,7 @@ function (key, values, rereduce) {
         for view in self.views.keys():
             if view=='overview_total':
                 continue 
-            for token in self.list_tokens_from_view(view): 
-                self.archive_a_token(token['id'],delete_on_save)
+            self.archive_token_from_view(view, delete_on_save)
 
 
     def archive_a_token(self,token_ID,delete=False):
@@ -513,8 +517,8 @@ class TokenSet(object):
             keys=dict(itertools.chain(self.token_keys.iteritems(),{key_name:str("%03d" % int(key) )}.iteritems()))
 #            _=keys.pop('_attachments')
             pipeline=""
-            if 'pipeline' in keys:
-                pipeline="_"+keys['pipeline']
+            if 'PIPELINE_STEP' in keys:
+                pipeline="_"+keys['PIPELINE_STEP']
             token=self.th.create_token(keys,append=id_append+pipeline+"_"+id_prefix+str("%03d" % int(key) ))
             if file_upload:
                 with open('temp_abn','w') as tmp_abn_file:
