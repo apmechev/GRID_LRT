@@ -238,7 +238,7 @@ function(doc) {
        if(doc.lock > 0 && doc.done > 0 && doc.output == 0 ) {
           emit('done', 1);
        }
-       if(doc.lock > 0 && doc.output != 0 ) {
+       if(doc.lock > 0 && doc.output != 0 && doc.output != "" ) {
           emit('error', 1);
        }
        if(doc.lock > 0 && doc.status == 'launched' ) {
@@ -310,7 +310,7 @@ function (key, values, rereduce) {
         self.add_view(view_name="todo", cond='doc.lock ==  0 && doc.done == 0 ')
         self.add_view(view_name="locked", cond='doc.lock > 0 && doc.done == 0 ')
         self.add_view(view_name="done", cond='doc.status == "done" ')
-        self.add_view(view_name="error", cond='doc.status == "error" ', emit_value2='doc.output')
+        self.add_view(view_name="error", cond='doc.output != 0 ', emit_value2='doc.output')
     
     def del_view(self, view_name="test_view"):
         '''Deletes the view with view name from the _design/${token_type} document
@@ -425,6 +425,7 @@ function (key, values, rereduce) {
             if view=='overview_total':
                 continue 
             self.archive_token_from_view(view, delete_on_save)
+        return(os.getcwd())
 
 
     def archive_a_token(self,token_ID,delete=False):
