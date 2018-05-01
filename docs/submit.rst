@@ -10,7 +10,7 @@ This module is located in GRID_LRT.Application. It can create and submit a jdl f
 
 GRID_LRT.Application.submit
 --------------------                                                                                     
-.. automodule:: GRID_LRT.Staging.submit
+.. automodule:: GRID_LRT.Application.submit
     :members:
     :undoc-members:
     :inherited-members:
