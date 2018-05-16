@@ -32,6 +32,9 @@ class Staging_Test(unittest.TestCase):
         self.assertTrue(len(l)==51)
 
     def test_awe_file(self):
+        directory=expanduser("~/.awe/")
+        if not os.path.exists(directory):
+                os.makedirs(directory)
         if os.path.exists(expanduser("~/.awe/Environment.cfg")):
             self.temfile=tempfile.NamedTemporaryFile(delete=False)
             with open(expanduser("~/.awe/Environment.cfg"),'r') as a_file:
