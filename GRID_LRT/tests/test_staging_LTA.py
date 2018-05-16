@@ -47,6 +47,7 @@ class Staging_Test(unittest.TestCase):
             a_file.write("database_user : test1\n")
             a_file.write("database_password : test2\n")
         from GRID_LRT.Staging import stager_access
+        print(stager_access.user)
         self.assertTrue(stager_access.user=='test1')
         self.assertTrue(stager_access.password=='test2')
 
