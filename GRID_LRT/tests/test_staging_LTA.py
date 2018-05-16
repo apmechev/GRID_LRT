@@ -46,9 +46,14 @@ class Staging_Test(unittest.TestCase):
         with open(expanduser("~/.awe/Environment.cfg"),'w') as a_file:
             a_file.write("database_user : test1\n")
             a_file.write("database_password : test2\n")
+        prev_usr=os.environ['PICAS_USR']
+        os.environ['PICAS_USR']=''
+        prev_pwd=os.environ['PICAS_USR_PWD']
+        os.environ['PICAS_USR_PWD']=''
         from GRID_LRT.Staging import stager_access
-        print(stager_access.user)
         self.assertTrue(stager_access.user=='test1')
         self.assertTrue(stager_access.password=='test2')
+        os.environ['PICAS_USR']=prev_usr
+        os.environ['PICAS_USR_PWD']=prev_pwd
 
 
