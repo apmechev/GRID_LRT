@@ -44,8 +44,8 @@ class Staging_Test(unittest.TestCase):
         else:
             self.temfile=None
         with open(expanduser("~/.awe/Environment.cfg"),'w') as a_file:
-            a_file.write("database_user : test1")
-            a_file.write("database_password : test2")
+            a_file.write("database_user : test1\n")
+            a_file.write("database_password : test2\n")
         from GRID_LRT.Staging import stager_access
         self.assertTrue(stager_access.user=='test1')
         self.assertTrue(stager_access.password=='test2')
