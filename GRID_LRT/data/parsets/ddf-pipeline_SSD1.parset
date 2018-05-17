@@ -24,8 +24,11 @@ clearcache=False
 nobar=False
 second_selfcal=False
 exitafter=phase
-NCPU_DDF = 28
-NCPU = 28
+NCPU_DDF = 20
+NCPU = 20
+
+[Parallel]
+Affinity = 1
 
 [masking]
 tgss=$$/TGSSADR1_7sigma_catalog.fits
