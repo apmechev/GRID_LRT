@@ -10,24 +10,25 @@ It's finally time to upgrade the picas_tools backend to make it into a bonafide 
 
 1. Change 
 
-```
-python getSBX.py $1 $2 $3 $4& 
-```
+.. code:: bash
+    python getSBX.py $1 $2 $3 $4& 
+
 
 with 
 
-```   
-python Launch.py  $1 $2 $3 $4 &
-```
+.. code:: bash
+    python Launch.py  $1 $2 $3 $4 &
+
+into your run_remote_sandbox.sh (This is located in various locations but one good place to look for it is {GRID_LRT/Sandbox/Launchers} for the Old versions and {GRID_LRT/data/launchers} for versions >0.2.x)
 
 2. Build your sandboxes with the new GRID_Sandbox repository (fork if you have to). This also requires the newest (>0.2) version of GRID_LRT. Building the SBX is easy. Use
 
 
-```
-sbx=GRID_LRT.sandbox.Sandbox()
-sbx.build_sandbox('config_file_here') 
-sbx.upload_sandbox()
-```
+.. code-block:: python 
+    sbx=GRID_LRT.sandbox.Sandbox()
+    sbx.build_sandbox('config_file_here') 
+    sbx.upload_sandbox()
+
 
 config files are in GRID_LRT/data/config. modify as you wish.
 
