@@ -12,7 +12,7 @@ It's finally time to upgrade the picas_tools backend to make it into a bonafide 
 
 .. code:: bash
 
-    python getSBX.py $1 $2 $3 $4& 
+    python getSBX.py $1 $2 $3 $4 & 
 
 
 with 
