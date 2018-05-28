@@ -1,0 +1,25 @@
+msin = ${RUNDIR}/Input/*.MS
+msin.datacolumn = DATA
+msout = ${RUNDIR}/Output/${OBSID}_${SB}_demixed.MS
+msout.datacolumn = DATA
+msout.storagemanager  = "dysco"
+steps = [ demix  ]
+demix.type = demixer
+demix.baseline =
+demix.blrange =
+demix.corrtype = cross
+demix.subtractsources = [CasA_69MHz]
+demix.modelsources = []
+demix.skymodel = "skymodels/CasA.69Mhz.min0Jy.skymodel.sourcedb"
+demix.targetsource = ""
+demix.ignoretarget = True
+demix.instrumentmodel= "L643413_SB229_uv.dppp.demix.ms.parmdb"
+demix.othersources = []
+demix.freqstep = 16
+demix.timestep = 4
+demix.demixfreqstep = 64
+demix.demixtimestep = 8
+demix.ntimechunk = 10
+demix.maxiter = 50
+
+
