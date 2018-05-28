@@ -188,7 +188,7 @@ class Token_Handler:
                 if not document[key[0]] == key[1]:
                     continue
             print("Deleting Token "+x['id'])
-            self.db.delete(document)
+            self.db.purge(document)
         #    self.tokens.pop(x['id'])
         # TODO:Pop tokens from self
 
