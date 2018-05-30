@@ -123,3 +123,11 @@ class jdl_launcher(object):
         if out[1]=="":
             return out[0].split('Your job identifier is:')[1].split()[0]
         raise RuntimeError("Launching of JDL failed because: "+out[1])
+
+class loui_launcher(jdl_launcher):
+    """
+        To make integration tests of an AGLOW step, this job launches it on loui. 
+    """
+
+    def __init__(self, *args, **kwargs):
+        pass
