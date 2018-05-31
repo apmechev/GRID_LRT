@@ -180,6 +180,7 @@ class Token_Handler:
         :type key: list
         """
         v = self.list_tokens_from_view(view_name)
+        to_delete=[]
         for x in v:
             document = self.db[x['key']]
             if key[0] == "":
@@ -188,7 +189,8 @@ class Token_Handler:
                 if not document[key[0]] == key[1]:
                     continue
             print("Deleting Token "+x['id'])
-            self.db.purge(document)
+            to_delete.append(document)
+        self.db.purge(to_delete)
         #    self.tokens.pop(x['id'])
         # TODO:Pop tokens from self
 
@@ -424,8 +426,10 @@ function (key, values, rereduce) {
         for view in self.views.keys():
             if view=='overview_total':
                 continue 
-            self.archive_token_from_view(view, delete_on_save)
-        return(os.getcwd())
+            self.archive_tokens_from_view(view, delete_on_save)
+        resultdir = os.getcwd()
+        os.chdir('..')
+        return(resultdir)
 
 
     def archive_a_token(self,token_ID,delete=False):
