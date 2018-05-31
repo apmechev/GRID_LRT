@@ -412,8 +412,12 @@ function (key, values, rereduce) {
         return v
   
     def archive_tokens_from_view(self,viewname,delete_on_save=False):
+         to_del=[]
          for token in self.list_tokens_from_view(viewname):
              self.archive_a_token(token['id'],delete_on_save)
+             to_del.append(token)
+         if delete_on_save:
+             self.db.purge(to_del)
 
 
     def archive_tokens(self,delete_on_save=False):
