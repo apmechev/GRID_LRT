@@ -99,7 +99,7 @@ class srmlist(list):
         For each item, it creates a valid link for the gfal staging scripts
         """
         if('srm://') in item:
-            return(re.sub('8443','8443/srm/managerv2?SFN=',item))
+            return(re.sub(':8443',':8443/srm/managerv2?SFN=',item))
         elif('gsiftp://') in item:
             return(self.srm_replace(item))
     
@@ -191,7 +191,7 @@ def slice_dicts(srmdict,slice_size=10):
     keys=sorted(srmdict.keys())
     start=int(keys[0])
     sliced={}
-    for chunk in range(0,int(ceil(len(keys)/float(slice_size)))):
+    for chunk in range(0,1 + int(ceil((int(keys[-1])-int(keys[0]))/float(slice_size)))):
         chunk_name=format(start+chunk*slice_size,'03')
         sliced[chunk_name]=srmlist()
         for i in range(slice_size):

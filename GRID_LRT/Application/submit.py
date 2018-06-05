@@ -89,7 +89,7 @@ class jdl_launcher(object):
   InputSandbox = {"%s"};
   OutputSandbox = {"parametricjob.out", "parametricjob.err"};
   DataAccessProtocol = {"gsiftp"};
-  ShallowRetryCount = 5;
+  ShallowRetryCount = 0;
 
   Requirements=(RegExp("%s",other.GlueCEUniqueID));
   WholeNodes = %s ;
@@ -110,7 +110,7 @@ class jdl_launcher(object):
 
     def make_temp_jdlfile(self):
         self.temp_file=tempfile.NamedTemporaryFile(delete=False)
-        with self.temp_file as t_file_obj:
+        with open(self.temp_file.name, 'w') as t_file_obj:
             for i in self.build_jdl_file():
                 t_file_obj.write(i)
         return self.temp_file
@@ -123,3 +123,11 @@ class jdl_launcher(object):
         if out[1]=="":
             return out[0].split('Your job identifier is:')[1].split()[0]
         raise RuntimeError("Launching of JDL failed because: "+out[1])
+
+class loui_launcher(jdl_launcher):
+    """
+        To make integration tests of an AGLOW step, this job launches it on loui. 
+    """
+
+    def __init__(self, *args, **kwargs):
+        pass

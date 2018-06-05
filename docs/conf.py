@@ -77,7 +77,7 @@ language = None
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
@@ -103,6 +103,7 @@ def skip(app, what, name, obj, skip, options):
 
 def setup(app):
     app.connect("autodoc-skip-member", skip)
+    app.add_javascript('copybutton.js')
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -168,7 +169,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'GRID_LRT', u'GRID_LRT Documentation',
-     author, 'GRID_LRT', 'One line description of project.',
+     author, 'GRID_LRT', 'Distributing LOFAR processing on the Dutch Grid infrastructure',
      'Miscellaneous'),
 ]
 

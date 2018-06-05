@@ -32,7 +32,8 @@ import ConfigParser
 import pdb
 import itertools
 import yaml
-
+import time
+import tarfile
 if 'couchdb' not in sys.modules:
     from GRID_LRT import couchdb
 from couchdb.design import ViewDefinition
@@ -47,6 +48,20 @@ __maintainer__ = "Alexandar P. Mechev"
 __email__ = "LOFAR@apmechev.com"
 __status__ = "Production"
 
+
+def reset_all_tokens(token_type,picas_creds):
+    th=Token_Handler(t_type=token_type, 
+            uname=picas_creds.user, pwd=picas_creds.password, dbn=picas_creds.database)
+    th.load_views()
+    for view in th.views.keys():
+        if view !='overview_total':
+            th.reset_tokens(view)
+
+def purge_tokens(token_type,picas_creds):
+    th=Token_Handler(t_type=token_type,
+            uname=picas_creds.user, pwd=picas_creds.password, dbn=picas_creds.database)
+    th.load_views()
+    th.purge_tokens()
 
 class Token_Handler:
     """
@@ -124,8 +139,9 @@ class Token_Handler:
             'done': 0,
             'hostname': '',
             'scrub_count': 0,
-            'output': ""
-        }
+            'output': "",
+            'created': time.time()
+            } 
         keys = dict(itertools.chain(keys.iteritems(), default_keys.iteritems()))
         self.append_id(keys, append)
         self.tokens[keys["_id"]] = keys
@@ -164,6 +180,7 @@ class Token_Handler:
         :type key: list
         """
         v = self.list_tokens_from_view(view_name)
+        to_delete=[]
         for x in v:
             document = self.db[x['key']]
             if key[0] == "":
@@ -172,7 +189,8 @@ class Token_Handler:
                 if not document[key[0]] == key[1]:
                     continue
             print("Deleting Token "+x['id'])
-            self.db.delete(document)
+            to_delete.append(document)
+        self.db.purge(to_delete)
         #    self.tokens.pop(x['id'])
         # TODO:Pop tokens from self
 
@@ -200,6 +218,53 @@ class Token_Handler:
         view = ViewDefinition(self.t_type, view_name, generalViewCode % (self.t_type, cond, emit_value, emit_value2))
         self.views[view_name] = view
         view.sync(self.db)
+
+    def add_mapreduce_view(self, view_name="test_mapred_view", cond='doc.PIPELINE_STEP == "pref_cal1" '):
+        """
+        While the overview_view is applied to all the tokens in the design document, this 'mapreduce' view
+        is useful if instead of regular view, you want to filter the tokens and display the user with 
+        a 'mini-oververview' view. This way you can check the status of a subset of the tokens.
+
+        """
+        overviewMapCode = '''
+function(doc) {
+   if(doc.type == "%s" )
+      if(%s){
+        {
+       if (doc.lock == 0 && doc.done == 0){
+          emit('todo', 1);
+       }
+       if(doc.lock > 0 && doc.status == 'downloading' ) {
+          emit('downloading', 1);
+       }
+       if(doc.lock > 0 && doc.done > 0 && doc.output == 0 ) {
+          emit('done', 1);
+       }
+       if(doc.lock > 0 && doc.output != 0 && doc.output != "" ) {
+          emit('error', 1);
+       }
+       if(doc.lock > 0 && doc.status == 'launched' ) {
+          emit('waiting', 1);
+       }
+       if(doc.lock > 0  && doc.done==0 && doc.status!='downloading' ) {
+          emit('running', 1);
+       }
+     }
+   }
+}
+'''
+        overviewReduceCode = '''
+function (key, values, rereduce) {
+   return sum(values);
+}
+'''
+        overview_total_view = ViewDefinition(self.t_type, view_name,
+                                             overviewMapCode % (self.t_type, cond),
+                                             overviewReduceCode)
+        self.views['overview_total'] = overview_total_view
+        overview_total_view.sync(self.db)
+
+
 
     def add_overview_view(self):
         """ Helper function that creates the Map-reduce view which makes it easy to count
@@ -247,7 +312,7 @@ function (key, values, rereduce) {
         self.add_view(view_name="todo", cond='doc.lock ==  0 && doc.done == 0 ')
         self.add_view(view_name="locked", cond='doc.lock > 0 && doc.done == 0 ')
         self.add_view(view_name="done", cond='doc.status == "done" ')
-        self.add_view(view_name="error", cond='doc.status == "error" ', emit_value2='doc.output')
+        self.add_view(view_name="error", cond='doc.output != 0 ', emit_value2='doc.output')
     
     def del_view(self, view_name="test_view"):
         '''Deletes the view with view name from the _design/${token_type} document
@@ -345,7 +410,16 @@ function (key, values, rereduce) {
             return
         v = self.db.view(self.t_type+"/"+view_name)
         return v
-   
+  
+    def archive_tokens_from_view(self,viewname,delete_on_save=False):
+         to_del=[]
+         for token in self.list_tokens_from_view(viewname):
+             self.archive_a_token(token['id'],delete_on_save)
+             to_del.append(self.db[token['id']])
+         if delete_on_save:
+             self.db.purge(to_del)
+
+
     def archive_tokens(self,delete_on_save=False):
         """Archives all tokens and attachments into a folder
 
@@ -356,8 +430,10 @@ function (key, values, rereduce) {
         for view in self.views.keys():
             if view=='overview_total':
                 continue 
-            for token in self.list_tokens_from_view(view): 
-                self.archive_a_token(token['id'],delete_on_save)
+            self.archive_tokens_from_view(view, delete_on_save)
+        resultdir = os.getcwd()
+        os.chdir('..') #TODO: Archive in a zip
+        return(resultdir)
 
 
     def archive_a_token(self,token_ID,delete=False):
@@ -450,8 +526,8 @@ class TokenSet(object):
             keys=dict(itertools.chain(self.token_keys.iteritems(),{key_name:str("%03d" % int(key) )}.iteritems()))
 #            _=keys.pop('_attachments')
             pipeline=""
-            if 'pipeline' in keys:
-                pipeline="_"+keys['pipeline']
+            if 'PIPELINE_STEP' in keys:
+                pipeline="_"+keys['PIPELINE_STEP']
             token=self.th.create_token(keys,append=id_append+pipeline+"_"+id_prefix+str("%03d" % int(key) ))
             if file_upload:
                 with open('temp_abn','w') as tmp_abn_file:

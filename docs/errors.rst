@@ -2,8 +2,8 @@ Error Codes
 =================
 Here are a list of errors that the GRID_Sandbox or GRID_Launcher return when processing data on a worker node. The error code is saved in the 'output' field of the PiCaS token.
 
-| 
-| -1 -> Fail to download Sandbox 
+| -2 -> Sandbox downloaded but size 0kB
+| -1 ->  
 | 0  -> RUN OK!
 | 1  -> One of Token=${TOKEN}, Picas_usr=${PICAS_USR}, Picas_db=${PICAS_DB} not set
 | 2  ->

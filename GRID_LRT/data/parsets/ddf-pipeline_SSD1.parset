@@ -1,7 +1,7 @@
 [data]
 mslist=mslist.txt
 full_mslist=big-mslist.txt
-colname=DATA
+colname=CORRECTED_DATA
 
 [image]
 imsize=20000
@@ -23,7 +23,12 @@ bootstrap=False
 clearcache=False
 nobar=False
 second_selfcal=False
-exitafter=dirin
+exitafter=phase
+NCPU_DDF = 20
+NCPU = 20
+
+[Parallel]
+Affinity = 1
 
 [masking]
 tgss=$$/TGSSADR1_7sigma_catalog.fits
