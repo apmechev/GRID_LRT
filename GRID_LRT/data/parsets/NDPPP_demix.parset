@@ -1,12 +1,12 @@
 msin = ${RUNDIR}/Input/*.MS
 msin.datacolumn = DATA
-msout = ${RUNDIR}/Output/${OBSID}_${SB}_demixed.MS
+msout = ${RUNDIR}/Output/${OBSID}_SB${STARTSB}_demixed.MS
 msout.datacolumn = DATA
 msout.storagemanager  = "dysco"
 steps = [ demix  ]
 demix.type = demixer
-demix.baseline =
-demix.blrange =
+demix.baseline = 
+demix.blrange = 
 demix.corrtype = cross
 demix.subtractsources = [CasA_69MHz]
 demix.modelsources = []
