@@ -33,7 +33,7 @@ import pdb
 import itertools
 import yaml
 import time
-
+import tarfile
 if 'couchdb' not in sys.modules:
     from GRID_LRT import couchdb
 from couchdb.design import ViewDefinition
@@ -432,7 +432,7 @@ function (key, values, rereduce) {
                 continue 
             self.archive_tokens_from_view(view, delete_on_save)
         resultdir = os.getcwd()
-        os.chdir('..')
+        os.chdir('..') #TODO: Archive in a zip
         return(resultdir)
 
 
