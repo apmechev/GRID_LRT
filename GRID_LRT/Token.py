@@ -448,6 +448,8 @@ function (key, values, rereduce) {
                 t_file.add(self.t_type+"/")
                 result_link=t_file.name
                 shutil.rmtree(self.t_type+"/")
+        if delete_on_save:
+            self.purge_tokens()
         return(result_link)
 
     def archive_a_token(self, token_ID, delete=False):
