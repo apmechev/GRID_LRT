@@ -28,6 +28,7 @@
 
 import sys
 import os
+import shutil
 import ConfigParser
 import pdb
 import itertools
@@ -420,7 +421,7 @@ function (key, values, rereduce) {
              self.db.purge(to_del)
 
 
-    def archive_tokens(self,delete_on_save=False):
+    def archive_tokens(self,delete_on_save=False, compress=True):
         """Archives all tokens and attachments into a folder
 
         """
@@ -431,9 +432,14 @@ function (key, values, rereduce) {
             if view=='overview_total':
                 continue 
             self.archive_tokens_from_view(view, delete_on_save)
-        resultdir = os.getcwd()
-        os.chdir('..') #TODO: Archive in a zip
-        return(resultdir)
+        result_link = os.getcwd()
+        os.chdir('..')
+        if compress:
+            with tarfile.open(name="tokens_"+self.t_type+".tar.gz",mode='w:gz') as t_file:
+                t_file.add(self.t_type+"/")
+                result_link=t_file.name
+                shutil.rmtree(self.t_type+"/")
+        return(result_link)
 
 
     def archive_a_token(self,token_ID,delete=False):
