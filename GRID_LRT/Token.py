@@ -400,7 +400,7 @@ function (key, values, rereduce) {
         try:
             attach = self.db.get_attachment(token, filename).read()
         except AttributeError:
-            print("error getting attachment")
+            print("error getting attachment: "+str(filename))
             return ""
         if "/" in filename:
             savefile = filename.replace("/", "_")
