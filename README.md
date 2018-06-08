@@ -5,7 +5,7 @@
 [![alt text](http://apmechev.com/img/git_repos/GRID_LRT_clones.svg "github clones since 2017-01-25")](https://github.com/apmechev/github_clones_badge)
 [![codecov Coverage](https://codecov.io/gh/apmechev/GRID_LRT/branch/master/graph/badge.svg?precision=1)](https://codecov.io/gh/apmechev/GRID_LRT)
 [![alt text](http://apmechev.com/img/git_repos/pylint/GRID_LRT.svg "pylint score")](https://github.com/apmechev/pylint-badge)
-
+[![BCH compliance](https://bettercodehub.com/edge/badge/apmechev/GRID_LRT?branch=master)](https://bettercodehub.com/)
 
 Due to the large computational requirements for LOFAR datasets,
 processing bulk data on the grid is required. This manual will detail
