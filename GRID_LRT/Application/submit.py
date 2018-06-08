@@ -40,7 +40,7 @@ class jdl_launcher(object):
             wholenodes(Boolean): Whether to reserve the entire node. Default is F
             NCPU (int, optional): Number of CPUs to use for each job. Default is 1
         """
-        grid_credentials.GRID_credentials_enabled()
+        grid_credentials.grid_credentials_enabled()
         if numjobs<1:
             logging.warn("jdl_file with zero jobs!")
             numjobs=1
