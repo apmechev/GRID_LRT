@@ -50,7 +50,7 @@ def main(filename, verbose=True):
     ('L229507_SB150_uv.dppp.MS_f6fc7fc5.tar', 'ONLINE_AND_NEARLINE')
 
     """
-    grid_credentials.GRID_credentials_enabled() # Check if credenitals enabled
+    grid_credentials.grid_credentials_enabled() # Check if credenitals enabled
     s_list=load_file_into_srmlist(filename)
     print("files are at "+s_list.LTA_location)
     results=[]

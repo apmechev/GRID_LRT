@@ -37,7 +37,7 @@ class Sandbox(object):
 
 
         """
-        grid_credentials.GRID_credentials_enabled()
+        grid_credentials.grid_credentials_enabled()
         lrt_module_dir=os.path.abspath(GRID_LRT.__file__).split("__init__.py")[0]
         self.base_dir=lrt_module_dir+"data/" 
         self.return_dir=os.getcwd()
