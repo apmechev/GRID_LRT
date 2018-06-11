@@ -1,1 +1,1 @@
-__all__ = ["Application","Staging",'sandbox','Token','couchdb',"couchdb.tests"]
+__all__ = ["Application", "Staging", 'sandbox', 'Token', 'couchdb', "couchdb.tests"]

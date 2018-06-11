@@ -51,15 +51,18 @@ __email__ = "LOFAR@apmechev.com"
 __status__ = "Production"
 
 
-def reset_all_tokens(token_type,picas_creds):
-    th=Token_Handler(t_type=token_type, 
+def reset_all_tokens(token_type, picas_creds):
+    """ Resets all Tokens with the pc authorization
+    """
+    th=Token_Handler(t_type=token_type,
             uname=picas_creds.user, pwd=picas_creds.password, dbn=picas_creds.database)
     th.load_views()
     for view in th.views.keys():
-        if view !='overview_total':
+        if view != 'overview_total':
             th.reset_tokens(view)
 
-def purge_tokens(token_type,picas_creds):
+def purge_tokens(token_type, picas_creds):
+    """Automated function to purge tokens authorizing with Picas_creds"""
     th=Token_Handler(t_type=token_type,
             uname=picas_creds.user, pwd=picas_creds.password, dbn=picas_creds.database)
     th.load_views()
