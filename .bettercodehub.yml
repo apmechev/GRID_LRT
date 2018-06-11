@@ -1,0 +1,2 @@
+exclude:
+        - GRID_LRT/couchdb/*
