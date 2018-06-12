@@ -30,7 +30,10 @@
 import sys
 import os
 import shutil
-import ConfigParser
+try:
+    import ConfigParser
+except ImportError
+    import configparser as ConfigParser
 import pdb
 import itertools
 import yaml
