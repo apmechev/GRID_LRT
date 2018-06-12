@@ -17,7 +17,15 @@ class TokenTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def create_Token(self):
-        pc=picas_cred()
-        th=Token.TokenHandler(t_type=T_TYPE, uname=pc.user, pwd=pc.password, dbn='sksp_unittest')
-        self.assertTrue(th.get_db(uname=pc.user, pwd=pc.password,  dbn='sksp_unittest', srv="https://picas-lofar.grid.surfsara.nl:6984").name=='sksp_unittest')
+    def test_create_Token(self):
+        pc = picas_cred()
+        th = Token.TokenHandler(t_type=T_TYPE, uname=pc.user, pwd=pc.password, dbn='sksp_unittest')
+        self.assertTrue(th.get_db(uname=pc.user, pwd=pc.password,  dbn='sksp_unittest', 
+                        srv="https://picas-lofar.grid.surfsara.nl:6984").name == 'sksp_unittest')
+        th.create_token(keys={'test_suite':'Token'}, append="Tokentest", attach=[])
+        th.add_status_views()
+        th.add_overview_view()
+        th.load_views()
+        views = th.views()
+
+        
