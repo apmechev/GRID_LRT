@@ -153,7 +153,7 @@ class Token_Handler:
             'output': "",
             'created': time.time()
             } 
-        keys = dict(itertools.chain(keys.iteritems(), default_keys.iteritems()))
+        keys = dict(itertools.chain(keys.items(), default_keys.items()))
         self.append_id(keys, append)
         self.tokens[keys["_id"]] = keys
         self.db.update([keys])
@@ -548,8 +548,8 @@ class TokenSet(object):
 
         """  # TODO: Check if key_name is inside token_keys!
         for key in iterable:
-            keys = dict(itertools.chain(self.token_keys.iteritems(), {
-                key_name: str("%03d" % int(key))}.iteritems()))
+            keys = dict(itertools.chain(self.token_keys.items(), {
+                key_name: str("%03d" % int(key))}.items()))
 #            _=keys.pop('_attachments')
             pipeline=""
             if 'PIPELINE_STEP' in keys:
