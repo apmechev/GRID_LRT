@@ -19,4 +19,4 @@ class TokenTest(unittest.TestCase):
 
     def create_Token(self):
         pc=picas_cred()
-	th=Token.TokenHandler(t_type=T_TYPE, uname=pc.user, pwd=pc.password, dbn='sksp_unittest')
+        th=Token.TokenHandler(t_type=T_TYPE, uname=pc.user, pwd=pc.password, dbn='sksp_unittest')
