@@ -20,3 +20,4 @@ class TokenTest(unittest.TestCase):
     def create_Token(self):
         pc=picas_cred()
         th=Token.TokenHandler(t_type=T_TYPE, uname=pc.user, pwd=pc.password, dbn='sksp_unittest')
+        self.assertTrue(th.get_db(uname=pc.user, pwd=pc.password,  dbn='sksp_unittest', srv="https://picas-lofar.grid.surfsara.nl:6984").name=='sksp_unittest')
