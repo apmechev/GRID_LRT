@@ -26,6 +26,6 @@ class TokenTest(unittest.TestCase):
         th.add_status_views()
         th.add_overview_view()
         th.load_views()
-        views = th.views()
+        views = th.views
 
         
