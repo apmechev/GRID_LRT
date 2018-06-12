@@ -2,6 +2,8 @@ from GRID_LRT import get_picas_credentials as get_pc
 import os 
 import glob
 import unittest
+
+import unittest.mock
 try:
     import StringIO
 except ImportError:
