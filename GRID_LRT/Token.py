@@ -347,7 +347,7 @@ function (key, values, rereduce) {
         '''
         cond = "doc.lock > 0 && doc.done > 0 && doc.output > 0"
         self.add_view(view_name="error", cond=cond)
-        self.delete_token("error")
+        self.delete_tokens("error")
 
     def reset_tokens(self, view_name="test_view", key=["", ""], del_attach=False):
         """ resets all tokens in a view, optionally can reset all tokens in a view

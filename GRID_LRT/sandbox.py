@@ -49,10 +49,10 @@ class Sandbox(object):
         if cfgfile:
             self.parseconfig(cfgfile)
 
-    def __exit__(self):
+    def __exit__(self, ex_type, ex_value, ex_traceback):
         if 'remove_when_done' in self.sbx_def.keys():
             if self.sbx_def['remove_when_done'] == True:
-                self.__cleanup()
+                self.cleanup()
 
     def parseconfig(self, yamlfile):
         """Helper function to parse the sandbox configuration options
@@ -156,7 +156,7 @@ class Sandbox(object):
 
     '''
         SBX_dir = self.sbx_def['name']
-        scripts_path = self.base_dir+'/scripts/'+SBX_type
+        scripts_path = self.base_dir+'/scripts/'+SBX_dir
         if os.path.exists(scripts_path):
             clone = subprocess.Popen(
                 ['git', 'clone', gitrepo, 'git_base_scripts'])
