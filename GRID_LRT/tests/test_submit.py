@@ -27,7 +27,7 @@ class JdlsubmitTest(unittest.TestCase):
         launcher=submit.jdl_launcher()
         self.assertTrue(launcher.numjobs==1)
         self.assertTrue(launcher.token_type=='t_test')
-        self.assertTrue(launcher.NCPU==1)
+        self.assertTrue(launcher.ncpu==1)
 
     def test_Numjobs(self):
         launcher=submit.jdl_launcher(numjobs=10)
@@ -36,13 +36,13 @@ class JdlsubmitTest(unittest.TestCase):
         self.assertTrue("Parameters= 10" in jdl_file)
 
     def test_Numjobs(self):
-        launcher=submit.jdl_launcher(NCPU=10)
-        self.assertTrue(launcher.NCPU==10)
+        launcher=submit.jdl_launcher(ncpu=10)
+        self.assertTrue(launcher.ncpu==10)
         jdl_file=launcher.build_jdl_file()
         self.assertTrue("CPUNumber = 10"in jdl_file)
 
     def test_LaunchFileExists(self):
-        launcher=submit.jdl_launcher(NCPU=10)
+        launcher=submit.jdl_launcher(ncpu=10)
         jdl_file=launcher.build_jdl_file()
         self.assertTrue(os.path.exists(launcher.launch_file))
         self.assertTrue(os.path.isfile(launcher.launch_file))
