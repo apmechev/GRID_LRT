@@ -22,11 +22,11 @@ class SandboxTest(unittest.TestCase):
         ''' 
         s=sandbox.Sandbox()
         s.parseconfig(self.sbxconf)
-        s.create_SBX_folder()
-        SBX_dir=s.SBXloc
-        self.assertTrue(os.path.exists(SBX_dir) & os.path.isdir(SBX_dir))
+        s.create_sbx_folder()
+        sbx_dir=s.sbxloc
+        self.assertTrue(os.path.exists(sbx_dir) & os.path.isdir(sbx_dir))
         s.cleanup()
-        self.assertTrue(not((os.path.exists(SBX_dir))))
+        self.assertTrue(not((os.path.exists(sbx_dir))))
 
     def test_autobuild(self):
         s=sandbox.Sandbox()
