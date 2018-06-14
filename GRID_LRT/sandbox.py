@@ -1,8 +1,11 @@
+"""
+Sandbox building and uploading module
+"""
+
 from __future__ import print_function
-import pdb
+
 import os
 import shutil
-import sys
 import tempfile
 import subprocess
 import warnings
@@ -45,13 +48,13 @@ class Sandbox(object):
             GRID_LRT.__file__).split("__init__.py")[0]
         self.base_dir = lrt_module_dir+"data/"
         self.return_dir = os.getcwd()
-        self.SBXloc = None
+        self.sbxloc = None
         if cfgfile:
             self.parseconfig(cfgfile)
 
     def __exit__(self, ex_type, ex_value, ex_traceback):
         if 'remove_when_done' in self.sbx_def.keys():
-            if self.sbx_def['remove_when_done'] == True:
+            if self.sbx_def['remove_when_done'] is True:
                 self.cleanup()
 
     def parseconfig(self, yamlfile):
@@ -69,40 +72,39 @@ class Sandbox(object):
         self.shell_vars = opts_f['Shell_variables']
         self.tok_vars = opts_f['Token']
 
-    def create_SBX_folder(self, directory=None):
+    def create_sbx_folder(self):
         '''Makes an empty sandbox folder or removes previous one
         '''
-        SBX_dir = tempfile.mkdtemp()
-        self.tmpdir = SBX_dir
+        sbx_dir = tempfile.mkdtemp()
+        self.tmpdir = sbx_dir
         if not os.path.exists(self.tmpdir):
             os.makedirs(self.tmpdir)
         else:
             shutil.rmtree(self.tmpdir)
             os.makedirs(self.tmpdir)
-        self.enter_SBX_fonder(self.tmpdir)
-        self.SBXloc = self.tmpdir
+        self.enter_sbx_folder(self.tmpdir)
+        self.sbxloc = self.tmpdir
         return self.tmpdir
 
-    def delete_SBX_folder(self, directory=None):
+    def delete_sbx_folder(self):
         '''Removes the sandbox folder and subfolders
-        '''
-        SBX_dir = directory if directory else self.sbx_def['name']
+        ''' 
         if os.path.basename(os.getcwd()) == self.sbx_def['name']:
             os.chdir(self.base_dir)
         if os.path.exists(self.tmpdir):
             shutil.rmtree(self.tmpdir)
 
-    def enter_SBX_fonder(self, directory=None):
-        SBX_dir = directory if directory else self.sbx_def['name']
-        if os.path.exists(self.base_dir+SBX_dir):
-            os.chdir(self.base_dir+SBX_dir)
+    def enter_sbx_folder(self, directory=None):
+        sbx_dir = directory if directory else self.sbx_def['name']
+        if os.path.exists(self.base_dir+sbx_dir):
+            os.chdir(self.base_dir+sbx_dir)
 
     def load_git_scripts(self):
         '''Loads the git scripts into the sandbox folder. Top dir names
             are defined in the yaml, not by the git name
         '''
         if os.path.basename(os.getcwd()) != self.tmpdir:
-            self.enter_SBX_fonder(self.tmpdir)
+            self.enter_sbx_folder(self.tmpdir)
         gits = self.sbx_def['git_scripts']
         if not gits:
             return
@@ -123,8 +125,6 @@ class Sandbox(object):
             os.chdir(self.tmpdir+"/")
 
     def copy_git_scripts(self):
-        SBX_type = self.sbx_def['git']['branch']
-        SBX_dir = self.sbx_def['name']
         print("Checking out Sanbox repository")
         subprocess.call(
             'git clone   ' + self.sbx_def['git']['location'] + " " + self.tmpdir, shell=True)
@@ -144,9 +144,8 @@ class Sandbox(object):
         warnings.warn(
             "Copy Local scripts is now deprecated!",
             DeprecationWarning)
-        SBX_type = basetype if basetype else self.sbx_def['type']
-        SBX_dir = self.sbx_def['name']
-        scripts_path = self.base_dir+'/scripts/'+SBX_type
+        sbx_type = basetype if basetype else self.sbx_def['type']
+        scripts_path = self.base_dir+'/scripts/'+sbx_type
         if os.path.exists(scripts_path):
             subprocess.call('cp -r '+scripts_path +
                             "/* "+self.tmpdir, shell=True)
@@ -155,8 +154,8 @@ class Sandbox(object):
         ''' Can pull the default scripts from a git repository
 
     '''
-        SBX_dir = self.sbx_def['name']
-        scripts_path = self.base_dir+'/scripts/'+SBX_dir
+        sbx_dir = self.sbx_def['name']
+        scripts_path = self.base_dir+'/scripts/'+sbx_dir
         if os.path.exists(scripts_path):
             clone = subprocess.Popen(
                 ['git', 'clone', gitrepo, 'git_base_scripts'])
@@ -164,36 +163,37 @@ class Sandbox(object):
             subprocess.call('mv '+'git_base_scripts' +
                             "/* "+self.tmpdir, shell=True)
 
-    def upload_SBX(self, SBXfile=None, loc=None, upload_name=None):
-        self.upload_gsi_SBX(SBXfile, loc, upload_name)
-        self.upload_gsi_SBX(SBXfile, upload_name=upload_name,
-                            loc=' gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/sandbox')
+    def upload_sbx(self, loc=None, upload_name=None):
+        self.upload_gsi_sbx(loc, upload_name)
+        self.upload_gsi_sbx(upload_name=upload_name,
+                            loc=('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/'
+                                 'data/lofar/user/sksp/distrib/sandbox'))
 
-    def upload_ssh_sandbox(self, SBXfile=None, loc=None, upload_name=None):
+    def upload_ssh_sandbox(self, upload_name=None):
         gsiloc = '/disks/ftphome/pub/apmechev/sandbox/'
-        rename = self.tarfile
+        rename = self.sbxtarfile
 
         if not upload_name:
-            if not ".tar" in rename:
+            if  ".tar" not in rename:
                 rename = rename+".tar"
             upload_name = rename
 
-        upload_place = gsiloc+self.sbx_def['loc']
-        if self.tarfile:
-            upload = subprocess.Popen(['scp', self.tarfile, "gaasp:"+gsiloc +
+        if self.sbxtarfile:
+            upload = subprocess.Popen(['scp', self.sbxtarfile, "gaasp:"+gsiloc +
                                        self.sbx_def['loc']+"/"+upload_name])
             upload.wait()
 
     # TODO: Use UL/DL interfaces
-    def upload_gsi_SBX(self, SBXfile=None, loc=None, upload_name=None):
+    def upload_gsi_sbx(self, loc=None, upload_name=None):
         """ Uploads the sandbox to the relative folders
         """
-        gsiloc = 'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/'
+        gsiloc = ("gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl"
+                  "/data/lofar/user/sksp/sandbox/")
 
-        rename = self.tarfile
+        rename = self.sbxtarfile
 
         if not upload_name:
-            if not ".tar" in rename:
+            if ".tar" not in rename:
                 rename = rename+".tar"
             upload_name = rename
 
@@ -205,13 +205,13 @@ class Sandbox(object):
         if self.sandbox_exists(gsiloc+self.sbx_def['loc']+"/"+upload_name):
             self.delete_gsi_sandbox(gsiloc+self.sbx_def['loc']+"/"+upload_name)
 
-        if self.tarfile:
-            upload = subprocess.Popen(['globus-url-copy', self.tarfile, gsiloc +
+        if self.sbxtarfile:
+            upload = subprocess.Popen(['globus-url-copy', self.sbxtarfile, gsiloc +
                                        self.sbx_def['loc']+"/"+upload_name])
         upload.wait()
         print("Uploaded sandbox to "+gsiloc +
               self.sbx_def['loc']+"/"+upload_name)
-        self.SBXloc = self.sbx_def['loc']+"/"+upload_name
+        self.sbxloc = self.sbx_def['loc']+"/"+upload_name
 
     def sandbox_exists(self, sbxfile):
         file1 = subprocess.Popen(
@@ -227,16 +227,16 @@ class Sandbox(object):
         print("deleted old sandbox")
         return deljob.communicate()
 
-    def zip_SBX(self, zipname=None):
+    def zip_sbx(self, zipname=None):
         filename = zipname if zipname else self.sbx_def['name']+".tar"
         print(filename)
         tar = subprocess.call('tar -cf '+filename+' *', shell=True)
-        self.tarfile = filename
+        print(tar)
+        self.sbxtarfile = filename
 
     def cleanup(self):
-        self.delete_SBX_folder()
-        os.chdir(self.return_dir)
-        pass
+        self.delete_sbx_folder()
+        os.chdir(self.return_dir) 
 
     def make_tokvar_dict(self):
         tokvardict = self.shell_vars
@@ -267,15 +267,15 @@ class Sandbox(object):
 
         """
         self.parseconfig(sbx_config)
-        self.create_SBX_folder()
-        self.enter_SBX_fonder()
+        self.create_sbx_folder()
+        self.enter_sbx_folder()
         self.copy_base_scripts()
         self.load_git_scripts()
         self.make_tokvar_dict()
-        self.zip_SBX()
+        self.zip_sbx()
 
     def upload_sandbox(self, upload_name=None):
-        self.upload_SBX(upload_name=upload_name)
+        self.upload_sbx(upload_name=upload_name)
         self.upload_ssh_sandbox(upload_name=upload_name)
         if self.sbx_def['remove_when_done'] == 'True':
             self.cleanup()
