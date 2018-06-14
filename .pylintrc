@@ -1,4 +1,3 @@
 [MASTER]
 ignore=couchdb
-init-hook='import sys; sys.path.append("/home/apmechev/miniconda2/lib/python2.7/site-packages/")'
 
