@@ -210,4 +210,5 @@ def slice_dicts(srmdict, slice_size=10):
             if format(start+chunk*slice_size+i, '03') in srmdict.keys():
                 sliced[chunk_name].append(
                     srmdict[format(start+chunk*slice_size+i, '03')])
+    sliced = dict((k, v) for k, v in sliced.items() if v) #Removing empty items
     return sliced
