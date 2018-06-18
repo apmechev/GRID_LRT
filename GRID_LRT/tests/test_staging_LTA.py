@@ -5,7 +5,7 @@ import glob
 import unittest
 import tempfile
 from os.path import expanduser
-
+import sys
 
 
 
@@ -39,7 +39,7 @@ class Staging_Test(unittest.TestCase):
             st_file.write('user=test1')
             st_file.write('password=test2')
         from GRID_LRT.Staging import stager_access
-        print(stager_access.user)
+        sys.stderr.write(stager_access.user)
         self.assertTrue(stager_access.user=='test1')
         self.assertTrue(stager_access.password=='test2')
 
