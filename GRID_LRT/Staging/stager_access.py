@@ -27,6 +27,8 @@ user = None
 passw = None
 
 def get_staging_creds():
+    user = None
+    passw = None
     try:
         with open(expanduser("~/.awe/Environment.cfg"), 'r') as authfile:
             print(datetime.datetime.now(), "stager_access: Parsing user credentials from",
