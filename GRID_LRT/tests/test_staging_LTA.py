@@ -32,6 +32,7 @@ class Staging_Test(unittest.TestCase):
             st_file.write('password=test2\n')
         from GRID_LRT.Staging import stager_access
         user, passw = stager_access.get_staging_creds()
+        sys.stderr.write('username is '+user)
         self.assertTrue(user=='test1')
         self.assertTrue(passw=='test2')
         from GRID_LRT.Staging import stager_access
