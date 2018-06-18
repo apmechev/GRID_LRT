@@ -22,28 +22,34 @@ class Staging_Test(unittest.TestCase):
                     for line in f2:
                         a_file.write(line)
 
-    def test_stage_file(self):
-        from GRID_LRT.Staging import stager_access
-        f=os.path.dirname(__file__)+'/srm_50_sara.txt'
-        stage_all_LTA.main(f, test=True)
-
-    def test_return_srmlist(self):
-        from GRID_LRT.Staging import stager_access
-        f=os.path.dirname(__file__)+'/srm_50_sara.txt'
-        l=stage_all_LTA.return_srmlist(f)
-        self.assertTrue(len(l)==51)
+#    def test_stage_file(self):
+#        from GRID_LRT.Staging import stager_access
+#        f=os.path.dirname(__file__)+'/srm_50_sara.txt'
+#        stage_all_LTA.main(f, test=True)
+#
+#    def test_return_srmlist(self):
+#        from GRID_LRT.Staging import stager_access
+#        f=os.path.dirname(__file__)+'/srm_50_sara.txt'
+#        l=stage_all_LTA.return_srmlist(f)
+#        self.assertTrue(len(l)==51)
 
     def test_stagingrc(self):
         directory=expanduser("~/")
         if os.path.exists(expanduser("~/.stagingrc")):
             os.remove(expanduser("~/.stagingrc"))
         with open(expanduser("~/.stagingrc"),'w') as st_file:
-            st_file.write('user=test1')
-            st_file.write('password=test2')
+            st_file.write('user=test1\n')
+            st_file.write('password=test2\n')
         from GRID_LRT.Staging import stager_access
         sys.stderr.write(stager_access.user)
         self.assertTrue(stager_access.user=='test1')
         self.assertTrue(stager_access.password=='test2')
+        from GRID_LRT.Staging import stager_access
+        f=os.path.dirname(__file__)+'/srm_50_sara.txt'
+        stage_all_LTA.main(f, test=True)
+        f=os.path.dirname(__file__)+'/srm_50_sara.txt'
+        l=stage_all_LTA.return_srmlist(f)
+        self.assertTrue(len(l)==51)
 
 
     def test_awe_file(self):
