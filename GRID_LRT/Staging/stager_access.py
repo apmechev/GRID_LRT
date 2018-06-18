@@ -25,40 +25,45 @@ from functools import wraps
 # Determine credentials and create proxy
 user = None
 passw = None
-try:
-    with open(expanduser("~/.awe/Environment.cfg"), 'r') as authfile:
-        print(datetime.datetime.now(), "stager_access: Parsing user credentials from",
-              expanduser("~/.awe/Environment.cfg"))
-        for line in authfile:
-            if line.startswith("database_user"):
-                user = line.split(':')[1].strip()
-            if line.startswith("database_password"):
-                passw = line.split(':')[1].strip()
-except IOError:
+
+def get_staging_creds():
     try:
-        with open(expanduser("~/.stagingrc"), 'r') as authfile:
-            print(datetime.datetime.now(
-            ), "stager_access: Parsing user credentials from", expanduser("~/.stagingrc"))
+        with open(expanduser("~/.awe/Environment.cfg"), 'r') as authfile:
+            print(datetime.datetime.now(), "stager_access: Parsing user credentials from",
+                  expanduser("~/.awe/Environment.cfg"))
             for line in authfile:
-                if line.startswith("user"):
-                    user = line.split('=')[1].strip()
-                if line.startswith("password"):
-                    passw = line.split('=')[1].strip()
+                if line.startswith("database_user"):
+                    user = line.split(':')[1].strip()
+                if line.startswith("database_password"):
+                    passw = line.split(':')[1].strip()
     except IOError:
-        print("No StagingRC file found")
+        try:
+            with open(expanduser("~/.stagingrc"), 'r') as authfile:
+                print(datetime.datetime.now(
+                ), "stager_access: Parsing user credentials from", expanduser("~/.stagingrc"))
+                for line in authfile:
+                    if line.startswith("user"):
+                        user = line.split('=')[1].strip()
+                    if line.startswith("password"):
+                        passw = line.split('=')[1].strip()
+        except IOError:
+            print("No StagingRC file found")
+    
+    try:
+        user = os.environ['LOFAR_LTA_USER']
+        passw = os.environ['LOFAR_LTA_PWD']
+    except:
+        print("LOFAR LTA USER/PASSW not in environment!")
+    
+    if user and passw:
+        print(datetime.datetime.now(), "stager_access: Creating proxy")
+        proxy = xmlrpclib.ServerProxy(
+            "https://"+user+':'+passw+"@webportal.astron.nl/service-public/xmlrpc")
+    else:
+        print("No User or Password exist. ")
+    return user, passw
 
-try:
-    user = os.environ['LOFAR_LTA_USER']
-    passw = os.environ['LOFAR_LTA_PWD']
-except:
-    print("LOFAR LTA USER/PASSW not in environment!")
-
-if user and passw:
-    print(datetime.datetime.now(), "stager_access: Creating proxy")
-    proxy = xmlrpclib.ServerProxy(
-        "https://"+user+':'+passw+"@webportal.astron.nl/service-public/xmlrpc")
-else:
-    print("No User or Password exist. ")
+user, passw = get_staging_creds()
 # ---
 
 
