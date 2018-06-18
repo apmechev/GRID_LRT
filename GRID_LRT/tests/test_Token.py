@@ -28,4 +28,11 @@ class TokenTest(unittest.TestCase):
         th.load_views()
         views = th.views
 
-        
+    def test_delete_token(self):
+        pc = picas_cred()
+        th = Token.Token_Handler(t_type=T_TYPE, uname=pc.user, pwd=pc.password, dbn='sksp_unittest')
+        th.create_token(keys={'test_suite':'Token','lock':1}, append="Tokentest", attach=[])
+        th.add_view('to_reset_view',cond=' doc.test_suite == "Token" ' )
+        th.reset_tokens('to_reset_view')
+        th.delete_tokens('to_reset_view')
+        th.del_view('to_reset_view')
