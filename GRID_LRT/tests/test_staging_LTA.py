@@ -29,6 +29,8 @@ class Staging_Test(unittest.TestCase):
         directory=expanduser("~/")
         if os.path.exists(expanduser("~/.stagingrc")):
             os.remove(expanduser("~/.stagingrc"))
+        if os.path.exists(expanduser("~/.awe/Environment.cfg")):
+            os.remove(expanduser("~/.awe/Environment.cfg"))
         with open(expanduser("~/.stagingrc"),'w') as st_file:
             st_file.write('user=test1\n')
             st_file.write('password=test2\n')
