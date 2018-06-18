@@ -40,9 +40,6 @@ class Staging_Test(unittest.TestCase):
         f=os.path.dirname(__file__)+'/srm_50_sara.txt'
         l=stage_all_LTA.return_srmlist(f)
         self.assertTrue(len(l)==51)
-
-
-    def test_awe_file(self):
         directory=expanduser("~/.awe/")
         if not os.path.exists(directory):
                 os.makedirs(directory)
