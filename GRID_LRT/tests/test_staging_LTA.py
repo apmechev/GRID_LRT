@@ -1,4 +1,4 @@
-#from GRID_LRT.Staging import stage_all_LTA 
+from GRID_LRT.Staging import stage_all_LTA 
 from GRID_LRT.Staging import stager_access
 import os
 import glob
@@ -24,18 +24,18 @@ class Staging_Test(unittest.TestCase):
 
 
     def test_stagingrc(self):
+        user, passw = stager_access.get_staging_creds()
+        self.assertTrue(user=='apmechev') 
         directory=expanduser("~/")
         if os.path.exists(expanduser("~/.stagingrc")):
             os.remove(expanduser("~/.stagingrc"))
         with open(expanduser("~/.stagingrc"),'w') as st_file:
             st_file.write('user=test1\n')
             st_file.write('password=test2\n')
-        from GRID_LRT.Staging import stager_access
-        user, passw = stager_access.get_staging_creds()
+        user2, passw2 = stager_access.get_staging_creds()
         sys.stderr.write('username is '+user)
-        self.assertTrue(user=='test1')
-        self.assertTrue(passw=='test2')
-        from GRID_LRT.Staging import stager_access
+        self.assertTrue(user2 == 'test1')
+        self.assertTrue(passw2 == 'test2') 
         f=os.path.dirname(__file__)+'/srm_50_sara.txt'
         stage_all_LTA.main(f, test=True)
         f=os.path.dirname(__file__)+'/srm_50_sara.txt'
@@ -59,7 +59,6 @@ class Staging_Test(unittest.TestCase):
         os.environ['PICAS_USR']=''
         prev_pwd=os.environ['PICAS_USR_PWD']
         os.environ['PICAS_USR_PWD']=''
-        from GRID_LRT.Staging import stager_access
 #        self.assertTrue(stager_access.user=='test1')
 #        self.assertTrue(stager_access.password=='test2')
         os.environ['PICAS_USR']=prev_usr
