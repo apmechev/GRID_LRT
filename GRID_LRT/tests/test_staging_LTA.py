@@ -31,6 +31,18 @@ class Staging_Test(unittest.TestCase):
         l=stage_all_LTA.return_srmlist(f)
         self.assertTrue(len(l)==51)
 
+    def test_stagingrc(self):
+        directory=expanduser("~/")
+        if os.path.exists(expanduser("~/.awe/stagingrc")):
+            os.remove(expanduser("~/.awe/stagingrc"))
+        with open(expanduser("~/.awe/stagingrc"),'w') as st_file:
+            st_file.write('user=test1')
+            st_file.write('password=test2')
+        from GRID_LRT.Staging import stager_access
+        self.assertTrue(stager_access.user=='test1')
+        self.assertTrue(stager_access.password=='test2')
+
+
     def test_awe_file(self):
         directory=expanduser("~/.awe/")
         if not os.path.exists(directory):
