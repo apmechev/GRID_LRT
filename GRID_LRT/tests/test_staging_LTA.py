@@ -1,4 +1,4 @@
-from GRID_LRT.Staging import stage_all_LTA 
+#from GRID_LRT.Staging import stage_all_LTA 
 #from GRID_LRT.Staging import stager_access
 import os
 import glob
@@ -23,19 +23,21 @@ class Staging_Test(unittest.TestCase):
                         a_file.write(line)
 
     def test_stage_file(self):
+        from GRID_LRT.Staging import stager_access
         f=os.path.dirname(__file__)+'/srm_50_sara.txt'
         stage_all_LTA.main(f, test=True)
 
     def test_return_srmlist(self):
+        from GRID_LRT.Staging import stager_access
         f=os.path.dirname(__file__)+'/srm_50_sara.txt'
         l=stage_all_LTA.return_srmlist(f)
         self.assertTrue(len(l)==51)
 
     def test_stagingrc(self):
         directory=expanduser("~/")
-        if os.path.exists(expanduser("~/.awe/stagingrc")):
-            os.remove(expanduser("~/.awe/stagingrc"))
-        with open(expanduser("~/.awe/stagingrc"),'w') as st_file:
+        if os.path.exists(expanduser("~/.stagingrc")):
+            os.remove(expanduser("~/.stagingrc"))
+        with open(expanduser("~/.stagingrc"),'w') as st_file:
             st_file.write('user=test1')
             st_file.write('password=test2')
         from GRID_LRT.Staging import stager_access
