@@ -8,10 +8,9 @@ but use this module to access the provided functionality.
 !! This is to ensure that when we change the remote interface,
 your scripts don't break and you will only have to upgrade this module.
 """
+from __future__ import print_function
 
 __version__ = "1.0"
-
-from __future__ import print_function
 import os
 from os.path import expanduser
 import datetime
