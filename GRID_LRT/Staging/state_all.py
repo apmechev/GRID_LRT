@@ -113,9 +113,9 @@ def percent_staged(results):
     """
     total_files = len(results)
     counts = Counter(x[1] for x in results)
-    staged = counts['ONLINE_AND_NEARLINE']+counts['ONLINE']
-    unstaged = counts['NEARLINE']
-    assert staged + unstaged == total_files
+    staged = dict(counts).get('ONLINE_AND_NEARLINE',0)+dict(counts).get('ONLINE',0)
+    unstaged = dict(counts).get()'NEARLINE',0)
+#    assert staged + unstaged == total_files
     print(str(float(staged/(staged + unstaged))*100)+" percent of files staged")
     return float(staged/total_files)
 
