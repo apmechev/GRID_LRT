@@ -24,8 +24,8 @@ class Staging_Test(unittest.TestCase):
 
 
     def test_stagingrc(self):
-        user, passw = stager_access.get_staging_creds()
-        self.assertTrue(user=='apmechev') 
+        user, passw, _ = stager_access.get_staging_creds()
+        self.assertTrue(user == 'apmechev') 
         directory=expanduser("~/")
         if os.path.exists(expanduser("~/.stagingrc")):
             os.remove(expanduser("~/.stagingrc"))
@@ -34,7 +34,7 @@ class Staging_Test(unittest.TestCase):
         with open(expanduser("~/.stagingrc"),'w') as st_file:
             st_file.write('user=test1\n')
             st_file.write('password=test2\n')
-        user2, passw2 = stager_access.get_staging_creds()
+        user2, passw2, _ = stager_access.get_staging_creds()
         sys.stderr.write('username is '+user)
 #        self.assertTrue(user2 == 'test1')
 #        self.assertTrue(passw2 == 'test2') 
@@ -66,4 +66,6 @@ class Staging_Test(unittest.TestCase):
         os.environ['PICAS_USR']=prev_usr
         os.environ['PICAS_USR_PWD']=prev_pwd
 
-
+    def test_prettyprint(self):
+        dic = {'3':1234132, '2342':"string", 'boo':'boo2'}
+        stager_access.prettyprint(dic)
