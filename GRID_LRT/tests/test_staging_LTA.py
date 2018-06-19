@@ -14,14 +14,7 @@ class Staging_Test(unittest.TestCase):
         pass
 
     def tearDown(self):
-        if not hasattr(self,'temfile'):
-            return
-        if self.temfile:
-            with open(expanduser("~/.awe/Environment.cfg"),'w') as a_file:
-                with open(self.temfile.name,'r') as f2:
-                    for line in f2:
-                        a_file.write(line)
-
+        pass
 
     def test_stagingrc(self):
         user, passw, _ = stager_access.get_staging_creds()
@@ -46,14 +39,6 @@ class Staging_Test(unittest.TestCase):
         directory=expanduser("~/.awe/")
         if not os.path.exists(directory):
                 os.makedirs(directory)
-        if os.path.exists(expanduser("~/.awe/Environment.cfg")):
-            self.temfile=tempfile.NamedTemporaryFile(delete=False)
-            with open(expanduser("~/.awe/Environment.cfg"),'r') as a_file:
-                for line in a_file.readlines():
-                    self.temfile.write(line)
-            self.temfile.close()
-        else:
-            self.temfile=None
         with open(expanduser("~/.awe/Environment.cfg"),'w') as a_file:
             a_file.write("database_user : test1\n")
             a_file.write("database_password : test2\n")
