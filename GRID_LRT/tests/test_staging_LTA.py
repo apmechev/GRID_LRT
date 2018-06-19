@@ -28,7 +28,7 @@ class Staging_Test(unittest.TestCase):
             st_file.write('user=test1\n')
             st_file.write('password=test2\n')
         user2, passw2, _ = stager_access.get_staging_creds()
-        sys.stderr.write('username is '+user)
+        sys.stderr.write('username is '+user2)
 #        self.assertTrue(user2 == 'test1')
 #        self.assertTrue(passw2 == 'test2') 
         f=os.path.dirname(__file__)+'/srm_50_sara.txt'
