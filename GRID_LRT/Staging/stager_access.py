@@ -54,11 +54,11 @@ def get_staging_creds():
                         passw = line.split('=')[1].strip()
         except IOError:
             print("No StagingRC file found")
-    try:
-        user = os.environ['LOFAR_LTA_USER']
-        passw = os.environ['LOFAR_LTA_PWD']
-    except KeyError:
-        print("LOFAR LTA USER/PASSW not in environment!")
+            try:
+                user = os.environ['LOFAR_LTA_USER']
+                passw = os.environ['LOFAR_LTA_PWD']
+            except KeyError:
+                print("LOFAR LTA USER/PASSW not in environment!")
     if user and passw:
         print(datetime.datetime.now(), "stager_access: Creating proxy")
         lta_proxy = xmlrpclib.ServerProxy(

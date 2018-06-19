@@ -29,8 +29,8 @@ class Staging_Test(unittest.TestCase):
             st_file.write('password=test2\n')
         user2, passw2, _ = stager_access.get_staging_creds()
         sys.stderr.write('username is '+user2)
-#        self.assertTrue(user2 == 'test1')
-#        self.assertTrue(passw2 == 'test2') 
+        self.assertTrue(user2 == 'test1')
+        self.assertTrue(passw2 == 'test2') 
         f=os.path.dirname(__file__)+'/srm_50_sara.txt'
         stage_all_LTA.main(f, test=True)
         f=os.path.dirname(__file__)+'/srm_50_sara.txt'
@@ -40,14 +40,15 @@ class Staging_Test(unittest.TestCase):
         if not os.path.exists(directory):
                 os.makedirs(directory)
         with open(expanduser("~/.awe/Environment.cfg"),'w') as a_file:
-            a_file.write("database_user : test1\n")
-            a_file.write("database_password : test2\n")
+            a_file.write("database_user : testu1\n")
+            a_file.write("database_password : testu2\n")
         prev_usr=os.environ['PICAS_USR']
         os.environ['PICAS_USR']=''
         prev_pwd=os.environ['PICAS_USR_PWD']
         os.environ['PICAS_USR_PWD']=''
-#        self.assertTrue(stager_access.user=='test1')
-#        self.assertTrue(stager_access.password=='test2')
+        user3, passw3, _ = stager_access.get_staging_creds()
+        self.assertTrue(user3=='test1')
+        self.assertTrue(passw3=='test2')
         os.environ['PICAS_USR']=prev_usr
         os.environ['PICAS_USR_PWD']=prev_pwd
 
