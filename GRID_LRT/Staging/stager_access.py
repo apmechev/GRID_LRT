@@ -9,24 +9,28 @@ but use this module to access the provided functionality.
 your scripts don't break and you will only have to upgrade this module.
 """
 from __future__ import print_function
-
-__version__ = "1.0"
 import os
 from os.path import expanduser
 import datetime
+from functools import wraps
 
 try:
     import xmlrpclib
 except ImportError:
     import xmlrpc.client as xmlrpclib  # pylint: disable=import-error
-from functools import wraps
+
+__version__ = "1.0"
 
 # ---
 # Determine credentials and create proxy
-user = None
-passw = None
+USER = None
+PASSW = None
 
 def get_staging_creds():
+    """Function to get the staging credentials first from
+       ~/.awe/Environment.cfg, if not there, then from ~/.stagingrc
+       and finally from the env variables LOFAR_LTA_USER and LOFAR_LTA_PWD
+    """
     user = None
     passw = None
     try:
@@ -50,59 +54,60 @@ def get_staging_creds():
                         passw = line.split('=')[1].strip()
         except IOError:
             print("No StagingRC file found")
-    
     try:
         user = os.environ['LOFAR_LTA_USER']
         passw = os.environ['LOFAR_LTA_PWD']
-    except:
+    except KeyError:
         print("LOFAR LTA USER/PASSW not in environment!")
-    
     if user and passw:
         print(datetime.datetime.now(), "stager_access: Creating proxy")
-        proxy = xmlrpclib.ServerProxy(
+        lta_proxy = xmlrpclib.ServerProxy(
             "https://"+user+':'+passw+"@webportal.astron.nl/service-public/xmlrpc")
     else:
         print("No User or Password exist. ")
-    return user, passw
+    return user, passw, lta_proxy
 
-user, passw = get_staging_creds()
+USER, PASSW, LTA_PROXY = get_staging_creds()
 # ---
 
 
-def HandleXMLRPCException(f):
+def handle_xmlrpc_exception(fun):
     """ Exception handler that stops xmlrpclib.ProtocolError
     from printing out the username and password to the terminal
 
     """
-    @wraps(f)
+    @wraps(fun)
     def wrapper(*args, **kwds):
+        """Wrapper around the function that captures the exception
+        and DOES NOT print out the password in plain text"""
         try:
-            return f(*args, **kwds)
+            return fun(*args, **kwds)
         except xmlrpclib.ProtocolError as err:
-            if passw in err.url:
-                err.url = err.url.replace(passw, '[REDACTED]')
+            if PASSW in err.url:
+                err.url = err.url.replace(PASSW, '[REDACTED]')
             raise err
     return wrapper
 
 
-@HandleXMLRPCException
+@handle_xmlrpc_exception
 def stage(surls):
     """ Stage list of SURLs or a string holding a single SURL
 
     :param surls: Either a list of strings or a string holding a single surl to stage
     :type surls: either a list() or a str()
-    :return: An integer which is used to refer to the stagig request when polling the API for a staging status
+    :return: An integer which is used to refer to the stagig request when polling
+    the API for a staging status
     """
     staged_surls = []
     if isinstance(surls, str):
         staged_surls = [surls]
     for i in surls:
         staged_surls.append(str(i))
-    stageid = proxy.LtaStager.add_getid(staged_surls)
+    stageid = LTA_PROXY.LtaStager.add_getid(staged_surls)
     return stageid
 
 
-@HandleXMLRPCException
+@handle_xmlrpc_exception
 def get_status(stageid):
     """ Get status of request with given ID
 
@@ -111,49 +116,53 @@ def get_status(stageid):
         :type stageid: int
 
     Returns:
-        :status: A string describing the staging status: 'new', 'scheduled', 'in progress' or 'success'
+        :status: A string describing the staging status: 'new', 'scheduled',
+        'in progress' or 'success'
         """
-    return proxy.LtaStager.getstatus(stageid)
+    return LTA_PROXY.LtaStager.getstatus(stageid)
 
 
-@HandleXMLRPCException
+@handle_xmlrpc_exception
 def abort(stageid):
     """ Abort running request / release data of a finished request with given ID """
-    return proxy.LtaStager.abort(stageid)
+    return LTA_PROXY.LtaStager.abort(stageid)
 
 
-@HandleXMLRPCException
+@handle_xmlrpc_exception
 def get_surls_online(stageid):
     """ Get a list of all files that are already online for a running request with given ID  """
-    return proxy.LtaStager.getstagedurls(stageid)
+    return LTA_PROXY.LtaStager.getstagedurls(stageid)
 
 
-@HandleXMLRPCException
+@handle_xmlrpc_exception
 def get_srm_token(stageid):
     """ Get the SRM request token for direct interaction with the SRM site via Grid/SRM tools """
-    return proxy.LtaStager.gettoken(stageid)
+    return LTA_PROXY.LtaStager.gettoken(stageid)
 
 
-@HandleXMLRPCException
+@handle_xmlrpc_exception
 def reschedule(stageid):
     """ Reschedule a request with a given ID, e.g. after it was put on hold due to maintenance """
-    return proxy.LtaStager.reschedule(stageid)
+    return LTA_PROXY.LtaStager.reschedule(stageid)
 
 
-@HandleXMLRPCException
+@handle_xmlrpc_exception
 def get_progress():
-    """ Get a detailed list of all running requests and their current progress. As a normal user, this only returns your own requests.  """
-    return proxy.LtaStager.getprogress()
+    """ Get a detailed list of all running requests and their current progress.
+    As a normal user, this only returns your own requests.  """
+    return LTA_PROXY.LtaStager.getprogress()
 
 
-@HandleXMLRPCException
+@handle_xmlrpc_exception
 def get_storage_info():
-    """ Get storage information of the different LTA sites, e.g. to check available disk pool space. Requires support role permissions. """
-    return proxy.LtaStager.getsrmstorageinfo()
+    """ Get storage information of the different LTA sites,
+    e.g. to check available disk pool space. Requires support role permissions. """
+    return LTA_PROXY.LtaStager.getsrmstorageinfo()
 
 
 def prettyprint(dictionary, indent=""):
-    """ Prints nested dict responses nicely. Example: 'stager_access.prettyprint(stager_access.get_progress())'"""
+    """ Prints nested dict responses nicely. Example:
+    'stager_access.prettyprint(stager_access.get_progress())'"""
     if isinstance(dictionary, dict):
         for key in sorted(dictionary.keys()):
             item = dictionary.get(key)
