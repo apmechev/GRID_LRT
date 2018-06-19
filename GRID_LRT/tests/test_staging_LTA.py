@@ -47,8 +47,8 @@ class Staging_Test(unittest.TestCase):
         prev_pwd=os.environ['PICAS_USR_PWD']
         os.environ['PICAS_USR_PWD']=''
         user3, passw3, _ = stager_access.get_staging_creds()
-        self.assertTrue(user3=='test1')
-        self.assertTrue(passw3=='test2')
+        self.assertTrue(user3=='testu1')
+        self.assertTrue(passw3=='testu2')
         os.environ['PICAS_USR']=prev_usr
         os.environ['PICAS_USR_PWD']=prev_pwd
 
