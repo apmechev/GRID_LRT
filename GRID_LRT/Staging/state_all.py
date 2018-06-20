@@ -56,7 +56,7 @@ def main(filename, verbose=True):
     """
     grid_credentials.grid_credentials_enabled()  # Check if credenitals enabled
     s_list = load_file_into_srmlist(filename)
-    print("files are at "+s_list.LTA_location)
+    print("files are at "+s_list.lta_location)
     results = []
     for i in s_list.gfal_links():
         results.append(check_status(i, verbose))
@@ -113,8 +113,8 @@ def percent_staged(results):
     """
     total_files = len(results)
     counts = Counter(x[1] for x in results)
-    staged = dict(counts).get('ONLINE_AND_NEARLINE',0)+dict(counts).get('ONLINE',0)
-    unstaged = dict(counts).get('NEARLINE',0)
+    staged = dict(counts).get('ONLINE_AND_NEARLINE', 0)+dict(counts).get('ONLINE', 0)
+    unstaged = dict(counts).get('NEARLINE', 0)
 #    assert staged + unstaged == total_files
     print(str(float(staged/(staged + unstaged))*100)+" percent of files staged")
     return float(staged/total_files)
