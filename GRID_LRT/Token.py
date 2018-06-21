@@ -613,7 +613,7 @@ class TokenSet(object):
             tok_list = self.__tokens
         to_update = []
         for token in tok_list:
-            document = self.th.db[token]
+            document = self.th.database[token]
             document[key] = str(val)
             to_update.append(document)
-        self.th.db.update(to_update)
+        self.th.database.update(to_update)
