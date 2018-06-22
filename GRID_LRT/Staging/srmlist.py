@@ -2,7 +2,8 @@ import sys
 import re
 from collections import deque
 from math import ceil
-
+import logging
+import subprocess
 
 
 class srmlist(list):
@@ -210,3 +211,26 @@ def slice_dicts(srmdict, slice_size=10):
                     srmdict[format(start+chunk*slice_size+i, '03')])
     sliced = dict((k, v) for k, v in sliced.items() if v) #Removing empty items
     return sliced
+
+def make_srmlist_from_gsiftpdir(gsiftpdir):
+    srml = srmlist()
+    for i in count_files_uberftp(gsiftpdir):
+        srml.append(i)
+    return srml    
+
+def count_files_uberftp(directory):                                                                                                         
+    num_files=0
+    logging.info(directory)
+    c=subprocess.Popen(['uberftp','-ls', directory],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out=c.communicate()
+    if out[1]!='':
+        logging.warning("srmls failed to find a directory!! ")
+        return 0
+    if 'lofsksp' not in out[0]:
+        logging.warning("no link found in folder!, returning 0 files")
+        return 0
+    file_list=[directory+"/"+str(i.split()[-1])
+                            for i in out[0].strip().split("\r\n")]
+    return file_list
+
