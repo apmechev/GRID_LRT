@@ -75,7 +75,7 @@ def purge_tokens(token_type, picas_creds):
     thandler.purge_tokens()
 
 
-class Token_Handler:
+class Token_Handler(object):
     """
 
     The Token_Handler class uses couchdb to create, modify and delete
