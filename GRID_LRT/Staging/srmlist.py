@@ -216,21 +216,20 @@ def make_srmlist_from_gsiftpdir(gsiftpdir):
     srml = srmlist()
     for i in count_files_uberftp(gsiftpdir):
         srml.append(i)
-    return srml    
+    return srml
 
-def count_files_uberftp(directory):                                                                                                         
-    num_files=0
+def count_files_uberftp(directory):
     logging.info(directory)
-    c=subprocess.Popen(['uberftp','-ls', directory],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out=c.communicate()
-    if out[1]!='':
+    f_list = subprocess.Popen(['uberftp', '-ls', directory],
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out = f_list.communicate()
+    if out[1] != '':
         logging.warning("srmls failed to find a directory!! ")
         return 0
     if 'lofsksp' not in out[0]:
         logging.warning("no link found in folder!, returning 0 files")
         return 0
-    file_list=[directory+"/"+str(i.split()[-1])
-                            for i in out[0].strip().split("\r\n")]
+    file_list = [directory+"/"+str(i.split()[-1])
+                 for i in out[0].strip().split("\r\n")]
     return file_list
 
