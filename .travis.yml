@@ -18,6 +18,7 @@ before_install:
       #    - sudo apt-get update 
       #    - sudo mkdir -p /etc/grid-security/certificates/
       #    - sudo apt-get -y --allow-unauthenticated install ca-policy-egi-core 
+    - pip install mock
     - pip install pyyaml
     - pip install codecov
 script:
