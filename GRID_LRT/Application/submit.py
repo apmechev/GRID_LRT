@@ -19,6 +19,16 @@ from GRID_LRT import grid_credentials
 #    def __init__(self):
 #        pass
 
+class gridjob(object):
+    """A class containing all required descriptions for a SINGLE 
+    Grid job, as well as its parameters"""
+    def __init__(self, wholenodes=False, NCPU=1, token_type=None):
+        self.token_type = token_type
+        if wholenodes:
+            self.wholenodes = 'true'
+        else:
+            self.wholenodes = 'false'
+        self.ncpu = NCPU       
 
 class jdl_launcher(object):
     """jdl_launcher creates a jdl launch file with the
