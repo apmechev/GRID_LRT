@@ -18,7 +18,12 @@ __status__ = "Production"
 
 
 def infolog(string):
-    """Logs to the info logger or else prints"""
+    """infolog
+    Logs to the info logger or else prints
+
+    :param string: the string to log to the logger or to just print
+    :type string: str
+    """
     if not logging:
         print("INFO: "+string)
     else:
