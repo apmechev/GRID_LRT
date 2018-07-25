@@ -154,10 +154,12 @@ database=picas_database
         return  # self.get_picas_creds()
 
     def put_creds_in_file(self, pic_file="~/.picasrc"):
-        """Exports PiCaS variables into a file
+        """put_creds_in_file
+            Exports PiCaS variables into a file
 
-        Args:
-            pic_file(str): File to write the variables in (default: ~/.picasrc)
+        :param pic_file: Name of the file containing the credentials (optional)
+        :type pic_file: str
+
         """
         with open(expanduser(pic_file), 'w') as pc_file:
             pc_file.write("user="+str(self.user)+"\n")
@@ -166,7 +168,8 @@ database=picas_database
         chmod(expanduser(pic_file), 384)
 
     def return_credentials(self):
-        """ Returns a dictionary of PiCaS credentials.
+        """return_credentials
+           Returns a dictionary of PiCaS credentials.
 
             d=pcred.return_credentials
             d.keys()=['user','password','database']
