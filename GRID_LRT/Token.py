@@ -44,16 +44,6 @@ from GRID_LRT.couchdb.design import ViewDefinition
 
 
 
-__author__ = "Alexandar P. Mechev"
-__copyright__ = "2016 Alexandar P. Mechev"
-__credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
-__license__ = "GPL 3.0"
-__version__ = "0.2.4"
-__maintainer__ = "Alexandar P. Mechev"
-__email__ = "LOFAR@apmechev.com"
-__status__ = "Production"
-
-
 def reset_all_tokens(token_type, picas_creds):
     """ Resets all Tokens with the pc authorization
     """
