@@ -138,19 +138,6 @@ class Sandbox(object):
         self.copy_git_scripts()
 
 
-    def git_base_scripts(self, gitrepo=None):
-        ''' Can pull the default scripts from a git repository
-
-    '''
-        sbx_dir = self.sbx_def['name']
-        scripts_path = self.base_dir+'/scripts/'+sbx_dir
-        if os.path.exists(scripts_path):
-            clone = subprocess.Popen(
-                ['git', 'clone', gitrepo, 'git_base_scripts'])
-            clone.wait()
-            subprocess.call('mv '+'git_base_scripts' +
-                            "/* "+self.tmpdir, shell=True)
-
     def upload_sbx(self, loc=None, upload_name=None):
         self.upload_gsi_sbx(loc, upload_name)
         self.upload_gsi_sbx(upload_name=upload_name,
