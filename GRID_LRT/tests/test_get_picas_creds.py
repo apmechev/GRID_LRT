@@ -39,6 +39,12 @@ class picas_cred_test(unittest.TestCase):
         self.assertTrue(pc.database=='testdatabase')
         os.remove(f.name)
 
+    def test_get_creds_from_init(self):
+         pc = get_pc.picas_cred(usr='tusr', pwd='tpwd', dbn='tdb')
+         self.assertTrue(pc.user=='tusr')
+         self.assertTrue(pc.password=='tpwd')
+         self.assertTrue(pc.database=='tdb')
+
 
 if __name__ == '__main__':
     unittest.main() 
