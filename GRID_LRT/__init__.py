@@ -17,7 +17,7 @@ __date__ = "2018-07-27"
 def get_git_hash():
     proc = Popen(["git", "describe"], stdout=PIPE)
     label = proc.communicate()[0].strip()
-    g_hash = label.split(__version__)[1][1:]
+    g_hash = label.split(__version__.encode('utf-8'))[1][1:]
     githashfile = __file__.split('__init__')[0]+"__githash__"
     if os.path.exists(githashfile):
        with open(githashfile) as _file:
