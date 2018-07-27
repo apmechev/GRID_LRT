@@ -1,5 +1,5 @@
 """GRID_LRT: Grid LOFAR Tools"""
-import subprocess
+from subprocess import PIPE,Popen
 import os
 __all__ = ["Application", "Staging", 'sandbox', 'Token', 'couchdb', "couchdb.tests"]
 __version__ = "0.4.0"
@@ -15,12 +15,16 @@ __date__ = "``2018-07-27"
 
 
 def get_git_hash():
-    label = subprocess.check_output(["git", "describe"]).strip()
+    proc = Popen(["git", "describe"], stdout=PIPE)
+    label = proc.communicate()[0].strip()
     g_hash=label.split(__version__+'-')[1]
     import GRID_LRT
     githashfile = GRID_LRT.__file__.split('__init__')[0]+"__githash__"
-    with open(githashfile) as _file:
-        file_hash = _file.read()
+    if os.exists(githashfile):
+       with open(githashfile) as _file:
+           file_hash = _file.read()
+    else:
+        file_hash=""
     if not g_hash in file_hash:
         with open(githashfile,'w') as _file:
             _file.write(g_hash)
