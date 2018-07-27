@@ -35,14 +35,23 @@ import pdb
 import itertools
 import time
 
+
 import tarfile
 import yaml
-
 if 'couchdb' not in sys.modules:
     from GRID_LRT import couchdb
 from GRID_LRT.couchdb.design import ViewDefinition
 
+import GRID_LRT
 
+__version__ = GRID_LRT.__version__
+__author__ = GRID_LRT.__author__
+__license__ = GRID_LRT.__license__
+__email__ = GRID_LRT.__email__
+__copyright__ = GRID_LRT.__copyright__
+__credits__ = GRID_LRT.__credits__ 
+__maintainer__ = GRID_LRT.__maintainer__
+__status__ = GRID_LRT.__status__
 
 def reset_all_tokens(token_type, picas_creds):
     """ Resets all Tokens with the pc authorization
