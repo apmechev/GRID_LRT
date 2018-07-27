@@ -20,7 +20,7 @@ def get_git_hash():
     g_hash=label.split(__version__+'-')[1]
     import GRID_LRT
     githashfile = GRID_LRT.__file__.split('__init__')[0]+"__githash__"
-    if os.exists(githashfile):
+    if os.path.exists(githashfile):
        with open(githashfile) as _file:
            file_hash = _file.read()
     else:
