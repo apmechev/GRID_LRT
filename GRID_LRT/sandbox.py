@@ -135,20 +135,8 @@ class Sandbox(object):
 
 
     def copy_base_scripts(self, basetype=None):
-        if 'git' in self.sbx_def:
-            self.copy_git_scripts()
-        else:
-            self.copy_local_scripts(basetype)
+        self.copy_git_scripts()
 
-    def copy_local_scripts(self, basetype):
-        warnings.warn(
-            "Copy Local scripts is now deprecated!",
-            DeprecationWarning)
-        sbx_type = basetype if basetype else self.sbx_def['type']
-        scripts_path = self.base_dir+'/scripts/'+sbx_type
-        if os.path.exists(scripts_path):
-            subprocess.call('cp -r '+scripts_path +
-                            "/* "+self.tmpdir, shell=True)
 
     def git_base_scripts(self, gitrepo=None):
         ''' Can pull the default scripts from a git repository
