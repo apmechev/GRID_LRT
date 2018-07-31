@@ -10,7 +10,6 @@ import tempfile
 import subprocess
 import warnings
 warnings.simplefilter('default')
-# TODO: Upload to different locations/methods
 import yaml
 import GRID_LRT
 from GRID_LRT import grid_credentials
@@ -88,13 +87,14 @@ class Sandbox(object):
 
     def delete_sbx_folder(self):
         '''Removes the sandbox folder and subfolders
-        ''' 
+        '''
         if os.path.basename(os.getcwd()) == self.sbx_def['name']:
             os.chdir(self.base_dir)
         if os.path.exists(self.tmpdir):
             shutil.rmtree(self.tmpdir)
 
     def enter_sbx_folder(self, directory=None):
+        """Changes directory to the (temporary) sandbox folder)"""
         sbx_dir = directory if directory else self.sbx_def['name']
         if os.path.exists(self.base_dir+sbx_dir):
             os.chdir(self.base_dir+sbx_dir)
@@ -125,6 +125,9 @@ class Sandbox(object):
             os.chdir(self.tmpdir+"/")
 
     def copy_git_scripts(self):
+        """ Reads the location of the sandbox base scripts repository
+        and clones in the current directory. Checks out the appropriate branch
+        """
         print("Checking out Sanbox repository")
         subprocess.call(
             'git clone   ' + self.sbx_def['git']['location'] + " " + self.tmpdir, shell=True)
@@ -135,11 +138,15 @@ class Sandbox(object):
 
 
     def copy_base_scripts(self, basetype=None):
+        """Backwards compatible"""
+        if 'git' not in self.sbx_def.keys():
+            raise RuntimeError("No github repository for the sandbox inside the cfg file!")
         self.copy_git_scripts()
 
 
     def upload_sbx(self, loc=None, upload_name=None):
-        self.upload_gsi_sbx(loc, upload_name)
+        """Uploads sandbox to all possible locations """
+#        self.upload_gsi_sbx(loc, upload_name)
         self.upload_gsi_sbx(upload_name=upload_name,
                             loc=('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/'
                                  'data/lofar/user/sksp/distrib/sandbox'))
@@ -158,7 +165,7 @@ class Sandbox(object):
                                        self.sbx_def['loc']+"/"+upload_name])
             upload.wait()
 
-    # TODO: Use UL/DL interfaces
+
     def upload_gsi_sbx(self, loc=None, upload_name=None):
         """ Uploads the sandbox to the relative folders
         """
@@ -211,7 +218,7 @@ class Sandbox(object):
 
     def cleanup(self):
         self.delete_sbx_folder()
-        os.chdir(self.return_dir) 
+        os.chdir(self.return_dir)
 
     def make_tokvar_dict(self):
         tokvardict = self.shell_vars
