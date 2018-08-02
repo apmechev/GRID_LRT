@@ -22,7 +22,6 @@ before_install:
     - pip install pyyaml
     - pip install codecov
     - curl -X PUT localhost:5984/test_db
-    - curl -X PUT localhost:5984/_config/admins/admin1 -d '"pass"'
 
 script:
     - nosetests --with-coverage
