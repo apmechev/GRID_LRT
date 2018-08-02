@@ -19,8 +19,8 @@ class TokenTest(unittest.TestCase):
 
     def test_create_Token(self):
         pc = picas_cred()
-        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/", uname='root', pwd="", dbn='test_db')
-        self.assertTrue(th.get_db(uname='root', pwd="",  dbn='test_db', 
+        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/", uname='admin1', pwd="pass", dbn='test_db')
+        self.assertTrue(th.get_db(uname='admin1', pwd="pass",  dbn='test_db', 
             srv="http://localhost:5984/").name == 'test_db')
         th.create_token(keys={'test_suite':'Token'}, append="Tokentest", attach=[])
         th.add_status_views()
