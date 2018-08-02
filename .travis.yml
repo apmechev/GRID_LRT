@@ -21,6 +21,7 @@ before_install:
     - pip install mock
     - pip install pyyaml
     - pip install codecov
+    - curl -X PUT localhost:5984/test_db
 script:
     - nosetests --with-coverage
 

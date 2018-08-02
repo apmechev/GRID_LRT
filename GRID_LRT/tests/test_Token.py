@@ -19,9 +19,9 @@ class TokenTest(unittest.TestCase):
 
     def test_create_Token(self):
         pc = picas_cred()
-        th = Token.Token_Handler(t_type=T_TYPE, uname=pc.user, pwd=pc.password, dbn='sksp_unittest')
-        self.assertTrue(th.get_db(uname=pc.user, pwd=pc.password,  dbn='sksp_unittest', 
-                        srv="https://picas-lofar.grid.surfsara.nl:6984").name == 'sksp_unittest')
+        th = Token.Token_Handler(t_type=T_TYPE, uname=pc.user, pwd=pc.password, dbn='test_db')
+        self.assertTrue(th.get_db(uname=pc.user, pwd=pc.password,  dbn='test_db', 
+            srv="localhost:5984/").name == 'test_db')
         th.create_token(keys={'test_suite':'Token'}, append="Tokentest", attach=[])
         th.add_status_views()
         th.add_overview_view()
