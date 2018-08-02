@@ -126,7 +126,8 @@ class Token_Handler(object):
         :rtype: :class:`~couchdb.client.Database`
         """
         server = couchdb.Server(srv)
-        server.resource.credentials = (uname, pwd)
+        if uname and pwd:
+            server.resource.credentials = (uname, pwd)
         database = server[dbn]
         return database
 
