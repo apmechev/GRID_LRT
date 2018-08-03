@@ -53,10 +53,10 @@ __credits__ = GRID_LRT.__credits__
 __maintainer__ = GRID_LRT.__maintainer__
 __status__ = GRID_LRT.__status__
 
-def reset_all_tokens(token_type, picas_creds):
+def reset_all_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfsara.nl:6984"):
     """ Resets all Tokens with the pc authorization
     """
-    thandler = Token_Handler(t_type=token_type,
+    thandler = Token_Handler(t_type=token_type, srv=server,
                              uname=picas_creds.user, pwd=picas_creds.password,
                              dbn=picas_creds.database)
     thandler.load_views()

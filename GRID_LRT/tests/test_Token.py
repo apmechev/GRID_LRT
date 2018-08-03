@@ -66,3 +66,17 @@ class TokenTest(unittest.TestCase):
         pc.user,pc.password="",""
         pc.database = 'test_db'
         Token.purge_tokens(T_TYPE,pc, "http://localhost:5984/")
+
+    def test_reset_tokens(self):
+        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+                                uname="", pwd="", dbn='test_db')
+        th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':1}, append="Tokentest", attach=[])
+        th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':1}, append="Tokentest2", attach=[])
+        th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':1}, append="Tokentest3", attach=[])
+        th.add_status_views()
+        th.set_view_to_status(view_name='todo',status='locked')
+        pc=picas_cred()
+        Token.reset_all_tokens(T_TYPE,pc, "http://localhost:5984/")
+        self.assertTrue(len(th.list_tokens_from_view('locked'))==0)
+        self.assertTrue(len(th.list_tokens_from_view('todo'))==3)
