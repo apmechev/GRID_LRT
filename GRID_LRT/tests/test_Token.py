@@ -42,7 +42,7 @@ class TokenTest(unittest.TestCase):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
         th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
                                  uname="", pwd="", dbn='test_db')
-        th.create_token(keys={'test_suite':'test_delete_tokens','done'=0,'lock':1}, append="Tokentest", attach=[])
+        th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':1}, append="Tokentest", attach=[])
         th.add_status_views()
         self.assertTrue(len(th.list_tokens_from_view('locked'))==1)
         self.assertTrue(len(th.list_tokens_from_view('todo'))==0)
