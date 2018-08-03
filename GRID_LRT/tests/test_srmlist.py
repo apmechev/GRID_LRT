@@ -108,6 +108,15 @@ class SrmlistTest(unittest.TestCase):
         s_dict=slice_dicts(sl.sbn_dict(),slice_size=10)
         self.assertTrue(len(s_dict.keys())==6)
 
+    def test_split_dict_10_with_prefix(self):
+        sl=srmlist()
+        self.assertTrue(os.path.exists(os.path.dirname(__file__)+'/dysco_test.txt'))
+        with open(os.path.dirname(__file__)+'/dysco_test.txt','r') as sfile:
+            for line in sfile:
+                sl.append(line)
+        self.assertTrue(len(sl)==25)
+        s_dict=slice_dicts(sl.sbn_dict(pref='ABN_',suff='\.'),slice_size=25)
+        self.assertTrue(len(s_dict.keys())==10)
 
 if __name__ == '__main__':
     unittest.main() 
