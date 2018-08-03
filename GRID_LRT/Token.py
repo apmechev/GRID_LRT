@@ -65,9 +65,9 @@ def reset_all_tokens(token_type, picas_creds):
             thandler.reset_tokens(view)
 
 
-def purge_tokens(token_type, picas_creds):
+def purge_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfsara.nl:6984"):
     """Automated function to purge tokens authorizing with Picas_creds"""
-    thandler = Token_Handler(t_type=token_type,
+    thandler = Token_Handler(t_type=token_type, srv=server,
                              uname=picas_creds.user, pwd=picas_creds.password,
                              dbn=picas_creds.database)
     thandler.load_views()
