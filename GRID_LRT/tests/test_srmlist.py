@@ -122,8 +122,8 @@ class SrmlistTest(unittest.TestCase):
         sl=srmlist()
         sfile = "srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583127/L583127_SB100_uv.MS_c0a9adfa.tar"
         sl.append(sfile)
-        sl.append("srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583127/L583127_SB100_uv.MS_c0a9adfa.tar ")
-        sl.append("srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583127/L583127_SB100_uv.MS_c0a9adfa.tar file://L583127_SB100_uv.MS_c0a9adfa.tar")
+        sl.append("srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583127/L583127_SB101_uv.MS_c0a9adfa.tar ")
+        sl.append("srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583127/L583127_SB102_uv.MS_c0a9adfa.tar file://L583127_SB100_uv.MS_c0a9adfa.tar")
         self.assertTrue(sl[0]==sl[1])
         self.assertTrue(sl[0]==sl[2])
 
