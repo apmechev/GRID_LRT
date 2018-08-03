@@ -51,7 +51,7 @@ class TokenTest(unittest.TestCase):
         th.reset_tokens('locked')
         self.assertTrue(len(th.list_tokens_from_view('todo'))==1)
         self.assertTrue(len(th.list_tokens_from_view('locked'))==0)
-        th.delete_tokens('to_reset_view')
+        th.delete_tokens('todo')
         self.assertTrue(len(th.list_tokens_from_view('todo'))==0)
         th.del_view('to_reset_view')
         th.purge_tokens()
