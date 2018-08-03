@@ -32,7 +32,7 @@ class TokenTest(unittest.TestCase):
         self.assertTrue('locked' in views.keys())
         self.assertTrue('error' in views.keys())
         self.assertTrue('done' in views.keys())
-        self.assertTrue('overview_view' in views.keys())
+        self.assertTrue('overview_total' in views.keys())
         th.purge_tokens()
 
 
