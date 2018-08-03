@@ -504,6 +504,7 @@ function (key, values, rereduce) {
     def set_view_to_status(self, view_name, status):
         """Sets the status to all tokens in 'view' to 'status
             eg. Set all locked tokens to error or all error tokens to todo
+            it also locks the tokens!
         """
         v = self.list_tokens_from_view(view_name)
         to_update = []

@@ -44,6 +44,7 @@ class TokenTest(unittest.TestCase):
                                  uname="", pwd="", dbn='test_db')
         th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':1}, append="Tokentest", attach=[])
         th.add_status_views()
+        th.set_view_to_status(view_name='todo',status='locked')
         self.assertTrue(len(th.list_tokens_from_view('locked'))==1)
         self.assertTrue(len(th.list_tokens_from_view('todo'))==0)
         th.add_view('to_reset_view',cond=' doc.test_suite == "test_delete_token" ' )
