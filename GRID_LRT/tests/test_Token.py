@@ -77,6 +77,8 @@ class TokenTest(unittest.TestCase):
         th.add_status_views()
         th.set_view_to_status(view_name='todo',status='locked')
         pc=picas_cred()
+        pc.user,pc.password="",""
+        pc.database = 'test_db'
         Token.reset_all_tokens(T_TYPE,pc, "http://localhost:5984/")
         self.assertTrue(len(th.list_tokens_from_view('locked'))==0)
         self.assertTrue(len(th.list_tokens_from_view('todo'))==3)
