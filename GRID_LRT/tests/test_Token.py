@@ -60,6 +60,7 @@ class TokenTest(unittest.TestCase):
         th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
                                  uname="", pwd="", dbn='test_db')
         th.create_token(keys={'test_suite':'Token','lock':1}, append="Tokentest", attach=[])
+        th.add_status_views() #Note without this, purge crashes!
         pc=picas_cred()
         pc.user,pc.password="",""
         pc.database = 'test_db'
