@@ -117,6 +117,15 @@ class SrmlistTest(unittest.TestCase):
         self.assertTrue(len(sl)==25)
         s_dict=slice_dicts(sl.sbn_dict(pref='ABN_',suff='\.'),slice_size=25)
         self.assertTrue(len(s_dict.keys())==10)
+    
+    def test_trimming_spaces(self):
+        sl=srmlist()
+        sfile = "srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583127/L583127_SB100_uv.MS_c0a9adfa.tar"
+        sl.append(sfile)
+        sl.append("srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583127/L583127_SB100_uv.MS_c0a9adfa.tar ")
+        sl.append("srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583127/L583127_SB100_uv.MS_c0a9adfa.tar file://L583127_SB100_uv.MS_c0a9adfa.tar")
+        self.assertTrue(sl[0]==sl[1])
+        self.assertTrue(sl[0]==sl[2])
 
 if __name__ == '__main__':
     unittest.main() 
