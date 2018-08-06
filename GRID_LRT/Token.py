@@ -161,7 +161,7 @@ class Token_Handler(object):
             keys = dict(itertools.chain(keys.items(), default_keys.items()))
             self.append_id(keys, append)
         else:
-            self.append_id(default_keys append)
+            self.append_id(default_keys, append)
         self.tokens[keys["_id"]] = keys
         self.database.update([keys])
         if attach:
