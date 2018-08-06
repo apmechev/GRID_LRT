@@ -31,7 +31,6 @@ from __future__ import print_function
 import sys
 import os
 import shutil
-import pdb
 import itertools
 import time
 
@@ -49,7 +48,7 @@ __author__ = GRID_LRT.__author__
 __license__ = GRID_LRT.__license__
 __email__ = GRID_LRT.__email__
 __copyright__ = GRID_LRT.__copyright__
-__credits__ = GRID_LRT.__credits__ 
+__credits__ = GRID_LRT.__credits__
 __maintainer__ = GRID_LRT.__maintainer__
 __status__ = GRID_LRT.__status__
 
@@ -60,7 +59,7 @@ def reset_all_tokens(token_type, picas_creds, server="https://picas-lofar.grid.s
                              uname=picas_creds.user, pwd=picas_creds.password,
                              dbn=picas_creds.database)
     thandler.load_views()
-    for view in thandler.views.keys():
+    for view in list(thandler.views):
         if view != 'overview_total':
             thandler.reset_tokens(view)
 
@@ -131,7 +130,7 @@ class Token_Handler(object):
         database = server[dbn]
         return database
 
-    def create_token(self, keys={}, append="", attach=[]):
+    def create_token(self, keys=None, append="", attach=[]):
         '''Creates a token, appends string to token ID if requested and
         adds user requested keys through the dict keys{}
 
@@ -158,8 +157,11 @@ class Token_Handler(object):
             'output': "",
             'created': time.time()
         }
-        keys = dict(itertools.chain(keys.items(), default_keys.items()))
-        self.append_id(keys, append)
+        if keys:
+            keys = dict(itertools.chain(keys.items(), default_keys.items()))
+            self.append_id(keys, append)
+        else:
+            self.append_id(default_keys append)
         self.tokens[keys["_id"]] = keys
         self.database.update([keys])
         if attach:
@@ -486,7 +488,7 @@ function (key, values, rereduce) {
         and deletes all tokens from those views. Finally, removes
         the views from the database"""
         self.load_views()
-        for view in self.views.keys():
+        for view in list(self.views):
             if view != 'overview_total':
                 self.delete_tokens(view)
             self.del_view(view)
