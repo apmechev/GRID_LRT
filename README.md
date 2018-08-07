@@ -37,29 +37,7 @@ Installing:
 Installing with pip
 ---------
 
-The GRID LOFAR Reduction Tools are now available through pip:
-
-```bash
-pip install GRID_LRT
-
-```
-
-Manual build
-------
-Alternatively you should use the setup.py script to install the tools:
-
-```
-python setup.py build
-python setup.py install
-```
-
-If you do not have permissions to write to the default Python package directory, you can use
-
-```
-python setup.py install --perfix={PATH_WHERE_TO_INSTALL_PACKAGE}
-```
-
-You have to make sure that this path 1. Exists, 2. Is in your PYTHONPATH and 3. Will be in your PYTHONPATH every time you enter your shell (add it to your ~/.bashrc)
+The [up to date installation instructions are here.](https://grid-lrt.readthedocs.io/en/latest/installing.html)
 
 Attribution
 =============
