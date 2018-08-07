@@ -130,7 +130,7 @@ class Token_Handler(object):
         database = server[dbn]
         return database
 
-    def create_token(self, keys=None, append="", attach=[]):
+    def create_token(self, keys=None, append="", attach=None):
         '''Creates a token, appends string to token ID if requested and
         adds user requested keys through the dict keys{}
 
@@ -177,12 +177,12 @@ class Token_Handler(object):
         Updates the internal self.views variable
         """
         db_views = self.database.get("_design/"+self.t_type)
-        if db_views == None:
+        if db_views is None:
             print("No views found in design document")
             return
         self.views = db_views["views"]
 
-    def delete_tokens(self, view_name="test_view", key=["", ""]):
+    def delete_tokens(self, view_name="test_view", key=None):
         """Deletes tokens from view view_name
 
             exits if the view doesn't exist
@@ -199,20 +199,18 @@ class Token_Handler(object):
         (by default empty == delete all token)
         :type key: list
         """
-        v = self.list_tokens_from_view(view_name)
+        view = self.list_tokens_from_view(view_name)
         to_delete = []
-        for x in v:
-            document = self.database[x['key']]
-            if key[0] == "":
+        for tok in view:
+            document = self.database[tok['key']]
+            if not key:
                 pass
             else:
-                if not document[key[0]] == key[1]:
+                if document[key[0]] != key[1]:
                     continue
-            print("Deleting Token "+x['id'])
+            print("Deleting Token "+tok['id'])
             to_delete.append(document)
         self.database.purge(to_delete)
-        #    self.tokens.pop(x['id'])
-        # TODO:Pop tokens from self
 
     def add_view(self, view_name="test_view",
                  cond='doc.lock > 0 && doc.done > 0 && doc.output < 0 ',
@@ -234,7 +232,7 @@ class Token_Handler(object):
         and its status for example
         :type emit_value2: str
         """
-        generalViewCode = '''
+        general_view_code = '''
         function(doc) {
            if(doc.type == "%s") {
             if(%s) {
@@ -243,7 +241,7 @@ class Token_Handler(object):
           }
         }
         '''
-        view = ViewDefinition(self.t_type, view_name, generalViewCode % (
+        view = ViewDefinition(self.t_type, view_name, general_view_code % (
             self.t_type, cond, emit_value, emit_value2))
         self.views[view_name] = view
         view.sync(self.database)
@@ -257,7 +255,7 @@ class Token_Handler(object):
         This way you can check the status of a subset of the tokens.
 
         """
-        overviewMapCode = '''
+        overview_map_code = '''
 function(doc) {
    if(doc.type == "%s" )
       if(%s){
@@ -284,15 +282,15 @@ function(doc) {
    }
 }
 '''
-        overviewReduceCode = '''
+        overview_reduce_code = '''
 function (key, values, rereduce) {
    return sum(values);
 }
 '''
         overview_total_view = ViewDefinition(self.t_type, view_name,
-                                             overviewMapCode % (
+                                             overview_map_code % (
                                                  self.t_type, cond),
-                                             overviewReduceCode)
+                                             overview_reduce_code)
         self.views['overview_total'] = overview_total_view
         overview_total_view.sync(self.database)
 
@@ -300,7 +298,7 @@ function (key, values, rereduce) {
         """ Helper function that creates the Map-reduce view which makes it easy to count
             the number of jobs in the 'locked','todo','downloading','error' and 'running' states
         """
-        overviewMapCode = '''
+        overview_map_code = '''
 function(doc) {
    if(doc.type == "%s") {
        if (doc.lock == 0 && doc.done == 0){
@@ -324,14 +322,14 @@ function(doc) {
    }
 }
 '''
-        overviewReduceCode = '''
+        overview_reduce_code = '''
 function (key, values, rereduce) {
    return sum(values);
 }
 '''
         overview_total_view = ViewDefinition(self.t_type, 'overview_total',
-                                             overviewMapCode % (self.t_type),
-                                             overviewReduceCode)
+                                             overview_map_code % (self.t_type),
+                                             overview_reduce_code)
         self.views['overview_total'] = overview_total_view
         overview_total_view.sync(self.database)
 
@@ -359,14 +357,14 @@ function (key, values, rereduce) {
         self.views.pop(view_name, None)
         self.database.update([db_views])
 
-    def remove_Error(self):
+    def remove_error(self):
         ''' Removes all tokens in the error view
         '''
         cond = "doc.lock > 0 && doc.done > 0 && doc.output > 0"
         self.add_view(view_name="error", cond=cond)
         self.delete_tokens("error")
 
-    def reset_tokens(self, view_name="test_view", key=["", ""], del_attach=False):
+    def reset_tokens(self, view_name="test_view", key=None, del_attach=False):
         """ resets all tokens in a view, optionally can reset all tokens in a view
             who have key-value pairs matched by key[0],key[1]
 
@@ -374,12 +372,12 @@ function (key, values, rereduce) {
             >>> t1.reset_token("error",key=["OBSID","L123456"])
             >>> t1.reset_token("error",key=["scrub_count",6])
         """
-        v = self.list_tokens_from_view(view_name)
+        view = self.list_tokens_from_view(view_name)
         to_update = []
-        for x in v:
-            document = self.database[x['key']]
+        for tok in view:
+            document = self.database[tok['key']]
 
-            if key[0] != "" and document[key[0]] != key[1]:  # make it not just equal
+            if key and document[key[0]] != key[1]:  # make it not just equal
                 continue
             try:
                 document['status'] = 'todo'
@@ -429,20 +427,22 @@ function (key, values, rereduce) {
             savefile = filename.replace("/", "_")
         if savename != None:
             savefile = savename
-        with open(savefile, 'w') as f:
+        with open(savefile, 'w') as _file:
             for line in attach:
-                f.write(line)
+                _file.write(line)
         return os.path.abspath(savefile)
 
     def list_tokens_from_view(self, view_name):
+        """Returns all tokens from a viewname
+        """
         self.load_views()
         if view_name in self.views:
             view = self.views[view_name]
         else:
             print("View Named "+view_name+" Doesn't exist")
             return
-        v = self.database.view(self.t_type+"/"+view_name)
-        return v
+        view = self.database.view(self.t_type+"/"+view_name)
+        return view
 
     def archive_tokens_from_view(self, viewname, delete_on_save=False):
         to_del = []
