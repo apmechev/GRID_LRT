@@ -6,7 +6,7 @@
 [![codecov Coverage](https://codecov.io/gh/apmechev/GRID_LRT/branch/master/graph/badge.svg?precision=1)](https://codecov.io/gh/apmechev/GRID_LRT)
 [![alt text](http://apmechev.com/img/git_repos/pylint/GRID_LRT.svg "pylint score")](https://github.com/apmechev/pylint-badge)
 [![BCH compliance](https://bettercodehub.com/edge/badge/apmechev/GRID_LRT?branch=master)](https://bettercodehub.com/)
-[![DOI](https://zenodo.org/badge/53421495.svg)](https://zenodo.org/badge/latestdoi/53421495)
+
 
 Due to the large computational requirements for LOFAR datasets,
 processing bulk data on the grid is required. This manual will detail
@@ -61,6 +61,20 @@ python setup.py install --perfix={PATH_WHERE_TO_INSTALL_PACKAGE}
 
 You have to make sure that this path 1. Exists, 2. Is in your PYTHONPATH and 3. Will be in your PYTHONPATH every time you enter your shell (add it to your ~/.bashrc)
 
+Attribution
+=============
+[![DOI](https://zenodo.org/badge/53421495.svg)](https://zenodo.org/badge/latestdoi/53421495)
+
+Please cite this software as such below:
+@misc{apmechev:2018,
+      author       = {Alexandar P. Mechev} 
+      title        = {apmechev/GRID_LRT: v0.4.0},
+      month        = aug,
+      year         = 2018,
+      doi          = {10.5281/zenodo.1341127},
+      url          = {https://doi.org/10.5281/zenodo.1341127}
+    }
+
 
 
 Tutorial Notebook
@@ -104,64 +118,4 @@ In order to stage the data using the ASTRON LTA api, you need credentials to the
 user=uname
 password=pswd
 ```
-
-Staging requires a list of srms to be staged (typically srm.txt)
-
-It can be done with this set of commands:
-
-```python 
-from GRID_LRT.Staging import stage_all_LTA
-from GRID_LRT.Staging import stager_access 
-stageID=stage_all_LTA.main('srm.txt') #Here is the path to your srm_file.
-print(stageID) # the stageID is your identifier to the staging system. You can poll it with:
-print(stage_all_LTA.get_stage_status(stageID)) # prints out a 'status' string
-
-statuses=stager_access.get_progress()
-print(statuses[stageID]) # More detailed information on your staging request
-```
-
-Because of design choices at the Astron service, when your staging is complete, the last 2 commands above will fail! The get\_stage\_status function appears to return 'success' though.
-
-Creating a Sandbox
---------------------
-
-In order to make processing portable, all scripts are archived in a 'sandbox', which is extracted to an empty temporary folder on the worker node. This architecture choice also makes it easy to test a clean environment on the login node or even your laptop. 
-
-
-
-PiCaS Tokens
---------------------
-
-Job 'Tokens' are a way to define your jobs.  
-
-
-[Mooc](http://docs.surfsaralabs.nl/projects/grid/en/latest/Pages/Tutorials/MOOC/mooc.html#mooc-picas-client)
-
-[Utility](https://ganglia.surfsara.nl/?r=hour&cs=&ce=&c=GINA+Servers&h=&tab=ch&vn=&hide-hf=false&m=load_one&sh=1&z=small&hc=4&host_regex=&max_graphs=0&s=by+name)
-
-Node-side processing
-====================
-
-Now that the data is staged, jobs are defined, scripts are bundled and jobs submitted, here's what happens on the worker node:
-
-Launching and Locking Tokens
---------------------------------
-
-
-Intermediate Storage
-=====================================
-
-
-Other
-=========================
-
----                                                                                                      
-author:
-- 'Alexandar P. Mechev, Raymond Oonk'
-title: |
-    GRID\_LRT: LOFAR Reduction Tools for The Dutch Grid\
-
-    A set of tools to reduce LOFAR Data: infrastructue and usage 
-... 
-
 
