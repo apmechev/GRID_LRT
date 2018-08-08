@@ -97,7 +97,7 @@ class TokenTest(unittest.TestCase):
         th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="Tokentest", attach=[])
         th.add_status_views()
         tok = list(th.list_tokens_from_view('todo'))[0]['id']
-        th.add_attachment(tok,open(os.path.dirname(__file__)+'/srm_50_sara.txt','r','test'))
+        th.add_attachment(tok,open(os.path.dirname(__file__)+'/srm_50_sara.txt','r'),'test')
         attaches = th.list_attachments(tok)
         self.assertTrue(len(attaches)==1)
         self.assertTrue(attaches[0]=='test')
