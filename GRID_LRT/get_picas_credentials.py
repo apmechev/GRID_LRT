@@ -43,9 +43,9 @@ def warnlog(string):
     if not logging:
         print("WARNING: "+string)
     else:
-        logging.warn(string)
+        logging.warning(string)
 
-
+#Will be renamed to PicasCred()
 class picas_cred(object):
     """Getting PiCaS credentials from environment or .picasrc file
 
@@ -129,8 +129,7 @@ database=picas_database
         if (not environ.get('PICAS_USR') and not environ.get('PICAS_USR_PWD') and
                 not environ.get('PICAS_DB')):
             return self.get_picas_creds_from_env()
-        else:
-            return self.get_picas_creds_from_file()
+        return self.get_picas_creds_from_file()
 
     def put_picas_creds_in_env(self, picas_db=None):
         """ Inserts PiCaS credentials in environment
@@ -151,7 +150,7 @@ database=picas_database
             environ['PICAS_DB'] = self.database
         else:
             environ['PICAS_DB'] = self.database
-        return  # self.get_picas_creds()
+
 
     def put_creds_in_file(self, pic_file="~/.picasrc"):
         """put_creds_in_file
