@@ -177,7 +177,7 @@ class Token_Handler(object):
         """
         db_views = self.database.get("_design/"+self.t_type)
         if db_views is None:
-            print("No views found in design document")
+            RuntimeWarning("No views found in design document")
             return
         self.views = db_views["views"]
 

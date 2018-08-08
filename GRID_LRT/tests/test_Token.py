@@ -20,7 +20,7 @@ class TokenTest(unittest.TestCase):
         pass
 
     def test_create_Token(self):
-        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
         th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
                                  uname='', pwd="", dbn='test_db')
         self.assertTrue(th.get_db(uname='', pwd="",  dbn='test_db', 
@@ -39,7 +39,7 @@ class TokenTest(unittest.TestCase):
 
 
     def test_delete_token(self):
-        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
         th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
                                  uname="", pwd="", dbn='test_db')
         th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':1}, append="Tokentest", attach=[])
@@ -57,7 +57,7 @@ class TokenTest(unittest.TestCase):
         th.purge_tokens()
 
     def test_purge_tokens(self):
-        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
         th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
                                  uname="", pwd="", dbn='test_db')
         th.create_token(keys={'test_suite':'Token','lock':1}, append="Tokentest", attach=[])
@@ -68,7 +68,7 @@ class TokenTest(unittest.TestCase):
         Token.purge_tokens(T_TYPE,pc, "http://localhost:5984/")
 
     def test_reset_tokens(self):
-        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
         th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
                                 uname="", pwd="", dbn='test_db')
         th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':1}, append="Tokentest", attach=[])
@@ -82,3 +82,11 @@ class TokenTest(unittest.TestCase):
         Token.reset_all_tokens(T_TYPE,pc, "http://localhost:5984/")
         self.assertTrue(len(th.list_tokens_from_view('locked'))==0)
         self.assertTrue(len(th.list_tokens_from_view('todo'))==3)
+
+    def test_no_views(self):
+        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+                                 uname="", pwd="", dbn='test_db')
+        th.load_views()
+        self.assertTrue(th.views == {})
+
