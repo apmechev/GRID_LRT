@@ -32,4 +32,3 @@ def grid_credentials_enabled():
         raise Exception("Grid Credentials expired! "
                         "Run 'startGridSession lofar:/lofar/user/sksp' in the shell")
     return True
-

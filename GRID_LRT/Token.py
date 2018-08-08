@@ -502,17 +502,17 @@ function (key, values, rereduce) {
         the database"""
         self.clear_all_views()
         del self.database['_design/'+self.t_type]
-        return None
+
 
     def set_view_to_status(self, view_name, status):
         """Sets the status to all tokens in 'view' to 'status
             eg. Set all locked tokens to error or all error tokens to todo
             it also locks the tokens!
         """
-        v = self.list_tokens_from_view(view_name)
+        view = self.list_tokens_from_view(view_name)
         to_update = []
-        for x in v:
-            document = self.database[x['key']]
+        for token in view:
+            document = self.database[token['key']]
             document['status'] = str(status)
             document['lock'] = 1
             to_update.append(document)
@@ -540,7 +540,7 @@ class TokenSet(object):
             :raises: AttributeError, KeyError
 
         """
-        self.th = th
+        self.thandler = th
         self.__tokens = []
         if not tok_config:
             self.token_keys = {}
@@ -576,14 +576,14 @@ class TokenSet(object):
             pipeline = ""
             if 'PIPELINE_STEP' in keys:
                 pipeline = "_"+keys['PIPELINE_STEP']
-            token = self.th.create_token(
+            token = self.thandler.create_token(
                 keys, append=id_append+pipeline+"_"+id_prefix+str("%03d" % int(key)))
             if file_upload:
                 with open('temp_abn', 'w') as tmp_abn_file:
                     for i in iterable[key]:
                         tmp_abn_file.write("%s\n" % i)
                 with open('temp_abn', 'r') as tmp_abn_file:
-                    self.th.add_attachment(token, tmp_abn_file, file_upload)
+                    self.thandler.add_attachment(token, tmp_abn_file, file_upload)
                 os.remove('temp_abn')
             self.__tokens.append(token)
 
@@ -596,7 +596,7 @@ class TokenSet(object):
         if not tok_list:
             tok_list = self.__tokens
         for token in tok_list:
-            self.th.add_attachment(token, open(
+            self.thandler.add_attachment(token, open(
                 attachment, 'r'), os.path.basename(name))
 
     @property
@@ -606,18 +606,18 @@ class TokenSet(object):
 
     def update_local_tokens(self):
         self.__tokens = []
-        self.th.load_views()
-        for v in self.th.views.keys():
-            if v != 'overview_total':
-                for t in self.th.list_tokens_from_view(v):
-                    self.__tokens.append(t['id'])
+        self.thandler.load_views()
+        for view in self.thandler.views.keys():
+            if view != 'overview_total':
+                for token in self.thandler.list_tokens_from_view(view):
+                    self.__tokens.append(token['id'])
 
     def add_keys_to_list(self, key, val, tok_list=None):
         if not tok_list:
             tok_list = self.__tokens
         to_update = []
         for token in tok_list:
-            document = self.th.database[token]
+            document = self.thandler.database[token]
             document[key] = str(val)
             to_update.append(document)
-        self.th.database.update(to_update)
+        self.thandler.database.update(to_update)

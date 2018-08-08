@@ -25,7 +25,7 @@ def get_git_hash():
             file_hash = _file.read().encode('utf-8')
     else:
         file_hash = ""
-    if not str(g_hash) in file_hash:
+    if str(g_hash) not in file_hash:
         with open(githashfile, 'w') as _file:
             _file.write(str(g_hash))
     return g_hash
