@@ -29,21 +29,18 @@
 """
 
 from __future__ import print_function
-import GRID_LRT
-from GRID_LRT.couchdb.design import ViewDefinition
-if 'couchdb' not in sys.modules:
-    from GRID_LRT import couchdb
-
 import sys
 import os
 import shutil
 import itertools
 import time
-
-
 import tarfile
 import yaml
 
+import GRID_LRT
+from GRID_LRT.couchdb.design import ViewDefinition
+if 'couchdb' not in sys.modules:
+    from GRID_LRT import couchdb
 
 __version__ = GRID_LRT.__version__
 __author__ = GRID_LRT.__author__
