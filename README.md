@@ -39,7 +39,7 @@ The [up to date installation instructions are here.](https://grid-lrt.readthedoc
 Attribution
 =============
 [![DOI](https://zenodo.org/badge/53421495.svg)](https://zenodo.org/badge/latestdoi/53421495)
-[![ArXiV](http://img.shields.io/badge/arXiv-1712.00312-orange.svg?style=flat)(https://arxiv.org/abs/1712.00312)
+[![ArXiV](http://img.shields.io/badge/arXiv-1712.00312-orange.svg?style=flat)](https://arxiv.org/abs/1712.00312)
 
 If you actively use GRID\_LRT, please cite this software as such below:
 ```
