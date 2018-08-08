@@ -34,9 +34,6 @@ Requirements:
 Installing:
 ============
 
-Installing with pip
----------
-
 The [up to date installation instructions are here.](https://grid-lrt.readthedocs.io/en/latest/installing.html)
 
 Attribution
@@ -44,6 +41,7 @@ Attribution
 [![DOI](https://zenodo.org/badge/53421495.svg)](https://zenodo.org/badge/latestdoi/53421495)
 
 Please cite this software as such below:
+```
 @misc{apmechev:2018,
       author       = {Alexandar P. Mechev} 
       title        = {apmechev/GRID_LRT: v0.4.0},
@@ -52,7 +50,7 @@ Please cite this software as such below:
       doi          = {10.5281/zenodo.1341127},
       url          = {https://doi.org/10.5281/zenodo.1341127}
     }
-
+```
 
 
 Tutorial Notebook

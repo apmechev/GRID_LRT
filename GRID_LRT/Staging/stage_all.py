@@ -18,7 +18,6 @@ from __future__ import print_function
 
 import re
 import sys
-from string import strip
 import gfal2 as gfal  # pylint: disable=import-error
 
 
@@ -89,7 +88,7 @@ def process(urls, repl_string, match):
     gfal on all the srms to stage them"""
     surls = []
     for url in urls:
-        surls.append(match.sub(repl_string, strip(url)))
+        surls.append(match.sub(repl_string, url.strip()))
 
     req = {}
     # Set the timeout to 24 hours
