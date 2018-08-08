@@ -12,6 +12,7 @@
    :synopsis: Set of tools for manually and automatically creating tokens
 
 .. moduleauthor:: Alexandar Mechev <LOFAR@apmechev.com>
+.. note:: Will be renamed GRID_LRT.token to conform to python standards
 
 >>> #Example creation of a token of token_type 'test'
 >>> from GRID_LRT.get_picas_credentials import picas_cred
@@ -28,6 +29,11 @@
 """
 
 from __future__ import print_function
+import GRID_LRT
+from GRID_LRT.couchdb.design import ViewDefinition
+if 'couchdb' not in sys.modules:
+    from GRID_LRT import couchdb
+
 import sys
 import os
 import shutil
@@ -37,11 +43,7 @@ import time
 
 import tarfile
 import yaml
-if 'couchdb' not in sys.modules:
-    from GRID_LRT import couchdb
-from GRID_LRT.couchdb.design import ViewDefinition
 
-import GRID_LRT
 
 __version__ = GRID_LRT.__version__
 __author__ = GRID_LRT.__author__
@@ -425,7 +427,7 @@ function (key, values, rereduce) {
             return ""
         if "/" in filename:
             savefile = filename.replace("/", "_")
-        if savename != None:
+        if savename is not None:
             savefile = savename
         with open(savefile, 'w') as _file:
             for line in attach:
