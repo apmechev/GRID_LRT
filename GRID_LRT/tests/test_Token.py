@@ -94,9 +94,9 @@ class TokenTest(unittest.TestCase):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
         th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
                                 uname="", pwd="", dbn='test_db')
-        th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="Tokentest", attach=[])
+        tok = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="Tokentest", attach=[])
         th.add_status_views()
-        tok = list(th.list_tokens_from_view('todo'))[0]['id']
+#        tok = list(th.list_tokens_from_view('todo'))[0]['id']
         th.add_attachment(tok,open(os.path.dirname(__file__)+'/srm_50_sara.txt','r'),'test')
         attaches = th.list_attachments(tok)
         self.assertTrue(len(attaches)==1)
