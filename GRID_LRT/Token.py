@@ -438,8 +438,8 @@ function (key, values, rereduce) {
         if view_name in self.views:
             view = self.views[view_name]
         else:
-            print("View Named "+view_name+" Doesn't exist")
-            return
+            RuntimeWarning("View Named "+view_name+" Doesn't exist")
+            return None
         view = self.database.view(self.t_type+"/"+view_name)
         return view
 
@@ -473,14 +473,16 @@ function (key, values, rereduce) {
             self.purge_tokens()
         return result_link
 
-    def archive_a_token(self, token_ID, delete=False):
+    def archive_a_token(self, tokenid, delete=False):
         "Dumps the token data into a yaml file and saves the attachments"
-        data = self.database[token_ID]
-        yaml.dump(data, open(token_ID+".dump", 'w'))
-        for f in self.list_attachments(token_ID):
-            fname = f.replace('/', '-')
-            self.get_attachment(token_ID, f, token_ID +
+        data = self.database[tokenid]
+        yaml.dump(data, open(tokenid+".dump", 'w'))
+        for att_file in self.list_attachments(tokenid):
+            fname = att_file.replace('/', '-')
+            self.get_attachment(tokenid, att_file, tokenid +
                                 "_attachment_"+str(fname))
+        if delete: #test
+            self.database.purge([tokenid])
 
     def clear_all_views(self):
         """Iterates over all views in the design document
