@@ -54,7 +54,7 @@ If you actively use GRID\_LRT, please cite this software as such below:
     }
 ```
 
-If you're using GRID processed data, also consider citing the paper below:
+If you're using GRID processed data, also consider citing the paper below, outlining the procedure of running LOFAR data through a High Throughput Cluster:
 
 ```
 @INPROCEEDINGS{mechev2017,
@@ -68,6 +68,7 @@ archivePrefix = "arXiv",
  primaryClass = "astro-ph.IM",
     month = mar,
       eid = {2},
+      doi = {10.22323/1.293.0002},
     pages = {2},
    adsurl = {\url{http://adsabs.harvard.edu/abs/2017isgc.confE...2M}},
   adsnote = {Provided by the SAO/NASA Astrophysics Data System}
