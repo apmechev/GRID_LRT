@@ -39,8 +39,9 @@ The [up to date installation instructions are here.](https://grid-lrt.readthedoc
 Attribution
 =============
 [![DOI](https://zenodo.org/badge/53421495.svg)](https://zenodo.org/badge/latestdoi/53421495)
+[![ArXiV](http://img.shields.io/badge/arXiv-1712.00312-orange.svg?style=flat)](https://arxiv.org/abs/1712.00312)
 
-Please cite this software as such below:
+If you actively use GRID\_LRT, please cite this software as such below:
 ```
 @misc{apmechev:2018,
       author       = {Alexandar P. Mechev} 
@@ -51,6 +52,29 @@ Please cite this software as such below:
       url          = {https://doi.org/10.5281/zenodo.1341127}
     }
 ```
+
+If you're using GRID processed data, also consider citing the paper below:
+
+```
+@INPROCEEDINGS{mechev2017,
+   author = {{Mechev}, A. and {Oonk}, J.~B.~R. and {Danezi}, A. and {Shimwell}, T.~W. and                             
+{Schrijvers}, C. and {Intema}, H. and {Plaat}, A. and {Rottgering}, H.~J.~A.},
+    title = "{An {A}utomated {S}calable {F}ramework for {D}istributing {R}adio {A}stronomy {P}rocessing {A}cross {C}lusters and {C}louds}",
+booktitle = {Proceedings of the International Symposium on Grids and Clouds (ISGC) 2017, held 5-10 March, 2017 at Academia Sinica, Taipei, Taiwan (ISGC2017). Online at \url{https://pos.sissa.it/cgi-bin/reader/conf.cgi?confid=293}, id.2},
+     year = 2017,
+archivePrefix = "arXiv",
+   eprint = {1712.00312},
+ primaryClass = "astro-ph.IM",
+    month = mar,
+      eid = {2},
+    pages = {2},
+   adsurl = {\url{http://adsabs.harvard.edu/abs/2017isgc.confE...2M}},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+
+```
+
 
 
 Tutorial Notebook
