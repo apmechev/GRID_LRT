@@ -23,7 +23,7 @@ def get_git_hash():
         githashfile = __file__.split('__init__')[0]+"__githash__"
         if os.path.exists(githashfile):
             with open(githashfile) as _file:
-                file_hash = _file.read()_
+                file_hash = _file.read()
         else:
             file_hash = ""
         if __version__ in g_hash:

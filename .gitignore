@@ -10,7 +10,7 @@ develop-eggs
 dist
 GRID_LRT.egg-info/
 build/
-
+GRID_LRT/__githash__
 docs/Makefile
 docs/_build
 docs/make.bat
