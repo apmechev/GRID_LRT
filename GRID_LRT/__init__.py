@@ -16,18 +16,21 @@ __date__ = "2018-07-27"
 
 def get_git_hash():
     """Gets the git hash using git describe"""
-    proc = Popen(["git", "describe"], stdout=PIPE)
-    label = proc.communicate()[0].strip()
-    g_hash = label
-    githashfile = __file__.split('__init__')[0]+"__githash__"
-    if os.path.exists(githashfile):
-        with open(githashfile) as _file:
-            file_hash = _file.read().encode('utf-8')
-    else:
-        file_hash = ""
-    if str(g_hash) not in file_hash:
-        with open(githashfile, 'w') as _file:
-            _file.write(str(g_hash))
+    proc = Popen(["git", "describe"], stdout=PIPE, stderr=PIPE)
+    label = proc.communicate()[0].strip().decode("utf-8") 
+    if label[0]:
+        g_hash = label
+        githashfile = __file__.split('__init__')[0]+"__githash__"
+        if os.path.exists(githashfile):
+            with open(githashfile) as _file:
+                file_hash = _file.read()_
+        else:
+            file_hash = ""
+        if __version__ in g_hash:
+            g_hash = g_hash.split(__version__)[1]
+        if g_hash not in file_hash:
+            with open(githashfile, 'w') as _file:
+                _file.write(str(g_hash))
     return g_hash
 
 
