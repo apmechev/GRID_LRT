@@ -430,7 +430,7 @@ function (key, values, rereduce) {
             savefile = filename
         with open(savefile, 'w') as _file:
             for line in attach:
-                _file.write(line)
+                _file.write(str(line))
         return os.path.abspath(savefile)
 
     def list_tokens_from_view(self, view_name):
