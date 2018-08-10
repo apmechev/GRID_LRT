@@ -104,11 +104,12 @@ class Token_Handler(object):
             self.t_type = t_type
         else:
             raise Exception("t_type not defined!")
-        self.database = self.get_db(uname, pwd, dbn, srv)
+        self.database = self._get_db(uname, pwd, dbn, srv)
         self.views = {}
         self.tokens = {}
 
-    def get_db(self, uname, pwd, dbn, srv):
+    @staticmethod
+    def _get_db(uname, pwd, dbn, srv):
         """Logs into the Couchdb server and returns the database requested.
         Returns a couchDB database object
 
@@ -158,16 +159,17 @@ class Token_Handler(object):
         }
         if keys:
             keys = dict(itertools.chain(keys.items(), default_keys.items()))
-            self.append_id(keys, append)
+            self._append_id(keys, append)
         else:
-            self.append_id(default_keys, append)
+            self._append_id(default_keys, append)
         self.tokens[keys["_id"]] = keys
         self.database.update([keys])
         if attach:
             self.add_attachment(keys['_id'], attach[0], attach[1])
         return keys['_id']  # returns the token ID
 
-    def append_id(self, keys, app=""):
+    @staticmethod
+    def _append_id(keys, app=""):
         """ Helper function that appends a string to the token ID"""
         keys["_id"] += app
 

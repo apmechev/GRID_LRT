@@ -16,7 +16,7 @@ __date__ = "2018-07-27"
 
 def get_git_hash():
     """Gets the git hash using git describe"""
-    g_hash=""
+    g_hash = ""
     proc = Popen(["git", "describe"], stdout=PIPE, stderr=PIPE)
     label = proc.communicate()[0].strip().decode("utf-8") 
     if label:
