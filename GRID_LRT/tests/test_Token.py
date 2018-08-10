@@ -105,7 +105,7 @@ class TokenTest(unittest.TestCase):
         savename = th.get_attachment(tok,'test',savename='not_a_test')
         self.assertTrue(no_savename.split('/')[-1]=='test')
         self.assertTrue(savename.split('/')[-1]=='not_a_test')
-        achment(tok,open(os.path.dirname(__file__)+'/srm_50_sara.txt','r'),'test/with/slash')
+        th.add_attachment(tok,open(os.path.dirname(__file__)+'/srm_50_sara.txt','r'),'test/with/slash')
         slash_name = th.get_attachment(tok,'test/with/slash')
         self.assertTrue(slash_name=='test_with_slash')
 
