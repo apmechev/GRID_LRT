@@ -426,6 +426,8 @@ function (key, values, rereduce) {
             savefile = filename.replace("/", "_")
         if savename is not None:
             savefile = savename
+        else:
+            savefile = filename
         with open(savefile, 'w') as _file:
             for line in attach:
                 _file.write(line)
