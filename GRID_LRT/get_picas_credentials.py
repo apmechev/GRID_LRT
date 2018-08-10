@@ -18,7 +18,12 @@ __status__ = "Production"
 
 
 def infolog(string):
-    """Logs to the info logger or else prints"""
+    """infolog
+    Logs to the info logger or else prints
+
+    :param string: the string to log to the logger or to just print
+    :type string: str
+    """
     if not logging:
         print("INFO: "+string)
     else:
@@ -38,9 +43,9 @@ def warnlog(string):
     if not logging:
         print("WARNING: "+string)
     else:
-        logging.warn(string)
+        logging.warning(string)
 
-
+#Will be renamed to PicasCred()
 class picas_cred(object):
     """Getting PiCaS credentials from environment or .picasrc file
 
@@ -124,8 +129,7 @@ database=picas_database
         if (not environ.get('PICAS_USR') and not environ.get('PICAS_USR_PWD') and
                 not environ.get('PICAS_DB')):
             return self.get_picas_creds_from_env()
-        else:
-            return self.get_picas_creds_from_file()
+        return self.get_picas_creds_from_file()
 
     def put_picas_creds_in_env(self, picas_db=None):
         """ Inserts PiCaS credentials in environment
@@ -146,13 +150,15 @@ database=picas_database
             environ['PICAS_DB'] = self.database
         else:
             environ['PICAS_DB'] = self.database
-        return  # self.get_picas_creds()
+
 
     def put_creds_in_file(self, pic_file="~/.picasrc"):
-        """Exports PiCaS variables into a file
+        """put_creds_in_file
+            Exports PiCaS variables into a file
 
-        Args:
-            pic_file(str): File to write the variables in (default: ~/.picasrc)
+        :param pic_file: Name of the file containing the credentials (optional)
+        :type pic_file: str
+
         """
         with open(expanduser(pic_file), 'w') as pc_file:
             pc_file.write("user="+str(self.user)+"\n")
@@ -161,7 +167,8 @@ database=picas_database
         chmod(expanduser(pic_file), 384)
 
     def return_credentials(self):
-        """ Returns a dictionary of PiCaS credentials.
+        """return_credentials
+           Returns a dictionary of PiCaS credentials.
 
             d=pcred.return_credentials
             d.keys()=['user','password','database']

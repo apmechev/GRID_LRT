@@ -12,6 +12,7 @@
    :synopsis: Set of tools for manually and automatically creating tokens
 
 .. moduleauthor:: Alexandar Mechev <LOFAR@apmechev.com>
+.. note:: Will be renamed GRID_LRT.token to conform to python standards
 
 >>> #Example creation of a token of token_type 'test'
 >>> from GRID_LRT.get_picas_credentials import picas_cred
@@ -31,44 +32,40 @@ from __future__ import print_function
 import sys
 import os
 import shutil
-import pdb
 import itertools
 import time
-
 import tarfile
 import yaml
 
+import GRID_LRT
+from GRID_LRT.couchdb.design import ViewDefinition
 if 'couchdb' not in sys.modules:
     from GRID_LRT import couchdb
-from GRID_LRT.couchdb.design import ViewDefinition
 
+__version__ = GRID_LRT.__version__
+__author__ = GRID_LRT.__author__
+__license__ = GRID_LRT.__license__
+__email__ = GRID_LRT.__email__
+__copyright__ = GRID_LRT.__copyright__
+__credits__ = GRID_LRT.__credits__
+__maintainer__ = GRID_LRT.__maintainer__
+__status__ = GRID_LRT.__status__
 
-
-__author__ = "Alexandar P. Mechev"
-__copyright__ = "2016 Alexandar P. Mechev"
-__credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
-__license__ = "GPL 3.0"
-__version__ = "0.2.4"
-__maintainer__ = "Alexandar P. Mechev"
-__email__ = "LOFAR@apmechev.com"
-__status__ = "Production"
-
-
-def reset_all_tokens(token_type, picas_creds):
+def reset_all_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfsara.nl:6984"):
     """ Resets all Tokens with the pc authorization
     """
-    thandler = Token_Handler(t_type=token_type,
+    thandler = Token_Handler(t_type=token_type, srv=server,
                              uname=picas_creds.user, pwd=picas_creds.password,
                              dbn=picas_creds.database)
     thandler.load_views()
-    for view in thandler.views.keys():
+    for view in list(thandler.views):
         if view != 'overview_total':
             thandler.reset_tokens(view)
 
 
-def purge_tokens(token_type, picas_creds):
+def purge_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfsara.nl:6984"):
     """Automated function to purge tokens authorizing with Picas_creds"""
-    thandler = Token_Handler(t_type=token_type,
+    thandler = Token_Handler(t_type=token_type, srv=server,
                              uname=picas_creds.user, pwd=picas_creds.password,
                              dbn=picas_creds.database)
     thandler.load_views()
@@ -107,11 +104,12 @@ class Token_Handler(object):
             self.t_type = t_type
         else:
             raise Exception("t_type not defined!")
-        self.database = self.get_db(uname, pwd, dbn, srv)
+        self.database = self._get_db(uname, pwd, dbn, srv)
         self.views = {}
         self.tokens = {}
 
-    def get_db(self, uname, pwd, dbn, srv):
+    @staticmethod
+    def _get_db(uname, pwd, dbn, srv):
         """Logs into the Couchdb server and returns the database requested.
         Returns a couchDB database object
 
@@ -127,11 +125,12 @@ class Token_Handler(object):
         :rtype: :class:`~couchdb.client.Database`
         """
         server = couchdb.Server(srv)
-        server.resource.credentials = (uname, pwd)
+        if uname and pwd:
+            server.resource.credentials = (uname, pwd)
         database = server[dbn]
         return database
 
-    def create_token(self, keys={}, append="", attach=[]):
+    def create_token(self, keys=None, append="", attach=None):
         '''Creates a token, appends string to token ID if requested and
         adds user requested keys through the dict keys{}
 
@@ -158,15 +157,19 @@ class Token_Handler(object):
             'output': "",
             'created': time.time()
         }
-        keys = dict(itertools.chain(keys.items(), default_keys.items()))
-        self.append_id(keys, append)
+        if keys:
+            keys = dict(itertools.chain(keys.items(), default_keys.items()))
+            self._append_id(keys, append)
+        else:
+            self._append_id(default_keys, append)
         self.tokens[keys["_id"]] = keys
         self.database.update([keys])
         if attach:
             self.add_attachment(keys['_id'], attach[0], attach[1])
         return keys['_id']  # returns the token ID
 
-    def append_id(self, keys, app=""):
+    @staticmethod
+    def _append_id(keys, app=""):
         """ Helper function that appends a string to the token ID"""
         keys["_id"] += app
 
@@ -175,12 +178,12 @@ class Token_Handler(object):
         Updates the internal self.views variable
         """
         db_views = self.database.get("_design/"+self.t_type)
-        if db_views == None:
-            print("No views found in design document")
+        if db_views is None:
+            RuntimeWarning("No views found in design document")
             return
         self.views = db_views["views"]
 
-    def delete_tokens(self, view_name="test_view", key=["", ""]):
+    def delete_tokens(self, view_name="test_view", key=None):
         """Deletes tokens from view view_name
 
             exits if the view doesn't exist
@@ -197,20 +200,18 @@ class Token_Handler(object):
         (by default empty == delete all token)
         :type key: list
         """
-        v = self.list_tokens_from_view(view_name)
+        view = self.list_tokens_from_view(view_name)
         to_delete = []
-        for x in v:
-            document = self.database[x['key']]
-            if key[0] == "":
+        for tok in view:
+            document = self.database[tok['key']]
+            if not key:
                 pass
             else:
-                if not document[key[0]] == key[1]:
+                if document[key[0]] != key[1]:
                     continue
-            print("Deleting Token "+x['id'])
+            print("Deleting Token "+tok['id'])
             to_delete.append(document)
         self.database.purge(to_delete)
-        #    self.tokens.pop(x['id'])
-        # TODO:Pop tokens from self
 
     def add_view(self, view_name="test_view",
                  cond='doc.lock > 0 && doc.done > 0 && doc.output < 0 ',
@@ -232,7 +233,7 @@ class Token_Handler(object):
         and its status for example
         :type emit_value2: str
         """
-        generalViewCode = '''
+        general_view_code = '''
         function(doc) {
            if(doc.type == "%s") {
             if(%s) {
@@ -241,7 +242,7 @@ class Token_Handler(object):
           }
         }
         '''
-        view = ViewDefinition(self.t_type, view_name, generalViewCode % (
+        view = ViewDefinition(self.t_type, view_name, general_view_code % (
             self.t_type, cond, emit_value, emit_value2))
         self.views[view_name] = view
         view.sync(self.database)
@@ -255,7 +256,7 @@ class Token_Handler(object):
         This way you can check the status of a subset of the tokens.
 
         """
-        overviewMapCode = '''
+        overview_map_code = '''
 function(doc) {
    if(doc.type == "%s" )
       if(%s){
@@ -282,15 +283,15 @@ function(doc) {
    }
 }
 '''
-        overviewReduceCode = '''
+        overview_reduce_code = '''
 function (key, values, rereduce) {
    return sum(values);
 }
 '''
         overview_total_view = ViewDefinition(self.t_type, view_name,
-                                             overviewMapCode % (
+                                             overview_map_code % (
                                                  self.t_type, cond),
-                                             overviewReduceCode)
+                                             overview_reduce_code)
         self.views['overview_total'] = overview_total_view
         overview_total_view.sync(self.database)
 
@@ -298,7 +299,7 @@ function (key, values, rereduce) {
         """ Helper function that creates the Map-reduce view which makes it easy to count
             the number of jobs in the 'locked','todo','downloading','error' and 'running' states
         """
-        overviewMapCode = '''
+        overview_map_code = '''
 function(doc) {
    if(doc.type == "%s") {
        if (doc.lock == 0 && doc.done == 0){
@@ -322,14 +323,14 @@ function(doc) {
    }
 }
 '''
-        overviewReduceCode = '''
+        overview_reduce_code = '''
 function (key, values, rereduce) {
    return sum(values);
 }
 '''
         overview_total_view = ViewDefinition(self.t_type, 'overview_total',
-                                             overviewMapCode % (self.t_type),
-                                             overviewReduceCode)
+                                             overview_map_code % (self.t_type),
+                                             overview_reduce_code)
         self.views['overview_total'] = overview_total_view
         overview_total_view.sync(self.database)
 
@@ -357,14 +358,14 @@ function (key, values, rereduce) {
         self.views.pop(view_name, None)
         self.database.update([db_views])
 
-    def remove_Error(self):
+    def remove_error(self):
         ''' Removes all tokens in the error view
         '''
         cond = "doc.lock > 0 && doc.done > 0 && doc.output > 0"
         self.add_view(view_name="error", cond=cond)
         self.delete_tokens("error")
 
-    def reset_tokens(self, view_name="test_view", key=["", ""], del_attach=False):
+    def reset_tokens(self, view_name="test_view", key=None, del_attach=False):
         """ resets all tokens in a view, optionally can reset all tokens in a view
             who have key-value pairs matched by key[0],key[1]
 
@@ -372,12 +373,12 @@ function (key, values, rereduce) {
             >>> t1.reset_token("error",key=["OBSID","L123456"])
             >>> t1.reset_token("error",key=["scrub_count",6])
         """
-        v = self.list_tokens_from_view(view_name)
+        view = self.list_tokens_from_view(view_name)
         to_update = []
-        for x in v:
-            document = self.database[x['key']]
+        for tok in view:
+            document = self.database[tok['key']]
 
-            if key[0] != "" and document[key[0]] != key[1]:  # make it not just equal
+            if key and document[key[0]] != key[1]:  # make it not just equal
                 continue
             try:
                 document['status'] = 'todo'
@@ -412,7 +413,7 @@ function (key, values, rereduce) {
     def list_attachments(self, token):
         """Lists all of the filenames attached to a couchDB token
         """
-        return self.database[token]["_attachments"].keys()
+        return list(self.database[token]["_attachments"].keys())
 
     def get_attachment(self, token, filename, savename=None):
         """Downloads an attachment from a CouchDB token. Optionally
@@ -423,24 +424,28 @@ function (key, values, rereduce) {
         except AttributeError:
             print("error getting attachment: "+str(filename))
             return ""
-        if "/" in filename:
-            savefile = filename.replace("/", "_")
-        if savename != None:
+        if savename is not None:
             savefile = savename
-        with open(savefile, 'w') as f:
+        else:
+            savefile = filename
+        if "/" in filename:
+             savefile = filename.replace("/", "_")
+        with open(savefile, 'w') as _file:
             for line in attach:
-                f.write(line)
+                _file.write(str(line))
         return os.path.abspath(savefile)
 
     def list_tokens_from_view(self, view_name):
+        """Returns all tokens from a viewname
+        """
         self.load_views()
         if view_name in self.views:
             view = self.views[view_name]
         else:
-            print("View Named "+view_name+" Doesn't exist")
-            return
-        v = self.database.view(self.t_type+"/"+view_name)
-        return v
+            RuntimeWarning("View Named "+view_name+" Doesn't exist")
+            return None
+        view = self.database.view(self.t_type+"/"+view_name)
+        return view
 
     def archive_tokens_from_view(self, viewname, delete_on_save=False):
         to_del = []
@@ -472,21 +477,23 @@ function (key, values, rereduce) {
             self.purge_tokens()
         return result_link
 
-    def archive_a_token(self, token_ID, delete=False):
+    def archive_a_token(self, tokenid, delete=False):
         "Dumps the token data into a yaml file and saves the attachments"
-        data = self.database[token_ID]
-        yaml.dump(data, open(token_ID+".dump", 'w'))
-        for f in self.list_attachments(token_ID):
-            fname = f.replace('/', '-')
-            self.get_attachment(token_ID, f, token_ID +
+        data = self.database[tokenid]
+        yaml.dump(data, open(tokenid+".dump", 'w'))
+        for att_file in self.list_attachments(tokenid):
+            fname = att_file.replace('/', '-')
+            self.get_attachment(tokenid, att_file, tokenid +
                                 "_attachment_"+str(fname))
+        if delete: #test
+            self.database.purge([tokenid])
 
     def clear_all_views(self):
         """Iterates over all views in the design document
         and deletes all tokens from those views. Finally, removes
         the views from the database"""
         self.load_views()
-        for view in self.views.keys():
+        for view in list(self.views):
             if view != 'overview_total':
                 self.delete_tokens(view)
             self.del_view(view)
@@ -499,16 +506,17 @@ function (key, values, rereduce) {
         the database"""
         self.clear_all_views()
         del self.database['_design/'+self.t_type]
-        return None
+
 
     def set_view_to_status(self, view_name, status):
         """Sets the status to all tokens in 'view' to 'status
             eg. Set all locked tokens to error or all error tokens to todo
+            it also locks the tokens!
         """
-        v = self.list_tokens_from_view(view_name)
+        view = self.list_tokens_from_view(view_name)
         to_update = []
-        for x in v:
-            document = self.database[x['key']]
+        for token in view:
+            document = self.database[token['key']]
             document['status'] = str(status)
             document['lock'] = 1
             to_update.append(document)
@@ -536,7 +544,7 @@ class TokenSet(object):
             :raises: AttributeError, KeyError
 
         """
-        self.th = th
+        self.thandler = th
         self.__tokens = []
         if not tok_config:
             self.token_keys = {}
@@ -572,14 +580,14 @@ class TokenSet(object):
             pipeline = ""
             if 'PIPELINE_STEP' in keys:
                 pipeline = "_"+keys['PIPELINE_STEP']
-            token = self.th.create_token(
+            token = self.thandler.create_token(
                 keys, append=id_append+pipeline+"_"+id_prefix+str("%03d" % int(key)))
             if file_upload:
                 with open('temp_abn', 'w') as tmp_abn_file:
                     for i in iterable[key]:
                         tmp_abn_file.write("%s\n" % i)
                 with open('temp_abn', 'r') as tmp_abn_file:
-                    self.th.add_attachment(token, tmp_abn_file, file_upload)
+                    self.thandler.add_attachment(token, tmp_abn_file, file_upload)
                 os.remove('temp_abn')
             self.__tokens.append(token)
 
@@ -592,7 +600,7 @@ class TokenSet(object):
         if not tok_list:
             tok_list = self.__tokens
         for token in tok_list:
-            self.th.add_attachment(token, open(
+            self.thandler.add_attachment(token, open(
                 attachment, 'r'), os.path.basename(name))
 
     @property
@@ -602,18 +610,18 @@ class TokenSet(object):
 
     def update_local_tokens(self):
         self.__tokens = []
-        self.th.load_views()
-        for v in self.th.views.keys():
-            if v != 'overview_total':
-                for t in self.th.list_tokens_from_view(v):
-                    self.__tokens.append(t['id'])
+        self.thandler.load_views()
+        for view in self.thandler.views.keys():
+            if view != 'overview_total':
+                for token in self.thandler.list_tokens_from_view(view):
+                    self.__tokens.append(token['id'])
 
     def add_keys_to_list(self, key, val, tok_list=None):
         if not tok_list:
             tok_list = self.__tokens
         to_update = []
         for token in tok_list:
-            document = self.th.database[token]
+            document = self.thandler.database[token]
             document[key] = str(val)
             to_update.append(document)
-        self.th.database.update(to_update)
+        self.thandler.database.update(to_update)

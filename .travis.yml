@@ -6,6 +6,7 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+    #  - "3.7"
 services:
       - couchdb
 # command to install dependencies
@@ -19,8 +20,9 @@ before_install:
       #    - sudo mkdir -p /etc/grid-security/certificates/
       #    - sudo apt-get -y --allow-unauthenticated install ca-policy-egi-core 
     - pip install mock
-    - pip install pyyaml
     - pip install codecov
+    - curl -X PUT localhost:5984/test_db
+
 script:
     - nosetests --with-coverage
 

@@ -6,6 +6,8 @@
 [![codecov Coverage](https://codecov.io/gh/apmechev/GRID_LRT/branch/master/graph/badge.svg?precision=1)](https://codecov.io/gh/apmechev/GRID_LRT)
 [![alt text](http://apmechev.com/img/git_repos/pylint/GRID_LRT.svg "pylint score")](https://github.com/apmechev/pylint-badge)
 [![BCH compliance](https://bettercodehub.com/edge/badge/apmechev/GRID_LRT?branch=master)](https://bettercodehub.com/)
+[![Updates](https://pyup.io/repos/github/apmechev/GRID_LRT/shield.svg)](https://pyup.io/repos/github/apmechev/GRID_LRT/)
+
 
 Due to the large computational requirements for LOFAR datasets,
 processing bulk data on the grid is required. This manual will detail
@@ -33,32 +35,47 @@ Requirements:
 Installing:
 ============
 
-Installing with pip
----------
+The [up to date installation instructions are here.](https://grid-lrt.readthedocs.io/en/latest/installing.html)
 
-The GRID LOFAR Reduction Tools are now available through pip:
+Attribution
+=============
+[![DOI](https://zenodo.org/badge/53421495.svg)](https://zenodo.org/badge/latestdoi/53421495)
+[![ArXiV](http://img.shields.io/badge/arXiv-1712.00312-orange.svg?style=flat)](https://arxiv.org/abs/1712.00312)
 
-```bash
-pip install GRID_LRT
-
+If you actively use GRID\_LRT, please cite this software as such below:
+```
+@misc{apmechev:2018,
+      author       = {Alexandar P. Mechev} 
+      title        = {apmechev/GRID_LRT: v0.4.0},
+      month        = aug,
+      year         = 2018,
+      doi          = {10.5281/zenodo.1341127},
+      url          = {https://doi.org/10.5281/zenodo.1341127}
+    }
 ```
 
-Manual build
-------
-Alternatively you should use the setup.py script to install the tools:
+If you're using GRID processed data, also consider citing the paper below, outlining the procedure of running LOFAR data through a High Throughput Cluster:
 
 ```
-python setup.py build
-python setup.py install
-```
+@INPROCEEDINGS{mechev2017,
+   author = {{Mechev}, A. and {Oonk}, J.~B.~R. and {Danezi}, A. and {Shimwell}, T.~W. and                             
+{Schrijvers}, C. and {Intema}, H. and {Plaat}, A. and {Rottgering}, H.~J.~A.},
+    title = "{An {A}utomated {S}calable {F}ramework for {D}istributing {R}adio {A}stronomy {P}rocessing {A}cross {C}lusters and {C}louds}",
+booktitle = {Proceedings of the International Symposium on Grids and Clouds (ISGC) 2017, held 5-10 March, 2017 at Academia Sinica, Taipei, Taiwan (ISGC2017). Online at \url{https://pos.sissa.it/cgi-bin/reader/conf.cgi?confid=293}, id.2},
+     year = 2017,
+archivePrefix = "arXiv",
+   eprint = {1712.00312},
+ primaryClass = "astro-ph.IM",
+    month = mar,
+      eid = {2},
+      doi = {10.22323/1.293.0002},
+    pages = {2},
+   adsurl = {\url{http://adsabs.harvard.edu/abs/2017isgc.confE...2M}},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
 
-If you do not have permissions to write to the default Python package directory, you can use
 
 ```
-python setup.py install --perfix={PATH_WHERE_TO_INSTALL_PACKAGE}
-```
-
-You have to make sure that this path 1. Exists, 2. Is in your PYTHONPATH and 3. Will be in your PYTHONPATH every time you enter your shell (add it to your ~/.bashrc)
 
 
 
@@ -103,64 +120,4 @@ In order to stage the data using the ASTRON LTA api, you need credentials to the
 user=uname
 password=pswd
 ```
-
-Staging requires a list of srms to be staged (typically srm.txt)
-
-It can be done with this set of commands:
-
-```python 
-from GRID_LRT.Staging import stage_all_LTA
-from GRID_LRT.Staging import stager_access 
-stageID=stage_all_LTA.main('srm.txt') #Here is the path to your srm_file.
-print(stageID) # the stageID is your identifier to the staging system. You can poll it with:
-print(stage_all_LTA.get_stage_status(stageID)) # prints out a 'status' string
-
-statuses=stager_access.get_progress()
-print(statuses[stageID]) # More detailed information on your staging request
-```
-
-Because of design choices at the Astron service, when your staging is complete, the last 2 commands above will fail! The get\_stage\_status function appears to return 'success' though.
-
-Creating a Sandbox
---------------------
-
-In order to make processing portable, all scripts are archived in a 'sandbox', which is extracted to an empty temporary folder on the worker node. This architecture choice also makes it easy to test a clean environment on the login node or even your laptop. 
-
-
-
-PiCaS Tokens
---------------------
-
-Job 'Tokens' are a way to define your jobs.  
-
-
-[Mooc](http://docs.surfsaralabs.nl/projects/grid/en/latest/Pages/Tutorials/MOOC/mooc.html#mooc-picas-client)
-
-[Utility](https://ganglia.surfsara.nl/?r=hour&cs=&ce=&c=GINA+Servers&h=&tab=ch&vn=&hide-hf=false&m=load_one&sh=1&z=small&hc=4&host_regex=&max_graphs=0&s=by+name)
-
-Node-side processing
-====================
-
-Now that the data is staged, jobs are defined, scripts are bundled and jobs submitted, here's what happens on the worker node:
-
-Launching and Locking Tokens
---------------------------------
-
-
-Intermediate Storage
-=====================================
-
-
-Other
-=========================
-
----                                                                                                      
-author:
-- 'Alexandar P. Mechev, Raymond Oonk'
-title: |
-    GRID\_LRT: LOFAR Reduction Tools for The Dutch Grid\
-
-    A set of tools to reduce LOFAR Data: infrastructue and usage 
-... 
-
 
