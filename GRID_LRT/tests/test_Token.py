@@ -23,7 +23,7 @@ class TokenTest(unittest.TestCase):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
         th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
                                  uname='', pwd="", dbn='test_db')
-        self.assertTrue(th.get_db(uname='', pwd="",  dbn='test_db', 
+        self.assertTrue(th._get_db(uname='', pwd="",  dbn='test_db', 
             srv="http://localhost:5984/").name == 'test_db')
         th.create_token(keys={'test_suite':'Token'}, append="Tokentest", attach=[])
         th.add_status_views()
