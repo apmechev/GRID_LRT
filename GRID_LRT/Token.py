@@ -422,12 +422,12 @@ function (key, values, rereduce) {
         except AttributeError:
             print("error getting attachment: "+str(filename))
             return ""
-        if "/" in filename:
-            savefile = filename.replace("/", "_")
         if savename is not None:
             savefile = savename
         else:
             savefile = filename
+        if "/" in filename:
+             savefile = filename.replace("/", "_")
         with open(savefile, 'w') as _file:
             for line in attach:
                 _file.write(str(line))
