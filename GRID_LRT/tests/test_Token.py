@@ -102,9 +102,9 @@ class TokenTest(unittest.TestCase):
         self.assertTrue(len(attaches)==1)
         self.assertTrue(attaches[0]=='test')
         no_savename = th.get_attachment(tok,'test')
-        savename = th.get_attachment(tok,'test','not_a_test')
+        savename = th.get_attachment(tok,'test',savename='not_a_test')
         self.assertTrue(no_savename.split('/')[-1]=='test')
-        self.assertTrue(no_savename.split('/')[-1]=='not_a_test')
+        self.assertTrue(savename.split('/')[-1]=='not_a_test')
 
 
 
