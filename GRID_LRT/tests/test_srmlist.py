@@ -131,7 +131,7 @@ class SrmlistTest(unittest.TestCase):
         f_name = 'srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583127/L583127_SB100_uv.MS_c0a9adfa.tar'
         sl = srmlist(link=f_name)
         self.assertTrue(f_name == sl[0])
-        g_link = sl.gfal_replace(s[0])
+        g_link = sl.gfal_replace(sl[0])
         self.assertTrue('8443/srm/managerv2?SFN=' in sl.gfal_replace(sl[0]))
 
 
