@@ -14,8 +14,13 @@ setup(name='GRID_LRT',
       tests_require=[
           'pytest',
           ],
+      install_requires=[
+          'pyyaml',
+          'couchdb'
+          ]
       include_package_data=True,
-      data_files=[("GRID_LRT/data/config",
+      data_files=[("githash",["GRID_LRT/__githash__"]),
+                 ("GRID_LRT/data/config",
                    ['GRID_LRT/data/config/bash_file.cfg',
                     'GRID_LRT/data/config/NDPPP_parset.cfg',
                     "GRID_LRT/data/config/tutorial.cfg",
