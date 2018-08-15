@@ -2,7 +2,7 @@
 from subprocess import PIPE, Popen
 import os
 __all__ = ["Application", "Staging", 'sandbox', 'Token', 'couchdb', "couchdb.tests"]
-__version__ = "0.4.0"
+__version__ = "0.4.3"
 __author__ = "Alexandar P. Mechev"
 __copyright__ = "2018 Alexandar P. Mechev"
 __credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
