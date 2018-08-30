@@ -51,6 +51,14 @@ __credits__ = GRID_LRT.__credits__
 __maintainer__ = GRID_LRT.__maintainer__
 __status__ = GRID_LRT.__status__
 
+def get_all_design_docs(pcreds, srv="https://picas-lofar.grid.surfsara.nl:6984"):
+    server = couchdb.Server(srv)
+    server.resource.credentials = (pcreds.user, pcreds.password)
+    database = server[pcreds.database]
+    ad=[doc for doc in database.get('_all_docs')['rows'] if '_design' in doc['id']]
+    return [i['id'] for i in ad]
+
+
 def reset_all_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfsara.nl:6984"):
     """ Resets all Tokens with the pc authorization
     """
