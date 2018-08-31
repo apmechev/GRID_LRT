@@ -65,6 +65,7 @@ def get_staging_creds():
             "https://"+user+':'+passw+"@webportal.astron.nl/service-public/xmlrpc")
     else:
         print("No User or Password exist. ")
+        return "", "", ""
     return user, passw, lta_proxy
 
 USER, PASSW, LTA_PROXY = get_staging_creds()
