@@ -96,7 +96,7 @@ def check_status(surl_link, verbose=True):
         color = "\033[31m"
     if verbose:
         print('{:s} is {:s}{:s}\033[0m'.format(filename, color, status))
-    return (filename, status)
+    return (filename, status.strip())
 
 
 def percent_staged(results):
