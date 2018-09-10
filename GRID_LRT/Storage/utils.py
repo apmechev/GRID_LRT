@@ -1,4 +1,4 @@
-
+from datetime import datetime
 from subprocess import Popen, PIPE
 import re
 import GRID_LRT.grid_credentials as grid_creds
@@ -46,9 +46,14 @@ class GSIFile(object):
 
     @staticmethod
     def _extract_date(data):
-        date = data[-4]+" "+data[-3]
-        time = data[-2]
-        return {'date':date, 'time':time}
+        if data[-2] not in ['2018','2017','2016','2015']:
+            date = data[-4]+" "+data[-3]+" " + str(datetime.now().year)
+            time = data[-2]
+        else:
+            date = data[-4]+" "+data[-3]+" "+data[-2]
+            time = "00:00"
+        file_datetime = datetime.strptime(date+"-"+time, "%b %d %Y-%H:%M")
+        return file_datetime
 
     @staticmethod
     def _get_port(location):
@@ -58,7 +63,6 @@ class GSIFile(object):
         except AttributeError:
             return None
 
-    @staticmethod
     def _donotdelete(self,location):
         """Raises Exception if you try to delete subfolders inside these folders"""
         locations = ['gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/',
