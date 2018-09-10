@@ -6,7 +6,7 @@ import GRID_LRT.grid_credentials as grid_creds
 class GSIFile(object):
     def __init__(self, location):
         _ = grid_creds.grid_credentials_enabled()
-        self._internal = self._test_file(location)
+        self._internal = self._test_file_exists(location)
         self.datetime = self._internal['datetime']
         self.location = self._internal['location']
         self.filename = self._internal['filename']
@@ -33,7 +33,7 @@ class GSIFile(object):
             return False, parent_dir
 
 
-    def _test_file(self,location):
+    def _test_file_exists(self,location):
         sub = Popen(['uberftp','-ls',location], stdout=PIPE, stderr=PIPE)
         result, error = sub.communicate()
         if error:
