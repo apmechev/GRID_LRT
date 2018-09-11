@@ -143,6 +143,15 @@ class SrmlistTest(unittest.TestCase):
         gsilink = sl.gsi_replace(sl.srm_replace(sl[0]))
         self.assertTrue(gsilink == f_name)
 
+    def test_run_pozn(self):
+        f_name = 'srm://lta-head.lofar.psnc.pl:8443/lofar/ops/projects/lc6_016/527613/L527613_SB228_uv.dppp.MS_90bafee7.tar'
+        sl = srmlist(link=f_name)
+        gsilink =sl.gsi_replace(sl[0])
+        self.assertTrue('gsiftp://gridftp.lofar.psnc.pl:2811' in sl.gsi_replace(sl[0]))
+        srm_link = sl.srm_replace(sl.gsi_replace(sl[0]))
+        self.assertTrue(srm_link == f_name)
+
+
 
 if __name__ == '__main__':
     unittest.main() 
