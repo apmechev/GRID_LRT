@@ -50,11 +50,15 @@ class Sandbox(object):
         self.sbxloc = None
         if cfgfile:
             self.parseconfig(cfgfile)
+    
+    def __enter__(self):
+        pass
 
     def __exit__(self, ex_type, ex_value, ex_traceback):
-        if 'remove_when_done' in self.sbx_def.keys():
-            if self.sbx_def['remove_when_done'] is True:
-                self.cleanup()
+        pass
+        #        if 'remove_when_done' in self.sbx_def.keys():
+#            if self.sbx_def['remove_when_done'] is True:
+#                self.cleanup()
 
     def parseconfig(self, yamlfile):
         """Helper function to parse the sandbox configuration options
@@ -259,5 +263,5 @@ class Sandbox(object):
     def upload_sandbox(self, upload_name=None):
         self.upload_sbx(upload_name=upload_name)
         self.upload_ssh_sandbox(upload_name=upload_name)
-        if self.sbx_def['remove_when_done'] == 'True':
+        if self.sbx_def['remove_when_done'] == True:
             self.cleanup()
