@@ -23,6 +23,7 @@ from collections import Counter
 
 try:
     import gfal2 as gfal  # pylint: disable=import-error
+    gfal.set_verbose(gfal.verbose_level.warning)
 except ImportError:
     print("GFAL CANNOT BE IMPORTED")
 from GRID_LRT.Staging.srmlist import srmlist
