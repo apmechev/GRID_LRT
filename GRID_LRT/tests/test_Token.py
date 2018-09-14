@@ -116,6 +116,12 @@ class TokenTest(unittest.TestCase):
         th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
                 uname="", pwd="", dbn='test_db')
         tok = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="archiveme1", attach=[])
-        th.archive_a_token(tok)
+        dump = th.archive_a_token(tok)
+        self.assertTrue(tok['_id']+'.dump' in dump)
         tok2 = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="archiveme2", attach=[])
         th.archive_a_token(tok2, delete=True)
+        tok3 = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="archiveme3", attach=[])
+        with open(os.path.dirname(__file__)+'/srm_50_sara.txt','r') as test_att:
+                th.add_attachment(tok3, test_att, 'test')
+        dump2 = th.archive_a_token(tok3)
+         self.assertTrue('test' in dump2)
