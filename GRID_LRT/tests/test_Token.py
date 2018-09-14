@@ -133,4 +133,4 @@ class TokenTest(unittest.TestCase):
         th.add_status_views()
         design_docs = Token.get_all_design_docs(None, srv="http://localhost:5984/")
         self.assertTrue(len(design_docs)>0)
-        self.AssertTrue(T_TYPE in design_docs)
+        self.assertTrue(T_TYPE in design_docs)
