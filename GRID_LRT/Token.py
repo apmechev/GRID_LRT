@@ -489,15 +489,20 @@ function (key, values, rereduce) {
         return result_link
 
     def archive_a_token(self, tokenid, delete=False):
-        "Dumps the token data into a yaml file and saves the attachments"
+        "Dumps the token data into a yaml file and saves the attachments
+        returns list of archived files"
         data = self.database[tokenid]
+        archived_files = []
         yaml.dump(data, open(tokenid+".dump", 'w'))
+        archived_files.append(tokenid+".dump")
         for att_file in self.list_attachments(tokenid):
             fname = att_file.replace('/', '-')
             self.get_attachment(tokenid, att_file, tokenid +
                                 "_attachment_"+str(fname))
+            archived_files.append(fname)
         if delete: #test
             self.database.purge([data])
+        return archived_files 
 
     def clear_all_views(self):
         """Iterates over all views in the design document

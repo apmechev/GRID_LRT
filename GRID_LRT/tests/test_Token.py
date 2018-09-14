@@ -96,8 +96,9 @@ class TokenTest(unittest.TestCase):
                                 uname="", pwd="", dbn='test_db')
         tok = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="Tokentest", attach=[])
         th.add_status_views()
-#        tok = list(th.list_tokens_from_view('todo'))[0]['id']
-        th.add_attachment(tok,open(os.path.dirname(__file__)+'/srm_50_sara.txt','r'),'test')
+#       tok = list(th.list_tokens_from_view('todo'))[0]['id']
+        with open(os.path.dirname(__file__)+'/srm_50_sara.txt','r') as test_att:
+            th.add_attachment(tok, test_att, 'test')
         attaches = th.list_attachments(tok)
         self.assertTrue(len(attaches)==1)
         self.assertTrue(attaches[0]=='test')
@@ -105,7 +106,8 @@ class TokenTest(unittest.TestCase):
         savename = th.get_attachment(tok,'test',savename='not_a_test')
         self.assertTrue(no_savename.split('/')[-1]=='test')
         self.assertTrue(savename.split('/')[-1]=='not_a_test')
-        th.add_attachment(tok,open(os.path.dirname(__file__)+'/srm_50_sara.txt','r'),'test/with/slash')
+        with open(os.path.dirname(__file__)+'/srm_50_sara.txt','r') as test_att:
+            th.add_attachment(tok, test_att, 'test/with/slash')
         slash_name = th.get_attachment(tok,'test/with/slash')
         self.assertTrue(slash_name.split('/')[-1]=='test_with_slash')
 
