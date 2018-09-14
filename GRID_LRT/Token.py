@@ -421,7 +421,10 @@ function (key, values, rereduce) {
     def list_attachments(self, token):
         """Lists all of the filenames attached to a couchDB token
         """
-        return list(self.database[token]["_attachments"].keys())
+        tok_keys = self.database[token]
+        if ['_attachments'] in tok_keys:
+            return list(tok_keys["_attachments"].keys())
+        return []
 
     def get_attachment(self, token, filename, savename=None):
         """Downloads an attachment from a CouchDB token. Optionally
