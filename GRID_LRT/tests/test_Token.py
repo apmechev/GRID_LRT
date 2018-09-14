@@ -124,4 +124,4 @@ class TokenTest(unittest.TestCase):
         with open(os.path.dirname(__file__)+'/srm_50_sara.txt','r') as test_att:
                 th.add_attachment(tok3, test_att, 'test')
         dump2 = th.archive_a_token(tok3)
-         self.assertTrue('test' in dump2)
+        self.assertTrue('test' in dump2)
