@@ -117,7 +117,7 @@ class TokenTest(unittest.TestCase):
                 uname="", pwd="", dbn='test_db')
         tok = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="archiveme1", attach=[])
         dump = th.archive_a_token(tok)
-        self.assertTrue(tok['_id']+'.dump' in dump)
+        self.assertTrue(tok+'.dump' in dump)
         tok2 = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="archiveme2", attach=[])
         th.archive_a_token(tok2, delete=True)
         tok3 = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="archiveme3", attach=[])
