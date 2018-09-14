@@ -422,7 +422,7 @@ function (key, values, rereduce) {
         """Lists all of the filenames attached to a couchDB token
         """
         tok_keys = self.database[token]
-        if ['_attachments'] in tok_keys:
+        if '_attachments' in tok_keys:
             return list(tok_keys["_attachments"].keys())
         return []
 
