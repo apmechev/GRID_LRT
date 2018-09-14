@@ -109,4 +109,11 @@ class TokenTest(unittest.TestCase):
         slash_name = th.get_attachment(tok,'test/with/slash')
         self.assertTrue(slash_name.split('/')[-1]=='test_with_slash')
 
-
+    def test_archive_a_token(self):
+        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+                uname="", pwd="", dbn='test_db')
+        tok = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="archiveme1", attach=[])
+        th.archive_a_token(tok)
+        tok2 = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="archiveme2", attach=[])
+        th.archive_a_token(tok2, delete=True)
