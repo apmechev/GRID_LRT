@@ -497,7 +497,7 @@ function (key, values, rereduce) {
             self.get_attachment(tokenid, att_file, tokenid +
                                 "_attachment_"+str(fname))
         if delete: #test
-            self.database.purge([tokenid])
+            self.database.purge(data)
 
     def clear_all_views(self):
         """Iterates over all views in the design document
