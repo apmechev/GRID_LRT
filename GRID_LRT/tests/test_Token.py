@@ -125,3 +125,12 @@ class TokenTest(unittest.TestCase):
                 th.add_attachment(tok3, test_att, 'test')
         dump2 = th.archive_a_token(tok3)
         self.assertTrue('test' in dump2)
+
+    def test_get_all_design_docs(self):
+        T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+                                uname="", pwd="", dbn='test_db') 
+        th.add_status_views()
+        design_docs = Token.get_all_design_docs(None, srv="http://localhost:5984/")
+        self.assertTrue(len(design_docs)>0)
+        self.AssertTrue(T_TYPE in design_docs)

@@ -52,9 +52,13 @@ __maintainer__ = GRID_LRT.__maintainer__
 __status__ = GRID_LRT.__status__
 
 def get_all_design_docs(pcreds, srv="https://picas-lofar.grid.surfsara.nl:6984"):
+    if pcreds:
+        user, passwd, dbn = pcreds.user, pcreds.password, pcreds.database
+    else:
+        user, passwd, dbn = "","","test_db"
     server = couchdb.Server(srv)
-    server.resource.credentials = (pcreds.user, pcreds.password)
-    database = server[pcreds.database]
+    server.resource.credentials = (user, passwd)
+    database = server[dbn]
     ad=[doc for doc in database.get('_all_docs')['rows'] if '_design' in doc['id']]
     return [i['id'] for i in ad]
 
@@ -493,7 +497,8 @@ function (key, values, rereduce) {
         returns list of archived files"""
         data = self.database[tokenid]
         archived_files = []
-        yaml.dump(data, open(tokenid+".dump", 'w'))
+        with open(tokenid+".dump", 'w') as savefile:
+            yaml.dump(data, savefile)
         archived_files.append(tokenid+".dump")
         for att_file in self.list_attachments(tokenid):
             fname = att_file.replace('/', '-')
