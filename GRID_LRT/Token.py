@@ -489,8 +489,8 @@ function (key, values, rereduce) {
         return result_link
 
     def archive_a_token(self, tokenid, delete=False):
-        "Dumps the token data into a yaml file and saves the attachments
-        returns list of archived files"
+        """Dumps the token data into a yaml file and saves the attachments
+        returns list of archived files"""
         data = self.database[tokenid]
         archived_files = []
         yaml.dump(data, open(tokenid+".dump", 'w'))
