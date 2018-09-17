@@ -37,7 +37,6 @@ def grid_credentials_enabled():
 
 
 def skip_grid_auth(func):
-    @wraps(func)
     def continue_on_auth_fail(func):
         try:
             return func(*args, **kwargs)
