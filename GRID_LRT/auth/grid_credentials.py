@@ -3,6 +3,8 @@ Grid tools exist and whether the GRID credentials are
 activated
 """
 import subprocess
+from functools import wraps
+
 
 def check_uberftp():
     """Checks if the uberftp executable
@@ -32,3 +34,16 @@ def grid_credentials_enabled():
         raise Exception("Grid Credentials expired! "
                         "Run 'startGridSession lofar:/lofar/user/sksp' in the shell")
     return True
+
+
+def skip_grid_auth(func):
+    @wraps(func)
+    def continue_on_auth_fail(func):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            if "Grid Credentials expired!" in str(e):
+                raise Warning("Not authorized GRID user but continuing anyways")
+            else:
+                raise e
+
