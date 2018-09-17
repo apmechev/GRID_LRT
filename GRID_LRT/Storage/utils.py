@@ -19,10 +19,9 @@ class GSIFile(object):
             self.is_file = True
 
     def _check_if_directory(self,location):
-        location = "/".join([i for i in location.split('/') if i])
         num_subdir = len([i for i in location.split('/') if i]) #check if too deep
         filename = location.split('/')[-1]
-        parent_dir = "/".join(location.split('/')[:-1])
+        parent_dir = self.get_parent_dir()
         parent_dir = parent_dir.replace(self.protocol+':/',self.protocol+"://")  #TODO Make this cleaner (new staticmethod)
         sub = Popen(['uberftp','-ls',parent_dir], stdout=PIPE, stderr=PIPE)
         res, err = sub.communicate()
@@ -64,7 +63,8 @@ class GSIFile(object):
             return None
 
     def _donotdelete(self,location):
-        """Raises Exception if you try to delete subfolders inside these folders"""
+        """Raises Exception if you try to delete files or folders whose parent is
+        one of these folders"""
         locations = ['gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/',
                      'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/archive',
                      'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated',
@@ -81,3 +81,14 @@ class GSIFile(object):
                      ]
         if self.parent_dir in locations:
             raise Exception("Not allowed to delete this folder because its parent is %s" % (self.parent_dir))
+
+    def delete(self):
+        parent_dir = self.get_parent_dir()
+        self._dontdelete(parent_dir)
+    
+    def get_parent_dir(self):
+        location = "/".join([i for i in self.location.split('/') if i])
+        parent_dir = "/".join(location.split('/')[:-1])
+        return parent_dir
+def remove_gsi_file(file_obj):
+    
