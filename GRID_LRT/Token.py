@@ -15,7 +15,7 @@
 .. note:: Will be renamed GRID_LRT.token to conform to python standards
 
 >>> #Example creation of a token of token_type 'test'
->>> from GRID_LRT.get_picas_credentials import picas_cred
+>>> from GRID_LRT.auth.get_picas_credentials import picas_cred
 >>> pc=picas_cred() #Gets picas_credentials
 >>>
 >>> th=Token.Token_Handler( t_type="test", uname=pc.user, pwd=pc.password, dbn=pc.database)
@@ -102,7 +102,7 @@ class Token_Handler(object):
                  uname="", pwd="", dbn=""):
         """
         >>> #Example creation of a token of token_type 'test'
-        >>> from GRID_LRT.get_picas_credentials import picas_cred
+        >>> from GRID_LRT.auth.get_picas_credentials import picas_cred
         >>> pc=picas_cred() #Gets picas_credentials
         >>>
         >>> th=Token.Token_Handler( t_type="test",

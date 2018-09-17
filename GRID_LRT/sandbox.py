@@ -12,7 +12,7 @@ import warnings
 warnings.simplefilter('default')
 import yaml
 import GRID_LRT
-from GRID_LRT import grid_credentials
+from GRID_LRT.auth import grid_credentials
 
 
 class Sandbox(object):

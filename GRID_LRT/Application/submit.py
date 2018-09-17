@@ -8,9 +8,9 @@ import subprocess
 import logging
 
 import tempfile
-from GRID_LRT.get_picas_credentials import picas_cred as pc
+from GRID_LRT.auth.get_picas_credentials import picas_cred as pc
 import GRID_LRT
-from GRID_LRT import grid_credentials
+from GRID_LRT.auth import grid_credentials
 
 
 #class job_launcher(object):

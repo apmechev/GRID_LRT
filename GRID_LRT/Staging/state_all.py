@@ -27,7 +27,7 @@ try:
 except ImportError:
     print("GFAL CANNOT BE IMPORTED")
 from GRID_LRT.Staging.srmlist import srmlist
-from GRID_LRT import grid_credentials
+from GRID_LRT.auth import grid_credentials
 
 
 

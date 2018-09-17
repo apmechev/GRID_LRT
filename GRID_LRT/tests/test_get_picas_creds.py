@@ -1,4 +1,4 @@
-from GRID_LRT import get_picas_credentials as get_pc
+from GRID_LRT.auth import get_picas_credentials as get_pc
 import os 
 import glob
 import unittest
