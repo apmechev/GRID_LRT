@@ -88,7 +88,7 @@ class JdlLauncher(object):
 
     def __check_authorized(self):
         grid_credentials.grid_credentials_enabled()
-	self.authorized = True
+        self.authorized = True
 
     def __enter__(self):
         return self
