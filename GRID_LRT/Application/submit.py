@@ -148,8 +148,8 @@ class JdlLauncher(object):
 
     def launch(self, database=None):
         """Launch the glite-job and return the job identification"""
-	if not self.authorized:
-	    self._check_authorized()
+        if not self.authorized:
+	        self._check_authorized()
         if not self.temp_file:
             self.temp_file = self.make_temp_jdlfile(database = database)
         sub = subprocess.Popen(['glite-wms-job-submit', '-d', os.environ["USER"],
