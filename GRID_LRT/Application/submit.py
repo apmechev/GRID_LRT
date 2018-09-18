@@ -6,6 +6,8 @@ Options include the number of cores and the queue type."""
 import os
 import subprocess
 import logging
+import warnings
+import random, string
 
 import tempfile
 from GRID_LRT.auth.get_picas_credentials import picas_cred as pc
@@ -30,7 +32,7 @@ class gridjob(object):
             self.wholenodes = 'false'
         self.ncpu = NCPU       
 
-class jdl_launcher(object):
+class JdlLauncher(object):
     """jdl_launcher creates a jdl launch file with the
     appropriate queue, CPUs, cores and Memory per node
 
@@ -56,7 +58,12 @@ class jdl_launcher(object):
             wholenodes(Boolean): Whether to reserve the entire node. Default is F
             NCPU (int, optional): Number of CPUs to use for each job. Default is 1
         """
-        grid_credentials.grid_credentials_enabled()
+
+        self.authorized = False
+        if 'authorize' in kwargs.keys() and kwargs['authorize'] == False:
+                warnings.warn("Skipping Grid Autorization")
+        else: 
+	        self.__check_authorized()
         if numjobs < 1:
             logging.warn("jdl_file with zero jobs!")
             numjobs = 1
@@ -79,6 +86,9 @@ class jdl_launcher(object):
         self.launch_file = str("/".join((GRID_LRT.__file__.split("/")[:-1])) +
                                "/data/launchers/run_remote_sandbox.sh")
 
+    def __check_authorized(self):
+        grid_credentials.grid_credentials_enabled()
+	self.authorized = True
 
     def __enter__(self):
         return self
@@ -136,6 +146,8 @@ class jdl_launcher(object):
 
     def launch(self):
         """Launch the glite-job and return the job identification"""
+	if not self.authorized:
+	    self._check_authorized()
         if not self.temp_file:
             self.temp_file = self.make_temp_jdlfile()
         sub = subprocess.Popen(['glite-wms-job-submit', '-d', os.environ["USER"],
@@ -145,6 +157,19 @@ class jdl_launcher(object):
         if out[1] == "":
             return out[0].split('Your job identifier is:')[1].split()[0]
         raise RuntimeError("Launching of JDL failed because: "+out[1])
+
+
+
+class UnauthorizedJdlLauncher(JdlLauncher):
+    def __init__(self, *args, **kw):
+        super(UnauthorizedJdlLauncher, self).__init__(*args, authorize=False, **kw)
+
+    def launch(self):
+        if not self.temp_file:
+            self.temp_file = self.make_temp_jdlfile()
+        fake_link = 'https://wms2.grid.sara.nl:9000/'+''.join(random.choice(string.ascii_letters + string.digits+"-") for _ in range(22))
+        warnings.warn("If you were authorized, we would be launching the JDL here. You'd get this in return: {}".format(fake_link))
+        return fake_link
 
 
 #class loui_launcher(jdl_launcher):

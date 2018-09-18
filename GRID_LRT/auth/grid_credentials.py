@@ -37,12 +37,10 @@ def grid_credentials_enabled():
 
 
 def skip_grid_auth(func):
-    def continue_on_auth_fail(func):
+    def wrapped(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except Exception as e:
-            if "Grid Credentials expired!" in str(e):
-                raise Warning("Not authorized GRID user but continuing anyways")
-            else:
-                raise e
+        except :
+            raise Warning("Not authorized GRID user but continuing anyways")
+    return wrapped
 

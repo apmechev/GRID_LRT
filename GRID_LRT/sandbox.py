@@ -13,7 +13,7 @@ warnings.simplefilter('default')
 import yaml
 import GRID_LRT
 from GRID_LRT.auth import grid_credentials
-
+import warnings
 
 class Sandbox(object):
     """ A set of functions to create a sandbox from a configuration file. Uploads to grid storage
@@ -30,7 +30,7 @@ class Sandbox(object):
         storage
     """
 
-    def __init__(self, cfgfile=None):
+    def __init__(self, cfgfile=None, **kwargs):
         """ Creates a 'sandbox' object which builds and uploads the sanbox. An optional
         argument is the configuration file which is a yaml file specifying the repositories
         to include, the type of the sanbox, and its name.
@@ -42,7 +42,12 @@ class Sandbox(object):
 
 
         """
-        grid_credentials.grid_credentials_enabled()
+	self.authorized = False
+	if 'authorize' in kwargs.keys() and kwargs['authorize'] == False:
+		pass
+	else:
+	        grid_credentials.grid_credentials_enabled()
+		self.authorized = True
         lrt_module_dir = os.path.abspath(
             GRID_LRT.__file__).split("__init__.py")[0]
         self.base_dir = lrt_module_dir+"data/"
@@ -261,7 +266,15 @@ class Sandbox(object):
         self.zip_sbx()
 
     def upload_sandbox(self, upload_name=None):
-        self.upload_sbx(upload_name=upload_name)
+	if self.authorized:
+	    self.upload_sbx(upload_name=upload_name)
+	else: 
+	    warnings.warn("not authorized to uplad to gsiftp", RuntimeWarning)
         self.upload_ssh_sandbox(upload_name=upload_name)
         if self.sbx_def['remove_when_done'] == True:
             self.cleanup()
+
+class UnauthorizedSandbox(Sandbox):
+    def __init__(self, *args, **kw):
+        super(UnauthorizedSandbox, self).__init__(*args, authorize=False, **kw)
+
