@@ -42,11 +42,11 @@ class Sandbox(object):
 
 
         """
-	    self.authorized = False
-	    if 'authorize' in kwargs.keys() and kwargs['authorize'] == False:
-		    pass
-	    else:
-	        grid_credentials.grid_credentials_enabled()
+        self.authorized = False
+        if 'authorize' in kwargs.keys() and kwargs['authorize'] == False:
+            pass
+        else:
+            grid_credentials.grid_credentials_enabled()
 		self.authorized = True
         lrt_module_dir = os.path.abspath(
             GRID_LRT.__file__).split("__init__.py")[0]
