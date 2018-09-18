@@ -147,7 +147,7 @@ class Token_Handler(object):
         database = server[dbn]
         return database
 
-    @retrying(wait_fixed=20, stop_max_attempt_number=2)
+    @retry(wait_fixed=20, stop_max_attempt_number=2)
     def create_token(self, keys=None, append="", attach=None):
         '''Creates a token, appends string to token ID if requested and
         adds user requested keys through the dict keys{}
