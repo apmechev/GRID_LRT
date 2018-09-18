@@ -47,7 +47,7 @@ class Sandbox(object):
             pass
         else:
             grid_credentials.grid_credentials_enabled()
-		self.authorized = True
+        self.authorized = True
         lrt_module_dir = os.path.abspath(
             GRID_LRT.__file__).split("__init__.py")[0]
         self.base_dir = lrt_module_dir+"data/"
@@ -266,11 +266,11 @@ class Sandbox(object):
         self.zip_sbx()
 
     def upload_sandbox(self, upload_name=None):
-	if self.authorized:
-	    self.upload_sbx(upload_name=upload_name)
-	else: 
-	    warnings.warn("not authorized to uplad to gsiftp", RuntimeWarning)
-        self.upload_ssh_sandbox(upload_name=upload_name)
+        if self.authorized:
+            self.upload_sbx(upload_name=upload_name)
+        else: 
+            warnings.warn("not authorized to uplad to gsiftp", RuntimeWarning)
+            self.upload_ssh_sandbox(upload_name=upload_name)
         if self.sbx_def['remove_when_done'] == True:
             self.cleanup()
 
