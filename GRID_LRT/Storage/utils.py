@@ -1,7 +1,7 @@
 from datetime import datetime
 from subprocess import Popen, PIPE
 import re
-import GRID_LRT.grid_credentials as grid_creds
+import GRID_LRT.auth.grid_credentials as grid_creds
 
 class GSIFile(object):
     def __init__(self, location):

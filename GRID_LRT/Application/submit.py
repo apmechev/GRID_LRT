@@ -96,11 +96,13 @@ class JdlLauncher(object):
     def __exit__(self, exc_type, exc_value, traceback):
         os.remove(self.temp_file.name)
 
-    def build_jdl_file(self):
+    def build_jdl_file(self, database=None):
         """Uses a template to build the jdl file and place it in a
         temporary file object stored internally.
             """
         creds = pc()  # Get credentials, get launch file to send to workers
+        if not database:
+            database = creds.database
         if not os.path.exists(self.launch_file):
             raise IOError("Launch file doesn't exist! "+self.launch_file)
         jdlfile = """[
@@ -124,7 +126,7 @@ class JdlLauncher(object):
   CPUNumber = %d;
 ]""" % (int(self.parameter_step),
         int(self.numjobs),
-        str(creds.database),
+        str(database),
         str(creds.user),
         str(creds.password),
         str(self.token_type),
@@ -135,21 +137,21 @@ class JdlLauncher(object):
         int(self.ncpu))
         return jdlfile
 
-    def make_temp_jdlfile(self):
+    def make_temp_jdlfile(self, database=None):
         """ Makes a temporary file to store the JDL
         document that is only visible to the user"""
         self.temp_file = tempfile.NamedTemporaryFile(delete=False)
         with open(self.temp_file.name, 'w') as t_file_obj:
-            for i in self.build_jdl_file():
+            for i in self.build_jdl_file(database):
                 t_file_obj.write(i)
         return self.temp_file
 
-    def launch(self):
+    def launch(self, database=None):
         """Launch the glite-job and return the job identification"""
 	if not self.authorized:
 	    self._check_authorized()
         if not self.temp_file:
-            self.temp_file = self.make_temp_jdlfile()
+            self.temp_file = self.make_temp_jdlfile(database = database)
         sub = subprocess.Popen(['glite-wms-job-submit', '-d', os.environ["USER"],
                                 self.temp_file.name], stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
