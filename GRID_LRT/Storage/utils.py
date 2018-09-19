@@ -5,21 +5,35 @@ import re
 import GRID_LRT.auth.grid_credentials as grid_creds
 from GRID_LRT.auth.get_picas_credentials import picas_cred
 from GRID_LRT import Token
+from GRID_LRT.Storage.srmlist import srmlist
 
+import pdb
 class GSIFile(object):
-    def __init__(self, location):
+    def __init__(self, location, parent_dir=None):
         _ = grid_creds.grid_credentials_enabled()
-        self._internal = self._test_file_exists(location)
-        self.datetime = self._internal['datetime']
-        self.location = self._internal['location']
-        self.filename = self._internal['filename']
+        if parent_dir:
+            self._internal = parent_dir.split()
+        else:
+            self._internal = self._test_file_exists(location)
+        self.datetime = self._extract_date(self._internal)
+        self.location = location
         self.protocol = location.split("://")[0]
         self.port = self._get_port(location)
-        self.is_dir, self.parent_dir = self._check_if_directory(location)
+        if parent_dir:
+            self.parent_dir = None
+            if self._internal[0]=='d':
+                self.is_dir = True
+            else:
+                self.is_dir = False
+        else:
+           self.is_dir, self.parent_dir = self._check_if_directory(location)
         if self.is_dir:
             self.is_file = False
+            self.filename = self.location.split('/')[-1]
         else:
             self.is_file = True
+            self.filename = self._internal[-1]
+
 
     def _check_if_directory(self,location):
         self.num_subdir = len([i for i in location.split('gsiftp://')[1].split('/') if i]) - 1
@@ -36,6 +50,9 @@ class GSIFile(object):
         else:
             return False, parent_dir
 
+    def __repr__(self):
+        return "<GRID_LRT.Storage.utils.GSIFile {} {} located in {} >".format("File" if self.is_file else "Folder", 
+                self.filename, self.location)
 
     def _test_file_exists(self,location):
         result, error = self._uberftpls(location)
@@ -46,9 +63,10 @@ class GSIFile(object):
         if "No match " in error:
             raise Exception("file %s cannot be found: %s"%(location, error))
         result = result.split()
-        datetime =self._extract_date(result)
-        filename = result[-1] 
-        return {'location':location, 'datetime':datetime, 'filename':filename, 'raw':result}
+#        datetime =self._extract_date(result)
+#        filename = result[-1]
+        return result
+#        return {'location':location, 'datetime':datetime, 'filename':filename, 'raw':result}
 
     @staticmethod
     def _extract_date(data):
@@ -137,9 +155,10 @@ class GSIFile(object):
             return []
         if results == '':
             return []
+        results = results.strip().split("\r\n")
         file_locs = [self.location +"/"+str(i.split()[-1])
-                for i in results.strip().split("\r\n")]
-        files_list = [GSIFile(i) for i in file_locs] #TODO: Do this in bulk rather than call uberftp for each file
+                for i in results]
+        files_list = [GSIFile(i,parent_dir=r) for i,r in zip(file_locs,results)]
         return files_list                                  
     
 def get_srmdir_from_token_task(token_type, view, key = 'RESULTS_DIR'):
@@ -155,5 +174,9 @@ def get_srmdir_from_token_task(token_type, view, key = 'RESULTS_DIR'):
             srmdir = GSIFile(srmdir_location)
     return srmdir
 
+def make_srmlist_from_srmdir(srmdir):
+    slist = srmlist()
+    for i in srmdir.list_dir():
+        slist.append(i.location)
 
 
