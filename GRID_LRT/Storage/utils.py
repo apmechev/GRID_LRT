@@ -3,6 +3,8 @@ import warnings
 from subprocess import Popen, PIPE
 import re
 import GRID_LRT.auth.grid_credentials as grid_creds
+from GRID_LRT.auth.get_picas_credentials import picas_cred
+from GRID_LRT import Token
 
 class GSIFile(object):
     def __init__(self, location):
@@ -40,22 +42,20 @@ class GSIFile(object):
         if result=="" and error=="":
             if location[-1]=='/':
                 location = location[:-1]
-            result, error = self._uberftpls("/".join(location.split('/')[:-1]))
-                if "No match " in error:
-                    raise Exception("file %s cannot be found: %s"%(location, error))
-                result = result.split()
-                datetime =self._extract_date(result)
-                filename = result[-1] 
-                return {'location':location, 'datetime':datetime, 'filename':filename, 'raw':result}
+                result, error = self._uberftpls("/".join(location.split('/')[:-1]))
+        if "No match " in error:
+            raise Exception("file %s cannot be found: %s"%(location, error))
+        result = result.split()
+        datetime =self._extract_date(result)
+        filename = result[-1] 
+        return {'location':location, 'datetime':datetime, 'filename':filename, 'raw':result}
 
-            @staticmethod
-            def _extract_date(data):
-                if data[-2] not in ['2018','2017','2016','2015']:
-                    date = data[-4]+" "+data[-3]+" " + str(datetime.now().year)
-                    time = data[-2]
-                er
-                Traceback (most recent call last):
-                      File "<stdin>", line lse:
+    @staticmethod
+    def _extract_date(data):
+        if data[-2] not in ['2018','2017','2016','2015']:
+            date = data[-4]+" "+data[-3]+" " + str(datetime.now().year)
+            time = data[-2]
+        else:
             date = data[-4]+" "+data[-3]+" "+data[-2]
             time = "00:00"
         file_datetime = datetime.strptime(date+"-"+time, "%b %d %Y-%H:%M")
@@ -126,3 +126,20 @@ class GSIFile(object):
         if self._get_num_files() == 0:
             return True
         return False
+
+    
+def get_srmdir_from_token_task(token_type, view, key = 'RESULTS_DIR'):
+    pc=picas_cred()
+    th=Token.Token_Handler(t_type=token_type, uname=pc.user, pwd=pc.password, dbn=pc.database)
+    tokens=th.list_tokens_from_view(view)
+    srmdir, OBSID = None, None
+    for t in tokens: #TODO: Do this with a proper view
+        if srmdir is not None: break
+        OBSID = th.database[t['id']]['OBSID']
+        if OBSID:
+            srmdir_location = str(th.database[t['id']][key])+str(OBSID)
+            srmdir = GSIFile(srmdir_location)
+    return srmdir
+
+
+
