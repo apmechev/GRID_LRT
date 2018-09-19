@@ -20,12 +20,14 @@ class GSIFile(object):
             self.is_file = True
 
     def _check_if_directory(self,location):
-        num_subdir = len([i for i in location.split('/') if i]) #check if too deep
+        self.num_subdir = len([i for i in location.split('gsiftp://')[1].split('/') if i]) - 1
         filename = location.split('/')[-1]
         parent_dir = self.get_parent_dir()
         parent_dir = parent_dir.replace(self.protocol+':/',self.protocol+"://")  #TODO Make this cleaner (new staticmethod)
-        sub = Popen(['uberftp','-ls',parent_dir], stdout=PIPE, stderr=PIPE)
-        res, err = sub.communicate()
+        res, err = self._uberftpls(parent_dir)
+        if '550' in err:
+            warnings.warn('Parent directory inaccessible!: {}'.format(err))
+            return None, parent_dir #Doesn't know if it's a file or dir if can't get parent_dir
         status = [x for x in res.split('\r\n') if filename in x]
         if status[0][0]=='d':
             return True, parent_dir
@@ -34,22 +36,26 @@ class GSIFile(object):
 
 
     def _test_file_exists(self,location):
-        sub = Popen(['uberftp','-ls',location], stdout=PIPE, stderr=PIPE)
-        result, error = sub.communicate()
-        if error:
-            raise Warning("file %s cannot be found: %s"%(location, error))
-            return {'location':None, 'datetime':None, 'filename':None, 'raw':None}
-        result = result.split()
-        datetime =self._extract_date(result)
-        filename = result[-1]
-        return {'location':location, 'datetime':datetime, 'filename':filename, 'raw':result}
+        result, error = self._uberftpls(location)
+        if result=="" and error=="":
+            if location[-1]=='/':
+                location = location[:-1]
+            result, error = self._uberftpls("/".join(location.split('/')[:-1]))
+                if "No match " in error:
+                    raise Exception("file %s cannot be found: %s"%(location, error))
+                result = result.split()
+                datetime =self._extract_date(result)
+                filename = result[-1] 
+                return {'location':location, 'datetime':datetime, 'filename':filename, 'raw':result}
 
-    @staticmethod
-    def _extract_date(data):
-        if data[-2] not in ['2018','2017','2016','2015']:
-            date = data[-4]+" "+data[-3]+" " + str(datetime.now().year)
-            time = data[-2]
-        else:
+            @staticmethod
+            def _extract_date(data):
+                if data[-2] not in ['2018','2017','2016','2015']:
+                    date = data[-4]+" "+data[-3]+" " + str(datetime.now().year)
+                    time = data[-2]
+                er
+                Traceback (most recent call last):
+                      File "<stdin>", line lse:
             date = data[-4]+" "+data[-3]+" "+data[-2]
             time = "00:00"
         file_datetime = datetime.strptime(date+"-"+time, "%b %d %Y-%H:%M")
@@ -66,28 +72,29 @@ class GSIFile(object):
     def _donotdelete(self,location):
         """Raises Exception if you try to delete files or folders whose parent is
         one of these folders"""
-        locations = ['gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/',
-                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/archive',
-                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated',
-                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/sksp_natalie',
-                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib',
-                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox',
-                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/LGPPP',
-                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines',
-                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/PiLL',
-                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/SKSP',
-                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/test',
-                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/NDPPP'
-#                     'gsiftp://gridftp.grid.sara.nl/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/DISC'
+        locations = ['gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/archive',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sksp_natalie',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/LGPPP',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/PiLL',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/SKSP',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/test',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/NDPPP'
+#                     'gsiftp://gridftp.grid.sara.n:2811l/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/DISC'
                      ]
         if self.parent_dir in locations:
-            raise Exception("Not allowed to delete this folder because its parent is %s" % (self.parent_dir))
+            raise Exception("FORBIDDEN to delete this {} because its parent is {}".format(
+                            'file' if self.is_file else 'folder', self.parent_dir))
 
     def delete(self):
         parent_dir = self.get_parent_dir()
         self._donotdelete(parent_dir)
-        if self.is_dir:
-            raise Exception("Not allowed to delete a folder yet" )
+        if self.is_dir and not self.is_empty():
+            raise Exception("Not allowed to delete a folder that isn't empty yet" )
         del_proc = Popen(['uberftp','-rm',self.location], stdout=PIPE, stderr=PIPE)
         res, err = del_proc.communicate()
         if not err:
@@ -100,4 +107,22 @@ class GSIFile(object):
         parent_dir = "/".join(location.split('/')[:-1])
         return parent_dir
 
+    def _get_num_files(self):
+        """If self is folder, gets the number of files in it"""
+        if self.is_file:
+            return 1
+        res, err = self._uberftpls(self.location)
+        num_files = len([x for x in res.split('\r\n') if x])
+        return num_files
 
+    def _uberftpls(self, location):
+        sub = Popen(['uberftp','-ls', location], stdout=PIPE, stderr=PIPE)
+        res, err = sub.communicate()
+        if err:
+            warnings.warn("Uberftp -ls gave us an error for location {}: {}".format(location, err))
+        return res, err
+
+    def is_empty(self):
+        if self._get_num_files() == 0:
+            return True
+        return False
