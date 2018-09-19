@@ -127,6 +127,20 @@ class GSIFile(object):
             return True
         return False
 
+    def list_dir(self):
+        """Checks the status of all srm links in the folder given. 
+        Returns a list of localities
+        """     
+        if self.is_dir:
+           results, error= self._uberftpls(self.location)
+        else: 
+            return []
+        if results == '':
+            return []
+        file_locs = [self.location +"/"+str(i.split()[-1])
+                for i in results.strip().split("\r\n")]
+        files_list = [GSIFile(i) for i in file_locs] #TODO: Do this in bulk rather than call uberftp for each file
+        return files_list                                  
     
 def get_srmdir_from_token_task(token_type, view, key = 'RESULTS_DIR'):
     pc=picas_cred()
