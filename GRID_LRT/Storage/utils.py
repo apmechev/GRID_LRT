@@ -1,4 +1,5 @@
 from datetime import datetime
+import warnings
 from subprocess import Popen, PIPE
 import re
 import GRID_LRT.auth.grid_credentials as grid_creds
@@ -84,11 +85,19 @@ class GSIFile(object):
 
     def delete(self):
         parent_dir = self.get_parent_dir()
-        self._dontdelete(parent_dir)
+        self._donotdelete(parent_dir)
+        if self.is_dir:
+            raise Exception("Not allowed to delete a folder yet" )
+        del_proc = Popen(['uberftp','-rm',self.location], stdout=PIPE, stderr=PIPE)
+        res, err = del_proc.communicate()
+        if not err:
+            return
+        else: 
+            warnings.warn('Deleting failed: {}'.format(err))
     
     def get_parent_dir(self):
         location = "/".join([i for i in self.location.split('/') if i])
         parent_dir = "/".join(location.split('/')[:-1])
         return parent_dir
-def remove_gsi_file(file_obj):
-    
+
+
