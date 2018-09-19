@@ -5,12 +5,12 @@ import re
 import GRID_LRT.auth.grid_credentials as grid_creds
 from GRID_LRT.auth.get_picas_credentials import picas_cred
 from GRID_LRT import Token
-from GRID_LRT.Storage.srmlist import srmlist
+from GRID_LRT.Staging.srmlist import srmlist
 
 import pdb
 class GSIFile(object):
     def __init__(self, location, parent_dir=None):
-        _ = grid_creds.grid_credentials_enabled()
+#        _ = grid_creds.grid_credentials_enabled()
         if parent_dir:
             self._internal = parent_dir.split()
         else:
