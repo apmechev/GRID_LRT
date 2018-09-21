@@ -17,7 +17,8 @@ setup(name='GRID_LRT',
       install_requires=[
           'pyyaml',
           'couchdb',
-          'retrying'
+          'retrying',
+          'humanfriendly'
           ],
       include_package_data=True,
       data_files=[("githash",["GRID_LRT/__githash__"]),
