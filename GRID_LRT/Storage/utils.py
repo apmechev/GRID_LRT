@@ -6,11 +6,12 @@ import GRID_LRT.auth.grid_credentials as grid_creds
 from GRID_LRT.auth.get_picas_credentials import picas_cred
 from GRID_LRT import Token
 from GRID_LRT.Staging.srmlist import srmlist
+import humanfriendly
 
 import pdb
 class GSIFile(object):
     def __init__(self, location, parent_dir=None):
-#        _ = grid_creds.grid_credentials_enabled()
+        _ = grid_creds.grid_credentials_enabled()
         self.location = location
         self.protocol = location.split("://")[0]
         self.port = self._get_port(location)
@@ -22,7 +23,7 @@ class GSIFile(object):
             self.is_dir, self.parent_dir = self._check_if_directory(location)
             self._internal = self._test_file_exists(location)
         self.datetime = self._extract_date(self._internal) 
-
+        self.size = self._get_size()
         if self.is_dir:
             self.is_file = False
             self.filename = self.location.split('/')[-1]
@@ -37,6 +38,21 @@ class GSIFile(object):
             self.is_dir = True
         elif self._internal[0][0] == '-':
             self.is_dir = False
+
+    def _get_size(self):
+        self._bytesize = self._internal[4]
+        human_size = humanfriendly.parse_size(self._bytesize)
+        return humanfriendly.format_size(human_size)
+
+    def get_dir_size(self):
+        """Will go one level deeper and sum the sizes of all objects. If the objects are directories, you'll
+        have to do the iteration yourself!"""
+        total = humanfriendly.parse_size(self.size)
+        for f in self.list_dir():
+            total += humanfriendly.parse_size(f.size)
+        print(total)
+        t = humanfriendly.parse_size(str(total))
+        return  humanfriendly.format_size(t)
 
     def _check_if_directory(self,location):
         self.num_subdir = len([i for i in location.split('gsiftp://')[1].split('/') if i]) - 1
