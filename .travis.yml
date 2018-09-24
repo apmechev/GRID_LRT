@@ -14,7 +14,7 @@ services:
 # command to install dependencies
 before_install:
     -  sudo apt-get update
-    -  sudo echo "deb http://cz.archive.ubuntu.com/ubuntu artful main universe" >> /etc/apt/sources.list
+    -  sudo echo "deb http://cz.archive.ubuntu.com/ubuntu bionic main universe" >> /etc/apt/sources.list
     -  sudo apt-get update
     -  sudo apt-get install gfal2 libgfal2-dev libgfal2-2  libboost-all-dev python-dev gfal2-doc gfal2-plugin-* libdpm-dev libgfal-transfer2 libgfal-srm-ifce1 gfal2-dbg
     -  pip install  git+https://github.com/cern-fts/gfal2-python.git@v1.9.3
