@@ -44,7 +44,7 @@ def cleanup_folder(base_dir, numdays):
     for f in todeletefiles:
         if f.is_dir:
             for subdir in f.list_dir():
-                subdir.remove()
-            f.remove()
+                subdir.delete()
+            f.delete()
         else:
             f.remove()
