@@ -11,15 +11,21 @@ services:
       - couchdb
 # command to install dependencies
 before_install:
-      #    - sudo apt-get -qq update
-      #    - sudo apt-get install -y gfal2* libgfal2-2 libgfal2-dev libgfal-srm-ifce1
-      #    - pip install gfal2-python 
+    - svn export http://svnweb.cern.ch/guest/lcgutil/gfal2/trunk gfal2 
+    - cd gfal2 
+    - mkdir build; cd build
+    - cmake −D CMAKE_INSTALL_PREFIX=/usr"
+    - make 
+    -  pip install gfal2-python 
       #    - sudo apt-get install globus-gass-copy-progs voms-clients -y
       #    - sudo add-apt-repository -y 'deb http://repository.egi.eu/sw/production/cas/1/current egi-igtf core' 
       #    - sudo apt-get update 
       #    - sudo mkdir -p /etc/grid-security/certificates/
       #    - sudo apt-get -y --allow-unauthenticated install ca-policy-egi-core 
     - pip install mock
+    - wget http://www.globus.org/ftppub/gt6/installers/repo/globus-toolkit-repo_latest_all.deb
+    - dkg -i globus-toolkit-repo_latest_all.deb
+    - apt-get install globus-data-management-client
     - pip install codecov
     - curl -X PUT localhost:5984/test_db
 
