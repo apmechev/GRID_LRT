@@ -1,4 +1,6 @@
 language: python
+dist: trusty
+sudo: required
 python:
   - "2.6"
   - "2.7"
@@ -12,7 +14,7 @@ services:
 # command to install dependencies
 before_install:
     -  sudo apt-get update
-    -  sudo apt-get install gfal2 libgfal2-dev libgfal2-2  libboost-all-dev python-dev gfal2-doc gfal2-plugin-*
+    -  sudo apt-get install gfal2 libgfal2-dev libgfal2-2  libboost-all-dev python-dev gfal2-doc gfal2-plugin-* libdpm-dev libgfal-transfer2 libgfal-srm-ifce1 gfal2-dbg
     -  pip install  git+https://github.com/cern-fts/gfal2-python.git@v1.9.3
       #    - sudo apt-get install globus-gass-copy-progs voms-clients -y
       #    - sudo add-apt-repository -y 'deb http://repository.egi.eu/sw/production/cas/1/current egi-igtf core' 
