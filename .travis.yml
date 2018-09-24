@@ -11,7 +11,7 @@ services:
       - couchdb
 # command to install dependencies
 before_install:
-    -  apt-get install gfal2
+    -  sudo apt-get install gfal2
     -  pip install gfal2-python 
       #    - sudo apt-get install globus-gass-copy-progs voms-clients -y
       #    - sudo add-apt-repository -y 'deb http://repository.egi.eu/sw/production/cas/1/current egi-igtf core' 
