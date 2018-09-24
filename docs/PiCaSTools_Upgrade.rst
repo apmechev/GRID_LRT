@@ -23,7 +23,8 @@ with
 
 into your run_remote_sandbox.sh (This is located in various locations but one good place to look for it is {GRID_LRT/Sandbox/Launchers} for the Old versions and {GRID_LRT/data/launchers} for versions >0.2.x)
 
-2. Build your sandboxes with the new GRID_Sandbox repository (fork if you have to). This also requires the newest (>0.2) version of GRID_LRT. Building the SBX is easy. Use
+2. Build your sandboxes with the new GRID_Sandbox repository (fork if you have to). 
+   This also requires the newest (>0.2) version of GRID_LRT. Building the SBX is easy. Use
 
 
 .. code-block:: python 

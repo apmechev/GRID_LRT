@@ -153,7 +153,6 @@ ndppp_prep_target.argument.msin.baseline            = CS*&; RS*&; CS*&RS*
 ndppp_prep_target.argument.msout.datacolumn         = DATA
 ndppp_prep_target.argument.msout.writefullresflag   = False
 ndppp_prep_target.argument.msout.overwrite          = True
-ndppp_prep_target.argument.msout.storagemanager     = 'dysco'
 ndppp_prep_target.argument.steps                    = [flag1,filter,flagamp,applyclock,applygain,applybeam,applyrotate,count,flag2,count,avg]
 ndppp_prep_target.argument.flag1.type               = preflagger
 ndppp_prep_target.argument.flag1.baseline           = {{ flag_baselines }}
