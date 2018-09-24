@@ -14,10 +14,10 @@ services:
 # command to install dependencies
 before_install:
     -  sudo apt-get update
-    - sudo apt-get install libdpm-dev
+    - sudo apt-get install libdpm-dev libboost-all-dev python-dev 
     -  sudo echo "deb http://cz.archive.ubuntu.com/ubuntu bionic main universe" >> /etc/apt/sources.list
     -  sudo apt-get update
-    -  sudo apt-get install gfal2 libgfal2-dev libgfal2-2  libboost-all-dev python-dev gfal2-doc gfal2-plugin-* libgfal-transfer2 libgfal-srm-ifce1
+    -  sudo apt-get install gfal2 libgfal2-dev libgfal2-2 gfal2-doc gfal2-plugin-* libgfal-transfer2 libgfal-srm-ifce1
     -  pip install  git+https://github.com/cern-fts/gfal2-python.git@v1.9.3
 
       #    - sudo apt-get install globus-gass-copy-progs voms-clients -y
