@@ -25,7 +25,10 @@ before_install:
     - wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gfal2/libgfal2-dev_2.13.4-1_amd64.deb
       #    - wget http://security.ubuntu.com/ubuntu/pool/main/g/gcc-7/libstdc++6_7.2.0-8ubuntu3.2_amd64.deb
       #    - sudo dpkg --install libstdc++6_7.2.0-8ubuntu3.2_amd64.deb
-    - sudo apt-get install -y gcc-7
+    - sudo apt-get update && sudo apt-get upgrade
+    - sudo apt-get install build-essential
+    - sudo apt-get install aptitude
+    - sudo apt-get install -y libstdc++
     - sudo dpkg --install libjson-c3_0.12.1-1.3_amd64.deb 
     - sudo dpkg --install libgfal2-2_2.13.4-1_amd64.deb
     - sudo dpkg --install libgfal-transfer2_2.13.4-1_amd64.deb
