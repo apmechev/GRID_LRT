@@ -55,7 +55,7 @@ class srmlist(list):
 
     def check_obsid(self, item):
         link = self.stringify_item(item)
-        tmp_obsid = re.search('L[0-9]*',
+        tmp_obsid = re.search('L[0-9][0-9]*',
                               link).group(0)
         if not self.obsid:
             self.obsid = tmp_obsid
