@@ -17,23 +17,23 @@ before_install:
     - sudo apt-get install libdpm-dev libboost-all-dev python-dev libglibmm-2.4-1c2a
     - sudo apt-get install -y dpkg
     - wget http://mirrors.kernel.org/ubuntu/pool/main/j/json-c/libjson-c3_0.12.1-1.3_amd64.deb
-    - wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gfal2/libgfal-transfer2_2.13.4-1_amd64.deb
+    - wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gfal2/libgfal-transfer2_2.15.2-1_amd64.deb
     - wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gfal2/gfal2_2.15.2-1_all.deb
-    - wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gfal2/libgfal2-2_2.13.4-1_amd64.deb
+    - wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gfal2/libgfal2-2_2.15.2-1_amd64.deb
     - wget http://mirrors.kernel.org/ubuntu/pool/main/a/attr/libattr1_2.4.47-2build1_amd64.deb
     - wget http://mirrors.kernel.org/ubuntu/pool/main/a/attr/libattr1-dev_2.4.47-2build1_amd64.deb
-    - wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gfal2/libgfal2-dev_2.13.4-1_amd64.deb
+    - wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gfal2/libgfal2-dev_2.15.2-1_amd64.deb  
     - wget http://security.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++6_5.4.0-6ubuntu1~16.04.10_amd64.deb
     - wget http://security.ubuntu.com/ubuntu/pool/main/g/gcc-5/gcc-5-base_5.4.0-6ubuntu1~16.04.10_amd64.deb
     - sudo dpkg --install gcc-5-base_5.4.0-6ubuntu1~16.04.10_amd64.deb
     - sudo dpkg --install libstdc++6_5.4.0-6ubuntu1~16.04.10_amd64.deb
     - sudo dpkg --install libjson-c3_0.12.1-1.3_amd64.deb 
-    - sudo dpkg --install libgfal2-2_2.13.4-1_amd64.deb
-    - sudo dpkg --install libgfal-transfer2_2.13.4-1_amd64.deb
+    - sudo dpkg --install libgfal2-2_2.15.2-1_amd64.deb
+    - sudo dpkg --install libgfal-transfer2_2.15.2-1_amd64.deb
     - sudo dpkg --install gfal2_2.15.2-1_all.deb
     - sudo dpkg --install libattr1_2.4.47-2build1_amd64.deb 
     - sudo dpkg --install libattr1-dev_2.4.47-2build1_amd64.deb 
-    - sudo dpkg --install libgfal2-dev_2.13.4-1_amd64.deb
+    - sudo dpkg --install libgfal2-dev_2.15.2-1_amd64.deb
     - pip install  git+https://github.com/cern-fts/gfal2-python.git
       #    - sudo apt-get install globus-gass-copy-progs voms-clients -y
       #    - sudo add-apt-repository -y 'deb http://repository.egi.eu/sw/production/cas/1/current egi-igtf core' 
