@@ -14,7 +14,7 @@ services:
 # command to install dependencies
 before_install:
     - sudo apt-get update
-    - sudo apt-get install libdpm-dev libboost-all-dev python-dev python3-dev libglibmm-2.4-1c2a
+    - sudo apt-get install libdpm-dev libboost-all-dev python-dev python3-dev libglibmm-2.4-1c2a libboost_python-py35
     - sudo apt-get install -y dpkg
     - wget http://mirrors.kernel.org/ubuntu/pool/main/j/json-c/libjson-c3_0.12.1-1.3_amd64.deb
     - wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gfal2/libgfal-transfer2_2.15.2-1_amd64.deb
@@ -34,11 +34,11 @@ before_install:
     - sudo dpkg --install libattr1_2.4.47-2build1_amd64.deb 
     - sudo dpkg --install libattr1-dev_2.4.47-2build1_amd64.deb 
     - sudo dpkg --install libgfal2-dev_2.15.2-1_amd64.deb
-    - sudo rm /opt/pyenv/shims/python
-    - sudo rm /usr/bin/python
+    - sudo rm /opt/pyenv/shims/python*
+    - sudo rm /usr/bin/python*
     - ls $(python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
     - export PYTHON_INCLUDE_DIR=$(python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
-    - export PYTHON_LIBRARY=$(python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")/libpython*.so
+    - export PYTHON_LIBRARY=$(python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")/libpython*[!m].so
     - pip install  --verbose git+https://github.com/cern-fts/gfal2-python.git
     - which -a python 
       #    - sudo apt-get install globus-gass-copy-progs voms-clients -y
