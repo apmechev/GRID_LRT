@@ -7,13 +7,13 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-    env Boost_PYTHON_3_SUFFIX=35
   - "3.6"
     #  - "3.7"
 services:
       - couchdb
 # command to install dependencies
 before_install:
+    - if [[ $TRAVIS_PYTHON_VERSION == 3.5  ]]; then export Boost_PYTHON_3_SUFFIX=35 ; fi
     - sudo apt-get update
     - sudo apt-get install libdpm-dev libboost-all-dev python-dev python3-dev libglibmm-2.4-1c2a 
     - sudo apt-get install -y dpkg
