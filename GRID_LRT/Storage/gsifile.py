@@ -188,4 +188,28 @@ class GSIFile(object):
                 for i in results if i]
         self._subfiles, _= self._uberftpls(self.location)
         files_list = [GSIFile(i, parent_dir=self) for i,r in zip(file_locs,results)]
-        return files_list                                  
+        return files_list
+
+
+class MockGSIFile(GSIFile):
+    def __init__(self, location):
+        """uses text from uberftp -ls to initialize, saved in a file"""
+        d = open(location,'r').read()
+        self._filedata = '\r\n'.join(d.split('\r\n')[1:])
+        self.location =d.split('\r\n')[0]
+        self.parent_dir = self.location.split('/')[-1]
+        self._internal = self._find_item_in_uberftp_result(self._filedata)
+        if len(d)>2:
+            self.is_dir = True
+            self.is_file = False
+        else:
+            self.is_dir = False
+            self.is_file = True
+
+    def list_dir(self):
+        results = self._filedata.split('\r\n')[1:]
+        file_locs = [self.location +"/"+str(i.split()[-1])
+                                for i in results if i]
+        return file_locs
+
+
