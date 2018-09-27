@@ -1,4 +1,4 @@
-from GRID_LRT.Application import submit
+from GRID_LRT.application import submit
 import os 
 import glob
 import unittest

@@ -4,13 +4,13 @@
 JDL Submission Modules
 =============
 
-This module is located in GRID_LRT.Application. It can create and submit a jdl file, linking it with a CouchDB design document (i.e. token 'type')
+This module is located in GRID_LRT.application. It can create and submit a jdl file, linking it with a CouchDB design document (i.e. token 'type')
 
 .. _submit-doc:
 
-GRID_LRT.Application.submit
+GRID_LRT.application.submit
 --------------------                                                                                     
-.. automodule:: GRID_LRT.Application.submit
+.. automodule:: GRID_LRT.application.submit
     :members:
     :undoc-members:
     :inherited-members:
