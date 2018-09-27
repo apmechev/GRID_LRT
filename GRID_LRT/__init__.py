@@ -4,7 +4,7 @@ import os
 import socket
 
 __all__ = ["Storage", 'auth', "application", "Staging", 'sandbox', 'Token', 'couchdb', "couchdb.tests"]
-__version__ = "0.5.0rc1"
+__version__ = "0.5.0rc2"
 __author__ = "Alexandar P. Mechev"
 __copyright__ = "2018 Alexandar P. Mechev"
 __credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
