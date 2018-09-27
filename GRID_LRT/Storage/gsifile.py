@@ -70,7 +70,7 @@ class GSIFile(object):
             return False, parent_dir
 
     def __repr__(self):
-        return "<GRID_LRT.Storage.utils.GSIFile {} {} located in {} >".format("File" if self.is_file else "Folder", 
+        return "<GRID_LRT.Storage.gsifile.GSIFile {} {} located in {} >".format("File" if self.is_file else "Folder", 
                 self.filename, self.location)
 
     def _test_file_exists(self,location):
