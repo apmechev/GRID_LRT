@@ -1,5 +1,5 @@
 import datetime
-from GRID_LRT.Storage.utils  import GSIFile
+from GRID_LRT.Storage.gsifile  import GSIFile
 
 
 
