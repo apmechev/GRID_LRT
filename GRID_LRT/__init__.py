@@ -4,14 +4,14 @@ import os
 import socket
 
 __all__ = ["storage", 'auth', "application", "Staging", 'sandbox', 'Token']
-__version__ = "0.5.0rc3"
+__version__ = "0.5.0"
 __author__ = "Alexandar P. Mechev"
 __copyright__ = "2018 Alexandar P. Mechev"
 __credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
 __bibtex__ = """@misc{apmechev:2018,
       author       = {Alexandar P. Mechev} 
-      title        = {apmechev/GRID_LRT: v0.4.0},
-      month        = aug,
+      title        = {apmechev/GRID_LRT: v0.5.0},
+      month        = sep,
       year         = 2018,
       doi          = {10.5281/zenodo.1341127},
       url          = {https://doi.org/10.5281/zenodo.1341127}
