@@ -1,7 +1,7 @@
 """Testing Storage functions; For now just test imports. 
 Need to scaffold test suite using mocked uberftp -ls results"""
 
-from  GRID_LRT.Storage.gsifile import GSIFile 
+from  GRID_LRT.storage.gsifile import GSIFile 
 import unittest
 
 class GSIFileTest(unittest.TestCase):
