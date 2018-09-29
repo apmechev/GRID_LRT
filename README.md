@@ -58,7 +58,7 @@ If you're using GRID processed data, also consider citing the paper below, outli
 
 ```
 @INPROCEEDINGS{mechev2017,
-   author = {{Mechev}, A. and {Oonk}, J.~B.~R. and {Danezi}, A. and {Shimwell}, T.~W. and                             
+   author = { {Mechev}, A. and {Oonk}, J.~B.~R. and {Danezi}, A. and {Shimwell}, T.~W. and                             
 {Schrijvers}, C. and {Intema}, H. and {Plaat}, A. and {Rottgering}, H.~J.~A.},
     title = "{An {A}utomated {S}calable {F}ramework for {D}istributing {R}adio {A}stronomy {P}rocessing {A}cross {C}lusters and {C}louds}",
 booktitle = {Proceedings of the International Symposium on Grids and Clouds (ISGC) 2017, held 5-10 March, 2017 at Academia Sinica, Taipei, Taiwan (ISGC2017). Online at \url{https://pos.sissa.it/cgi-bin/reader/conf.cgi?confid=293}, id.2},
