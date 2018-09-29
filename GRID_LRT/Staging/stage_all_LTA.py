@@ -11,7 +11,6 @@
 
 #!/usr/bin/env python
 
-#import pythonpath
 #import gfal2 as gfal
 import re
 import sys
