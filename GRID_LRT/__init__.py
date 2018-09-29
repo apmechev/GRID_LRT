@@ -3,8 +3,8 @@ from subprocess import PIPE, Popen
 import os
 import socket
 
-__all__ = ["Storage", 'auth', "application", "Staging", 'sandbox', 'Token', 'couchdb', "couchdb.tests"]
-__version__ = "0.5.0rc2"
+__all__ = ["storage", 'auth', "application", "Staging", 'sandbox', 'Token']
+__version__ = "0.5.0rc3"
 __author__ = "Alexandar P. Mechev"
 __copyright__ = "2018 Alexandar P. Mechev"
 __credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
@@ -20,7 +20,7 @@ __license__ = "GPL 3.0"
 __maintainer__ = "Alexandar P. Mechev"
 __email__ = "LOFAR@apmechev.com"
 __status__ = "Production"
-__date__ = "2018-09-21"
+__date__ = "2018-09-29"
 
 
 
