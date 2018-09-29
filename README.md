@@ -39,18 +39,18 @@ The [up to date installation instructions are here.](https://grid-lrt.readthedoc
 
 Attribution
 =============
-[![DOI](https://zenodo.org/badge/53421495.svg)](https://zenodo.org/badge/latestdoi/53421495)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1438833.svg)](https://doi.org/10.5281/zenodo.1438833)
 [![ArXiV](http://img.shields.io/badge/arXiv-1712.00312-orange.svg?style=flat)](https://arxiv.org/abs/1712.00312)
 
 If you actively use GRID\_LRT, please cite this software as such below:
 ```
 @misc{apmechev:2018,
       author       = {Alexandar P. Mechev} 
-      title        = {apmechev/GRID_LRT: v0.4.0},
-      month        = aug,
+      title        = {apmechev/GRID_LRT: v0.5.0},
+      month        = sep,
       year         = 2018,
-      doi          = {10.5281/zenodo.1341127},
-      url          = {https://doi.org/10.5281/zenodo.1341127}
+      doi          = {10.5281/zenodo.1438833},
+      url          = {https://doi.org/10.5281/zenodo.1438833}
     }
 ```
 
