@@ -18,7 +18,7 @@
 >>> from GRID_LRT.auth.get_picas_credentials import picas_cred
 >>> pc=picas_cred() #Gets picas_credentials
 >>>
->>> th=Token.Token_Handler( t_type="test", uname=pc.user, pwd=pc.password, dbn=pc.database)
+>>> th=token.TokenHandler( t_type="test", uname=pc.user, pwd=pc.password, dbn=pc.database)
 >>> #creates object to 'handle' Tokens
 >>> th.add_overview_view()
 >>> th.add_status_views() #Adds 'todo', 'done', 'locked' and 'error' views
@@ -71,7 +71,7 @@ def get_all_design_docs(pcreds = None, srv="https://picas-lofar.grid.surfsara.nl
 def reset_all_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfsara.nl:6984"):
     """ Resets all Tokens with the pc authorization
     """
-    thandler = Token_Handler(t_type=token_type, srv=server,
+    thandler = TokenHandler(t_type=token_type, srv=server,
                              uname=picas_creds.user, pwd=picas_creds.password,
                              dbn=picas_creds.database)
     thandler.load_views()
@@ -82,7 +82,7 @@ def reset_all_tokens(token_type, picas_creds, server="https://picas-lofar.grid.s
 
 def purge_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfsara.nl:6984"):
     """Automated function to purge tokens authorizing with Picas_creds"""
-    thandler = Token_Handler(t_type=token_type, srv=server,
+    thandler = TokenHandler(t_type=token_type, srv=server,
                              uname=picas_creds.user, pwd=picas_creds.password,
                              dbn=picas_creds.database)
     thandler.load_views()
@@ -92,7 +92,7 @@ def purge_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfs
 class TokenHandler(object):
     """
 
-    The Token_Handler class uses couchdb to create, modify and delete
+    The TokenHandler class uses couchdb to create, modify and delete
     tokens and views, to attach files, or download attachments and to
     easily modify fields in tokens. It's initiated with the token_type,
     server, username, password and name of database.
@@ -107,7 +107,7 @@ class TokenHandler(object):
         >>> from GRID_LRT.auth.get_picas_credentials import picas_cred
         >>> pc=picas_cred() #Gets picas_credentials
         >>>
-        >>> th=Token.Token_Handler( t_type="test",
+        >>> th=token.TokenHandler( t_type="test",
         srv="https://picas-lofar.grid.surfsara.nl:6984", uname=pc.user,
         pwd=pc.password, dbn=pc.database ) #creates object to 'handle' Tokens
         >>> th.add_overview_view()
@@ -235,7 +235,7 @@ class TokenHandler(object):
                  cond='doc.lock > 0 && doc.done > 0 && doc.output < 0 ',
                  emit_value='doc._id', emit_value2='doc._id'):
         """Adds a view to the db, needs a view name and a condition.
-        Emits all tokens with the type of Token_Handler.t_type, that also match the condition
+        Emits all tokens with the type of TokenHandler.t_type, that also match the condition
 
         :param view_name: The name of the new view to be created
         :type view_name: str
