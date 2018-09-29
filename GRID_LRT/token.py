@@ -89,7 +89,7 @@ def purge_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfs
     thandler.purge_tokens()
 
 
-class Token_Handler(object):
+class TokenHandler(object):
     """
 
     The Token_Handler class uses couchdb to create, modify and delete

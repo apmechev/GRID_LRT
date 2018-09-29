@@ -4,7 +4,6 @@ from subprocess import Popen, PIPE
 import re
 import GRID_LRT.auth.grid_credentials as grid_creds
 from GRID_LRT.auth.get_picas_credentials import picas_cred
-from GRID_LRT import Token
 from GRID_LRT.Staging.srmlist import srmlist
 import humanfriendly
 

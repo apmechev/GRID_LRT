@@ -1,6 +1,6 @@
 import random
 import string
-from GRID_LRT import Token 
+from GRID_LRT import token 
 from GRID_LRT.auth.get_picas_credentials import picas_cred
 import os
 import glob
@@ -21,7 +21,7 @@ class TokenTest(unittest.TestCase):
 
     def test_create_Token(self):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+        th = token.TokenHandler(t_type=T_TYPE, srv="http://localhost:5984/",
                                  uname='', pwd="", dbn='test_db')
         self.assertTrue(th._get_db(uname='', pwd="",  dbn='test_db', 
             srv="http://localhost:5984/").name == 'test_db')
@@ -40,7 +40,7 @@ class TokenTest(unittest.TestCase):
 
     def test_delete_token(self):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+        th = token.TokenHandler(t_type=T_TYPE, srv="http://localhost:5984/",
                                  uname="", pwd="", dbn='test_db')
         th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':1}, append="Tokentest", attach=[])
         th.add_status_views()
@@ -58,18 +58,18 @@ class TokenTest(unittest.TestCase):
 
     def test_purge_tokens(self):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+        th = token.TokenHandler(t_type=T_TYPE, srv="http://localhost:5984/",
                                  uname="", pwd="", dbn='test_db')
         th.create_token(keys={'test_suite':'Token','lock':1}, append="Tokentest", attach=[])
         th.add_status_views() #Note without this, purge crashes!
         pc=picas_cred()
         pc.user,pc.password="",""
         pc.database = 'test_db'
-        Token.purge_tokens(T_TYPE,pc, "http://localhost:5984/")
+        token.purge_tokens(T_TYPE,pc, "http://localhost:5984/")
 
     def test_reset_tokens(self):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+        th = token.TokenHandler(t_type=T_TYPE, srv="http://localhost:5984/",
                                 uname="", pwd="", dbn='test_db')
         th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':1}, append="Tokentest", attach=[])
         th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':1}, append="Tokentest2", attach=[])
@@ -79,20 +79,20 @@ class TokenTest(unittest.TestCase):
         pc=picas_cred()
         pc.user,pc.password="",""
         pc.database = 'test_db'
-        Token.reset_all_tokens(T_TYPE,pc, "http://localhost:5984/")
+        token.reset_all_tokens(T_TYPE,pc, "http://localhost:5984/")
         self.assertTrue(len(th.list_tokens_from_view('locked'))==0)
         self.assertTrue(len(th.list_tokens_from_view('todo'))==3)
 
     def test_no_views(self):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+        th = token.TokenHandler(t_type=T_TYPE, srv="http://localhost:5984/",
                                  uname="", pwd="", dbn='test_db')
         th.load_views()
         self.assertTrue(th.views == {})
     
     def test_attachments(self):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+        th = token.TokenHandler(t_type=T_TYPE, srv="http://localhost:5984/",
                                 uname="", pwd="", dbn='test_db')
         tok = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="Tokentest", attach=[])
         th.add_status_views()
@@ -113,7 +113,7 @@ class TokenTest(unittest.TestCase):
 
     def test_archive_a_token(self):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+        th = token.TokenHandler(t_type=T_TYPE, srv="http://localhost:5984/",
                 uname="", pwd="", dbn='test_db')
         tok = th.create_token(keys={'test_suite':'test_delete_tokens','done':0,'lock':0}, append="archiveme1", attach=[])
         dump = th.archive_a_token(tok)
@@ -128,10 +128,10 @@ class TokenTest(unittest.TestCase):
 
     def test_get_all_design_docs(self):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        th = Token.Token_Handler(t_type=T_TYPE, srv="http://localhost:5984/",
+        th = token.TokenHandler(t_type=T_TYPE, srv="http://localhost:5984/",
                                 uname="", pwd="", dbn='test_db') 
         th.add_status_views()
         th.add_overview_view()
-        design_docs = Token.get_all_design_docs(None, srv="http://localhost:5984/")
+        design_docs = token.get_all_design_docs(None, srv="http://localhost:5984/")
         self.assertTrue(len(design_docs)>0)
         self.assertTrue('_design/'+T_TYPE in design_docs)
