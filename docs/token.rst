@@ -6,24 +6,24 @@ The GRID_LRT.Token module is responsible for interactions with CouchDB using the
 
 Token.py
 --------
-Location: GRID_LRT/Token.py
+Location: GRID_LRT/token.py
 Imports:
 
->>> from GRID_LRT.Token import Token_Handler
->>> from GRID_LRT.Token import TokenSet
+>>> from GRID_LRT.token import TokenHandler
+>>> from GRID_LRT.token import TokenSet
 
 
 TokenHandler
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: GRID_LRT.Token.Token_Handler
+.. autoclass:: GRID_LRT.token.TokenHandler
     :members: 
     :undoc-members:
 
 TokenSet
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: GRID_LRT.Token.TokenSet
+.. autoclass:: GRID_LRT.token.TokenSet
     :members: 
     :undoc-members:
 

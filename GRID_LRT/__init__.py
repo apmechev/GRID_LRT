@@ -1,5 +1,6 @@
 """GRID_LRT: Grid LOFAR Tools"""
 from subprocess import call, check_output, STDOUT
+from future.moves.subprocess import check_output
 import os
 import socket
 
@@ -22,8 +23,6 @@ __email__ = "LOFAR@apmechev.com"
 __status__ = "Production"
 __date__ = "2018-09-29"
 
-                
-
 def format_version(version):
     fmt = '{tag}.{commitcount}+{gitsha}'
     parts = version.split('-')
@@ -33,7 +32,6 @@ def format_version(version):
     if count == '0' and not dirty:
         return tag
     return fmt.format(tag=tag, commitcount=count, gitsha=sha.lstrip('g'))
-
 
 def get_git_version():
     command = 'git describe --tags --long --dirty'
@@ -51,4 +49,4 @@ def get_git_hash():
 
 if not call(["git", "branch"], stderr=STDOUT, stdout=open(os.devnull, 'w')) != 0:
     __commit__ = get_git_hash()
-
+    __githash__ = __commit__['hash']
