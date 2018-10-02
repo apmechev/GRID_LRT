@@ -1,6 +1,8 @@
 """GRID_LRT: Grid LOFAR Tools"""
+import sys
 from subprocess import call, check_output, STDOUT
-from future.moves.subprocess import check_output
+if sys.version_info[0] == 2 and sys.version_info[1] == 6:
+    from future.moves.subprocess import check_output
 import os
 import socket
 
