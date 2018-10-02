@@ -40,9 +40,8 @@ from retrying import retry
 
 
 import GRID_LRT
-from GRID_LRT.couchdb.design import ViewDefinition
-if 'couchdb' not in sys.modules:
-    from GRID_LRT import couchdb
+from couchdb.design import ViewDefinition
+import couchdb
 
 __version__ = GRID_LRT.__version__
 __author__ = GRID_LRT.__author__
