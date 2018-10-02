@@ -1,6 +1,6 @@
 """GRID_LRT: Grid LOFAR Tools"""
 import sys
-from subprocess import call STDOUT
+from subprocess import call, STDOUT
 if sys.version_info[0] == 2 and sys.version_info[1] == 6:
     from future.moves.subprocess import check_output
 else:
