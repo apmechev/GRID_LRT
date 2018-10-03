@@ -29,6 +29,7 @@ Requirements:
 * User account to the lofar ui at grid.surfsara.nl
 * Login to the PiCaS client at picas-lofar.grid.sara.nl
 * Active Grid certificate for launching jobs/accessing storage
+* Membership of the LOFAR VO. 
 * Astron LTA credentials for staging LOFAR data
 
 
