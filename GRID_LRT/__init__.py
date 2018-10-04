@@ -1,9 +1,7 @@
 """GRID_LRT: Grid LOFAR Tools"""
 import sys
 from subprocess import call, Popen, PIPE, STDOUT
-if sys.version_info[0] == 2 and sys.version_info[1] == 6:
-    check_output = monkeypatched_output_check
-else:
+if sys.version_info[0:2] != (2,6):
     from subprocess import check_output
 import os
 import socket
@@ -27,10 +25,11 @@ __email__ = "LOFAR@apmechev.com"
 __status__ = "Production"
 __date__ = "2018-09-29"
 
-def monkeypatched_output_check(*args, **kwargs):
-    process = Popen(stdout=PIPE, *args, **kwargs)
-    output, _ = process.communicate()
-    return output
+if sys.version_info[0:2] == (2,6) 
+    def check_output(*args, **kwargs):
+        process = Popen(stdout=PIPE, *args, **kwargs)
+        output, _ = process.communicate()
+        return output
 
 
 def format_version(version):
