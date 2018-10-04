@@ -19,6 +19,27 @@ from __future__ import print_function
 import re
 import sys
 import gfal2 as gfal  # pylint: disable=import-error
+from GRID_LRT.Staging import srmlist as srmlist_module
+
+
+##>>> ctx = gfal2.creat_context()
+#>>> (status, token) = ctx.bring_online(surl, 60, 60, True)
+
+
+class LTA_Stager(object):
+    """Stager that handles a file/srmlist and stages it. It can wait
+    for the staging to complete"""
+
+    def __init__(self,filename=None, srmlist=None):
+        if srmlist and isinstance(srmlist,srmlist_module.srmlist):
+            self.srmlist = srmlist
+        else:
+            self.srmlist = srmlist_module.srmlist()
+        pass
+
+    def load_from_filemane(self, filename):
+        for i in open(filename):
+            self.srmlist.append(i.strip('\r\n'))
 
 
 
