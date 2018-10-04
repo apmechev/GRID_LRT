@@ -25,7 +25,7 @@ __email__ = "LOFAR@apmechev.com"
 __status__ = "Production"
 __date__ = "2018-09-29"
 
-if sys.version_info[0:2] == (2,6) 
+if sys.version_info[0:2] == (2,6): 
     def check_output(*args, **kwargs):
         process = Popen(stdout=PIPE, *args, **kwargs)
         output, _ = process.communicate()
