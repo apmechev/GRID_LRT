@@ -19,7 +19,7 @@ class Staging_Test(unittest.TestCase):
     def test_load_srmlist(self):
         slist = srmlist()
         for i in open(os.path.dirname(__file__)+'/srm_50_sara.txt','r') :
-            slist.append(i.strip('\r\n')
+            slist.append(i.strip('\r\n'))
         self.assertTrue(len(slist) == 51)
         stager = stage_all.LTA_Stager(srmlist=slist)
         self.assertTrue(len(stager.srmlist) == 51)
