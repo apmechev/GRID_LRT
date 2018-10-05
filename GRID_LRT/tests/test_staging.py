@@ -1,5 +1,5 @@
 from GRID_LRT.Staging import stage_all
-from GRID_LRt.Staging.srmlist import srmlist
+from GRID_LRT.Staging.srmlist import srmlist
 import os
 import glob
 import unittest
