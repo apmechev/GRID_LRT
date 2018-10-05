@@ -1,4 +1,4 @@
 pyyaml >= 3.13
 retrying
 humanfriendly==4.16.1
-CouchDB
+CouchDB==1.2
