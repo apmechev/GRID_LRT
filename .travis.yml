@@ -42,7 +42,7 @@ before_install:
     - export PYTHON_INCLUDE_DIR=$(python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
     - export PYTHON_LIBRARY=$(python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")/libpython*[!m].so
       #    - pip install  --verbose git+https://github.com/cern-fts/gfal2-python.git
-    - pip install --verbose git+https://gitlab.cern.ch/dmc/gfal2-binding
+    - pip install --verbose git+https://gitlab.cern.ch/dmc/gfal2-binding.git
     - which -a python 
       #    - sudo apt-get install globus-gass-copy-progs voms-clients -y
       #    - sudo add-apt-repository -y 'deb http://repository.egi.eu/sw/production/cas/1/current egi-igtf core' 
