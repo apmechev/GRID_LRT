@@ -5,6 +5,7 @@
 from __future__ import print_function
 from os.path import expanduser, isfile
 from os import environ, chmod
+from collections import namedtuple
 import logging
 
 __author__ = "Alexandar Mechev"
@@ -44,6 +45,12 @@ def warnlog(string):
         print("WARNING: "+string)
     else:
         logging.warning(string)
+
+def get_picas_cred():
+    Creds = namedtuple('Creds',['user','password','database'])
+    pc = picas_cred()
+    creds = Creds(pc.user, pc.password, pc.database)
+    return  creds
 
 #Will be renamed to PicasCred()
 class picas_cred(object):

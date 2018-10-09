@@ -3,14 +3,14 @@ import warnings
 from subprocess import Popen, PIPE
 import re
 import GRID_LRT.auth.grid_credentials as grid_creds
-from GRID_LRT.auth.get_picas_credentials import picas_cred
+from GRID_LRT.auth.get_picas_credentials import get_picas_cred
 from GRID_LRT import Token
 from GRID_LRT.Staging.srmlist import srmlist
 from GRID_LRT.storage.gsifile import GSIFile
 
 
 def get_srmdir_from_token_task(token_type, view, key = 'RESULTS_DIR'):
-    pc=picas_cred()
+    pc=get_picas_cred()
     th=Token.Token_Handler(t_type=token_type, uname=pc.user, pwd=pc.password, dbn=pc.database)
     tokens=th.list_tokens_from_view(view)
     srmdir, OBSID, pipeline_step = None, None, None
