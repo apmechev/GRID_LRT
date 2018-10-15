@@ -8,6 +8,8 @@ import subprocess
 import logging
 import warnings
 import random, string
+from shutil import copyfile
+
 
 import tempfile
 from GRID_LRT.auth.get_picas_credentials import picas_cred as pc
@@ -174,10 +176,22 @@ class UnauthorizedJdlLauncher(JdlLauncher):
         return fake_link
 
 
-#class loui_launcher(jdl_launcher):
-#    """
-#        To make integration tests of an AGLOW step, this job launches it on loui.
-#    """
-#
-#    def __init__(self, *args, **kwargs):
-#        pass
+class loui_launcher(jdl_launcher):
+    """
+        To make integration tests of an AGLOW step, this job launches it on loui.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(loui_launcher,self).__init__(*args, **kwargs)
+        self.run_directory = tempfile.mkdtemp(prefix='/scratch/') 
+        
+    def launch(self, database=None):
+        copyfile(self.launch_file, self.run_directory)
+        os.chdir(self.run_directory)
+        pass # TODO: Launch here without waiting
+
+    def __check_authorised(self):
+        self.authorized = True
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        return None
