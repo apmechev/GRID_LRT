@@ -176,13 +176,13 @@ class UnauthorizedJdlLauncher(JdlLauncher):
         return fake_link
 
 
-class loui_launcher(jdl_launcher):
+class LouiLauncher(JdlLauncher):
     """
         To make integration tests of an AGLOW step, this job launches it on loui.
     """
 
     def __init__(self, *args, **kwargs):
-        super(loui_launcher,self).__init__(*args, **kwargs)
+        super(LouiLauncher,self).__init__(*args, **kwargs)
         self.run_directory = tempfile.mkdtemp(prefix='/scratch/') 
         
     def launch(self, database=None):
