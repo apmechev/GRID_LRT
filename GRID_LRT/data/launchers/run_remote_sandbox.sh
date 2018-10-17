@@ -1,3 +1,4 @@
+#!/bin/bash
 # ============================================================================================  #
 # author: Natalie Danezi <anatoli.danezi@surfsara.nl>   --  SURFsara                            #
 # helpdesk: Grid Services <grid.support@surfsara.nl>    --  SURFsara                            #
