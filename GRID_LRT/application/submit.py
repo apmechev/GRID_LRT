@@ -188,7 +188,13 @@ class LouiLauncher(JdlLauncher):
     def launch(self, database=None):
         copyfile(self.launch_file, self.run_directory)
         os.chdir(self.run_directory)
-        pass # TODO: Launch here without waiting
+        creds = pc()
+        if not database:
+            database = pc.database
+        command = "./run_remote_sandbox.sh {} {} {} {}".format(database,
+                            pc.user, pc.password, self.token_type)
+        launcher = subprocess.Popen(command.split())
+        launcher.wait()
 
     def __check_authorised(self):
         self.authorized = True
