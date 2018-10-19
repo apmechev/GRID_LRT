@@ -59,6 +59,10 @@ class Sandbox(object):
     def __enter__(self):
         pass
 
+    def __del__(self):
+        if os.path.exists(self.tmpdir):
+            shutil.rmtree(self.tmpdir)
+
     def __exit__(self, ex_type, ex_value, ex_traceback):
         pass
         #        if 'remove_when_done' in self.sbx_def.keys():
