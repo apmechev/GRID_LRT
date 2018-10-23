@@ -8,7 +8,7 @@ import subprocess
 import logging
 import warnings
 import random, string
-from shutil import copyfile
+from shutil import copyfile, rmtree
 
 
 import tempfile
@@ -186,18 +186,34 @@ class LouiLauncher(JdlLauncher):
         self.run_directory = tempfile.mkdtemp(prefix='/scratch/') 
         
     def launch(self, database=None):
-        copyfile(self.launch_file, self.run_directory)
+        copyfile(self.launch_file, self.run_directory+"/run_remote_sandbox.sh")
         os.chdir(self.run_directory)
         creds = pc()
         if not database:
-            database = pc.database
+            database = creds.database
         command = "./run_remote_sandbox.sh {} {} {} {}".format(database,
-                            pc.user, pc.password, self.token_type)
-        launcher = subprocess.Popen(command.split())
+                            creds.user, creds.password, self.token_type)
+        os.chmod('run_remote_sandbox.sh',0744)
+        print("Running in folder: ")
+        print("")
+        print("Don't forget to run LouiLauncher.cleanup() in Pythonwhen you're done!")
+        print(self.run_directory)
+        with open(self.run_directory+"/stdout.txt","wb") as out, open(self.run_directory+"/stderr.txt","wb") as err:
+            launcher = subprocess.Popen(command.split(), stdout=out, stderr=err)
         launcher.wait()
+        return {'output':self.run_directory+"/stdout.txt",
+                'error':self.run_directory+"/stderr.txt"}
 
     def __check_authorised(self):
         self.authorized = True
+    
+    def cleanup(self):
+        print("removing directory " + self.run_directory)
+        rmtree(self.run_directory)
+    
+    def __del__(self):
+        if os.path.exists(self.run_directory):
+            self.cleanup()
 
     def __exit__(self, exc_type, exc_value, traceback):
         return None
