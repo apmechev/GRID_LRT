@@ -3,7 +3,7 @@ import os
 import glob
 import unittest
 import mock
-
+import subprocess
 
 class JdlsubmitTest(unittest.TestCase):
     def setUp(self):
