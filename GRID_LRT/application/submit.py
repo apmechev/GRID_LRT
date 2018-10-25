@@ -193,7 +193,7 @@ class LouiLauncher(JdlLauncher):
             database = creds.database
         command = "./run_remote_sandbox.sh {} {} {} {}".format(database,
                             creds.user, creds.password, self.token_type)
-        os.chmod('run_remote_sandbox.sh',0744)
+        os.chmod('run_remote_sandbox.sh',0o744)
         print("Running in folder: ")
         print("")
         print("Don't forget to run LouiLauncher.cleanup() in Pythonwhen you're done!")
