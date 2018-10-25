@@ -9,7 +9,7 @@ import subprocess
 def mocked_import(*args, **kwargs):
     with mock.patch.object(subprocess, 'Popen') as mocked_popen:
         mocked_popen.return_value.returncode = 0
-        mocked_popen.return_value.communicate.return_value = ("the file really exists", "")
+        mocked_popen.return_value.communicate.return_value = (str("the file really exists", 'utf-8'), str("",'utf-8'))
         launcher = submit.JdlLauncher(*args, **kwargs)
     return launcher
 
