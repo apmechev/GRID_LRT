@@ -2,6 +2,14 @@ import GRID_LRT.sandbox as sandbox
 import os 
 import glob
 import unittest
+import mock
+
+def mocked_import():
+    with mock.patch.object(subprocess, 'Popen') as mocked_popen:
+        mock_popen.return_value.returncode = 0
+        mock_popen.return_value.communicate.return_value = ("the file really exists", "")    
+        s = sandbox.Sandbox()
+    return s
 
 class SandboxTest(unittest.TestCase):
 
@@ -22,7 +30,7 @@ class SandboxTest(unittest.TestCase):
     def test_creating_folder(self):
         ''' Tests creating folders on the FS in the appropriate locations
         ''' 
-        s=sandbox.Sandbox()
+        s = mocked_import()
         s.parseconfig(self.sbxconf)
         s.create_sbx_folder()
         sbx_dir=s.sbxloc
@@ -31,7 +39,7 @@ class SandboxTest(unittest.TestCase):
         self.assertTrue(not((os.path.exists(sbx_dir))))
 
     def test_autobuild(self):
-        s=sandbox.Sandbox()
+        s = mocked_import()
         s.build_sandbox(self.sbxconf)
 
 

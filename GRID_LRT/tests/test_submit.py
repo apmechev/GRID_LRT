@@ -9,7 +9,7 @@ import subprocess
 def mocked_import(*args, **kwargs):
     with mock.patch.object(subprocess, 'Popen') as mocked_popen:
         mock_popen.return_value.returncode = 0
-        mock_popen.return_value.communicate.return_value = ("output", "Error")
+        mock_popen.return_value.communicate.return_value = ("the file really exists", "")
         launcher = submit.JdlLauncher(*args, **kwargs)
     return launcher
 
@@ -45,7 +45,7 @@ class JdlsubmitTest(unittest.TestCase):
         self.assertTrue("CPUNumber = 10"in jdl_file)
 
     def test_LaunchFileExists(self, mock_popen):
-        launcher = mocked_import()NCPU=10)
+        launcher = mocked_import(NCPU=10)
         jdl_file = launcher.build_jdl_file()
         self.assertTrue(os.path.exists(launcher.launch_file))
         self.assertTrue(os.path.isfile(launcher.launch_file))
