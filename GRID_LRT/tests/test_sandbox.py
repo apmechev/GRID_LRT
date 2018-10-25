@@ -6,16 +6,18 @@ import unittest
 class SandboxTest(unittest.TestCase):
 
     def setUp(self):
-        self.PWD=os.getcwd()
+#        self.PWD=os.getcwd()
         self.assertTrue(os.path.exists(os.path.dirname(__file__)+'/sandbox_config_NDPPP_from_git.cfg'))
         self.sbxconf=os.path.dirname(__file__)+'/sandbox_config_NDPPP_from_git.cfg'
 #        os.chdir(self.PWD+"/GRID_LRT/Sandbox")
 
 
     def tearDown(self):
-        for filename in glob.glob(self.PWD+'/GRID_LRT/Sandbox/*tar'):
-            os.remove(filename)
+#        for filename in glob.glob(self.PWD+'/GRID_LRT/Sandbox/*tar'):
+#            os.remove(filename)
 #        os.chdir(self.PWD)
+        pass
+
 
     def test_creating_folder(self):
         ''' Tests creating folders on the FS in the appropriate locations
