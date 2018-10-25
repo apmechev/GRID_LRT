@@ -198,9 +198,10 @@ class LouiLauncher(JdlLauncher):
         print("")
         print("Don't forget to run LouiLauncher.cleanup() in Pythonwhen you're done!")
         print(self.run_directory)
-        with open(self.run_directory+"/stdout.txt","wb") as out, open(self.run_directory+"/stderr.txt","wb") as err:
-            launcher = subprocess.Popen(command.split(), stdout=out, stderr=err)
-        launcher.wait()
+        with open(self.run_directory+"/stdout.txt","wb"), as out:
+            with open(self.run_directory+"/stderr.txt","wb") as err:
+                launcher = subprocess.Popen(command.split(), stdout=out, stderr=err)
+                launcher.wait()
         return {'output':self.run_directory+"/stdout.txt",
                 'error':self.run_directory+"/stderr.txt"}
 
