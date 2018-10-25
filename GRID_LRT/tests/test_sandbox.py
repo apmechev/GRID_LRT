@@ -3,11 +3,12 @@ import os
 import glob
 import unittest
 import mock
+import subprocess
 
 def mocked_import():
     with mock.patch.object(subprocess, 'Popen') as mocked_popen:
-        mock_popen.return_value.returncode = 0
-        mock_popen.return_value.communicate.return_value = ("the file really exists", "")    
+        mocked_popen.return_value.returncode = 0
+        mocked_popen.return_value.communicate.return_value = ("the file really exists", "")
         s = sandbox.Sandbox()
     return s
 
