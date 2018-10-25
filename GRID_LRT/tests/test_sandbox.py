@@ -8,7 +8,7 @@ import subprocess
 def mocked_import():
     with mock.patch.object(subprocess, 'Popen') as mocked_popen:
         mocked_popen.return_value.returncode = 0
-        mocked_popen.return_value.communicate.return_value = (str("the file really exists", 'utf-8'), str("",'utf-8'))
+        mocked_popen.return_value.communicate.return_value = ("the file really exists".encode(), "".encode())
         s = sandbox.Sandbox()
     return s
 
