@@ -101,8 +101,8 @@ class Sandbox(object):
     def delete_sbx_folder(self):
         '''Removes the sandbox folder and subfolders
         '''
-        if os.path.basename(os.getcwd()) == self.sbx_def['name']:
-            os.chdir(self.base_dir)
+#        if os.path.basename(os.getcwd()) == self.sbx_def['name']:
+#            os.chdir(self.base_dir)
         if os.path.exists(self.tmpdir):
             shutil.rmtree(self.tmpdir)
 
