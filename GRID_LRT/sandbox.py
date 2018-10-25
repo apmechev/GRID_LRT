@@ -51,7 +51,7 @@ class Sandbox(object):
         lrt_module_dir = os.path.abspath(
             GRID_LRT.__file__).split("__init__.py")[0]
         self.base_dir = lrt_module_dir+"data/"
-        self.return_dir = os.getcwd()
+#        self.return_dir = os.getcwd()
         self.sbxloc = None
         if cfgfile:
             self.parseconfig(cfgfile)
@@ -231,7 +231,7 @@ class Sandbox(object):
 
     def cleanup(self):
         self.delete_sbx_folder()
-        os.chdir(self.return_dir)
+#        os.chdir(self.return_dir)
 
     def make_tokvar_dict(self):
         tokvardict = self.shell_vars
