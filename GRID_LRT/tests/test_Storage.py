@@ -30,6 +30,12 @@ output_one_file="""-r--------  1 lofsksp    lofsksp        80445440 Nov 17  2017
 
 from mock import MagicMock
 
+from GRID_LRT.auth import grid_credentials
+subprocess=grid_credentials.subprocess
+Popen= subprocess.Popen
+Popen.communicate=MagicMock(return_value=("uberftp ",""))
+
+
 class GSIFileTest(unittest.TestCase):
 
     def setUp(self):
