@@ -26,13 +26,15 @@ __version__ = "1.0"
 USER = None
 PASSW = None
 
-def get_staging_creds():
+def get_staging_creds(user=None, passw=None):
     """Function to get the staging credentials first from
        ~/.awe/Environment.cfg, if not there, then from ~/.stagingrc
        and finally from the env variables LOFAR_LTA_USER and LOFAR_LTA_PWD
     """
-    user = None
-    passw = None
+    if user and passw:
+        lta_proxy = xmlrpclib.ServerProxy(
+                "https://"+user+':'+passw+"@webportal.astron.nl/service-public/xmlrpc")
+        return user, passw, lta_proxy
     try:
         with open(expanduser("~/.awe/Environment.cfg"), 'r') as authfile:
             print(datetime.datetime.now(), "stager_access: Parsing user credentials from",
