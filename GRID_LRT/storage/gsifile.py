@@ -83,7 +83,7 @@ class GSIFile(object):
         if self.is_dir:
             result,err = self._uberftpls(self.parent_dir)
             result = self._find_item_in_uberftp_result(result) 
-        return result
+        return result.split()
 
     def _find_item_in_uberftp_result(self,result):
         for i in result.split('\r\n'):
