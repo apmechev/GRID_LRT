@@ -1,5 +1,7 @@
 from GRID_LRT.Staging import stage_all
 from GRID_LRT.Staging.srmlist import srmlist
+from mock import MagicMock
+
 import os
 import glob
 import unittest
@@ -8,8 +10,13 @@ from os.path import expanduser
 import sys
 
 
+gfal = stage_all.gfal
+gfal.gfal_init = MagicMock(return_value=(0,2,3))
+gfal.gfal_set_timeout_srm = MagicMock(return_value=None)
+gfal.gfal_prestage = MagicMock(return_value=(0,1,2))
 
 class Staging_Test(unittest.TestCase):
+
     def setUp(self):
         pass
 
@@ -23,3 +30,6 @@ class Staging_Test(unittest.TestCase):
         self.assertTrue(len(slist) == 51)
         stager = stage_all.LTA_Stager(srmlist=slist)
         self.assertTrue(len(stager.srmlist) == 51)
+
+    def test_mocked_stage(self):
+        stage_all.main(os.path.dirname(__file__)+'/srm_50_sara.txt')
