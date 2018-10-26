@@ -31,10 +31,6 @@ output_one_file="""-r--------  1 lofsksp    lofsksp        80445440 Nov 17  2017
 from mock import MagicMock
 
 from GRID_LRT.auth import grid_credentials
-subprocess=grid_credentials.subprocess
-Popen= subprocess.Popen
-Popen.communicate=MagicMock(return_value=("uberftp ",""))
-
 
 class GSIFileTest(unittest.TestCase):
 
@@ -47,6 +43,9 @@ class GSIFileTest(unittest.TestCase):
     def test_1(self):
         ''' Tests creating folders on the FS in the appropriate locations
         '''
+        subprocess=grid_credentials.subprocess
+        Popen_g= subprocess.Popen
+        Popen_g.communicate=MagicMock(return_value=("uberftp ",""))
         Popen = gsifile.Popen
         Popen.communicate = MagicMock(return_value=(output_sbx_test,""))
         gf = gsifile.GSIFile('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/testf/')
