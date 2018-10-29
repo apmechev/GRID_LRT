@@ -8,7 +8,7 @@ Here are a list of errors that the GRID_Sandbox or GRID_Launcher return when pro
 | 1  -> One of Token=${TOKEN}, Picas_usr=${PICAS_USR}, Picas_db=${PICAS_DB} not set
 | 2  ->
 | 3  -> Parset doesn't exist
-| 4  ->
+| 4  -> $JOBDIR doesn't exist
 | 5  ->
 | 6  ->
 | 7  ->
