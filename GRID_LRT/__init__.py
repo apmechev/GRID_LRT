@@ -5,6 +5,7 @@ if sys.version_info[0:2] != (2,6):
     from subprocess import check_output
 import os
 import socket
+import git
 
 __all__ = ["storage", 'auth', "application", "Staging", 'sandbox', 'Token']
 __version__ = "0.5.0"
@@ -43,9 +44,9 @@ def format_version(version):
     return fmt.format(tag=tag, commitcount=count, gitsha=sha.lstrip('g'))
 
 def get_git_version():
-    command = 'git describe --tags --long --dirty'
-    git_version = check_output(command.split()).decode('utf-8').strip()
-    return format_version(version=git_version)
+    repo = git.Repo(search_parent_directories=True)
+    tag  = str(repo.tags[-1])
+    return tag
 
 def get_git_hash():
     git_hash = get_git_version()
