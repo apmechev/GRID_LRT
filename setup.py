@@ -18,7 +18,8 @@ setup(name='GRID_LRT',
           'pyyaml',
           'couchdb',
           'retrying',
-          'humanfriendly'
+          'humanfriendly',
+          'gitpython'
           ],
       include_package_data=True,
       data_files=[("GRID_LRT/data/config",

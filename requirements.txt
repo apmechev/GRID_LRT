@@ -2,3 +2,4 @@ pyyaml >= 3.13
 retrying
 humanfriendly>=4.17
 CouchDB
+gitpython
