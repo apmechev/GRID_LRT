@@ -30,7 +30,7 @@ def grid_credentials_enabled():
         'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox'
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     res = process.communicate()
-    if b'Failed to acquire credentials.'in res[1]:
+    if 'Failed to acquire credentials.'in res[1]:
         raise Exception("Grid Credentials expired! "
                         "Run 'startGridSession lofar:/lofar/user/sksp' in the shell")
     return True
