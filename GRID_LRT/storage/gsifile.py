@@ -1,6 +1,6 @@
 from datetime import datetime
 import warnings
-from subprocess import Popen, PIPE
+import subprocess
 import re
 import GRID_LRT.auth.grid_credentials as grid_creds
 from GRID_LRT.auth.get_picas_credentials import picas_cred
@@ -140,7 +140,8 @@ class GSIFile(object):
         self._donotdelete(parent_dir)
         if self.is_dir and not self.is_empty():
             raise Exception("Not allowed to delete a folder that isn't empty yet" )
-        del_proc = Popen(['uberftp','-rm',self.location], stdout=PIPE, stderr=PIPE)
+        del_proc = subprocess.Popen(['uberftp','-rm',self.location],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         res, err = del_proc.communicate()
         if not err:
             return
