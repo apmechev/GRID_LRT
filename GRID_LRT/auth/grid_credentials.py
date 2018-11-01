@@ -34,7 +34,7 @@ def grid_credentials_enabled():
         error = res[1].decode('utf8')
     else:
         error = res[1].encode('utf8')
-    if 'Failed to acquire credentials.' in error:
+    if "Failed to acquire credentials." in error:
         raise Exception("Grid Credentials expired! "
                         "Run 'startGridSession lofar:/lofar/user/sksp' in the shell")
     return True
