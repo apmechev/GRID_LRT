@@ -101,7 +101,7 @@ class GSIFile(object):
     def _extract_date(data):
         if data[-2] not in ['2018','2017','2016','2015']:
             date = data[-4].decode('ascii')+" "+data[-3].decode('ascii')+" " + str(datetime.now().year)
-            time = data[-2]
+            time = data[-2].decode('ascii')
         else:
             date = data[-4].decode('ascii')+" "+data[-3].decode('ascii')+" "+data[-2].decode('ascii')
             time = "00:00"
