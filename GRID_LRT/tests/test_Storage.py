@@ -42,7 +42,6 @@ class GSIFileTest(unittest.TestCase):
         pass
 
     @mock.patch('subprocess.Popen', autospec=True)
-    @mock.patch('GRID_LRT.storage.gsifile.subprocess.Popen', autospec=True)
     def test_1(self, mock_subproc_popen):
         ''' Tests creating folders on the FS in the appropriate locations
         '''
