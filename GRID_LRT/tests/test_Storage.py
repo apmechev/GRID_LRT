@@ -10,7 +10,7 @@ drwx------  1 lofsksp    lofsksp             512 May 10  2017 sksp_natalie
 drwx------  1 lofsksp    lofsksp             512 Jul 26 11:50 distrib
 drwx------  1 lofsksp    lofsksp             512 Sep 18 14:06 sandbox
 drwx------  1 lofsksp    lofsksp             512 Feb  5  2018 LGPPP
-drwx------  1 lofsksp    lofsksp             512 Jul 17 10:50 pipelines""")
+drwx------  1 lofsksp    lofsksp             512 Jul 17 10:50 pipelines""".encode('ascii'))
 
 output_sbx_test=bytes("""-r--------  1 lofsksp    lofsksp        80445440 Nov 17  2017 airflowtest1.tar
 -r--------  1 lofsksp    lofsksp       125491200 Nov 13  2017 test_data.tar
@@ -22,9 +22,9 @@ output_sbx_test=bytes("""-r--------  1 lofsksp    lofsksp        80445440 Nov 17
 drwx------  1 lofsksp    lofsksp             512 Jan 23  2018 leah
 -r--------  1 lofsksp    lofsksp        80445440 Nov 23  2017 pref_cal1.tar
 -r--------  1 lofsksp    lofsksp        80445440 Nov 23  2017 pref_cal2.tar
--r--------  1 lofsksp    lofsksp           30720 Feb  2  2018 tutorial.tar""")
+-r--------  1 lofsksp    lofsksp           30720 Feb  2  2018 tutorial.tar""".encode('ascii'))
 
-output_one_file=bytes("""-r--------  1 lofsksp    lofsksp        80445440 Nov 17  2017 airflowtest1.tar""")
+output_one_file=bytes("""-r--------  1 lofsksp    lofsksp        80445440 Nov 17  2017 airflowtest1.tar""".encode('ascii'))
 
 
 from mock import MagicMock
