@@ -13,7 +13,7 @@ def check_uberftp():
     :returns: bool"""
     process = subprocess.Popen(['which', 'uberftp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = process.communicate()
-    if output[0].decode() == '' and output[1].decode() == '':
+    if output[0] == '' and output[1] == '':
         return False
     return True
 

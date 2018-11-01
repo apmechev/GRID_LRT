@@ -166,7 +166,7 @@ class GSIFile(object):
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         res, err = sub.communicate()
         if err:
-            warnings.warn("Uberftp -ls gave us an error for location {}: {}".format(location, err))
+            warnings.warn("Uberftp -ls gave us an error for location {0}: {1}".format(location, err))
         return res, err
 
     def is_empty(self):
