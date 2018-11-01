@@ -162,7 +162,8 @@ class GSIFile(object):
         return num_files
 
     def _uberftpls(self, location):
-        sub = Popen(['uberftp','-ls', location], stdout=PIPE, stderr=PIPE)
+        sub = subprocess.Popen(['uberftp','-ls', location],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         res, err = sub.communicate()
         if err:
             warnings.warn("Uberftp -ls gave us an error for location {}: {}".format(location, err))
