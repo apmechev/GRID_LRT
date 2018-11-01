@@ -62,6 +62,8 @@ class GSIFile(object):
         if '550' in err:
             warnings.warn('Parent directory inaccessible!: {}'.format(err))
             return None, parent_dir #Doesn't know if it's a file or dir if can't get parent_dir
+        if type(res)==bytes:
+            res = res.decode('utf8')
         status = [x for x in res.split('\r\n') if filename in x]
         if status[0][0]=='d':
             return True, parent_dir
