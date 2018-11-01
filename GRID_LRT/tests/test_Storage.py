@@ -29,7 +29,7 @@ output_one_file="""-r--------  1 lofsksp    lofsksp        80445440 Nov 17  2017
 
 
 from mock import MagicMock
-
+import mock
 from GRID_LRT.auth import grid_credentials
 subprocess = grid_credentials.subprocess
 
@@ -41,7 +41,7 @@ class GSIFileTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @mock.patch('subprocess.Popen')
+    @mock.patch('subprocess.Popen', autospec=True)
     def test_1(self, mock_subproc_popen):
         ''' Tests creating folders on the FS in the appropriate locations
         '''
