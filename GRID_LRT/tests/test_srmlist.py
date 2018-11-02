@@ -5,6 +5,7 @@ import os
 import glob
 import unittest
 import mock
+import logging
 
 output_sbx_test=bytes("""-r--------  1 lofsksp    lofsksp        80445440 Nov 17  2017 airflowtest1.tar
 -r--------  1 lofsksp    lofsksp       125491200 Nov 13  2017 test_data.tar
@@ -168,7 +169,7 @@ class SrmlistTest(unittest.TestCase):
     def test_count_files(self,  mock_subproc_popen):
         from GRID_LRT.auth import grid_credentials
         process_mock = mock.Mock()
-        attrs = {'communicate.return_value': (output_sbx_test, 'error')}
+        attrs = {'communicate.return_value': (output_sbx_test, '')}
         process_mock.configure_mock(**attrs)
         mock_subproc_popen.return_value = process_mock
         files = count_files_uberftp('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/')
