@@ -18,7 +18,7 @@ stager_access.PASSW = 'PASSWORD'
 
 @handle_xmlrpc_exception
 def throw_proterror():
-    raise ProtocolError('PASSWORD should be redacted')
+    raise ProtocolError('http://test.com/PASSWORD/not_redacted', 999,"should be redacted", {})
 
 @handle_xmlrpc_exception
 def no_proterror():
