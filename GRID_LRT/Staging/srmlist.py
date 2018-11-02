@@ -1,4 +1,3 @@
-from GRID_LRT.storage import gsifile
 import sys
 import re
 from collections import deque
@@ -214,6 +213,7 @@ def slice_dicts(srmdict, slice_size=10):
     return sliced
 
 def make_srmlist_from_gsiftpdir(gsiftpdir):
+    from GRID_LRT.storage import gsifile
     srml = srmlist()
     grid_dir = gsifile.GSIFile(gsiftpdir)
     for i in [f.loc for f in grid_dir.list_dir()]:
@@ -221,5 +221,6 @@ def make_srmlist_from_gsiftpdir(gsiftpdir):
     return srml
 
 def count_files_uberftp(directory):
+    from GRID_LRT.storage import gsifile
     grid_dir = gsifile.GSIFile(gsiftpdir)
     return [f.loc for f in grid_dir.list_dir()]
