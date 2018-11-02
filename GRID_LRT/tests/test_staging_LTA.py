@@ -73,10 +73,12 @@ class Staging_Test(unittest.TestCase):
 
     def test_wrap(self):
         stager_access.PASSW = 'PASSWORD'
-        with self.assertRaises(Exception) as context:
-            throw_proterror()
-        logging.warn(context.exception)
-        self.assertTrue('REDACTED' in context.exception.url)
+        if sys.version_info.major == 2 and sys.version_info.minor == 6:
+            self.assertRaises(Exception, throw_proterror)
+        else:
+            with self.assertRaises(Exception) as context:
+                throw_proterror()
+            self.assertTrue('REDACTED' in context.exception.url)
         no_proterror()
 
     def test_prettyprint(self):
