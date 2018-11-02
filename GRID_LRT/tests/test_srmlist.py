@@ -1,9 +1,20 @@
-from GRID_LRT.Staging.srmlist import srmlist
+from GRID_LRT.Staging.srmlist import srmlist, count_files_uberftp
 from GRID_LRT.Staging.srmlist import slice_dicts
 import os 
 import glob
 import unittest
 
+output_sbx_test=bytes("""-r--------  1 lofsksp    lofsksp        80445440 Nov 17  2017 airflowtest1.tar
+-r--------  1 lofsksp    lofsksp       125491200 Nov 13  2017 test_data.tar
+-r--------  1 lofsksp    lofsksp        80435200 Oct  4  2017 josh_pref_cal2.tar
+-r--------  1 lofsksp    lofsksp           30720 Sep 24 15:03 calib_tutorial.tar
+-r--------  1 lofsksp    lofsksp        80445440 Nov 24  2017 pref_targ2.tar
+-r--------  1 lofsksp    lofsksp        80445440 Nov 24  2017 pref_targ1.tar
+-r--------  1 lofsksp    lofsksp       212295680 Jan 24  2018 travis_test.tar
+drwx------  1 lofsksp    lofsksp             512 Jan 23  2018 leah
+-r--------  1 lofsksp    lofsksp        80445440 Nov 23  2017 pref_cal1.tar
+-r--------  1 lofsksp    lofsksp        80445440 Nov 23  2017 pref_cal2.tar
+-r--------  1 lofsksp    lofsksp           30720 Feb  2  2018 tutorial.tar""".encode('ascii'))
 
 
 class SrmlistTest(unittest.TestCase):
@@ -151,6 +162,15 @@ class SrmlistTest(unittest.TestCase):
         srm_link = sl.srm_replace(sl.gsi_replace(sl[0]))
         self.assertTrue(srm_link == f_name)
 
+    @mock.patch('subprocess.Popen', autospec=True)
+    def test_count_files(self,  mock_subproc_popen):
+        from GRID_LRT.auth import grid_credentials
+        process_mock = mock.Mock()
+        attrs = {'communicate.return_value': (output_sbx_test, 'error')}
+        process_mock.configure_mock(**attrs)
+        mock_subproc_popen.return_value = process_mock
+        files = count_files_uberftp('test_dir')
+        self.assertTrue(len(files)==10)
 
 
 if __name__ == '__main__':
