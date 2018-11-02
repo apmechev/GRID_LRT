@@ -12,7 +12,11 @@ try:
 except ImportError:
     import xmlrpc.client as xmlrpclib  # pylint: disable=import-error
 
-from xmlrpclib import ProtocolError
+try:
+    from xmlrpclib import ProtocolError
+except ImportError:
+    from xmlrpc.client import ProtocolError
+
 from GRID_LRT.Staging.stager_access import handle_xmlrpc_exception
 stager_access.PASSW = 'PASSWORD'
 
@@ -72,7 +76,7 @@ class Staging_Test(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             throw_proterror()
         logging.warn(context.exception)
-        self.assertTrue('REDACTED' in context.exception)
+        self.assertTrue('REDACTED' in context.exception.url)
         no_proterror()
 
     def test_prettyprint(self):
