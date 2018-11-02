@@ -6,6 +6,7 @@ import unittest
 import tempfile
 from os.path import expanduser
 import sys
+import logging
 try:
     import xmlrpclib
 except ImportError:
@@ -67,9 +68,10 @@ class Staging_Test(unittest.TestCase):
         os.environ['PICAS_USR_PWD']=prev_pwd
 
     def test_wrap(self):
-        global PASSW = "PASSWORD"
+        stager_access.PASSW = 'PASSWORD'
         with self.assertRaises(Exception) as context:
             throw_proterror()
+        logging.warn(context.exception)
         self.assertTrue('REDACTED' in context.exception)
         no_proterror()
 
