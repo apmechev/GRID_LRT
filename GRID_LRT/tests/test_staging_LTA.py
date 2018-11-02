@@ -12,7 +12,7 @@ except ImportError:
     import xmlrpc.client as xmlrpclib  # pylint: disable=import-error
 
 from xmlrpclib import ProtocolError
-from stager_access import handle_xmlrpc_exception
+from GRID_LRT.Staging.stager_access import handle_xmlrpc_exception
 
 @handle_xmlrpc_exception
 def throw_proterror():
