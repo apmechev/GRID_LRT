@@ -6,8 +6,21 @@ import unittest
 import tempfile
 from os.path import expanduser
 import sys
+try:
+    import xmlrpclib
+except ImportError:
+    import xmlrpc.client as xmlrpclib  # pylint: disable=import-error
 
+from xmlrpclib import ProtocolError
+from stager_access import handle_xmlrpc_exception
 
+@handle_xmlrpc_exception
+def throw_proterror():
+    raise ProtocolError('PASSWORD should be redacted')
+
+@handle_xmlrpc_exception
+def no_proterror():
+    pass
 
 class Staging_Test(unittest.TestCase):
     def setUp(self):
@@ -52,6 +65,17 @@ class Staging_Test(unittest.TestCase):
         os.environ['PICAS_USR']=prev_usr
         os.environ['PICAS_USR_PWD']=prev_pwd
 
+    def test_wrap(self):
+        PASSW = "PASSWORD"
+        with self.assertRaises(Exception) as context:
+            throw_proterror()
+        self.assertTrue('REDACTED' in context.exception)
+        no_proterror()
+
     def test_prettyprint(self):
         dic = {'3':1234132, '2342':"string", 'boo':'boo2'}
         stager_access.prettyprint(dic)
+        notdic=""
+        stager_access.prettyprint(notdic)
+        dicdic={'1':{2:2,3:3},"goo":"gar"}
+        stager_access.prettyprint(dicdic)
