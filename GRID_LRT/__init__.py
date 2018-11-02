@@ -5,7 +5,7 @@ if sys.version_info[0:2] != (2,6):
     from subprocess import check_output
 import os
 import socket
-import git
+
 
 __all__ = ["storage", 'auth', "application", "Staging", 'sandbox', 'Token']
 __version__ = "0.5.0"
