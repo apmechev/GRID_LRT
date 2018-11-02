@@ -164,6 +164,21 @@ class SrmlistTest(unittest.TestCase):
         self.assertTrue('gsiftp://gridftp.lofar.psnc.pl:2811' in sl.gsi_replace(sl[0]))
         srm_link = sl.srm_replace(sl.gsi_replace(sl[0]))
         self.assertTrue(srm_link == f_name)
+    
+    def test_http_replace(self):
+        f_name = 'srm://lta-head.lofar.psnc.pl:8443/lofar/ops/projects/lc6_016/527613/L527613_SB228_uv.dppp.MS_90bafee7.tar'
+        sl = srmlist(link=f_name)
+        http_link = sl.http_replace(sl[0])
+        self.assertTrue('https:' in http_link)
+        f_name = "srm://lofar-srm.fz-juelich.de:8443/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583127/L583127_SB010_uv.MS_c0a9adfa.tar"
+        sl = srmlist(link=f_name)
+        http_link = sl.http_replace(sl[0])
+        self.assertTrue('https:' in http_link)
+        f_name = "srm://srm.grid.sara.nl:8443/pnfs/grid.sara.nl/data/lofar/ops/projects/lc2_038/233700/L233700_SB290_uv.dppp.MS_83fc1cc3.tar"
+        sl = srmlist(link=f_name)
+        http_link = sl.http_replace(sl[0])
+        self.assertTrue('https:' in http_link)
+
 
     @mock.patch('subprocess.Popen', autospec=True)
     def test_count_files(self,  mock_subproc_popen):
