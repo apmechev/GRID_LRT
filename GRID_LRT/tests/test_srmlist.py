@@ -171,7 +171,7 @@ class SrmlistTest(unittest.TestCase):
         attrs = {'communicate.return_value': (output_sbx_test, 'error')}
         process_mock.configure_mock(**attrs)
         mock_subproc_popen.return_value = process_mock
-        files = count_files_uberftp('test_dir')
+        files = count_files_uberftp('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/')
         self.assertTrue(len(files)==10)
 
 
