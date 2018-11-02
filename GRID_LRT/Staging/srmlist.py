@@ -1,3 +1,4 @@
+from GRID_LRT.storage import gsifile
 import sys
 import re
 from collections import deque
@@ -214,22 +215,11 @@ def slice_dicts(srmdict, slice_size=10):
 
 def make_srmlist_from_gsiftpdir(gsiftpdir):
     srml = srmlist()
-    for i in count_files_uberftp(gsiftpdir):
+    grid_dir = gsifile.GSIFile(gsiftpdir)
+    for i in [f.loc for f in grid_dir.list_dir()]:
         srml.append(i)
     return srml
 
 def count_files_uberftp(directory):
-    logging.info(directory)
-    f_list = subprocess.Popen(['uberftp', '-ls', directory],
-                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out = f_list.communicate()
-    if out[1] != '':
-        logging.warning("srmls failed to find a directory!! ")
-        return 0
-    if 'lofsksp' not in out[0]:
-        logging.warning("no link found in folder!, returning 0 files")
-        return 0
-    file_list = [directory+"/"+str(i.split()[-1])
-                 for i in out[0].strip().split("\r\n")]
-    return file_list
-
+    grid_dir = gsifile.GSIFile(gsiftpdir)
+    return [f.loc for f in grid_dir.list_dir()]
