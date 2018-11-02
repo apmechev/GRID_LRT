@@ -13,6 +13,7 @@ except ImportError:
 
 from xmlrpclib import ProtocolError
 from GRID_LRT.Staging.stager_access import handle_xmlrpc_exception
+stager_access.PASSW = 'PASSWORD'
 
 @handle_xmlrpc_exception
 def throw_proterror():
@@ -66,7 +67,7 @@ class Staging_Test(unittest.TestCase):
         os.environ['PICAS_USR_PWD']=prev_pwd
 
     def test_wrap(self):
-        PASSW = "PASSWORD"
+        global PASSW = "PASSWORD"
         with self.assertRaises(Exception) as context:
             throw_proterror()
         self.assertTrue('REDACTED' in context.exception)
