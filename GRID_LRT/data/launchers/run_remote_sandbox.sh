@@ -20,12 +20,12 @@ set -x
 if type git &> /dev/null
 then
  git clone https://github.com/apmechev/GRID_picastools.git p_tools_git
- cd p_tools_git
+ cd p_tools_git || exit -100
  git checkout master
- cd ../
+ cd ../ || exit -100
 else  #move this to testpy3
- wget -O master.zip https://github.com/apmechev/GRID_picastools/archive/master.zip 
- unzip master.zip -d p_tools_git/ 
+ wget -O master.zip https://github.com/apmechev/GRID_picastools/archive/master.zip
+ unzip master.zip -d p_tools_git/
 fi
 
 mv p_tools_git/* . 
@@ -36,10 +36,9 @@ echo "Downloaded the test_py3 branch and Launching Token Type $4"
 
 #launches script designed to lock token, download sandbox with 
 #token's OBSID and execute the master.sh in the sandbox
-python Launch.py  $1 $2 $3 $4 &
+python Launch.py  "$1" "$2" "$3" "$4" &
 wait
 
 ls -l
 cat log*
-
 
