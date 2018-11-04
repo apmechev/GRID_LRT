@@ -89,10 +89,10 @@ class GSIFile(object):
 
 
     def _find_item_in_uberftp_result(self,result):
+        if self.location[-1]=='/':
+            location = self.location[:-1]
         for i in result.split('\r\n'):
-            if self.location[-1]=='/':
-                location = self.location[:-1]
-            if self.location.split('/')[-1] in i:
+            if location.split('/')[-1] in i:
                 result = i
                 break
         result = result.split()
