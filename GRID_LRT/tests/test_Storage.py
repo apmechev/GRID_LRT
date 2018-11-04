@@ -46,7 +46,7 @@ class GSIFileTest(unittest.TestCase):
         '''
         from GRID_LRT.auth import grid_credentials
         process_mock = mock.Mock()
-        attrs = {'communicate.return_value': (output_sbx_test, 'error')}
+        attrs = {'communicate.return_value': (output_sbx_test, '')}
         process_mock.configure_mock(**attrs)
         mock_subproc_popen.return_value = process_mock 
         gf = gsifile.GSIFile('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/testf/')
@@ -54,6 +54,19 @@ class GSIFileTest(unittest.TestCase):
 
     def test_autobuild(self):
         pass
+    @mock.patch('subprocess.Popen', autospec=True)
+
+    def test_parent_dir(self):
+        """test looking at parent directory when target if a file"""
+        from GRID_LRT.auth import grid_credentials
+        process_mock = mock.Mock()
+        attrs = {'communicate.return_value': (output_sbx_test, '')}
+        process_mock.configure_mock(**attrs) 
+        mock_subproc_popen.return_value = process_mock
+        gf = gsifile.GSIFile('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/test/airflowtest1.tar')
+        gf.parent_dir._subfiles = output_one_file
+        is_dir == gf._build_from_parent_dir()
+        self.assertTrue(is_dir == False)
 
 
 if __name__ == '__main__':
