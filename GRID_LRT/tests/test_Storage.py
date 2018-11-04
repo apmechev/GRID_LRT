@@ -54,9 +54,9 @@ class GSIFileTest(unittest.TestCase):
 
     def test_autobuild(self):
         pass
-    @mock.patch('subprocess.Popen', autospec=True)
 
-    def test_parent_dir(self):
+    @mock.patch('subprocess.Popen', autospec=True)
+    def test_parent_dir(self, mock_subproc_popen):
         """test looking at parent directory when target if a file"""
         from GRID_LRT.auth import grid_credentials
         process_mock = mock.Mock()

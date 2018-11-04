@@ -85,7 +85,8 @@ class GSIFile(object):
         if self.is_dir:
             result,err = self._uberftpls(self.parent_dir)
             result = self._find_item_in_uberftp_result(result)
-        return result
+            return result
+        return result.split()
 
 
     def _find_item_in_uberftp_result(self,result):
@@ -108,6 +109,7 @@ class GSIFile(object):
         else:
             date = data[-4].decode('ascii')+" "+data[-3].decode('ascii')+" "+data[-2].decode('ascii')
             time = "00:00"
+        
         file_datetime = datetime.strptime(date+"-"+time, "%b %d %Y-%H:%M")
         return file_datetime
 
