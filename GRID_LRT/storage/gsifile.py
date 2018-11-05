@@ -94,7 +94,7 @@ class GSIFile(object):
             location = self.location[:-1]
         else:
             location = self.location
-        for i in result.split('\r\n'):
+        for i in result.split(b'\r\n'):
             if location.split('/')[-1] in i:
                 result = i
                 break
