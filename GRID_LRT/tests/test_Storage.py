@@ -66,7 +66,8 @@ class GSIFileTest(unittest.TestCase):
         gf = gsifile.GSIFile('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/test/airflowtest1.tar')
         gf_parent = gsifile.GSIFile('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/test/')
         gf_parent._subfiles = output_one_file
-        is_dir = gf._build_from_parent_dir(gf_parent)
+        gf._build_from_parent_dir(gf_parent)
+        is_dir = gf.is_dir
         self.assertTrue(is_dir == False)
 
 
