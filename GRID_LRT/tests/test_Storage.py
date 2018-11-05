@@ -65,7 +65,7 @@ class GSIFileTest(unittest.TestCase):
         mock_subproc_popen.return_value = process_mock
         gf = gsifile.GSIFile('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/test/airflowtest1.tar')
         gf_parent = gsifile.GSIFile('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/test/')
-        is_dir._subfiles = output_one_file
+        gf_parent._subfiles = output_one_file
         is_dir = gf._build_from_parent_dir(gf_parent)
         self.assertTrue(is_dir == False)
 
