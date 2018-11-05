@@ -94,12 +94,12 @@ class GSIFile(object):
             location = self.location[:-1]
         else:
             location = self.location
-        for i in result.split(b'\r\n'):
-            if location.split(b'/')[-1] in i:
-                result = i
-                break
         if type(result) == bytes:
             result = result.decode('ascii')
+        for i in result.split('\r\n'):
+            if location.split('/')[-1] in i:
+                result = i
+                break
         result = result.split()
         return result
 
