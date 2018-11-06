@@ -181,7 +181,7 @@ class SrmlistTest(unittest.TestCase):
         http_links = [i for i in sl.http_links()]
         self.assertTrue(len(http_links)==1)
         self.assertTrue('https://' in http_links[0])
-        self.assertTrue(len(http_links[0])==168)
+        self.assertTrue(len(http_links[0])==186)
 
     @mock.patch('subprocess.Popen', autospec=True)
     def test_count_files(self,  mock_subproc_popen):
