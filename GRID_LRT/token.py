@@ -479,7 +479,8 @@ function (key, values, rereduce) {
         """Archives all tokens and attachments into a folder
 
         """
-        os.mkdir(self.t_type)
+        if not os.path.exists(self.t_type):
+            os.mkdir(self.t_type)
         os.chdir(self.t_type)
         self.load_views()
         for view in self.views.keys():
