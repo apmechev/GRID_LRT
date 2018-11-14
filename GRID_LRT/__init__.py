@@ -17,8 +17,8 @@ __bibtex__ = """@misc{apmechev:2018,
       title        = {apmechev/GRID_LRT: v0.5.0},
       month        = sep,
       year         = 2018,
-      doi          = {10.5281/zenodo.1341127},
-      url          = {https://doi.org/10.5281/zenodo.1341127}
+      doi          = {10.5281/zenodo.1438833},
+      url          = {https://doi.org/10.5281/zenodo.1438833}
     }"""
 __license__ = "GPL 3.0"
 __maintainer__ = "Alexandar P. Mechev"
