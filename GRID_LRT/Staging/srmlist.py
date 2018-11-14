@@ -16,8 +16,9 @@ class srmlist(list):
     done automatically. Checking OBSID is an optional argument set to True by default.
     """
 
-    def __init__(self, checkOBSID=True, link=None):
+    def __init__(self, checkOBSID=True, check_location = True, link=None):
         super(srmlist, self).__init__()
+        self._check_location = check_location
         self.lta_location = None
         self.obsid = None
         self.checkobsid = checkOBSID
@@ -70,7 +71,7 @@ class srmlist(list):
         item = self.trim_spaces(self.stringify_item(item))
         if not self.lta_location:
             self.lta_location = tmp_loc
-        elif self.lta_location != tmp_loc:
+        elif self.lta_location != tmp_loc  and self._check_location :
             raise AttributeError(
                 "Appended srm link not the same location as previous links!")
         if item in self:
