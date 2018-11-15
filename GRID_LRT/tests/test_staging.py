@@ -13,7 +13,7 @@ import sys
 gfal = stage_all.gfal
 gfal.creat_context = MagicMock(return_value=(0))
 gfal.gfal_init = MagicMock(return_value=(0,2,3))
-gfal.gfal_set_timeout_srm = MagicMock(return_value=None)
+gfal.bring_online = MagicMock(return_value=(None,0))
 gfal.gfal_prestage = MagicMock(return_value=(0,1,2))
 
 class Staging_Test(unittest.TestCase):
