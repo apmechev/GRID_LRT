@@ -103,41 +103,29 @@ def replace(file_loc):
             sys.exit()
     return repl_string, match
 
+def stage_srm(surl, pintime, timeout, asynch=True):
+    context = gfal.creat_context()
+    (errors, token) = context.bring_online(surl, pintime, timeout, asynch)
+    return errors, token
 
 def process(urls, repl_string, match):
     """Main function that invokes
     gfal on all the srms to stage them"""
     surls = []
     for url in urls:
-        surls.append(match.sub(repl_string, url.strip()))
+        surls.append(url.strip())
+
+    err, tok = stage_srm(surls, 24*3600, 3600)
 
     req = {}
     # Set the timeout to 24 hours
     # gfal_set_timeout_srm  Sets  the  SRM  timeout, used when doing an asyn-
     # chronous SRM request. The request will be aborted if it is still queued
     # after 24 hours.
-    gfal.gfal_set_timeout_srm(86400)
-
-    req.update({'surls': surls})
-    req.update({'setype': 'srmv2'})
-    req.update({'no_bdii_check': 1})
-    req.update({'protocols': ['gsiftp']})
-
     # Set the time that the file stays pinned on disk for a week (604800sec)
-    req.update({'srmv2_desiredpintime': 604800})
 
-    returncode, obj, err = gfal.gfal_init(req)
-    if returncode != 0:
-        sys.stderr.write(err+'\n')
-        sys.exit(1)
-
-    returncode, obj, err = gfal.gfal_prestage(obj)
-    if returncode != 0:
-        sys.stderr.write(err+'\n')
-        sys.exit(1)
-    del req
-    print("staged")
-
+    print("staging request sent")
+    return  err, tok 
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
