@@ -1,13 +1,13 @@
 """GRID_LRT: Grid LOFAR Tools"""
 import sys
-from subprocess import call, Popen, PIPE, STDOUT
-if sys.version_info[0:2] != (2,6):
-    from subprocess import check_output
 import os
 import socket
+from subprocess import call, Popen, PIPE, STDOUT
+if sys.version_info[0:2] != (2, 6):
+    from subprocess import check_output
 
 
-__all__ = ["storage", 'auth', "application", "Staging", 'sandbox', 'Token']
+__all__ = ["storage", 'auth', "application", "Staging", 'sandbox', 'token']
 __version__ = "0.5.0"
 __author__ = "Alexandar P. Mechev"
 __copyright__ = "2018 Alexandar P. Mechev"

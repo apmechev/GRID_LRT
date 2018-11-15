@@ -52,18 +52,18 @@ __credits__ = GRID_LRT.__credits__
 __maintainer__ = GRID_LRT.__maintainer__
 __status__ = GRID_LRT.__status__
 
-def get_all_design_docs(pcreds = None, srv="https://picas-lofar.grid.surfsara.nl:6984"):
+def get_all_design_docs(pcreds=None, srv="https://picas-lofar.grid.surfsara.nl:6984"):
     """Returns a list of design documents for the pcreds.databse on server=srv
     If pcreds are none, then we're adminparty and db is test_db"""
     if pcreds:
         user, passwd, dbn = pcreds.user, pcreds.password, pcreds.database
     else:
-        user, passwd, dbn = "","","test_db"
+        user, passwd, dbn = "", "", "test_db"
     server = couchdb.Server(srv)
     if user and passwd:
         server.resource.credentials = (user, passwd)
     database = server[dbn]
-    ad=[doc for doc in database.get('_all_docs')['rows'] if '_design' in doc['id']]
+    ad = [doc for doc in database.get('_all_docs')['rows'] if '_design' in doc['id']]
     return [i['id'] for i in ad]
 
 
@@ -71,8 +71,8 @@ def reset_all_tokens(token_type, picas_creds, server="https://picas-lofar.grid.s
     """ Resets all Tokens with the pc authorization
     """
     thandler = TokenHandler(t_type=token_type, srv=server,
-                             uname=picas_creds.user, pwd=picas_creds.password,
-                             dbn=picas_creds.database)
+                            uname=picas_creds.user, pwd=picas_creds.password,
+                            dbn=picas_creds.database)
     thandler.load_views()
     for view in list(thandler.views):
         if view != 'overview_total':
@@ -82,8 +82,8 @@ def reset_all_tokens(token_type, picas_creds, server="https://picas-lofar.grid.s
 def purge_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfsara.nl:6984"):
     """Automated function to purge tokens authorizing with Picas_creds"""
     thandler = TokenHandler(t_type=token_type, srv=server,
-                             uname=picas_creds.user, pwd=picas_creds.password,
-                             dbn=picas_creds.database)
+                            uname=picas_creds.user, pwd=picas_creds.password,
+                            dbn=picas_creds.database)
     thandler.load_views()
     thandler.purge_tokens()
 
@@ -449,7 +449,7 @@ function (key, values, rereduce) {
         else:
             savefile = filename
         if "/" in filename:
-             savefile = filename.replace("/", "_")
+            savefile = filename.replace("/", "_")
         with open(savefile, 'w') as _file:
             for line in attach:
                 _file.write(str(line))
