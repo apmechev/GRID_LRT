@@ -1,7 +1,3 @@
-from GRID_LRT.Staging import stage_all
-from GRID_LRT.Staging.srmlist import srmlist
-from mock import MagicMock
-
 import os
 import glob
 import unittest
@@ -9,6 +5,10 @@ import tempfile
 from os.path import expanduser
 import sys
 
+from GRID_LRT.Staging import stage_all
+from GRID_LRT.Staging.srmlist import srmlist
+from mock import MagicMock
+from mock import patch 
 
 gfal = stage_all.gfal
 gfal.creat_context = MagicMock()
