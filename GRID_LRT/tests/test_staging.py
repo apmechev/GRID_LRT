@@ -13,7 +13,7 @@ from mock import patch
 gfal = stage_all.gfal
 gfal.creat_context = MagicMock()
 gfal.gfal_init = MagicMock(return_value=(0,2,3))
-gfal.creat_context.bring_online = MagicMock(return_value=(None,0))
+gfal.creat_context.bring_online = MagicMock(return_value=((None,0)))
 gfal.gfal_prestage = MagicMock(return_value=(0,1,2))
 
 class Staging_Test(unittest.TestCase):
@@ -32,7 +32,5 @@ class Staging_Test(unittest.TestCase):
         stager = stage_all.LTA_Stager(srmlist=slist)
         self.assertTrue(len(stager.srmlist) == 51)
 
-    @patch('GRID_LRT.Staging.stage_all.gfal.creat_context.bring_online')
-    def test_mocked_stage(self, bring_online_mock):
-        bring_online_mock.return_value = (None, 0)
+    def test_mocked_stage(self):
         stage_all.main(os.path.dirname(__file__)+'/srm_50_sara.txt')
