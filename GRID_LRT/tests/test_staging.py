@@ -11,7 +11,7 @@ import sys
 
 
 gfal = stage_all.gfal
-gfal.creat_context = MagicMock()
+gfal.creat_context = MagicMockreturn_value=(gfal.creat_context))
 gfal.gfal_init = MagicMock(return_value=(0,2,3))
 gfal.creat_context.bring_online = MagicMock(return_value=(None,0))
 gfal.gfal_prestage = MagicMock(return_value=(0,1,2))
