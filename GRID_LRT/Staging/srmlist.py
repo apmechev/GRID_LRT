@@ -16,7 +16,16 @@ class srmlist(list):
     done automatically. Checking OBSID is an optional argument set to True by default.
     """
 
-    def __init__(self, checkOBSID=True, check_location = True, link=None):
+    def __init__(self, check_OBSID=True, check_location = True, link=None):
+        """__init__: Initializes the srmlist object. 
+
+        :param check_OBSID: Boolean flag to check if each added link has the same OBSID
+        :type check_OBSID: Boolean
+        :param check_location: Boolean flag to check if all files are in the same location (for staging purposes)
+        :type check_location: Boolean
+        :param link: append a link to the srmlist at creation
+        :type link: str
+        """
         super(srmlist, self).__init__()
         self._check_location = check_location
         self.lta_location = None
