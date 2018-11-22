@@ -34,6 +34,65 @@ class gridjob(object):
             self.wholenodes = 'false'
         self.ncpu = NCPU       
 
+
+
+class running_job(object):
+    def __init__(self, glite_url=''):
+        self.job_status='Unknown'
+        self.glite_status='Unknown'
+        if glite_url:
+            self.glite_url = glite_url
+   
+    @property
+    def status(self):
+        self.__check_status()
+        return self.job_status
+
+    def __check_status(self):
+        glite_process = subprocess.Popen(['glite-wms-job-status', self.glite_url],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = glite_process.communicate()[0]
+        try:
+            self.job_status=result.split('Current Status:')[1].split()[0]
+        except:
+            print(err)
+
+        if self.glite_status== 'Running':
+            self.count_successes(result)
+        if self.glite_status=='Waiting':
+            self.count_successes(result)
+        if self.glite_status=='Running' and self.job_status=='Waiting':
+            self.glite_status='Completed'
+            
+    def count_successes(self,jobs):
+        """Counts the number of Completed jobs in the results of the glite-wms-job-status
+        output.  """
+        exit_codes=[]
+        jobs_list=[]
+        for j in jobs.split('=========================================================================='):
+            jobs_list.append(j)
+        statuses=[]
+        for j in jobs_list:
+            if "Current Status:" in j:
+                statuses.append(j.split("Current Status:")[1].split('\n')[0])
+        numdone=0
+        for i in statuses:
+            if 'Done' in i or 'Cancelled' in i or 'Aborted' in i  :
+                numdone+=1
+        if 'Done' in statuses[0] or 'Aborted' in statuses[0]:
+            self.job_status = 'Done'
+        if numdone == len(jobs_list):
+            self.job_status='Done'
+        if self.job_status == 'Waiting':
+            for i in statuses:
+                if 'Scheduled' in i or 'Running' in i:
+                    self.job_status = 'Waiting'
+                    return  statuses[1:]
+                self.job_status = "Done"
+        logging.info("Num_jobs_done "+str(numdone)+" snd status is "+self.job_status)
+        self.numdone = numdone
+        return statuses[1:]
+
+
 class JdlLauncher(object):
     """jdl_launcher creates a jdl launch file with the
     appropriate queue, CPUs, cores and Memory per node
@@ -80,6 +139,8 @@ class JdlLauncher(object):
             self.ncpu = kwargs["NCPU"]
         else:
             self.ncpu = 1
+        if self.ncpu == 0:
+            self.wholenodes = 'true'
         if "queue" in kwargs:
             self.queue = kwargs['queue']
         else:
