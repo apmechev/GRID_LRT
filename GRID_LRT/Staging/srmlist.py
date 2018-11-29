@@ -30,7 +30,7 @@ class srmlist(list):
         self._check_location = check_location
         self.lta_location = None
         self.obsid = None
-        self.checkobsid = checkOBSID
+        self.checkobsid = check_OBSID
         if link:
             self.append(link)
 
