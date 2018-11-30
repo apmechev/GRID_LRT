@@ -10,11 +10,11 @@ from GRID_LRT.Staging.srmlist import srmlist
 from mock import MagicMock
 from mock import patch 
 
-gfal = stage_all.gfal
-gfal.creat_context = MagicMock()
-gfal.gfal_init = MagicMock(return_value=(0,2,3))
+#gfal = stage_all.gfal
+#gfal.creat_context = MagicMock()
+#gfal.gfal_init = MagicMock(return_value=(0,2,3))
 #gfal.creat_context.bring_online = MagicMock(return_value=(None,0))
-gfal.gfal_prestage = MagicMock(return_value=(0,1,2))
+#gfal.gfal_prestage = MagicMock(return_value=(0,1,2))
 
 class Staging_Test(unittest.TestCase):
 
