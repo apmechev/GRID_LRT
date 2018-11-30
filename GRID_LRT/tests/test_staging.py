@@ -7,14 +7,16 @@ import sys
 
 from GRID_LRT.Staging import stage_all
 from GRID_LRT.Staging.srmlist import srmlist
+from GRID_LRT.Staging.stage_all import gfal
+
 from mock import MagicMock
 from mock import patch 
 
-gfal = stage_all.gfal
-gfal.creat_context = MagicMock()
-gfal.gfal_init = MagicMock(return_value=(0,2,3))
+#gfal = stage_all.gfal
+#gfal.creat_context = MagicMock()
+#gfal.gfal_init = MagicMock(return_value=(0,2,3))
 #gfal.creat_context.bring_online = MagicMock(return_value=(None,0))
-gfal.gfal_prestage = MagicMock(return_value=(0,1,2))
+#gfal.gfal_prestage = MagicMock(return_value=(0,1,2))
 
 class Staging_Test(unittest.TestCase):
 
@@ -32,8 +34,8 @@ class Staging_Test(unittest.TestCase):
         stager = stage_all.LTA_Stager(srmlist=slist)
         self.assertTrue(len(stager.srmlist) == 51)
 
-    @patch('GRID_LRT.Staging.stage_all.gfal',spec = True)
+    @patch('GRID_LRT.Staging.stage_all')
     def test_mocked_stage(self, bring_online_mock):
-        ret_val =  bring_online_mock.return_value
-        ret_val.creat_context.bring_online = ((None, 0))
+        ret_val =  bring_online_mock.gfal.creat_context.bring_online
+        ret_val.return_value = (('sfsfs','22'))
         stage_all.main(os.path.dirname(__file__)+'/srm_50_sara.txt')
