@@ -34,8 +34,8 @@ class Staging_Test(unittest.TestCase):
         stager = stage_all.LTA_Stager(srmlist=slist)
         self.assertTrue(len(stager.srmlist) == 51)
 
-    @patch('GRID_LRT.Staging.stage_all')
+    @patch('GRID_LRT.Staging.stage_all.stage_srm')
     def test_mocked_stage(self, bring_online_mock):
-        ret_val =  bring_online_mock.gfal.creat_context.bring_online
-        ret_val.return_value = (('sfsfs','22'))
-#        stage_all.main(os.path.dirname(__file__)+'/srm_50_sara.txt')
+        ret_val =  bring_online_mock.return_value
+        ret_val = ('sfsfs','22')
+        stage_all.main(os.path.dirname(__file__)+'/srm_50_sara.txt')
