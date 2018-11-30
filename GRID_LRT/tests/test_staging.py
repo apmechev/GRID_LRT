@@ -32,7 +32,7 @@ class Staging_Test(unittest.TestCase):
         stager = stage_all.LTA_Stager(srmlist=slist)
         self.assertTrue(len(stager.srmlist) == 51)
 
-    @patch('GRID_LRT.Staging.stage_all.gfal')
+    @patch('GRID_LRT.Staging.stage_all.gfal',spec = True)
     def test_mocked_stage(self, bring_online_mock):
         ret_val =  bring_online_mock.return_value
         ret_val.creat_context.bring_online = ((None, 0))
