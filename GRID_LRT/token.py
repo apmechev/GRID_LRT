@@ -470,7 +470,7 @@ function (key, values, rereduce) {
     def archive_tokens_from_view(self, viewname, delete_on_save=False):
         to_del = []
         for token in self.list_tokens_from_view(viewname):
-            self.archive_a_token(token['id'], delete_on_save)
+            self.archive_a_token(token['id'])
             to_del.append(self.database[token['id']])
         if delete_on_save:
             self.database.purge(to_del)
