@@ -92,6 +92,12 @@ class running_job(object):
         self.numdone = numdone
         return statuses[1:]
 
+    def __str__(self):
+        return "<Grid job with status '{}' at '{}'>".format(self.status, self.glite_url)
+
+    def __repr__(self):
+        return self.__str__()
+
 
 class JdlLauncher(object):
     """jdl_launcher creates a jdl launch file with the
