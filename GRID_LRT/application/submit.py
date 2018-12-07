@@ -93,7 +93,7 @@ class running_job(object):
         return statuses[1:]
 
     def __str__(self):
-        return "<Grid job with status '{}' at '{}'>".format(self.status, self.glite_url)
+        return "<Grid job '{}' with status '{}'>".format(self.glite_url, self.status)
 
     def __repr__(self):
         return self.__str__()
