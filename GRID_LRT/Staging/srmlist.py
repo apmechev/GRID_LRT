@@ -63,7 +63,7 @@ class srmlist(list):
             return ""
         return link
 
-    def check_obsid(self, item):
+    def _check_obsid(self, item):
         link = self.stringify_item(item)
         tmp_obsid = re.search('L[0-9][0-9]*',
                               link).group(0)
@@ -75,7 +75,8 @@ class srmlist(list):
     def append(self, item):
         if not item or item == "":
             return
-        self.check_obsid(item)
+        if self.checkobsid:
+            self._check_obsid(item)
         tmp_loc = self.check_location(item)
         item = self.trim_spaces(self.stringify_item(item))
         if not self.lta_location:
