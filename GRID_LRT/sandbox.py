@@ -42,6 +42,7 @@ class Sandbox(object):
 
 
         """
+        self.return_dir = os.getcwd()
         self.authorized = False
         if 'authorize' in kwargs.keys() and kwargs['authorize'] == False:
             pass
@@ -60,8 +61,7 @@ class Sandbox(object):
         pass
 
     def __del__(self):
-        if os.path.exists(self.tmpdir):
-            shutil.rmtree(self.tmpdir)
+        self.delete_sbx_folder()
 
     def __exit__(self, ex_type, ex_value, ex_traceback):
         pass
@@ -105,6 +105,7 @@ class Sandbox(object):
 #            os.chdir(self.base_dir)
         if os.path.exists(self.tmpdir):
             shutil.rmtree(self.tmpdir)
+        os.chdir(self.return_dir)
 
     def enter_sbx_folder(self, directory=None):
         """Changes directory to the (temporary) sandbox folder)"""
