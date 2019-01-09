@@ -36,7 +36,7 @@ class gridjob(object):
 
 
 
-class running_job(object):
+class RunningJob(object):
     def __init__(self, glite_url=''):
         self.job_status='Unknown'
         self.glite_status='Unknown'
@@ -50,7 +50,7 @@ class running_job(object):
 
     def __check_status(self):
         glite_process = subprocess.Popen(['glite-wms-job-status', self.glite_url],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        result = glite_process.communicate()[0]
+        result, err = glite_process.communicate()
         try:
             self.job_status=result.split('Current Status:')[1].split()[0]
         except:
