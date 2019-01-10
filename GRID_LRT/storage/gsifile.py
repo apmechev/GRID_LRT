@@ -1,4 +1,6 @@
 from datetime import datetime
+from datetime import timedelta
+from time import strptime
 import warnings
 import subprocess
 import re
@@ -105,11 +107,20 @@ class GSIFile(object):
 
     @staticmethod
     def _extract_date(data):
-        if str(data[-2].decode('ascii')) not in ['2018','2017','2016','2015']:
-            date = data[-4].decode('ascii')+" "+data[-3].decode('ascii')+" " + str(datetime.now().year)
+        year = str(data[-2].decode('ascii'))
+        month = data[-4].decode('ascii')
+        day = data[-3].decode('ascii')
+        if year not in ['2019','2018','2017','2016','2015']:
+            ## In this case the year is not specified.
+            this_year = datetime.now().year
+            if strptime(month,'%b').tm_mon > datetime.now().month:
+                year = this_year -1
+            else:
+                year = this_year
+            date = month +" " + day + " " + str(year)
             time = data[-2].decode('ascii')
         else:
-            date = data[-4].decode('ascii')+" "+data[-3].decode('ascii')+" "+data[-2].decode('ascii')
+            date = month + " " + day + " "+year
             time = "00:00"
         
         file_datetime = datetime.strptime(date+"-"+time, "%b %d %Y-%H:%M")
