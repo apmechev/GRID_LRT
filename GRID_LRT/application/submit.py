@@ -84,10 +84,14 @@ class RunningJob(object):
             self.job_status='Done'
         if self.job_status == 'Waiting':
             for i in statuses:
-                if 'Scheduled' in i or 'Running' in i:
-                    self.job_status = 'Waiting'
-                    return  statuses[1:]
-                self.job_status = "Done"
+                if 'Scheduled' in i:
+                    self.job_status = 'Scheduled'
+                elif 'Running' in i: 
+                    self.job_status = 'Running'
+                elif 'Submitted' in i:
+                    self.job_status = 'Submitted'
+                else:
+                    self.job_status = "Done"
         logging.info("Num_jobs_done "+str(numdone)+" snd status is "+self.job_status)
         self.numdone = numdone
         return statuses[1:]
