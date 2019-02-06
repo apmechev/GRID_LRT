@@ -56,10 +56,11 @@ before_install:
     - export PYTHON_INCLUDE_DIR=$(python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
     - export PYTHON_LIBRARY=$(python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")/libpython*[!m].so
       #    - pip install  --verbose git+https://github.com/cern-fts/gfal2-python.git
-      #    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py34.so /usr/lib/x86_64-linux-gnu/libboost_python-py35.so
-      #    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py34.so /usr/lib/x86_64-linux-gnu/libboost_python-py36.so
-      #    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py34.so /usr/lib/x86_64-linux-gnu/libboost_python-py33.so
-      #    - sudo apt-get install gfal2-plugin-mock
+    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py33.so
+    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py34.so
+    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py36.so
+    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py37.so
+    #    - sudo apt-get install gfal2-plugin-mock
     - pip install --verbose git+https://gitlab.cern.ch/dmc/gfal2-bindings.git
     - which -a python 
       #    - sudo apt-get install globus-gass-copy-progs voms-clients -y
