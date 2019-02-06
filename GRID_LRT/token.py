@@ -36,6 +36,7 @@ import itertools
 import time
 import tarfile
 import yaml
+import json
 from retrying import retry
 
 
@@ -504,7 +505,7 @@ function (key, values, rereduce) {
         data = self.database[tokenid]
         archived_files = []
         with open(tokenid+".dump", 'w') as savefile:
-            yaml.dump(data, savefile)
+            json.dump(data, savefile)
         archived_files.append(tokenid+".dump")
         for att_file in self.list_attachments(tokenid):
             fname = att_file.replace('/', '-')
@@ -577,7 +578,7 @@ class TokenSet(object):
             self.token_keys = {}
         else:
             with open(tok_config, 'r') as optfile:
-                self.token_keys = yaml.load(optfile)['Token']
+                self.token_keys = json.load(optfile)['Token']
 
     def create_dict_tokens(self, iterable={}, id_prefix='SB', id_append="L000000",
                            key_name='STARTSB', file_upload=None):
