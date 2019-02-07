@@ -12,7 +12,7 @@ matrix:
           dist: trusty
           python: 3.3
         - os: linux
-          dist: xenial                                                                                                                        
+          dist: xenial
           python: 3.4
         - os: linux
           dist: xenial
@@ -30,7 +30,8 @@ before_install:
     #    - sudo rm /opt/pyenv/shims/python*
     #- sudo rm /usr/bin/python*
     - sudo apt-get update
-    - sudo apt-get install libdpm-dev libboost-all-dev python-dev python3-dev libglibmm-2.4-1v5 
+    - sudo apt-get install libdpm-dev libboost-all-dev python-dev python3-dev 
+    - if [[ $TRAVIS_PYTHON_VERSION == "2.6" ]]  || [[ $TRAVIS_PYTHON_VERSION == "3.3"  ]]; then sudo apt-get install libglibmm-2.4-1c2a ; else sudo apt-get install  libglibmm-2.4-1v5 ; fi
     - sudo apt-get install -y dpkg
     - wget http://mirrors.kernel.org/ubuntu/pool/main/j/json-c/libjson-c3_0.12.1-1.3_amd64.deb
     - wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gfal2/libgfal-transfer2_2.15.2-1_amd64.deb
@@ -56,10 +57,12 @@ before_install:
     - export PYTHON_INCLUDE_DIR=$(python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
     - export PYTHON_LIBRARY=$(python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")/libpython*[!m].so
       #    - pip install  --verbose git+https://github.com/cern-fts/gfal2-python.git
-    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py33.so
-    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py34.so
-    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py36.so
-    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py37.so
+    - if [[ $TRAVIS_PYTHON_VERSION == "3.3"  ]]; 
+     then sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py34.so /usr/lib/x86_64-linux-gnu/libboost_python-py33.so;
+     else sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py34.so;
+          sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py36.so;
+          sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py37.so;
+     fi
     #    - sudo apt-get install gfal2-plugin-mock
     - pip install --verbose git+https://gitlab.cern.ch/dmc/gfal2-bindings.git
     - which -a python 
