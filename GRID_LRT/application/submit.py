@@ -253,7 +253,8 @@ class LouiLauncher(JdlLauncher):
     """
 
     def __init__(self, *args, **kwargs):
-        super(LouiLauncher,self).__init__(*args, **kwargs)
+        super(LouiLauncher,self).__init__(*args, *kwargs)
+        self.return_directory = os.getcwd()
         self.run_directory = tempfile.mkdtemp(prefix='/scratch/') 
         
     def launch(self, database=None):
@@ -282,6 +283,7 @@ class LouiLauncher(JdlLauncher):
     def cleanup(self):
         print("removing directory " + self.run_directory)
         rmtree(self.run_directory)
+        os.chdir(self.return_directory)
     
     def __del__(self):
         if os.path.exists(self.run_directory):
