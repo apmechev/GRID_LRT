@@ -253,7 +253,7 @@ class LouiLauncher(JdlLauncher):
     """
 
     def __init__(self, *args, **kwargs):
-        super(LouiLauncher,self).__init__(*args, *kwargs)
+        super(LouiLauncher,self).__init__(*args, **kwargs)
         self.return_directory = os.getcwd()
         self.run_directory = tempfile.mkdtemp(prefix='/scratch/') 
         
