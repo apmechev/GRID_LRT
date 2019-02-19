@@ -154,7 +154,7 @@ class JdlLauncher(object):
         if "queue" in kwargs:
             self.queue = kwargs['queue']
         else:
-            self.queue = "mediummc"
+            self.queue = "medium"
         self.temp_file = None
         self.launch_file = str("/".join((GRID_LRT.__file__.split("/")[:-1])) +
                                "/data/launchers/run_remote_sandbox.sh")
