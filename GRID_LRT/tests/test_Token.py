@@ -1,16 +1,20 @@
 import random
 import string
-from GRID_LRT import token 
-from GRID_LRT.auth.get_picas_credentials import picas_cred
 import os
 import glob
 import unittest
 import sys
 
+import GRID_LRT
+from GRID_LRT import token
+from GRID_LRT.token import TokenDictBuilder
+from GRID_LRT.token import TokenConfigBuilder
+from GRID_LRT.auth.get_picas_credentials import picas_cred
+
 vers=str(sys.version_info[0])+"."+str(sys.version_info[1])
 T_TYPE="travis_ci_test"+vers
 TOKEN="travis_getSBX_test"+vers
-
+BASEPATH = GRID_LRT.__file__.split('__init__.py')[0]+'/'
 
 class TokenTest(unittest.TestCase):
     def setUp(self):
@@ -68,6 +72,18 @@ class TokenTest(unittest.TestCase):
         self.assertTrue('two' in db[t1['_id']])
         t1.synchronize(db, prefer_local=True, upload=True)
         self.assertTrue('two' not in db[t1['_id']])
+
+    def test_token_builder(self):
+        t1=token.Token(token_type='test')
+        t2=token.Token(token_type='test')
+        config_path = "{0}/{1}".format(BASEPATH,'data/config/steps/cal_pref3.json'
+        with open(config_path) as _jsonfile:
+            data = json.load(_jsonfile)
+            t1.build(TokenDictBuilder(data))
+            t2.build(TokenConfigBuilder(config_path))
+        for k in [u'status', u'upload', '_id', 'type', 'config.json', u'times']:
+            self.assertTrue(k in t1)
+            self.assertTrie(k in t2)
 
 
     def test_delete_token(self):
