@@ -76,7 +76,7 @@ class TokenTest(unittest.TestCase):
     def test_token_builder(self):
         t1=token.Token(token_type='test')
         t2=token.Token(token_type='test')
-        config_path = "{0}/{1}".format(BASEPATH,'data/config/steps/cal_pref3.json'
+        config_path = "{0}/{1}".format(BASEPATH,'data/config/steps/cal_pref3.json')
         with open(config_path) as _jsonfile:
             data = json.load(_jsonfile)
             t1.build(TokenDictBuilder(data))
