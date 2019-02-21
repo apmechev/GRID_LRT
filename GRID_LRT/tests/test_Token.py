@@ -52,7 +52,7 @@ class TokenTest(unittest.TestCase):
         self.assertEquals(t1['_id'],'my_id')
     
     def test_synchornize_Token(self):
-        t1=Token(token_type='test')
+        t1=token.Token(token_type='test')
         db={}
         db[t1['_id']]=t1
         t1.synchronize(db)
@@ -62,7 +62,7 @@ class TokenTest(unittest.TestCase):
         self.assertTrue('type' in t1)
         self.assertTrue('_id' in t1)
         self.assertTrue('two' in t1)
-        t1=Token(token_type='test')
+        t1=token.Token(token_type='test')
         t1.synchronize(db, prefer_local=True)
         self.assertTrue('two' not in t1)
         self.assertTrue('two' in db[t1['_id']])
