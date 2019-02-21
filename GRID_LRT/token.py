@@ -38,6 +38,7 @@ import tarfile
 import yaml
 import json
 from retrying import retry
+from abc import ABCMeta, abstractmethod
 
 
 import GRID_LRT
@@ -91,7 +92,6 @@ def purge_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfs
 
 class Token(dict):
     def __init__(self, token_type, token_id=None):
-        self.store = dict()
         self.__setitem__('type', token_type)
         if not token_id:
             self.__setitem__('_id',token_type)
@@ -112,6 +112,68 @@ class Token(dict):
                 self[k] = remote_token.get(k)
         if upload:
             db[self['_id']] = self
+    
+    def build(self,token_builder):
+        data = token_builder.data
+        self.update(data)
+
+
+class TokenBuilder:
+    __metaclass__ = ABCMeta
+    """Creates a token"""
+ 
+    def __repr__(self):
+         return self._data
+
+    @abstractmethod
+    def _build(self):
+        pass
+
+    @property
+    def data(self):
+        return self._data
+
+
+class TokenDictBuilder(TokenBuilder):
+    def __init__(self, config_dict):
+        self._build(config_dict)
+
+    def _build(self,config_dict):
+        self._build_from_dict(config_dict)
+
+    def _build_from_dict(self, config_dict):
+        self._data={}
+        if "PicasApiVersion" in config_dict and config_dict["PicasApiVersion"]<0.5:
+            raise RuntimeError("Unsupported PiCaS API version {0}", config_dict["PicasApiVersion"])
+        self._data['config.json']={}
+        _config = config_dict
+        _variables={}
+
+        if 'Token' in _config:
+            if 'variables' in _config['Token']:
+                _variables.update(_config['Token']['variables'])
+                del _config['Token']['variables']
+            self._data.update(_config['Token'])
+
+        if 'Job' in _config and 'variables' in _config['Job']:
+            _variables.update(_config['Job']['variables'])
+        self._data['config.json']['variables'] = _variables
+        if 'container' in _config:
+            self._data['config.json']['container']=_config['container']
+        if 'sandbox' in _config:
+            self._data['config.json']['sandbox']=_config['sandbox']
+
+
+class TokenConfigBuilder(TokenDictBuilder):
+    def __init__(self, config_file):
+        self._build(config_file)
+
+    def _build(self, config_file):
+        _config = json.load(open(config_file))
+        self._data={}
+        self._build_from_dict(_config)
+
+
 
 
 class TokenHandler(object):
@@ -123,7 +185,6 @@ class TokenHandler(object):
     server, username, password and name of database.
 
     """
-
     def __init__(self, t_type="token",
                  srv="https://picas-lofar.grid.surfsara.nl:6984",
                  uname="", pwd="", dbn=""):
