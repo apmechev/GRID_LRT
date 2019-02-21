@@ -89,6 +89,31 @@ def purge_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfs
     thandler.purge_tokens()
 
 
+class Token(dict):
+    def __init__(self, token_type, token_id=None):
+        self.store = dict()
+        self.__setitem__('type', token_type)
+        if not token_id:
+            self.__setitem__('_id',token_type)
+        else: 
+            self.__setitem__('_id',token_id)
+
+    def __getitem__(self, k):
+        return super(Token, self).__getitem__(k)
+
+    def synchronize(self, db, prefer_local=False, upload=False):
+        """Synchronizes the token with the database. 
+        """
+        remote_token = db[self['_id']]
+        for k in set(remote_token.keys()+self.keys()):
+            if prefer_local:
+                remote_token[k] = self.get(k)
+            else:
+                self[k] = remote_token.get(k)
+        if upload:
+            db[self['_id']] = self
+
+
 class TokenHandler(object):
     """
 

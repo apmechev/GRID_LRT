@@ -37,6 +37,38 @@ class TokenTest(unittest.TestCase):
         self.assertTrue('overview_total' in views.keys())
         th.purge_tokens()
 
+    def test_new_Token(self):
+        t1 = token.Token(token_type='test')
+        self.assertTrue('type' in t1)
+        self.assertTrue('_id' in t1)
+        self.assertEquals(t1['type'],'test')
+        self.assertEquals(t1['_id'],'test')
+    
+    def test_new_Token_with_id(self):
+        t1 = token.Token(token_type='test', token_id='my_id')
+        self.assertTrue('type' in t1)
+        self.assertTrue('_id' in t1)
+        self.assertEquals(t1['type'],'test')
+        self.assertEquals(t1['_id'],'my_id')
+    
+    def test_synchornize_Token(self):
+        t1=Token(token_type='test')
+        db={}
+        db[t1['_id']]=t1
+        t1.synchronize(db)
+        self.assertEquals(t1, {'_id': 'test', 'type': 'test'})
+        db[t1['_id']]['two']=2
+        t1.synchronize(db)
+        self.assertTrue('type' in t1)
+        self.assertTrue('_id' in t1)
+        self.assertTrue('two' in t1)
+        t1=Token(token_type='test')
+        t1.synchronize(db, prefer_local=True)
+        self.assertTrue('two' not in t1)
+        self.assertTrue('two' in db[t1['_id']])
+        t1.synchronize(db, prefer_local=True, upload=True)
+        self.assertTrue('two' not in db[t1['_id']])
+
 
     def test_delete_token(self):
         T_TYPE = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
