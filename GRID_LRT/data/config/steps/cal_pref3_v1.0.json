@@ -1,25 +1,17 @@
 {
-    "Submit": {
-        "NCPU": 4,
+    "Job": {
+        "NCPU": 6,
         "parameter_step": 1,
         "queue": "mediummc",
+        "variables": {
+            "OBSID": "L229585",
+            "PIPELINE_STEP": "pref3_cal_CI",
+            "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/test/",
+            "STARTSB": "000"
+        },
         "wholenode": false
     },
     "Token": {
-        "sandbox": {
-            "git": {
-                "branch": "master",
-                "location": "https://github.com/apmechev/GRID_Sandbox.git"
-            },
-            "prefactor": {
-                "branch": "version3.0",
-                "location": "https://github.com/lofar-astron/prefactor.git"
-            }
-        },
-        "singularity": {
-            "SIMG": "shub://tikk3r/lofar-grid-hpccloud:lofar",
-            "SIMG_COMMIT": "ef3d3566e858e486e57550a5c2b822d3"
-        },
         "status": "queued",
         "times": {},
         "upload": {
@@ -27,18 +19,31 @@
             "gzip": false,
             "location": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/test/",
             "remove_prev": false,
-            "template": "CI_pref3_cal"
+            "template": "CI_pref3_cal_$DATE"
         },
         "variables": {
-            "OBSID": "",
-            "PIPELINE_STEP": "pref3_cal_CI",
-            "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/test/",
-            "STARTSB": "",
             "_attachments": {
                 "PARSET": "Pre-Facet-Calibrator.parset",
                 "SRMFILE": "srm.txt"
             }
         }
     },
-    "apiVersion": 0.5
+    "_apiVersion": 0.5,
+    "container": {
+        "singularity": {
+            "SIMG": "shub://tikk3r/lofar-grid-hpccloud:lofar",
+            "SIMG_COMMIT": "ef3d3566e858e486e57550a5c2b822d3"
+        }
+    },
+    "sandbox": {
+        "git": {
+            "branch": "master",
+            "url": "https://github.com/apmechev/GRID_Sandbox.git"
+        },
+        "prefactor": {
+            "branch": "version3.0",
+            "url": "https://github.com/lofar-astron/prefactor.git",
+            "checkout_dir":"prefactor"
+        }
+    }
 }
