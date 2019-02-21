@@ -84,7 +84,7 @@ class TokenTest(unittest.TestCase):
             t2.build(TokenConfigBuilder(config_path))
         for k in [u'status', u'upload', '_id', 'type', 'config.json', u'times']:
             self.assertTrue(k in t1)
-            self.assertTrie(k in t2)
+            self.assertTrue(k in t2)
 
 
     def test_delete_token(self):
