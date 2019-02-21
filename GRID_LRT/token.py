@@ -105,7 +105,7 @@ class Token(dict):
         """Synchronizes the token with the database. 
         """
         remote_token = db[self['_id']]
-        for k in set(remote_token.keys()+self.keys()):
+        for k in set(list(remote_token.keys())+list(self.keys())):
             if prefer_local:
                 remote_token[k] = self.get(k)
             else:
