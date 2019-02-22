@@ -48,6 +48,7 @@ from cloudant import couchdb as cloudant_couchdb
 from cloudant import couchdb_admin_party
 from cloudant.client import CouchDB
 from cloudant import CouchDB
+from cloudant.document import Document
 
 
 __version__ = GRID_LRT.__version__
@@ -97,7 +98,7 @@ def purge_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfs
     thandler.purge_tokens()
 
 class Token(dict):
-    def __init__(self, token_type, token_id=None):
+    def __init__(self, token_type, token_id=None, **kwargs):
         self.__setitem__('type', token_type)
         if not token_id:
             self.__setitem__('_id',token_type)
@@ -127,6 +128,11 @@ class Token(dict):
     def build(self,token_builder):
         data = token_builder.data
         self.update(data)
+
+class caToken(Token, Document):
+    def __init__(self, database, token_type, **kwargs):
+        Token.__init__(self, token_type=token_type, **kwargs)
+        Document.__init__(self,database=database, **kwargs)
 
 
 class TokenBuilder:
