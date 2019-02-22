@@ -181,6 +181,6 @@ class TokenTest(unittest.TestCase):
                                 uname="", pwd="", dbn='test_db') 
         th.add_status_views()
         th.add_overview_view()
-        design_docs = token.get_all_design_docs(None, srv="http://localhost:5984/")
+        design_docs = token.get_all_design_docs(None, srv="http://localhost:5984")
         self.assertTrue(len(design_docs)>0)
         self.assertTrue('_design/'+T_TYPE in design_docs)
