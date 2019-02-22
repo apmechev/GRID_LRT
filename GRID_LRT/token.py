@@ -43,6 +43,7 @@ from abc import ABCMeta, abstractmethod
 
 import GRID_LRT
 from couchdb.design import ViewDefinition
+import couchdb
 from cloudant import couchdb as cloudant_couchdb
 from cloudant import couchdb_admin_party
 from cloudant.client import CouchDB
