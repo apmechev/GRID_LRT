@@ -63,13 +63,16 @@ __status__ = GRID_LRT.__status__
 def get_all_design_docs(pcreds=None, srv="https://picas-lofar.grid.surfsara.nl:6984"):
     """Returns a list of design documents for the pcreds.databse on server=srv
     If pcreds are none, then we're adminparty and db is test_db"""
+    kwargs={'connect':True, 'url':srv}
     if pcreds:
         user, passwd, dbn = pcreds.user, pcreds.password, pcreds.database
         connect_client = CaCouchClient
+        kwargs['user'] = user
+        kwargs['passwd'] = passwd
     else:
         user, passwd, dbn = None, None, "test_db"
         connect_client = couchdb_admin_party
-    with connect_client(user=user, passwd=passwd, connect=True,url=srv) as client:
+    with connect_client(**kwargs) as client:
         database = client[dbn]
         ad = [doc for doc in database['_all_docs']['rows'] if '_design' in doc['id']]
     return [i['id'] for i in ad]
