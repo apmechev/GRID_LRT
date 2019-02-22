@@ -111,7 +111,7 @@ class Token(dict):
             else:
                 self[k] = remote_token.get(k)
         if upload:
-            self.upload() 
+            self.upload(db) 
 
     def upload(self, db):
         if isinstance(db,dict):
