@@ -18,6 +18,7 @@ setup(name='GRID_LRT',
           'pyyaml',
           'couchdb',
           'retrying',
+          'cloudant',
           'humanfriendly',
           'gitpython'
           ],

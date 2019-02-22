@@ -43,7 +43,11 @@ from abc import ABCMeta, abstractmethod
 
 import GRID_LRT
 from couchdb.design import ViewDefinition
-import couchdb
+from cloudant import couchdb as cloudant_couchdb
+from cloudant import couchdb_admin_party
+from cloudant.client import CouchDB
+from cloudant import CouchDB
+
 
 __version__ = GRID_LRT.__version__
 __author__ = GRID_LRT.__author__
@@ -59,9 +63,11 @@ def get_all_design_docs(pcreds=None, srv="https://picas-lofar.grid.surfsara.nl:6
     If pcreds are none, then we're adminparty and db is test_db"""
     if pcreds:
         user, passwd, dbn = pcreds.user, pcreds.password, pcreds.database
+        server =  CouchDB(user, passwd, url=srv, connect=True)
+
     else:
         user, passwd, dbn = "", "", "test_db"
-    server = couchdb.Server(srv)
+        server = couchdb_admin_party(url=srv)
     if user and passwd:
         server.resource.credentials = (user, passwd)
     database = server[dbn]
@@ -88,7 +94,6 @@ def purge_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfs
                             dbn=picas_creds.database)
     thandler.load_views()
     thandler.purge_tokens()
-
 
 class Token(dict):
     def __init__(self, token_type, token_id=None):
