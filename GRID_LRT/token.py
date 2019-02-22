@@ -67,7 +67,7 @@ def get_all_design_docs(pcreds=None, srv="https://picas-lofar.grid.surfsara.nl:6
         user, passwd, dbn = pcreds.user, pcreds.password, pcreds.database
     else:
         user, passwd, dbn = None, None, "test_db", 
-    with CaCouchClient(user,passwd, url=srv) as client:
+    with CaCouchClient(user,passwd, url=srv, connect=True) as client:
         database = client[dbn]
         ad = [doc for doc in database['_all_docs']['rows'] if '_design' in doc['id']]
     return [i['id'] for i in ad]
