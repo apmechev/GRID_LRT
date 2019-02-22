@@ -111,8 +111,13 @@ class Token(dict):
             else:
                 self[k] = remote_token.get(k)
         if upload:
+            self.upload() 
+
+    def upload(self, db):
+        if isinstance(db,dict):
             db[self['_id']] = self
-    
+
+
     def build(self,token_builder):
         data = token_builder.data
         self.update(data)
@@ -122,9 +127,6 @@ class TokenBuilder:
     __metaclass__ = ABCMeta
     """Creates a token"""
  
-    def __repr__(self):
-         return self._data
-
     @abstractmethod
     def _build(self):
         pass
