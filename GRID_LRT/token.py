@@ -106,9 +106,6 @@ class Token(dict):
         else: 
             self.__setitem__('_id',token_id)
 
-    def __getitem__(self, k):
-        return super(Token, self).__getitem__(k)
-
     def synchronize(self, db, prefer_local=False, upload=False):
         """Synchronizes the token with the database. 
         """
@@ -120,11 +117,6 @@ class Token(dict):
                 self[k] = remote_token.get(k)
         if upload:
             self.upload(db) 
-
-    def upload(self, db):
-        if isinstance(db,dict):
-            db[self['_id']] = self
-
 
     def build(self,token_builder):
         data = token_builder.data
