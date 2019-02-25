@@ -71,7 +71,7 @@ class TokenTest(unittest.TestCase):
         t1.synchronize(db, prefer_local=True)
         self.assertTrue('two' not in t1)
         self.assertTrue('two' in db[t1['_id']])
-        db = dict(t1)
+        db[t1['_id']] = dict(t1)
         self.assertTrue('two' not in db[t1['_id']])
 
     def test_token_builder(self):
