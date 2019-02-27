@@ -9,7 +9,7 @@ import json
 import GRID_LRT
 from GRID_LRT import token
 from GRID_LRT.token import TokenDictBuilder
-from GRID_LRT.token import TokenConfigBuilder
+from GRID_LRT.token import TokenJsonBuilder
 from GRID_LRT.auth.get_picas_credentials import picas_cred
 
 vers=str(sys.version_info[0])+"."+str(sys.version_info[1])
@@ -81,7 +81,7 @@ class TokenTest(unittest.TestCase):
         with open(config_path) as _jsonfile:
             data = json.load(_jsonfile)
             t1.build(TokenDictBuilder(data))
-            t2.build(TokenConfigBuilder(config_path))
+            t2.build(TokenJsonBuilder(config_path))
         for k in [u'status', u'upload', '_id', 'type', 'config.json', u'times']:
             self.assertTrue(k in t1)
             self.assertTrue(k in t2)
