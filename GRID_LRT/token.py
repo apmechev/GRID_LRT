@@ -39,7 +39,7 @@ import yaml
 import json
 from retrying import retry
 from abc import ABCMeta, abstractmethod
-
+import pdb
 
 import GRID_LRT
 from couchdb.design import ViewDefinition
@@ -112,6 +112,7 @@ class Token(dict):
         remote_token = db[self['_id']]
         for k in set(list(remote_token.keys())+list(self.keys())):
             if prefer_local:
+#                pdb.set_trace()
                 remote_token[k] = self.get(k)
             else:
                 self[k] = remote_token.get(k)
@@ -171,7 +172,7 @@ class TokenDictBuilder(TokenBuilder):
             self._data['config.json']['sandbox']=_config['sandbox']
 
 
-class TokenConfigBuilder(TokenDictBuilder):
+class TokenJsonBuilder(TokenDictBuilder):
     def __init__(self, config_file):
         self._build(config_file)
 
