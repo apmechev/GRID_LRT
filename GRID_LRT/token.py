@@ -37,7 +37,7 @@ import time
 import tarfile
 import yaml
 import json
-from retrying import retry
+#from retrying import retry
 from abc import ABCMeta, abstractmethod
 import pdb
 
@@ -105,6 +105,8 @@ class Token(dict):
             self.__setitem__('_id',token_type)
         else: 
             self.__setitem__('_id',token_id)
+        self.__setitem__('lock',0)
+        self.__setitem__('done',0)
 
     def synchronize(self, db, prefer_local=False, upload=False):
         """Synchronizes the token with the database. 
@@ -160,17 +162,20 @@ class TokenDictBuilder(TokenBuilder):
         if 'Token' in _config:
             if 'variables' in _config['Token']:
                 _variables.update(_config['Token']['variables'])
+                _config['variables'] = _config['Token']['variables']
                 del _config['Token']['variables']
             self._data.update(_config['Token'])
 
         if 'Job' in _config and 'variables' in _config['Job']:
-            _variables.update(_config['Job']['variables'])
-        self._data['config.json']['variables'] = _variables
+            self._data.update(_config['Job']['variables'])
+        
+        if 'variables' in _config:
+            self._data['config.json']['variables']=_config['variables']
         if 'container' in _config:
             self._data['config.json']['container']=_config['container']
         if 'sandbox' in _config:
             self._data['config.json']['sandbox']=_config['sandbox']
-
+    
 
 class TokenJsonBuilder(TokenDictBuilder):
     def __init__(self, config_file):
@@ -182,6 +187,32 @@ class TokenJsonBuilder(TokenDictBuilder):
         self._build_from_dict(_config)
 
 
+class TokenList(list):
+    """A list of token that a Token can be appended to
+    Includes upload and download functions to upload all the 
+    local documents and to download the remote ones"""
+    def __init__(self, token_type=None):
+        self._token_ids = []
+        self.__set_token_type(token_type)
+
+    def __set_token_type(self, token_type):
+        self.token_type = token_type
+
+    def append(self, item):
+        if isinstance(item, Token):
+            if not self.token_type:
+                self.__set_token_type(item['type'])
+            elif item['type'] != self.token_type:
+                raise TypeError("Appending token of wrong token type, {0} != {1}".format(
+                                item['type'], self.token_type))
+            if item['_id'] not in self._token_ids:
+                self._token_ids.append(item['_id'])
+            else:
+                raise RuntimeError("token with id {0} already exists! You need unique '_id' fields ".format(
+                    item['_id']))
+            super(TokenList, self).append(item)
+        else:
+            raise TypeError("Cannot append item {0} as it's not a Token".format(item))
 
 
 class TokenHandler(object):
@@ -241,7 +272,7 @@ class TokenHandler(object):
         database = server[dbn]
         return database
 
-    @retry(wait_fixed=20, stop_max_attempt_number=2)
+#    @retry(wait_fixed=20, stop_max_attempt_number=2)
     def create_token(self, keys=None, append="", attach=None):
         '''Creates a token, appends string to token ID if requested and
         adds user requested keys through the dict keys{}
