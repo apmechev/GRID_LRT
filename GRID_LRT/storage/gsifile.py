@@ -23,7 +23,7 @@ class GSIFile(object):
             self._subfiles = None
             self.is_dir, self.parent_dir = self._check_if_directory(location)
             self._internal = self._test_file_exists(location)
-        self.datetime = self._extract_date(self._internal) 
+        self.datetime = self._extract_date(self._internal)
         self.size = self._get_size()
         if self.is_dir:
             self.is_file = False
@@ -35,7 +35,7 @@ class GSIFile(object):
     def _build_from_parent_dir(self, parent_dir):
         self.parent_dir = parent_dir.location
         self._internal = self._find_item_in_uberftp_result(parent_dir._subfiles)
-        if self._internal[0][0]=='d':
+        if self._internal[0][0] == 'd':
             self.is_dir = True
         elif self._internal[0][0] == '-':
             self.is_dir = False
@@ -46,8 +46,9 @@ class GSIFile(object):
         return humanfriendly.format_size(human_size)
 
     def get_dir_size(self):
-        """Will go one level deeper and sum the sizes of all objects. If the objects are directories, you'll
-        have to do the iteration yourself!"""
+    """Will go one level deeper and sum the sizes of all objects. 
+    If the objects are directories, you'll have to do the iteration yourself!
+    """
         total = humanfriendly.parse_size(self.size)
         for f in self.list_dir():
             total += humanfriendly.parse_size(f.size)
@@ -55,44 +56,45 @@ class GSIFile(object):
         t = humanfriendly.parse_size(str(total))
         return  humanfriendly.format_size(t)
 
-    def _check_if_directory(self,location):
+    def _check_if_directory(self, location):
         self.num_subdir = len([i for i in location.split('gsiftp://')[1].split('/') if i]) - 1
         filename = location.split('/')[-1]
         parent_dir = self.get_parent_dir()
-        parent_dir = parent_dir.replace(self.protocol+':/',self.protocol+"://")  #TODO Make this cleaner (new staticmethod)
+        parent_dir = parent_dir.replace(self.protocol+':/',self.protocol+"://")
+        #TODO Make this cleaner (new staticmethod)
         res, err = self._uberftpls(parent_dir)
         if '550' in err:
             warnings.warn('Parent directory inaccessible!: {}'.format(err))
             return None, parent_dir #Doesn't know if it's a file or dir if can't get parent_dir
-        if type(res)==bytes:
+        if type(res) == bytes:
             res = res.decode('utf8')
         status = [x for x in res.split('\r\n') if filename in x]
-        if status[0][0]=='d':
+        if status[0][0] == 'd':
             return True, parent_dir
         else:
             return False, parent_dir
 
     def __repr__(self):
-        return "<GRID_LRT.Storage.gsifile.GSIFile {} {} located in {} >".format("File" if self.is_file else "Folder", 
-                self.filename, self.location)
+        return "<GRID_LRT.Storage.gsifile.GSIFile {} {} located in {} >".format(
+                "File" if self.is_file else "Folder",self.filename, self.location)
 
-    def _test_file_exists(self,location):
+    def _test_file_exists(self, location):
         result, error = self._uberftpls(location)
-        if result=="" and error=="":
-            if location[-1]=='/':
+        if result == "" and error == "":
+            if location[-1] == '/':
                 location = location[:-1]
                 result, error = self._uberftpls("/".join(location.split('/')[:-1]))
         if "No match " in error:
             raise Exception("file %s cannot be found: %s"%(location, error))
         if self.is_dir:
-            result,err = self._uberftpls(self.parent_dir)
+            result, err = self._uberftpls(self.parent_dir)
             result = self._find_item_in_uberftp_result(result)
             return result
         return result.split()
 
 
-    def _find_item_in_uberftp_result(self,result):
-        if self.location[-1]=='/':
+    def _find_item_in_uberftp_result(self, result):
+        if self.location[-1] == '/':
             location = self.location[:-1]
         else:
             location = self.location
@@ -110,17 +112,17 @@ class GSIFile(object):
         year = str(data[-2].decode('ascii'))
         month = data[-4].decode('ascii')
         day = data[-3].decode('ascii')
-        if year not in ['2019','2018','2017','2016','2015']:
+        if year not in ['2019', '2018', '2017', '2016', '2015']:
             ## In this case the year is not specified.
             this_year = datetime.now().year
             if strptime(month,'%b').tm_mon > datetime.now().month:
                 year = this_year -1
             else:
                 year = this_year
-            date = month +" " + day + " " + str(year)
+            date = month + " " + day + " " + str(year)
             time = data[-2].decode('ascii')
         else:
-            date = month + " " + day + " "+year
+            date = month + " " + day + " " + year
             time = "00:00"
         
         file_datetime = datetime.strptime(date+"-"+time, "%b %d %Y-%H:%M")
@@ -160,7 +162,7 @@ class GSIFile(object):
         self._donotdelete(parent_dir)
         if self.is_dir and not self.is_empty():
             raise Exception("Not allowed to delete a folder that isn't empty yet" )
-        del_proc = subprocess.Popen(['uberftp','-rm',self.location],
+        del_proc = subprocess.Popen(['uberftp', '-rm', self.location],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         res, err = del_proc.communicate()
         if not err:
@@ -207,17 +209,17 @@ class GSIFile(object):
         results = results.strip().split("\r\n")
         file_locs = [self.location +"/"+str(i.split()[-1])
                 for i in results if i]
-        self._subfiles, _= self._uberftpls(self.location)
-        files_list = [GSIFile(i, parent_dir=self) for i,r in zip(file_locs,results)]
+        self._subfiles, _ = self._uberftpls(self.location)
+        files_list = [GSIFile(i, parent_dir=self) for i, r in zip(file_locs, results)]
         return files_list
 
 
 class MockGSIFile(GSIFile):
     def __init__(self, location):
         """uses text from uberftp -ls to initialize, saved in a file"""
-        d = open(location,'r').read()
+        d = open(location, 'r').read()
         self._filedata = '\r\n'.join(d.split('\r\n')[1:])
-        self.location =d.split('\r\n')[0]
+        self.location = d.split('\r\n')[0]
         self.parent_dir = self.location.split('/')[-1]
         self._internal = self._find_item_in_uberftp_result(self._filedata)
         if len(d)>2:
