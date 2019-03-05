@@ -7,8 +7,8 @@ if sys.version_info[0:2] != (2, 6):
     from subprocess import check_output
 
 
-__all__ = ["storage", 'auth', "application", "Staging", 'sandbox', 'token']
-__version__ = "0.6.0"
+__all__ = ["storage", 'auth', "application", "Staging", 'token']
+__version__ = "0.5.1"
 __author__ = "Alexandar P. Mechev"
 __copyright__ = "2019 Alexandar P. Mechev"
 __credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
