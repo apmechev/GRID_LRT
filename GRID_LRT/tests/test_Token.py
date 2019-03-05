@@ -61,7 +61,7 @@ class TokenTest(unittest.TestCase):
         db={}
         db[t1['_id']]=t1
         t1.synchronize(db)
-        self.assertEquals(t1, {'_id': 'test', 'type': 'test'})
+        self.assertEquals(t1, {'_id': 'test', 'type': 'test','lock': 0, 'done': 0})
         db[t1['_id']]['two']=2
         t1.synchronize(db)
         self.assertTrue('type' in t1)
