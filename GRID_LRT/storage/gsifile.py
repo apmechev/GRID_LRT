@@ -46,9 +46,9 @@ class GSIFile(object):
         return humanfriendly.format_size(human_size)
 
     def get_dir_size(self):
-    """Will go one level deeper and sum the sizes of all objects. 
+        """Will go one level deeper and sum the sizes of all objects. 
     If the objects are directories, you'll have to do the iteration yourself!
-    """
+        """
         total = humanfriendly.parse_size(self.size)
         for f in self.list_dir():
             total += humanfriendly.parse_size(f.size)
