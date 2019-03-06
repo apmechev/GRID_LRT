@@ -45,6 +45,7 @@ import GRID_LRT
 from couchdb.design import ViewDefinition
 import couchdb
 from cloudant import couchdb as cloudant_couchdb
+from cloudant.design_document import DesignDocument
 from cloudant import couchdb_admin_party
 #from cloudant.client import CouchDB
 from cloudant import couchdb as CaCouchClient
@@ -114,7 +115,6 @@ class Token(dict):
         remote_token = db[self['_id']]
         for k in set(list(remote_token.keys())+list(self.keys())):
             if prefer_local:
-#                pdb.set_trace()
                 remote_token[k] = self.get(k)
             else:
                 self[k] = remote_token.get(k)
@@ -193,13 +193,29 @@ class TokenList(list):
     local documents and to download the remote ones"""
     def __init__(self, token_type=None):
         self._token_ids = []
+        self._design_doc = None
         self.__set_token_type(token_type)
+        self._database = None
 
     def __set_token_type(self, token_type):
         self.token_type = token_type
+        if token_type and self._database!=None:
+                self.__set_design_doc()
+
+    def __set_database(self, database):
+        self._database = database
+
+    def __set_design_doc(self):
+        design_doc_name = '_design/{0}'.format(self.token_type)
+        self._design_doc = DesignDocument(self._database, design_doc_name)
+        if design_doc_name not in self._database:
+            self._design_doc.save()
+        self._design_doc.fetch()
 
     def append(self, item):
         if isinstance(item, Token):
+            if not self._database:
+                self.__set_database(item._database) #Does this have a getter?
             if not self.token_type:
                 self.__set_token_type(item['type'])
             elif item['type'] != self.token_type:
@@ -221,9 +237,36 @@ class TokenList(list):
         object. """
         for token in self:
             token.save()
+    
+    def add_view(self, viewname, cond, emit_values=('doc._id', 'doc._id')):
+        general_view_code = """
+        function(doc) {{
+           if(doc.type == "{0}") {{
+            if({1}) {{
+              emit({2}, {3} );
+            }} 
+          }} 
+        }}
+        """.format(self.token_type,
+                   cond, 
+                   emit_values[0],
+                   emit_values[1])
+        if self._design_doc: 
+            self._design_doc.add_view(viewname, general_view_code)
+            self._design_doc.save()
+
+    def get_views(self):
+        if self._design_doc:
+            self._design_doc.fetch()
+            return self._design_doc.list_views()
+
+
+def tokenView(object):
+    def __init__(self,view_name):
+        self.view_name = view_name
 
 class TokenHandler(object):
-    """
+    """self.database.get("_design/""
 
     The TokenHandler class uses couchdb to create, modify and delete
     tokens and views, to attach files, or download attachments and to
@@ -257,29 +300,6 @@ class TokenHandler(object):
         self.views = {}
         self.tokens = {}
 
-    @staticmethod
-    def _get_db(uname, pwd, dbn, srv):
-        """Logs into the Couchdb server and returns the database requested.
-        Returns a couchDB database object
-
-        :param uname: The username to log into CouchDB with
-        :type uname: str
-        :param pwd: The CouchDB password
-        :type pwd: str
-        :param dbn: The CouchDB Database Name
-        :type dbn: str
-        :param srv: URL of the CouchDB Server
-        :type srv: str
-        :return: A CouchDB Database Object
-        :rtype: :class:`~couchdb.client.Database`
-        """
-        server = couchdb.Server(srv)
-        if uname and pwd:
-            server.resource.credentials = (uname, pwd)
-        database = server[dbn]
-        return database
-
-#    @retry(wait_fixed=20, stop_max_attempt_number=2)
     def create_token(self, keys=None, append="", attach=None):
         '''Creates a token, appends string to token ID if requested and
         adds user requested keys through the dict keys{}
@@ -497,7 +517,10 @@ function (key, values, rereduce) {
                       emit_value2='doc.output')
 
     def del_view(self, view_name="test_view"):
-        '''Deletes the view with view name from the _design/${token_type} document
+        '''Deletes the view with view name from the ]
+    except KeyError:
+    return None
+    token_type} document
             and from the token_Handler's dict of views
 
         :param view_name: The name of the view which should be removed
