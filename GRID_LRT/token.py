@@ -214,6 +214,13 @@ class TokenList(list):
         else:
             raise TypeError("Cannot append item {0} as it's not a Token".format(item))
 
+    def upload_all(self):
+        """Uploads all tokens in the list. It will crash if the token already exists
+        This also cannot be called if the tokens were created inside a context manager
+        that has been exited. Best option is to create a persistent 'cloudant.client.CouchDB'
+        object. """
+        for token in self:
+            token.save()
 
 class TokenHandler(object):
     """
