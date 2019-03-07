@@ -50,7 +50,7 @@ from cloudant import couchdb_admin_party
 #from cloudant.client import CouchDB
 from cloudant import couchdb as CaCouchClient
 from cloudant.document import Document
-
+from cloudant.error import CloudantArgumentError
 
 __version__ = GRID_LRT.__version__
 __author__ = GRID_LRT.__author__
@@ -106,8 +106,8 @@ class Token(dict):
             self.__setitem__('_id',token_type)
         else: 
             self.__setitem__('_id',token_id)
-        self.__setitem__('lock',0)
-        self.__setitem__('done',0)
+        self.__setitem__('lock', 0)
+        self.__setitem__('done', 0)
 
     def synchronize(self, db, prefer_local=False, upload=False):
         """Synchronizes the token with the database. 
@@ -124,6 +124,14 @@ class Token(dict):
     def build(self,token_builder):
         data = token_builder.data
         self.update(data)
+    
+    def reset(self):
+        self.__setitem__('lock', 0)
+        self.__setitem__('done', 0)
+        scrub_count = self.get('scrub_count', 0)
+        self.__setitem__('scrub_count', scrub_count + 1)
+        self.__setitem__('hostname', '')
+        self.__setitem__('output', '')
 
 class caToken(Token, Document):
     def __init__(self, database, token_type, **kwargs):
@@ -178,6 +186,8 @@ class TokenDictBuilder(TokenBuilder):
     
 
 class TokenJsonBuilder(TokenDictBuilder):
+    """Reads a json config file and builds the 
+    Token fields using the data in this file."""
     def __init__(self, config_file):
         self._build(config_file)
 
@@ -238,9 +248,19 @@ class TokenList(list):
         for token in self:
             token.save()
     
+    def delete_all(self):
+        for token in self:
+            token.delete()
+
     def add_view(self, view):
+        map_code = view.get_codes(self.token_type)[0]
+        reduce_code = view.get_codes(self.token_type)[1]
         if self._design_doc: 
-            self._design_doc.add_view(view.name, view.get_code(self.token_type))
+            try:
+                self._design_doc.add_view(view.name, map_code, reduce_code)
+            except CloudantArgumentError:
+                self._design_doc.delete_view(view.name)
+                self._design_doc.add_view(view.name, map_code, reduce_code)
             self._design_doc.save()
 
     def get_views(self):
@@ -248,9 +268,13 @@ class TokenList(list):
             self._design_doc.fetch()
             return self._design_doc.list_views()
 
-    def add_status_views(self):
-        pass
-
+    def add_token_views(self):
+        self.add_view(TokenView("todo", 'doc.lock ==  0 && doc.done == 0 '))
+        self.add_view(TokenView("locked", 'doc.lock > 0 && doc.done == 0 ',
+                                ('doc._id', 'doc.status')))
+        self.add_view(TokenView("done", 'doc.status == "done"' ))
+        self.add_view(TokenView("error", 'doc.status == "error" ', ('doc._id', 'doc.status')))
+        self.add_view(TokenReduceView('overview_view'))
 
 class TokenView(object):
     def __init__(self, name, condition, emit_values=('doc._id', 'doc._id')):
@@ -259,65 +283,62 @@ class TokenView(object):
         self.emit_values = emit_values
 
     def _get_map_code(self, token_type):
-        general_view_code = """
-        function(doc) {{
-           if(doc.type == "{0}") {{
-            if({1}) {{
-              emit({2}, {3} );
-            }} 
-          }} 
-        }}
-        """.format(token_type,
-                   self.condition,
-                   self.emit_values[0],
-                   self.emit_values[1])
+        general_view_code = """function(doc) {{
+   if(doc.type == "{0}") {{
+      if({1}) {{
+         emit({2}, {3});
+      }} 
+   }} 
+}}
+""".format(token_type,
+           self.condition,
+           self.emit_values[0],
+           self.emit_values[1])
         return general_view_code
+
+    def _get_reduce_code(self):
+        return None
  
-    def get_code(self, token_type):
-        return self._get_map_code(token_type)
+    def get_codes(self, token_type):
+        return self._get_map_code(token_type), self._get_reduce_code()
 
 class TokenReduceView(TokenView):
-    def __init__(self,**kwargs):
-        super(TokenReduceView,self).__init__(kwargs)
+    def __init__(self, name, **kwargs):
+        super(TokenReduceView, self).__init__(name, kwargs)
 
-    def _get_mapreduce_code(self,token_type):
-        overview_map_code = '''
-function(doc) {
+    def _get_map_code(self, token_type):
+        overview_map_code = '''function(doc) {{
    if(doc.type == "{0}" )
-      if(%s){
-        {
-       if (doc.lock == 0 && doc.done == 0){
+     {{
+       if (doc.lock == 0 && doc.done == 0){{
           emit('todo', 1);
-       }
-       if(doc.lock > 0 && doc.status == 'downloading' ) {
+       }}
+       if(doc.lock > 0 && doc.status == 'downloading' ) {{
           emit('downloading', 1);
-       }
-       if(doc.lock > 0 && doc.done > 0 && doc.output == 0 ) {
+       }}
+       if(doc.lock > 0 && doc.done > 0 && doc.output == 0 ) {{
           emit('done', 1);
-       }
-       if(doc.lock > 0 && doc.output != 0 && doc.output != "" ) {
+       }}
+       if(doc.lock > 0 && doc.output != 0 && doc.output != "" ) {{
           emit('error', 1);
-       }
-       if(doc.lock > 0 && doc.status == 'launched' ) {
+       }}
+       if(doc.lock > 0 && doc.status == 'launched' ) {{
           emit('waiting', 1);
-       }
-       if(doc.lock > 0  && doc.done==0 && doc.status!='downloading' ) {
+       }}
+       if(doc.lock > 0  && doc.done==0 && doc.status!='downloading' ) {{
           emit('running', 1);
-       }
-     }  
-   }
-}
+      }}
+     }}  
+}}
 '''.format(token_type)
-        overview_reduce_code = '''
-function (key, values, rereduce) {
+        return overview_map_code
+
+    def _get_reduce_code(self):
+        overview_reduce_code = '''function (key, values, rereduce) {
    return sum(values);
 }   
 '''     
-        return overview_map_code, overview_reduce_code
-    
-    def get_code(self, token_type):
-        return self._get_mapreduce_code(token_type)
-
+        return overview_reduce_code
 
 class TokenHandler(object):
     """self.database.get("_design/""
@@ -354,221 +375,11 @@ class TokenHandler(object):
         self.views = {}
         self.tokens = {}
 
-    def create_token(self, keys=None, append="", attach=None):
-        '''Creates a token, appends string to token ID if requested and
-        adds user requested keys through the dict keys{}
-
-        :param keys: A dictionary of keys, which will be uploaded to the CouchDB document.
-            The supported values for a key are str,int,float and dict
-        :type keys: dict
-        :param append: A string which is appended to the end of the tokenID, useful for
-            adding an OBSID for example
-        :type append: str
-        :param attach: A 2-item list of file to be attached to the token.
-        The first value is the file handle and the second is a string with
-        the attachment name. ex: [open('/home/apmechev/file.txt','r'),"file.txt"]
-        :type attach: list
-        :return: A string with the token ID
-        :rtype: str
-        '''
-        default_keys = {
-            '_id': 't_'+self.t_type+"_",
-            'type': self.t_type,
-            'lock': 0,
-            'done': 0,
-            'hostname': '',
-            'scrub_count': 0,
-            'output': "",
-            'created': time.time()
-        }
-        if keys:
-            keys = dict(itertools.chain(keys.items(), default_keys.items()))
-            self._append_id(keys, append)
-        else:
-            self._append_id(default_keys, append)
-        self.tokens[keys["_id"]] = keys
-        self.database.update([keys])
-        if attach:
-            self.add_attachment(keys['_id'], attach[0], attach[1])
-        return keys['_id']  # returns the token ID
-
     @staticmethod
     def _append_id(keys, app=""):
         """ Helper function that appends a string to the token ID"""
         keys["_id"] += app
 
-    def load_views(self):
-        """Helper function to get the current views on the database.
-        Updates the internal self.views variable
-        """
-        db_views = self.database.get("_design/"+self.t_type)
-        if db_views is None:
-            RuntimeWarning("No views found in design document")
-            return
-        self.views = db_views["views"]
-
-    def delete_tokens(self, view_name="test_view", key=None):
-        """Deletes tokens from view view_name
-
-            exits if the view doesn't exist
-
-            User can select which tokens within the view to delete
-
-            >>> t1.delete_tokens("todo",["OBSID","L123456"])
-            >>> #Only deletes tokens with OBSID key = L123456
-            >>> t1.delete_tokens("error") # Deletes all error tokens
-
-        :param view_name: Name of the view from which to delete tokens
-        :type view_name: str
-        :param key: key-value pair that selects which tokens to delete
-        (by default empty == delete all token)
-        :type key: list
-        """
-        view = self.list_tokens_from_view(view_name)
-        to_delete = []
-        for tok in view:
-            document = self.database[tok['key']]
-            if not key:
-                pass
-            else:
-                if document[key[0]] != key[1]:
-                    continue
-            print("Deleting Token "+tok['id'])
-            to_delete.append(document)
-        self.database.purge(to_delete)
-
-    def add_view(self, view_name="test_view",
-                 cond='doc.lock > 0 && doc.done > 0 && doc.output < 0 ',
-                 emit_value='doc._id', emit_value2='doc._id'):
-        """Adds a view to the db, needs a view name and a condition.
-        Emits all tokens with the type of TokenHandler.t_type, that also match the condition
-
-        :param view_name: The name of the new view to be created
-        :type view_name: str
-        :param cond: A string containing the condition which all tokens of the view must match.
-        It can include boolean operators '>', '<'and '&&'.
-        The token's fields are refered to as 'doc.field'
-        :type cond: str
-        :param emit_value: The (first) emit value that is returne by the view.
-        If you look on couchdb/request the tokens from the view, you'll get two values.
-        This will be the first (typically the token's ID)
-        :type emit_value: str
-        :param emit_value2: The second emit value. You can thus return the token's ID
-        and its status for example
-        :type emit_value2: str
-        """
-        general_view_code = '''
-        function(doc) {
-           if(doc.type == "%s") {
-            if(%s) {
-              emit(%s, %s );
-            }
-          }
-        }
-        '''
-        view = ViewDefinition(self.t_type, view_name, general_view_code % (
-            self.t_type, cond, emit_value, emit_value2))
-        self.views[view_name] = view
-        view.sync(self.database)
-
-    def add_mapreduce_view(self, view_name="test_mapred_view",
-                           cond='doc.PIPELINE_STEP == "pref_cal1" '):
-        """
-        While the overview_view is applied to all the tokens in the design document,
-        this 'mapreduce' view is useful if instead of regular view, you want to filter
-        the tokens and display the user with a 'mini-oververview' view.
-        This way you can check the status of a subset of the tokens.
-
-        """
-        overview_map_code = '''
-function(doc) {
-   if(doc.type == "%s" )
-      if(%s){
-        {
-       if (doc.lock == 0 && doc.done == 0){
-          emit('todo', 1);
-       }
-       if(doc.lock > 0 && doc.status == 'downloading' ) {
-          emit('downloading', 1);
-       }
-       if(doc.lock > 0 && doc.done > 0 && doc.output == 0 ) {
-          emit('done', 1);
-       }
-       if(doc.lock > 0 && doc.output != 0 && doc.output != "" ) {
-          emit('error', 1);
-       }
-       if(doc.lock > 0 && doc.status == 'launched' ) {
-          emit('waiting', 1);
-       }
-       if(doc.lock > 0  && doc.done==0 && doc.status!='downloading' ) {
-          emit('running', 1);
-       }
-     }
-   }
-}
-'''
-        overview_reduce_code = '''
-function (key, values, rereduce) {
-   return sum(values);
-}
-'''
-        overview_total_view = ViewDefinition(self.t_type, view_name,
-                                             overview_map_code % (
-                                                 self.t_type, cond),
-                                             overview_reduce_code)
-        self.views['overview_total'] = overview_total_view
-        overview_total_view.sync(self.database)
-
-    def add_overview_view(self):
-        """ Helper function that creates the Map-reduce view which makes it easy to count
-            the number of jobs in the 'locked','todo','downloading','error' and 'running' states
-        """
-        overview_map_code = '''
-function(doc) {
-   if(doc.type == "%s") {
-       if (doc.lock == 0 && doc.done == 0){
-          emit('todo', 1);
-       }
-       if(doc.lock > 0 && doc.status == 'downloading' ) {
-          emit('downloading', 1);
-       }
-       if(doc.lock > 0 && doc.done > 0 && doc.output == 0 ) {
-          emit('done', 1);
-       }
-       if(doc.lock > 0 && doc.output != 0 ) {
-          emit('error', 1);
-       }
-       if(doc.lock > 0 && doc.status == 'launched' ) {
-          emit('waiting', 1);
-       }
-       if(doc.lock > 0  && doc.done==0 && doc.status!='downloading' ) {
-          emit('running', 1);
-       }
-   }
-}
-'''
-        overview_reduce_code = '''
-function (key, values, rereduce) {
-   return sum(values);
-}
-'''
-        overview_total_view = ViewDefinition(self.t_type, 'overview_total',
-                                             overview_map_code % (self.t_type),
-                                             overview_reduce_code)
-        self.views['overview_total'] = overview_total_view
-        overview_total_view.sync(self.database)
-
-    def add_status_views(self):
-        """ Adds the 'todo', locked, done and error views. the TODO view is necessary for the
-        worker node to find an un-locked token
-        """
-        self.add_view(view_name="todo",
-                      cond='doc.lock ==  0 && doc.done == 0 ')
-        self.add_view(view_name="locked",
-                      cond='doc.lock > 0 && doc.done == 0 ')
-        self.add_view(view_name="done", cond='doc.status == "done" ')
-        self.add_view(view_name="error", cond='doc.output != 0 ',
-                      emit_value2='doc.output')
 
     def del_view(self, view_name="test_view"):
         '''Deletes the view with view name from the ]
@@ -592,36 +403,6 @@ function (key, values, rereduce) {
         self.add_view(view_name="error", cond=cond)
         self.delete_tokens("error")
 
-    def reset_tokens(self, view_name="test_view", key=None, del_attach=False):
-        """ resets all tokens in a view, optionally can reset all tokens in a view
-            who have key-value pairs matched by key[0],key[1]
-
-            >>> t1.reset_token("error")
-            >>> t1.reset_token("error",key=["OBSID","L123456"])
-            >>> t1.reset_token("error",key=["scrub_count",6])
-        """
-        view = self.list_tokens_from_view(view_name)
-        to_update = []
-        for tok in view:
-            document = self.database[tok['key']]
-
-            if key and document[key[0]] != key[1]:  # make it not just equal
-                continue
-            try:
-                document['status'] = 'todo'
-            except KeyError:
-                pass
-            document['lock'] = 0
-            document['done'] = 0
-            document['scrub_count'] += 1
-            document['hostname'] = ''
-            document['output'] = ''
-            if del_attach:
-                if "_attachments" in document:
-                    del document["_attachments"]
-            to_update.append(document)
-        self.database.update(to_update)
-        return to_update
 
     def add_attachment(self, token, filehandle, filename="test"):
         """Uploads an attachment to a token
