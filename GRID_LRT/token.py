@@ -209,7 +209,10 @@ class TokenJsonBuilder(TokenDictBuilder):
 class TokenList(list):
     """A list of token that a Token can be appended to
     Includes upload and download functions to upload all the 
-    local documents and to download the remote ones"""
+    local documents and to download the remote ones
+    
+    NOTE: Implement this in a composite pattern, to allow sublists
+    where each sublist is the result of a view"""
     def __init__(self, token_type=None):
         self._token_ids = []
         self._design_doc = None
@@ -231,7 +234,7 @@ class TokenList(list):
             self._design_doc.save()
         self._design_doc.fetch()
 
-    def add_attachment_to_list(self, filename, attachment_name):
+    def add_attachment(self, filename, attachment_name):
         for token in self:
             token.add_attachment(filename, attachment_name)
 
@@ -250,6 +253,8 @@ class TokenList(list):
                 raise RuntimeError("token with id {0} already exists! You need unique '_id' fields ".format(
                     item['_id']))
             super(TokenList, self).append(item)
+        elif isinstance(item, TokenList):
+            super(TokenList, self).append(item)
         else:
             raise TypeError("Cannot append item {0} as it's not a Token".format(item))
 
@@ -261,9 +266,15 @@ class TokenList(list):
         for token in self:
             token.save()
     
+    def save(self):
+        self.upload_all()
+
     def delete_all(self):
         for token in self:
             token.delete()
+
+    def delete(self):
+        self.delete_all(self) 
 
     def add_view(self, view):
         map_code = view.get_codes(self.token_type)[0]
@@ -275,6 +286,10 @@ class TokenList(list):
                 self._design_doc.delete_view(view.name)
                 self._design_doc.add_view(view.name, map_code, reduce_code)
             self._design_doc.save()
+
+    def fetch(self):
+        for token in self:
+            token.fetch()
 
     def get_views(self):
         if self._design_doc:
