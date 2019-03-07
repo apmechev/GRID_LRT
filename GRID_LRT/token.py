@@ -238,7 +238,27 @@ class TokenList(list):
         for token in self:
             token.save()
     
-    def add_view(self, viewname, cond, emit_values=('doc._id', 'doc._id')):
+    def add_view(self, view):
+        if self._design_doc: 
+            self._design_doc.add_view(view.name, view.get_code(self.token_type))
+            self._design_doc.save()
+
+    def get_views(self):
+        if self._design_doc:
+            self._design_doc.fetch()
+            return self._design_doc.list_views()
+
+    def add_status_views(self):
+        pass
+
+
+class TokenView(object):
+    def __init__(self, name, condition, emit_values=('doc._id', 'doc._id')):
+        self.name = name
+        self.condition = condition
+        self.emit_values = emit_values
+
+    def _get_map_code(self, token_type):
         general_view_code = """
         function(doc) {{
            if(doc.type == "{0}") {{
@@ -247,23 +267,57 @@ class TokenList(list):
             }} 
           }} 
         }}
-        """.format(self.token_type,
-                   cond, 
-                   emit_values[0],
-                   emit_values[1])
-        if self._design_doc: 
-            self._design_doc.add_view(viewname, general_view_code)
-            self._design_doc.save()
+        """.format(token_type,
+                   self.condition,
+                   self.emit_values[0],
+                   self.emit_values[1])
+        return general_view_code
+ 
+    def get_code(self, token_type):
+        return self._get_map_code(token_type)
 
-    def get_views(self):
-        if self._design_doc:
-            self._design_doc.fetch()
-            return self._design_doc.list_views()
+class TokenReduceView(TokenView):
+    def __init__(self,**kwargs):
+        super(TokenReduceView,self).__init__(kwargs)
 
+    def _get_mapreduce_code(self,token_type):
+        overview_map_code = '''
+function(doc) {
+   if(doc.type == "{0}" )
+      if(%s){
+        {
+       if (doc.lock == 0 && doc.done == 0){
+          emit('todo', 1);
+       }
+       if(doc.lock > 0 && doc.status == 'downloading' ) {
+          emit('downloading', 1);
+       }
+       if(doc.lock > 0 && doc.done > 0 && doc.output == 0 ) {
+          emit('done', 1);
+       }
+       if(doc.lock > 0 && doc.output != 0 && doc.output != "" ) {
+          emit('error', 1);
+       }
+       if(doc.lock > 0 && doc.status == 'launched' ) {
+          emit('waiting', 1);
+       }
+       if(doc.lock > 0  && doc.done==0 && doc.status!='downloading' ) {
+          emit('running', 1);
+       }
+     }  
+   }
+}
+'''.format(token_type)
+        overview_reduce_code = '''
+function (key, values, rereduce) {
+   return sum(values);
+}   
+'''     
+        return overview_map_code, overview_reduce_code
+    
+    def get_code(self, token_type):
+        return self._get_mapreduce_code(token_type)
 
-def tokenView(object):
-    def __init__(self,view_name):
-        self.view_name = view_name
 
 class TokenHandler(object):
     """self.database.get("_design/""
