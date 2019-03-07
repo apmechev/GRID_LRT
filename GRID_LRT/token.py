@@ -41,6 +41,7 @@ import json
 from abc import ABCMeta, abstractmethod
 import pdb
 
+import mimetypes
 import GRID_LRT
 from couchdb.design import ViewDefinition
 import couchdb
@@ -124,7 +125,10 @@ class Token(dict):
     def build(self,token_builder):
         data = token_builder.data
         self.update(data)
-    
+
+    def add_attachment(self):
+        raise NotImplementedError
+
     def reset(self):
         self.__setitem__('lock', 0)
         self.__setitem__('done', 0)
@@ -137,7 +141,12 @@ class caToken(Token, Document):
     def __init__(self, database, token_type, **kwargs):
         Token.__init__(self, token_type=token_type, **kwargs)
         Document.__init__(self,database=database, **kwargs)
+        self._document_id = self['_id']
 
+    def add_attachment(self, filename, attachment_name):
+        file_type = mimetypes.guess_type(filename)[0]
+        self.put_attachment(attachment_name, file_type, open(filename,'r'))
+        
 
 class TokenBuilder:
     __metaclass__ = ABCMeta
@@ -222,6 +231,10 @@ class TokenList(list):
             self._design_doc.save()
         self._design_doc.fetch()
 
+    def add_attachment_to_list(self, filename, attachment_name):
+        for token in self:
+            token.add_attachment(filename, attachment_name)
+
     def append(self, item):
         if isinstance(item, Token):
             if not self._database:
@@ -267,6 +280,12 @@ class TokenList(list):
         if self._design_doc:
             self._design_doc.fetch()
             return self._design_doc.list_views()
+
+    def delete_views(self):
+        for view in self.get_views():
+            self._design_doc.delete_view(view)
+        self._design_doc.save()
+
 
     def add_token_views(self):
         self.add_view(TokenView("todo", 'doc.lock ==  0 && doc.done == 0 '))
