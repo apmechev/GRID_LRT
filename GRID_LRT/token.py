@@ -238,6 +238,7 @@ class TokenList(list):
         for token in self:
             token.add_attachment(filename, attachment_name)
 
+
     def append(self, item):
         if isinstance(item, Token):
             if not self._database:
@@ -254,6 +255,8 @@ class TokenList(list):
                     item['_id']))
             super(TokenList, self).append(item)
         elif isinstance(item, TokenList):
+            for _id in item._token_ids:
+                self._token_ids.append(_id)
             super(TokenList, self).append(item)
         else:
             raise TypeError("Cannot append item {0} as it's not a Token".format(item))
