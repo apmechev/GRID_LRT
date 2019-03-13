@@ -236,7 +236,13 @@ class TokenList(list):
 
     def add_attachment(self, filename, attachment_name):
         for token in self:
-            token.add_attachment(filename, attachment_name)
+            try:
+                token.add_attachment(filename, attachment_name)
+            except HTTPError as e:
+                if '404' in str(e):
+                    token.save()
+                    token.add_attachment(filename, attachment_name)
+
 
 
     def append(self, item):
