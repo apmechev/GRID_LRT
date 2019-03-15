@@ -13,18 +13,20 @@
         "wholenode": false
     },
     "Token": {
+        "_id":"CI_cal_",
         "status": "queued",
         "times": {},
         "upload": {
             "add_date": true,
+            "date_granularity":"hour",
             "gzip": false,
-            "location": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/test/",
-            "remove_prev": false,
+            "location": "$RESULTS_DIR",
+            "overwrite": false,
             "template": "CI_pref3_cal_$STARTSB_$DATE"
         },
         "variables": {
             "_attachments": {
-                "$PARSET": "Pre-Facet-Calibrator.parset",
+                "$PARSET": "Pre-Facet-Calibrator-v3.parset"
                 "$SRMFILE": "srm.txt"
             },
             "_token_keys": {
@@ -43,7 +45,7 @@
     },
     "sandbox": {
         "git": {
-            "branch": "master",
+            "branch": "prefactor",
             "url": "https://github.com/apmechev/GRID_Sandbox.git"
         },
         "scripts": [

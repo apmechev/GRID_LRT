@@ -193,7 +193,7 @@ class JdlLauncher(object):
   DataAccessProtocol = {"gsiftp"};
   ShallowRetryCount = 0;
 
-  Requirements=(RegExp("%s",other.GlueCEUniqueID));
+  Requirements=(RegExp("gina.sara.nl:8443/cream-pbs-%s",other.GlueCEUniqueID));
   WholeNodes = %s ;
   SmpGranularity = %d;
   CPUNumber = %d;
