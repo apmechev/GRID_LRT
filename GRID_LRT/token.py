@@ -52,6 +52,7 @@ from cloudant import couchdb_admin_party
 from cloudant import couchdb as CaCouchClient
 from cloudant.document import Document
 from cloudant.error import CloudantArgumentError
+from requests.exceptions import HTTPError
 
 __version__ = GRID_LRT.__version__
 __author__ = GRID_LRT.__author__
@@ -213,11 +214,13 @@ class TokenList(list):
     
     NOTE: Implement this in a composite pattern, to allow sublists
     where each sublist is the result of a view"""
-    def __init__(self, token_type=None):
+    def __init__(self, token_type=None, database=None):
         self._token_ids = []
         self._design_doc = None
+        self.__set_database(database)
         self.__set_token_type(token_type)
-        self._database = None
+
+
 
     def __set_token_type(self, token_type):
         self.token_type = token_type
@@ -239,6 +242,7 @@ class TokenList(list):
             try:
                 token.add_attachment(filename, attachment_name)
             except HTTPError as e:
+                print(e)
                 if '404' in str(e):
                     token.save()
                     token.add_attachment(filename, attachment_name)
