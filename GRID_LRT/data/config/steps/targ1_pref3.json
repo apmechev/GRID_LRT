@@ -1,19 +1,19 @@
 {
     "PicasApiVersion": 0.5,
     "Job": {
-        "NCPU": 6,
+        "NCPU": 2,
         "parameter_step": 1,
-        "queue": "mediummc",
+        "queue": "medium",
         "variables": {
-            "OBSID": "L229585",
-            "PIPELINE_STEP": "pref3_cal_CI",
-            "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly/pipelines/CI/prefactor_3.0/CI_pref3_cal",
+            "OBSID": "L229587",
+            "PIPELINE_STEP": "pref3_targ1_CI",
+            "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/test/",
             "STARTSB": "000"
         },
         "wholenode": false
     },
     "Token": {
-        "_id":"CI_cal_",
+        "_id":"CI_targ1_",
         "status": "queued",
         "times": {},
         "upload": {
@@ -22,18 +22,19 @@
             "gzip": false,
             "location": "$RESULTS_DIR",
             "overwrite": false,
-            "template": "CI_pref3_cal_$STARTSB_$DATE"
+            "template": "CI_pref3_targ1_$STARTSB_$DATE"
         },
         "variables": {
             "_attachments": {
-                "$PARSET": "Pre-Facet-Calibrator-v3.parset",
+                "$PARSET": "Pre-Facet-Target1-v3.parset",
                 "$SRMFILE": "srm.txt"
             },
             "_token_keys": {
                 "$OBSID": "OBSID",
                 "$PIPELINE_STEP": "PIPELINE_STEP",
                 "$RESULTS_DIR": "RESULTS_DIR",
-                "$STARTSB": "STARTSB"
+                "$STARTSB": "STARTSB",
+                "$CAL2_SOLUTIONS":"CAL2_SOLUTIONS"
             }
         }
     },
