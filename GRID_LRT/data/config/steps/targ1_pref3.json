@@ -8,7 +8,7 @@
             "OBSID": "L229587",
             "PIPELINE_STEP": "pref3_targ1_CI",
             "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/test/",
-            "STARTSB": "000"
+            "ABN": "000"
         },
         "wholenode": false
     },
@@ -22,7 +22,7 @@
             "gzip": false,
             "location": "$RESULTS_DIR",
             "overwrite": false,
-            "template": "CI_pref3_targ1_$STARTSB_$DATE"
+            "template": "CI_pref3_targ1_ABN$ABN_$DATE"
         },
         "variables": {
             "_attachments": {
@@ -34,7 +34,8 @@
                 "$PIPELINE_STEP": "PIPELINE_STEP",
                 "$RESULTS_DIR": "RESULTS_DIR",
                 "$STARTSB": "STARTSB",
-                "$CAL2_SOLUTIONS":"CAL2_SOLUTIONS"
+                "$CAL2_SOLUTIONS":"CAL2_SOLUTIONS",
+                "$ABN":"ABN"
             }
         }
     },
