@@ -414,13 +414,8 @@ class TokenHandler(object):
         >>> th.reset_tokens(view_name='error') # resets all tokens in 'error' view
         >>> th.set_view_to_status(view_name='done','processed')
         """
-        if t_type:
-            self.t_type = t_type
-        else:
-            raise Exception("t_type not defined!")
-        self.database = self._get_db(uname, pwd, dbn, srv)
-        self.views = {}
-        self.tokens = {}
+        print("TokenHandler is no longer supported!")
+
 
     @staticmethod
     def _append_id(keys, app=""):
@@ -429,164 +424,40 @@ class TokenHandler(object):
 
 
     def del_view(self, view_name="test_view"):
-        '''Deletes the view with view name from the ]
-    except KeyError:
-    return None
-    token_type} document
-            and from the token_Handler's dict of views
-
-        :param view_name: The name of the view which should be removed
-        :type view_name: str
-        '''
-        db_views = self.database.get("_design/"+self.t_type)
-        db_views["views"].pop(view_name, None)
-        self.views.pop(view_name, None)
-        self.database.update([db_views])
+        pass
 
     def remove_error(self):
-        ''' Removes all tokens in the error view
-        '''
-        cond = "doc.lock > 0 && doc.done > 0 && doc.output > 0"
-        self.add_view(view_name="error", cond=cond)
-        self.delete_tokens("error")
-
+        pass
 
     def add_attachment(self, token, filehandle, filename="test"):
-        """Uploads an attachment to a token
-
-        Args:
-            :param token: The Token _id as recorded in the CouchDB database
-            :type token: str
-            :param filehandle: the file handle to the file which to upload open(filepath,'r')
-            :type tok_config: os.file()
-            :param filename: The name of the attachment
-            :type tok_config: str
-
-        """
-        self.database.put_attachment(self.database[token], filehandle, filename)
+        pass 
 
     def list_attachments(self, token):
-        """Lists all of the filenames attached to a couchDB token
-        """
-        tok_keys = self.database[token]
-        if '_attachments' in tok_keys:
-            return list(tok_keys["_attachments"].keys())
-        return []
+        pass
 
     def get_attachment(self, token, filename, savename=None):
-        """Downloads an attachment from a CouchDB token. Optionally
-            a save name can be specified.
-        """
-        try:
-            attach = self.database.get_attachment(token, filename).read()
-        except AttributeError:
-            print("error getting attachment: "+str(filename))
-            return ""
-        if savename is not None:
-            savefile = savename
-        else:
-            savefile = filename
-        if "/" in filename:
-            savefile = filename.replace("/", "_")
-        with open(savefile, 'w') as _file:
-            for line in attach:
-                _file.write(str(line))
-        return os.path.abspath(savefile)
+        pass
 
     def list_tokens_from_view(self, view_name):
-        """Returns all tokens from a viewname
-        """
-        self.load_views()
-        if view_name in self.views:
-            view = self.views[view_name]
-        else:
-            RuntimeWarning("View Named "+view_name+" Doesn't exist")
-            return None
-        view = self.database.view(self.t_type+"/"+view_name)
-        return view
+        pass
 
     def archive_tokens_from_view(self, viewname, delete_on_save=False):
-        to_del = []
-        for token in self.list_tokens_from_view(viewname):
-            self.archive_a_token(token['id'])
-            to_del.append(self.database[token['id']])
-        if delete_on_save:
-            self.database.purge(to_del)
+        pass
 
     def archive_tokens(self, delete_on_save=False, compress=True):
-        """Archives all tokens and attachments into a folder
-
-        """
-        if not os.path.exists(self.t_type):
-            os.mkdir(self.t_type)
-        os.chdir(self.t_type)
-        self.load_views()
-        for view in self.views.keys():
-            if view == 'overview_total':
-                continue
-            self.archive_tokens_from_view(view, delete_on_save)
-        result_link = os.getcwd()
-        os.chdir('..')
-        if compress:
-            with tarfile.open(name="tokens_"+self.t_type+".tar.gz", mode='w:gz') as t_file:
-                t_file.add(self.t_type+"/")
-                result_link = t_file.name
-                shutil.rmtree(self.t_type+"/")
-        if delete_on_save:
-            self.purge_tokens()
-        return result_link
+        pass
 
     def archive_a_token(self, tokenid, delete=False):
-        """Dumps the token data into a yaml file and saves the attachments
-        returns list of archived files"""
-        data = self.database[tokenid]
-        archived_files = []
-        with open(tokenid+".dump", 'w') as savefile:
-            json.dump(data, savefile)
-        archived_files.append(tokenid+".dump")
-        for att_file in self.list_attachments(tokenid):
-            fname = att_file.replace('/', '-')
-            self.get_attachment(tokenid, att_file, tokenid +
-                                "_attachment_"+str(fname))
-            archived_files.append(fname)
-        if delete: #test
-            self.database.purge([data])
-        return archived_files 
+        pass
 
     def clear_all_views(self):
-        """Iterates over all views in the design document
-        and deletes all tokens from those views. Finally, removes
-        the views from the database"""
-        self.load_views()
-        for view in list(self.views):
-            if view != 'overview_total':
-                self.delete_tokens(view)
-            self.del_view(view)
-        self.load_views()
-        return self.views
+        pass
 
     def purge_tokens(self):
-        """ Deletes ALL tokens associated with this token_type
-        and removes all views. Also removes the design document from
-        the database"""
-        self.clear_all_views()
-        del self.database['_design/'+self.t_type]
-
+        pass
 
     def set_view_to_status(self, view_name, status):
-        """Sets the status to all tokens in 'view' to 'status
-            eg. Set all locked tokens to error or all error tokens to todo
-            it also locks the tokens!
-        """
-        view = self.list_tokens_from_view(view_name)
-        to_update = []
-        for token in view:
-            document = self.database[token['key']]
-            document['status'] = str(status)
-            document['lock'] = 1
-            to_update.append(document)
-        self.database.update(to_update)
-
+        pass
 
 class TokenSet(object):
     """ The TokenSet object can automatically create a group of tokens from a
