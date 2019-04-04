@@ -3,4 +3,4 @@ pyyaml>=4.2b1
 retrying
 humanfriendly>=4.17
 CouchDB
-cloudant
+cloudant==2.12.0
