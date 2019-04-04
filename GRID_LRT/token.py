@@ -286,6 +286,10 @@ class TokenList(list):
         for token in self:
             token.delete()
 
+    def reset(self):
+        for token in self:
+            token.reset()
+
     def delete(self):
         self.delete_all(self) 
 
