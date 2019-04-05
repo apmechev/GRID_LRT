@@ -4,6 +4,7 @@
 Options include the number of cores and the queue type."""
 
 import os
+import signal
 import subprocess
 import logging
 import warnings
@@ -193,7 +194,7 @@ class JdlLauncher(object):
   DataAccessProtocol = {"gsiftp"};
   ShallowRetryCount = 0;
 
-  Requirements=(RegExp("gina.sara.nl:8443/cream-pbs-%s",other.GlueCEUniqueID));
+  Requirements=(RegExp("gina.sara.nl:8443/cream-pbs-%s"),other.GlueCEUniqueID);
   WholeNodes = %s ;
   SmpGranularity = %d;
   CPUNumber = %d;
@@ -284,7 +285,13 @@ class LouiLauncher(JdlLauncher):
         print("removing directory " + self.run_directory)
         rmtree(self.run_directory)
         os.chdir(self.return_directory)
-    
+        p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
+        out, err = p.communicate()
+        for line in out.splitlines():
+            if 'master.sh' in line:
+                pid = int(line.split(None, 1)[0])
+                os.kill(pid, signal.SIGKILL)
+
     def __del__(self):
         if os.path.exists(self.run_directory):
             self.cleanup()
