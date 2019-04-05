@@ -115,7 +115,7 @@ def process(urls, repl_string, match):
     for url in urls:
         surls.append(url.strip())
 
-    err, tok = stage_srm(surls, 24*3600, 3600)
+    err, tok = stage_srm(surls, 5*24*3600, 3600)
 
     req = {}
     # Set the timeout to 24 hours
