@@ -255,6 +255,7 @@ class LouiLauncher(JdlLauncher):
 
     def __init__(self, *args, **kwargs):
         super(LouiLauncher,self).__init__(*args, **kwargs)
+        self.pid=None
         self.return_directory = os.getcwd()
         self.run_directory = tempfile.mkdtemp(prefix='/scratch/') 
         
@@ -274,6 +275,7 @@ class LouiLauncher(JdlLauncher):
         with open(self.run_directory+"/stdout.txt","wb") as out:
             with open(self.run_directory+"/stderr.txt","wb") as err:
                 launcher = subprocess.Popen(command.split(), stdout=out, stderr=err)
+                self.pid = launcher.pid
                 launcher.wait()
         return {'output':self.run_directory+"/stdout.txt",
                 'error':self.run_directory+"/stderr.txt"}
@@ -285,12 +287,8 @@ class LouiLauncher(JdlLauncher):
         print("removing directory " + self.run_directory)
         rmtree(self.run_directory)
         os.chdir(self.return_directory)
-        p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
-        out, err = p.communicate()
-        for line in out.splitlines():
-            if 'master.sh' in line:
-                pid = int(line.split(None, 1)[0])
-                os.kill(pid, signal.SIGKILL)
+        if self.pid:
+            os.kill(self.pid, signal.SIGKILL)
 
     def __del__(self):
         if os.path.exists(self.run_directory):
