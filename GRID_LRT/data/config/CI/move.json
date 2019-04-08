@@ -1,0 +1,46 @@
+{
+    "PicasApiVersion": 0.5,
+    "Job": {
+        "NCPU": 8,
+        "parameter_step": 1,
+        "queue": "medium",
+        "variables": {
+            "PIPELINE_STEP": "move_image",
+            "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly/CI/dev/nightly/"
+        },
+        "wholenode": false
+    },
+    "Token": {
+        "_id":"CI_move",
+        "status": "queued",
+        "times": {},
+        "upload": {
+            "add_date": true,
+            "date_granularity":"day",
+            "gzip": true,
+            "location": "$RESULTS_DIR",
+            "overwrite": true,
+            "template": "lofar_simg_$DATE"
+        },
+        "variables": {
+            "_attachments": {
+                "$SCRIPT": "pull_container.sh"
+            },
+            "_token_keys": {
+                "$PIPELINE_STEP": "PIPELINE_STEP",
+                "$RESULTS_DIR": "RESULTS_DIR"
+            }
+        }
+    },
+    "sandbox": {
+        "git": {
+            "branch": "master",
+            "url": "https://github.com/apmechev/GRID_Sandbox.git"
+        }
+        
+    },
+    "downloader":{"executable":"globus-url-copy",
+        "options":["-rst","-st", "30","-fast","-v"],
+        "extract":"true"
+    }
+}
