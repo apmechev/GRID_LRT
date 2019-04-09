@@ -308,6 +308,17 @@ class TokenList(list):
         for token in self:
             token.fetch()
 
+    def list_view_tokens(self, view_name):
+        view = self._design_doc.get_view(view_name)
+        if not view:
+            return self 
+        view_list = TokenList(token_type=self.token_type, database=self._database)
+        for i in view.result:
+            tok=caToken(database=self._database, token_type=self.token_type,token_id=i['id'])
+            view_list.append(tok)
+        view_list.fetch()
+        return view_list
+
     def get_views(self):
         if self._design_doc:
             self._design_doc.fetch()
@@ -320,6 +331,8 @@ class TokenList(list):
 
 
     def add_token_views(self):
+        """Adds the todo, locked, error, done and overview_view 
+        views that are standard for a PiCaS Token."""
         self.add_view(TokenView("todo", 'doc.lock ==  0 && doc.done == 0 '))
         self.add_view(TokenView("locked", 'doc.lock > 0 && doc.done == 0 ',
                                 ('doc._id', 'doc.status')))
