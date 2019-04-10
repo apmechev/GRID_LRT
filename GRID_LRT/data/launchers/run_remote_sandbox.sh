@@ -20,8 +20,7 @@ set -x
 if type git &> /dev/null
 then
  git clone https://github.com/apmechev/GRID_picastools.git p_tools_git
- cd p_tools_git || exit -100
- git checkout master
+ cd p_tools_git || exit -100 
  cd ../ || exit -100
 else  #move this to testpy3
  wget -O master.zip https://github.com/apmechev/GRID_picastools/archive/master.zip
