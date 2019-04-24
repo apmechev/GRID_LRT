@@ -147,7 +147,18 @@ class caToken(Token, Document):
     def add_attachment(self, filename, attachment_name):
         file_type = mimetypes.guess_type(filename)[0]
         self.put_attachment(attachment_name, file_type, open(filename,'r'))
-        
+
+    def get_all_attachments(self):
+        """Gets all attachments from the remote token and saves them
+        to a file with name ID-Attachment"""
+        self.fetch()
+        for attachment in self.get('__attachments'):
+            if not self['_attachments'][attachment].get('content-type'):
+                 data=self.get_attachment(attachment, attachment_type='text/plain')
+            else:
+                data=self.get_attachment(attachment)
+        with open(self['_id']+"-"+attachment,'wb') as att_f:
+            att_f.write(data) 
 
 class TokenBuilder:
     __metaclass__ = ABCMeta
