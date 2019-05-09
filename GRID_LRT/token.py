@@ -44,7 +44,6 @@ import shutil
 import itertools
 import time
 import tarfile
-import yaml
 import json
 #from retrying import retry
 from abc import ABCMeta, abstractmethod
