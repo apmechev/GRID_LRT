@@ -68,7 +68,7 @@ class srmlist(list):
         if self.LTA_location=='sara': return re.sub('srm://srm.grid.sara.nl:8443',
                                             'gsiftp://gridftp.grid.sara.nl:2811',
                                             item)
-        if self.LTA_location=='juelich': return re.sub("srm://lofar-srm.fz-juelich.de:8443","gsiftp://lofar-gridftp.fz-juelich.de:2811",item)
+        if self.LTA_location=='juelich': return re.sub("srm://lofar-srm.fz-juelich.de:8443","gsiftp://dcachepool12.fz-juelich.de:2811",item)
         if self.LTA_location=='poznan': return re.sub("srm://lta-head.lofar.psnc.pl:8443",
                                                     "gsiftp://door02.lofar.psnc.pl:2811",
                                             item)
