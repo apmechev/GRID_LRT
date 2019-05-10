@@ -149,7 +149,7 @@ class SrmlistTest(unittest.TestCase):
         self.assertTrue('8443/srm/managerv2?SFN=' in sl.gfal_replace(sl[0]))
 
     def test_srm_replace(self):
-        f_name = 'gsiftp://dcachepool12.fz-juelich.de:2811/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583139/L583139_SB000_uv.MS_900c9fcf.tar'
+        f_name = 'gsiftp://lofar-gridftp.fz-juelich.de:2811/pnfs/fz-juelich.de/data/lofar/ops/projects/lc7_012/583139/L583139_SB000_uv.MS_900c9fcf.tar'
         sl = srmlist(link=f_name)
         self.assertTrue(f_name == sl[0])
         srm_link = sl.srm_replace(sl[0])
