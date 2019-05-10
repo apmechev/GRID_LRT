@@ -133,7 +133,7 @@ class srmlist(list):
                           item)
         if self.lta_location == 'juelich':
             return re.sub("srm://lofar-srm.fz-juelich.de:8443",
-                          "gsiftp://dcachepool12.fz-juelich.de:2811", item)
+                    "gsiftp://lofar-gridftp.fz-juelich.de:2811", item)
         if self.lta_location == 'poznan':
             return re.sub("srm://lta-head.lofar.psnc.pl:8443",
                           "gsiftp://gridftp.lofar.psnc.pl:2811",
