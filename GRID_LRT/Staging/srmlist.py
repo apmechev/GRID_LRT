@@ -118,7 +118,7 @@ class srmlist(list):
                           'srm://srm.grid.sara.nl:8443',
                           item)
         if self.lta_location == 'juelich':
-            return re.sub("gsiftp://dcachepool12.fz-juelich.de:2811",
+            return re.sub("gsiftp://lofar-gridftp.fz-juelich.de:2811",
                           "srm://lofar-srm.fz-juelich.de:8443",
                           item)
         if self.lta_location == 'poznan':
