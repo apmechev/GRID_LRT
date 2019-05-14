@@ -14,13 +14,13 @@
 ##########################################
 
 ## information about the target data
-! target_input_path         =  PREFACTOR_SCRATCH_DIR/Input            ## specify the directory where your target data is stored
-! target_input_pattern      =  *MS                                    ## regular expression pattern of all your target files
+! target_input_path         =  PREFACTOR_SCRATCH_DIR/Input            ## @NO_OVERWRITE@
+! target_input_pattern      =  *MS                                    ## @NO_OVERWRITE@
 
 ## location of the software
-! prefactor_directory       =  PREFACTOR_SCRATCH_DIR/prefactor        ## path to your prefactor copy
-! losoto_directory          =  /opt/lofar/losoto                      ## path to your local LoSoTo installation
-! aoflagger                 =  /opt/lofar/aoflagger/bin/aoflagger     ## path to your aoflagger executable
+! prefactor_directory       =  PREFACTOR_SCRATCH_DIR/prefactor        ## @NO_OVERWRITE@ 
+! losoto_directory          =  /opt/lofar/losoto                      ## @NO_OVERWRITE@ 
+! aoflagger                 =  /opt/lofar/aoflagger/bin/aoflagger     ## @NO_OVERWRITE@ 
 
 ## location of the calibrator solutions
 ! cal_solutions             =  $RUNDIR/prefactor/cal_values/cal_solutions.h5
@@ -29,9 +29,10 @@
 ### parameters you may need to adjust   ##
 ##########################################
 
-! refant                   =  'CS001HBA0'                             ## name of the station that will be used as a reference for the phase plots, 'closest' will reference to the spatially closest unflagged antenna
+! refant                    =  'CS001HBA0'                             ## name of the station that will be used as a reference for the phase plots, 'closest' will reference to the spatially closest unflagged antenna
 ! flag_baselines            =  []                                     ## NDPPP-compatible pattern for baselines or stations to be flagged (may be an empty list, i.e.: [] )
-! filter_baselines          =  [CR]S*&                                ## selects only this set of baselines to be processed. Choose [CR]S*& if you want to process only cross-correlations and remove international stations.
+! process_baselines_target  =  [CR]S*&  
+! filter_baselines          =  {{ process_baselines_target }}         ## selects only this set of baselines to be processed. Choose [CR]S*& if you want to process only cross-correlations and remove international stations.
 ! do_smooth                 =  False                                  ## enable or disable baseline-based smoothing
 ! rfistrategy               =  HBAdefault.rfis                        ## strategy to be applied with the statistical flagger (AOFlagger) for wideband flagging
 ! interp_windowsize         =  15                                     ## Size of the window over which a value is interpolated. Should be odd.
@@ -57,7 +58,7 @@
 ! initial_flagging          =  {{ default_flagging }}                 ## choose {{ raw_flagging }} if you process raw data
 ! demix_step                =  {{ none }}                             ## choose {{ demix }} if you want to demix
 ! apply_steps               =  applyclock,applybeam,applyRM           ## comma-separated list of apply_steps performed in the target preparation (NOTE: only use applyRM if you have performed RMextract before!)
-! clipAteam_step            =  {{ clipATeam }}                        ## choose {{ none }} if you want to skip A-team-clipping
+! clipATeam_step            =  {{ clipATeam }}                        ## choose {{ none }} if you want to skip A-team-clipping
 ! gsmcal_step               =  phase                                  ## choose tec if you want to fit TEC instead of self-calibrating for phases
 ! updateweights             =  True                                   ## update the weights column, in a way consistent with the weights being inverse proportional to the autocorrelations
 
@@ -65,12 +66,12 @@
 ### parameters for pipeline performance ##
 ##########################################
 
-! num_proc_per_node         =  4                                      ## number of processes to use per step per node (usually max_per_node from pipeline.cfg)
-! num_proc_per_node_limit   =  4                                      ## number of processes to use per step per node for tasks with high i/o (dppp or cp) or memory (eg calibration)
-! max_dppp_threads          =  4                                      ## number of threads per process for NDPPP
-! min_length                =  5                                      ## minimum amount of chunks to concatenate in frequency necessary to perform the wide-band flagging in the RAM. It data is too big aoflag will use indirect-read.
-! overhead                  =  0.8                                    ## Only use this fraction of the available memory for deriving the amount of data to be concatenated.
-! min_separation            =  30                                     ## minimal accepted distance to an A-team source on the sky in degrees (will raise a WARNING)
+! num_proc_per_node         =  2                                      ## @NO_OVERWRITE@ 
+! num_proc_per_node_limit   =  2                                      ## @NO_OVERWRITE@
+! max_dppp_threads          =  2                                      ## @NO_OVERWRITE@
+! min_length                =  5                                      ## @NO_OVERWRITE@
+! overhead                  =  0.8                                    ## @NO_OVERWRITE@
+! min_separation            =  30                                     ## @NO_OVERWRITE@
 
 ! error_tolerance           =  False                                  ## set this to True if you want the pipeline run to continue if single bands fail
 
@@ -79,7 +80,7 @@
 ##########################################
 
 ## main directories
-! lofar_directory           =  $LOFARROOT                             ## base directory of your LOFAR installation
+! lofar_directory           =  $LOFARROOT                             ## @NO_OVERWRITE@
 ! job_directory             =  input.output.job_directory             ## directory of the prefactor outputs
 
 ## script and plugin directories
@@ -91,10 +92,10 @@ pipeline.pluginpath         =  {{ prefactor_directory }}/plugins
 ! A-team_skymodel           =  {{ calibrator_path_skymodel }}/Ateam_LBA_CC.skymodel
 ! target_skymodel           =  {{ job_directory }}/target.skymodel    ## path to the skymodel for the phase-only calibration of the target
 ! use_target                =  True                                   ## download the phase-only calibration skymodel from TGSS, "Force" : always download , "True" download if {{ target_skymodel }} does not exist , "False" : never download
-! skymodel_source           =  GSM                                    ## use GSM if you want to use the experimental (!) GSM SkyModel creator using TGSS, NVSS, WENSS and VLSS
+! skymodel_source           =  TGSS                                   ## use GSM if you want to use the experimental (!) GSM SkyModel creator using TGSS, NVSS, WENSS and VLSS
 
 ## result directories
-! results_directory         =  $RUNDIR/Output                         ## location of the results
+! results_directory         =  $RUNDIR/Output                         ## @NO_OVERWRITE@
 ! inspection_directory      =  {{ results_directory }}/inspection     ## directory where the inspection plots will be stored
 ! cal_values_directory      =  {{ results_directory }}/cal_values     ## directory where the final h5parm solution set will be stored
 
@@ -102,23 +103,19 @@ pipeline.pluginpath         =  {{ prefactor_directory }}/plugins
 ! solutions                 =  {{ cal_values_directory }}/solutions.h5
 
 ## averaging for the target data
-! avg_timeresolution        =  4.                                     ## average to 4 sec/timeslot
-! avg_freqresolution        =  36.62kHz                               ## average to 3 ch/SB
-! avg_timeresolution_concat =  8.                                     ## average to 8 sec/timeslot
-! avg_freqresolution_concat =  36.62kHz                               ## average to 3 ch/SB
+! avg_timeresolution        =  8.                                     ## @NO_OVERWRITE@
+! avg_freqresolution        =  97.65kHz                               ## @NO_OVERWRITE@
+! avg_timeresolution_concat =  8.                                     ## @NO_OVERWRITE@
+! avg_freqresolution_concat =  97.65kHz                               ## @NO_OVERWRITE@
 
 ## concatenating the target data
-! num_SBs_per_group         =  10                                     ## make concatenated measurement-sets with that many subbands, choose a high number if running LBA
-! reference_stationSB       =  None                                   ## station-subband number to use as reference for grouping, "None" -> use lowest frequency input data as reference
+! num_SBs_per_group         =  10                                     ## @NO_OVERWRITE@
+! reference_stationSB       =  None                                   ## @NO_OVERWRITE@
 
 ## RMextract settings
 ! ionex_server              =  "ftp://ftp.aiub.unibe.ch/CODE/"        ## to download from the "standard" server
 ! ionex_prefix              =  CODG                                   ## the prefix of the IONEX files
 ! ionex_path                =  {{ job_directory }}/IONEX/             ## path where the IONEX files can be stored or are already stored
-
-## EoR NCP specific settings.
-! eor_fix_script            = PREFACTOR_SCRATCH_DIR/prefactor/scripts/fix_frequencies.py
-! eor_reference_frequencies = PREFACTOR_SCRATCH_DIR/prefactor/scripts/central_frequencies_000_319.npy
 
 ########################################################
 ##                                                    ##
@@ -127,14 +124,14 @@ pipeline.pluginpath         =  {{ prefactor_directory }}/plugins
 ########################################################
 
 # which steps to run
-pipeline.steps              =  [prep, {{ clipATeam }} finalize]
+pipeline.steps              =  [prep, {{ clipATeam }} finalize] ## @NO_OVERWRITE@
 
 # pipeline substeps
-pipeline.steps.prep         =  [createmap_target, get_targetname, combine_data_target_map, check_Ateam_separation, mk_targ_values_dir, copy_cal_sols, check_station_mismatch, createmap_preptarg, createmap_insttarg, create_ateam_model_map, make_sourcedb_ateam, expand_sourcedb_ateam, h5imp_RMextract, prepare_losoto_RMextract, process_losoto_RMextract, ndppp_prep_target]
+pipeline.steps.prep         =  [createmap_target, get_targetname, combine_data_target_map, check_Ateam_separation, mk_targ_values_dir, copy_cal_sols, check_station_mismatch, createmap_preptarg, createmap_insttarg, create_ateam_model_map, make_sourcedb_ateam, expand_sourcedb_ateam, h5imp_RMextract, prepare_losoto_RMextract, process_losoto_RMextract, ndppp_prep_target] ## @NO_OVERWRITE@
 
-pipeline.steps.clipATeam    =  [predict_ateam, ateamcliptar]
+pipeline.steps.clipATeam    =  [predict_ateam, ateamcliptar] ## @NO_OVERWRITE@
 
-pipeline.steps.finalize     =  [make_results_mapfile_uncor, move_results_uncor]
+pipeline.steps.finalize     =  [make_results_mapfile_uncor, move_results_uncor] ## @NO_OVERWRITE@
 
 
 #############################
@@ -263,8 +260,6 @@ h5imp_RMextract.argument.ionex_server                          =   {{ ionex_serv
 h5imp_RMextract.argument.ionex_prefix                          =   {{ ionex_prefix }}
 h5imp_RMextract.argument.ionexPath                             =   {{ ionex_path }}
 h5imp_RMextract.argument.solset_name                           =   target
-h5imp_RMextract.argument.all_stations                          =   True
-
 
 # create losoto v2 parset file
 prepare_losoto_RMextract.control.kind                          =   plugin
