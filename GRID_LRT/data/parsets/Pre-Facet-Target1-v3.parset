@@ -23,7 +23,7 @@
 ! aoflagger                 =  /opt/lofar/aoflagger/bin/aoflagger     ## @NO_OVERWRITE@ 
 
 ## location of the calibrator solutions
-! cal_solutions             =  $RUNDIR/prefactor/cal_values/cal_solutions.h5
+! cal_solutions             =  $RUNDIR/prefactor/cal_values/cal_solutions.h5 ## @NO_OVERWRITE@
 
 ##########################################
 ### parameters you may need to adjust   ##
