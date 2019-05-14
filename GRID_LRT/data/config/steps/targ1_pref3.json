@@ -7,7 +7,7 @@
         "variables": {
             "OBSID": "L229587",
             "PIPELINE_STEP": "pref3_targ1_CI",
-            "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/test/",
+            "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly/CI/products/pref_targ1/",
             "ABN": "000"
         },
         "wholenode": false
@@ -22,7 +22,7 @@
             "gzip": false,
             "location": "$RESULTS_DIR",
             "overwrite": false,
-            "template": "CI_pref3_targ1_ABN$ABN_$DATE"
+            "template": "CI_pref3_targ1_$OBSID_ABN$ABN_$DATE"
         },
         "variables": {
             "_attachments": {
