@@ -61,6 +61,8 @@ class RunningJob(object):
             self.count_successes(result)
         if self.glite_status=='Waiting':
             self.count_successes(result)
+        if self.glite_status == 'Aborted':
+            self.count_successes(result)
         if self.glite_status=='Running' and self.job_status=='Waiting':
             self.glite_status='Completed'
             
@@ -215,6 +217,7 @@ class JdlLauncher(object):
         """ Makes a temporary file to store the JDL
         document that is only visible to the user"""
         self.temp_file = tempfile.NamedTemporaryFile(delete=False)
+        print("making temp file at "+self.temp_file.name)
         with open(self.temp_file.name, 'w') as t_file_obj:
             for i in self.build_jdl_file(database):
                 t_file_obj.write(i)
