@@ -16,7 +16,7 @@ class srmlist(list):
     done automatically. Checking OBSID is an optional argument set to True by default.
     """
 
-    def __init__(self, check_OBSID=True, check_location = True, link=None):
+    def __init__(self, check_OBSID=True, check_location=True, link=None):
         """__init__: Initializes the srmlist object. 
 
         :param check_OBSID: Boolean flag to check if each added link has the same OBSID
@@ -34,7 +34,7 @@ class srmlist(list):
         if link:
             self.append(link)
 
-    def check_location(self, item):
+    def check_link_location(self, item):
         tmp_loc = ""
         if isinstance(item, str):
             tmp_loc = self.check_str_location(item)
@@ -77,7 +77,7 @@ class srmlist(list):
             return
         if self.checkobsid:
             self._check_obsid(item)
-        tmp_loc = self.check_location(item)
+        tmp_loc = self.check_link_location(item)
         item = self.trim_spaces(self.stringify_item(item))
         if not self.lta_location:
             self.lta_location = tmp_loc
