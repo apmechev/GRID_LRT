@@ -141,10 +141,11 @@ class Token(dict):
     def reset(self):
         self.__setitem__('lock', 0)
         self.__setitem__('done', 0)
-        scrub_count = self.get('scrub_count', 0)
+        scrub_count = self.get('scrub_count', 0) ##TODO: Get function override to get from db
         self.__setitem__('scrub_count', scrub_count + 1)
         self.__setitem__('hostname', '')
         self.__setitem__('output', '')
+        self.__setitem__('status', 'reset')
 
 class caToken(Token, Document):
     def __init__(self, database, token_type, **kwargs):
@@ -154,6 +155,8 @@ class caToken(Token, Document):
 
     def add_attachment(self, filename, attachment_name):
         file_type = mimetypes.guess_type(filename)[0]
+        if "." in filename and filename.split(".")[-1]=='parset':
+            file_type='text/plain'
         self.put_attachment(attachment_name, file_type, open(filename,'r'))
 
     def get_all_attachments(self):
