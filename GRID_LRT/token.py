@@ -269,8 +269,6 @@ class TokenList(list):
                     token.save()
                     token.add_attachment(filename, attachment_name)
 
-
-
     def append(self, item):
         if isinstance(item, Token):
             if not self._database:
@@ -426,157 +424,18 @@ class TokenReduceView(TokenView):
 '''     
         return overview_reduce_code
 
-class TokenHandler(object):
-    """self.database.get("_design/""
-
-    The TokenHandler class uses couchdb to create, modify and delete
-    tokens and views, to attach files, or download attachments and to
-    easily modify fields in tokens. It's initiated with the token_type,
-    server, username, password and name of database.
-
-    """
-    def __init__(self, t_type="token",
-                 srv="https://picas-lofar.grid.surfsara.nl:6984",
-                 uname="", pwd="", dbn=""):
-        """
-        >>> #Example creation of a token of token_type 'test'
-        >>> from GRID_LRT.auth.get_picas_credentials import picas_cred
-        >>> pc=picas_cred() #Gets picas_credentials
-        >>>
-        >>> th=token.TokenHandler( t_type="test",
-        srv="https://picas-lofar.grid.surfsara.nl:6984", uname=pc.user,
-        pwd=pc.password, dbn=pc.database ) #creates object to 'handle' Tokens
-        >>> th.add_overview_view()
-        >>> th.add_status_views() #Adds 'todo', 'done', 'locked' and 'error' views
-        >>> th.load_views()
-        >>> th.views.keys()
-        >>> th.reset_tokens(view_name='error') # resets all tokens in 'error' view
-        >>> th.set_view_to_status(view_name='done','processed')
-        """
-        print("TokenHandler is no longer supported!")
-
-
-    @staticmethod
-    def _append_id(keys, app=""):
-        """ Helper function that appends a string to the token ID"""
-        keys["_id"] += app
-
-
-    def del_view(self, view_name="test_view"):
-        pass
-
-    def remove_error(self):
-        pass
-
-    def add_attachment(self, token, filehandle, filename="test"):
-        pass 
-
-    def list_attachments(self, token):
-        pass
-
-    def get_attachment(self, token, filename, savename=None):
-        pass
-
-    def list_tokens_from_view(self, view_name):
-        pass
-
-    def archive_tokens_from_view(self, viewname, delete_on_save=False):
-        pass
-
-    def archive_tokens(self, delete_on_save=False, compress=True):
-        pass
-
-    def archive_a_token(self, tokenid, delete=False):
-        pass
-
-    def clear_all_views(self):
-        pass
-
-    def purge_tokens(self):
-        pass
-
-    def set_view_to_status(self, view_name, status):
-        pass
 
 class TokenSet(object):
-    """ The TokenSet object can automatically create a group of tokens from a
-    yaml configuration file and a dictionary. It keeps track internally of
-    the set of tokens and allows users to batch attach files to the entire TokenSet or alter
-    fields of all tokens in the set.
-
-    """
 
     def __init__(self, th=None, tok_config=None):
-        """ The TokenSet object is created with a TokenHandler Object, which is
-        responsible for the interface to the CouchDB views and Documents. This also ensures
-        that only one job type is contained in a TokenSet.
-
-        Args:
-            :param th: The TokenHandler associated with the job tokens
-            :type th: GRID_LRT.Token.TokenHandler
-            :param tok_config: Location of the token yaml file on the host FileSystem
-            :type tok_config: str
-            :raises: AttributeError, KeyError
-
-        """
-        self.thandler = th
-        self.__tokens = []
-        if not tok_config:
-            self.token_keys = {}
-        else:
-            with open(tok_config, 'r') as optfile:
-                self.token_keys = json.load(optfile)['Token']
+        print("TokenSet is no longer supported!")
 
     def create_dict_tokens(self, iterable={}, id_prefix='SB', id_append="L000000",
                            key_name='STARTSB', file_upload=None):
-        """ A function that accepts a dictionary and creates a set of tokens equal to
-            the number of entries (keys) of the dictionary. The values of the dict are
-            a list of strings that may be attached to each token if the 'file_upload'
-            argument exists.
-
-            Args:
-                :param iterable: The dictionary which determines how many tokens will be created.
-                The values  are attached to each token
-                :type iterable: dict
-                :param id_append: Option to append the OBSID to each Token
-                :type id_append: str
-                :param key_name: The Token field which will hold the value of the dictionary's
-                keys for each Token
-                :type key_name: str
-                :param file_upload: The name of the file which to upload to the tokens
-                (typically srm.txt)
-                :type file_upload: str
-
-        """  # TODO: Check if key_name is inside token_keys!
-        for key in iterable:
-            keys = dict(itertools.chain(self.token_keys.items(), {
-                key_name: str("%03d" % int(key))}.items()))
-#            _=keys.pop('_attachments')
-            pipeline = ""
-            if 'PIPELINE_STEP' in keys:
-                pipeline = "_"+keys['PIPELINE_STEP']
-            token = self.thandler.create_token(
-                keys, append=id_append+pipeline+"_"+id_prefix+str("%03d" % int(key)))
-            if file_upload:
-                with open('temp_abn', 'w') as tmp_abn_file:
-                    for i in iterable[key]:
-                        tmp_abn_file.write("%s\n" % i)
-                with open('temp_abn', 'r') as tmp_abn_file:
-                    self.thandler.add_attachment(token, tmp_abn_file, file_upload)
-                os.remove('temp_abn')
-            self.__tokens.append(token)
+        pass
 
     def add_attach_to_list(self, attachment, tok_list=None, name=None):
-        '''Adds an attachment to all the tokens in the TokenSet, or to another list
-            of tokens if explicitly specified.
-        '''
-        if not name:
-            name = attachment
-        if not tok_list:
-            tok_list = self.__tokens
-        for token in tok_list:
-            self.thandler.add_attachment(token, open(
-                attachment, 'r'), os.path.basename(name))
+        pass
 
     @property
     def tokens(self):
@@ -584,19 +443,7 @@ class TokenSet(object):
         return self.__tokens
 
     def update_local_tokens(self):
-        self.__tokens = []
-        self.thandler.load_views()
-        for view in self.thandler.views.keys():
-            if view != 'overview_total':
-                for token in self.thandler.list_tokens_from_view(view):
-                    self.__tokens.append(token['id'])
+        pass
 
     def add_keys_to_list(self, key, val, tok_list=None):
-        if not tok_list:
-            tok_list = self.__tokens
-        to_update = []
-        for token in tok_list:
-            document = self.thandler.database[token]
-            document[key] = str(val)
-            to_update.append(document)
-        self.thandler.database.update(to_update)
+        pass
