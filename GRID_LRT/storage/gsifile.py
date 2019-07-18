@@ -75,7 +75,7 @@ class GSIFile(object):
             return False, parent_dir
 
     def __repr__(self):
-        return "<GRID_LRT.Storage.gsifile.GSIFile {} {} located in {} >".format(
+        return "<GRID_LRT.storage.gsifile.GSIFile {} {} located in {} >".format(
                 "File" if self.is_file else "Folder",self.filename, self.location)
 
     def _test_file_exists(self, location):
@@ -140,6 +140,7 @@ class GSIFile(object):
         """Raises Exception if you try to delete files or folders whose parent is
         one of these folders"""
         locations = ['gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/',
+                     'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly'
                      'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/archive',
                      'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly',
                      'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sksp_natalie',
@@ -168,7 +169,19 @@ class GSIFile(object):
             return
         else: 
             warnings.warn('Deleting failed: {}'.format(err))
-    
+
+    def copy(self, other_location):
+        if self.is_dir:
+            raise Exception("We cannot copy an entire folder, loop over its contents instead")
+        copy = subprocess.Popen(['globus-url-copy',self.location, other_location.location+"/"], 
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        res, err = copy.communicate()
+        if not err:
+            return
+        else:
+            warnings.warn('Copying {0} failed: {1}'.format(self.filename, err))
+
+
     def get_parent_dir(self):
         location = "/".join([i for i in self.location.split('/') if i])
         parent_dir = "/".join(location.split('/')[:-1])
@@ -211,6 +224,16 @@ class GSIFile(object):
         self._subfiles, _ = self._uberftpls(self.location)
         files_list = [GSIFile(i, parent_dir=self) for i, r in zip(file_locs, results)]
         return files_list
+
+
+def gsi_mkdir(location):
+    mkdir = subprocess.Popen(['uberftp','-mkdir',location],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = mkdir.communicate()
+    if err:
+        warnings.warn('mkdir {0} failed: {1}'.format(location, err))
+    return GSIFile(location)
+
 
 
 class MockGSIFile(GSIFile):
