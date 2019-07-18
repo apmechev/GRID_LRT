@@ -112,7 +112,7 @@ class GSIFile(object):
         year = str(data[-2].decode('ascii'))
         month = data[-4].decode('ascii')
         day = data[-3].decode('ascii')
-        if year not in ['2019', '2018', '2017', '2016', '2015']:
+        if year not in ['2021','2020','2019', '2018', '2017', '2016', '2015']:
             ## In this case the year is not specified.
             this_year = datetime.now().year
             if strptime(month,'%b').tm_mon > datetime.now().month:
