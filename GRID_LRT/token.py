@@ -146,6 +146,17 @@ class Token(dict):
         self.__setitem__('hostname', '')
         self.__setitem__('output', '')
         self.__setitem__('status', 'reset')
+    
+    def archive(self, delete=False, db=None):
+        self.get_all_attachments()
+        json.dump(self, open(self._filename()+'.json','wb'))
+        if delete:
+            del db[self['_id']]
+
+    def _filename(self):
+        filename = self['_id']
+        filename = filename.replace('/','_')
+        return filename
 
 class caToken(Token, Document):
     def __init__(self, database, token_type, **kwargs):
@@ -163,13 +174,14 @@ class caToken(Token, Document):
         """Gets all attachments from the remote token and saves them
         to a file with name ID-Attachment"""
         self.fetch()
-        for attachment in self.get('__attachments'):
+        for attachment in self.get('_attachments'):
             if not self['_attachments'][attachment].get('content-type'):
                  data=self.get_attachment(attachment, attachment_type='text/plain')
             else:
                 data=self.get_attachment(attachment)
-        with open(self['_id']+"-"+attachment,'wb') as att_f:
-            att_f.write(data) 
+            attachment = attachment.replace('/','_')
+            with open(self._filename()+"-"+attachment,'wb') as att_f:
+                att_f.write(data) 
 
 class TokenBuilder:
     __metaclass__ = ABCMeta
@@ -298,7 +310,14 @@ class TokenList(list):
         object. """
         for token in self:
             token.save()
-    
+
+    def get_all_remote_tokens(self):
+        for view in self.get_views():
+            if view !='overview_total': 
+                for token in self.list_view_tokens(view):
+                    if token not in self:
+                        self.append(token)
+
     def save(self):
         self.upload_all()
 
@@ -330,7 +349,7 @@ class TokenList(list):
 
     def list_view_tokens(self, view_name):
         view = self._design_doc.get_view(view_name)
-        if not view:
+        if not view or 'reduce' in view:
             return self 
         view_list = TokenList(token_type=self.token_type, database=self._database)
         for i in view.result:
