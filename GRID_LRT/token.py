@@ -147,11 +147,16 @@ class Token(dict):
         self.__setitem__('output', '')
         self.__setitem__('status', 'reset')
     
-    def archive(self, delete=False, db=None):
+    def archive(self, delete=False):
+        """Archives all tokens, given a database. Deletes them if the delete flag is set to True"""
         self.get_all_attachments()
         json.dump(self, open(self._filename()+'.json','wb'))
         if delete:
+            db = self.get_database()
             del db[self['_id']]
+        
+    def get_database():
+        raise NotImplementedError("You cannot use a Token without having a database attached to it")
 
     def _filename(self):
         filename = self['_id']
@@ -161,8 +166,11 @@ class Token(dict):
 class caToken(Token, Document):
     def __init__(self, database, token_type, **kwargs):
         Token.__init__(self, token_type=token_type, **kwargs)
-        Document.__init__(self,database=database, **kwargs)
+        Document.__init__(self, database=database, **kwargs)
         self._document_id = self['_id']
+
+    def get_database(self):
+        return self.__database
 
     def add_attachment(self, filename, attachment_name):
         file_type = mimetypes.guess_type(filename)[0]
