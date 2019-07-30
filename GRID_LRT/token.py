@@ -111,6 +111,10 @@ def purge_tokens(token_type, picas_creds, server="https://picas-lofar.grid.surfs
 
 class Token(dict):
     def __init__(self, token_type, token_id=None, **kwargs):
+        """Base token class, that inherits from a python dict. You can access token fields
+        using the python __get__ method, i.e. token['field']. Each token has a token_id that is unique
+        in the database, which it is part of, however the database interface is only defined in the 
+        child classes of Token"""
         self.__setitem__('type', token_type)
         if not token_id:
             self.__setitem__('_id',token_type)
@@ -120,7 +124,8 @@ class Token(dict):
         self.__setitem__('done', 0)
 
     def synchronize(self, db, prefer_local=False, upload=False):
-        """Synchronizes the token with the database. 
+        """Synchronizes the token with the database. This method requires
+        the child class of Token to have a .upload(database) interface available
         """
         remote_token = db[self['_id']]
         for k in set(list(remote_token.keys())+list(self.keys())):
@@ -132,6 +137,9 @@ class Token(dict):
             self.upload(db) 
 
     def build(self,token_builder):
+        """Uses a TokenBuilder to load data into the token. TokenBuilders can
+        interface Tokens with different ways to build them (i.e. from a dict in pyton,
+        from json files, from streams, etc)"""
         data = token_builder.data
         self.update(data)
 
@@ -139,6 +147,9 @@ class Token(dict):
         raise NotImplementedError
 
     def reset(self):
+        """General interface to 'reset' a Token as defined in PiCaS Standards. 
+        The lock and done fields are timestamps and if are set to 0, the token will be
+        considered in the 'todo' state"""
         self.__setitem__('lock', 0)
         self.__setitem__('done', 0)
         scrub_count = self.get('scrub_count', 0) ##TODO: Get function override to get from db
@@ -165,6 +176,8 @@ class Token(dict):
 
 class caToken(Token, Document):
     def __init__(self, database, token_type, **kwargs):
+        """The caToken is a Token implementation using the python cloudant client
+        to store tokens in a remote couchDB database. """
         Token.__init__(self, token_type=token_type, **kwargs)
         Document.__init__(self, database=database, **kwargs)
         self._document_id = self['_id']
@@ -379,15 +392,18 @@ class TokenList(list):
     def archive(self, compress=False, delete=False):
         """Archives all tokens in the tokenlist"""
         curr_dir = os.getcwd()
-        os.mkdir(self._design_doc)
-        os.chdir(self._design_doc)
+        save_dir = self._design_doc['_id'].split('/')[1]
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
+        os.chdir(save_dir)
         for token in self:
             token.archive(delete=delete)
         if compress:
-            with tarfile.open("{0}.tar.gz".format(self._design_doc), 'w:gz') as tf:
+            with tarfile.open("{0}.tar.gz".format(save_dir), 'w:gz') as tf:
                 for savefile in os.listdir(os.getcwd()):
                     tf.add(savefile)
-        self._design_doc.delete()
+        ddoc = self._database.get_design_document(save_dir)
+        ddoc.delete()
         os.chdir(curr_dir)
 
     def add_token_views(self):
