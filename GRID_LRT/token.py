@@ -376,6 +376,19 @@ class TokenList(list):
             self._design_doc.delete_view(view)
         self._design_doc.save()
 
+    def archive(self, compress=False, delete=False):
+        """Archives all tokens in the tokenlist"""
+        curr_dir = os.getcwd()
+        os.mkdir(self._design_doc)
+        os.chdir(self._design_doc)
+        for token in self:
+            token.archive(delete=delete)
+        if compress:
+            with tarfile.open("{0}.tar.gz".format(self._design_doc), 'w:gz') as tf:
+                for savefile in os.listdir(os.getcwd()):
+                    tf.add(savefile)
+        self._design_doc.delete()
+        os.chdir(curr_dir)
 
     def add_token_views(self):
         """Adds the todo, locked, error, done and overview_view 
