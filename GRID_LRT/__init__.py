@@ -8,9 +8,9 @@ if sys.version_info[0:2] != (2, 6):
 
 
 __all__ = ["storage", 'auth', "application", "Staging", 'sandbox', 'token']
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 __author__ = "Alexandar P. Mechev"
-__copyright__ = "2018 Alexandar P. Mechev"
+__copyright__ = "2019 Alexandar P. Mechev"
 __credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
 __bibtex__ = """@misc{apmechev:2018,
       author       = {Alexandar P. Mechev} 
@@ -22,8 +22,8 @@ __bibtex__ = """@misc{apmechev:2018,
     }"""
 __license__ = "GPL 3.0"
 __maintainer__ = "Alexandar P. Mechev"
-__email__ = "LOFAR@apmechev.com"
+__email__ = "apmechev+LOFAR@gmail.com"
 __status__ = "Production"
-__date__ = "2018-09-29"
+__date__ = "2019-08-08"
 
 

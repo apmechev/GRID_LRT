@@ -31,16 +31,21 @@ setup(name='GRID_LRT',
                     "GRID_LRT/data/config/steps/pref_targ1.cfg",
                     "GRID_LRT/data/config/steps/pref_targ2.cfg"]),
                   ("GRID_LRT/data/launchers/",
-                   ["GRID_LRT/data/launchers/run_remote_sandbox.sh"])
-                 ],
+                   ["GRID_LRT/data/launchers/run_remote_sandbox.sh"]), 
+                  ("GRID_LRT/data/parsets",
+                      ["GRID_LRT/data/parsets/Pre-Facet-Calibrator-1.parset", 
+                      "GRID_LRT/data/parsets/Pre-Facet-Calibrator-2.parset",
+                      "GRID_LRT/data/parsets/Pre-Facet-Target-1.parset",
+                      "GRID_LRT/data/parsets/Pre-Facet-Target-2.parset"
+                 ])]
       description='GRID LOFAR Reduction Tools',
       long_description="Software that encapsulates LOFAR processing"
       "and allows the use of High Throughput Distributed processing available"
       "at SURFsara and other European Grid Initiative locations.",
       author='Alexandar Mechev',
-      author_email='LOFAR@apmechev.com',
+      author_email='apmechev+LOFAR@gmail.com',
       url='https://www.github.com/apmechev/GRID_LRT/',
-      download_url='https://github.com/apmechev/GRID_LRT/archive/v0.5.0.tar.gz',
+      download_url='https://github.com/apmechev/GRID_LRT/archive/v0.6.0.tar.gz',
       keywords=['surfsara', 'distributed-computing', 'LOFAR'],
       classifiers=['Development Status :: 5 - Production/Stable',
                    'Intended Audience :: Developers',
@@ -50,10 +55,11 @@ setup(name='GRID_LRT',
                    "Topic :: Scientific/Engineering :: Astronomy",
                    "Topic :: System :: Distributed Computing",
                    'Programming Language :: Python :: 2.6',
-                   'Programming Language :: Python :: 2.7',
+                   'Programming Language :: Python :: 2.7', 
                    'Programming Language :: Python :: 3',
-                   'Programming Language :: Python :: 3.2',
                    'Programming Language :: Python :: 3.3',
-                   'Programming Language :: Python :: 3.4']
+                   'Programming Language :: Python :: 3.4', 
+                   'Programming Language :: Python :: 3.5']
+                   'Programming Language :: Python :: 3.6']
      )
 
