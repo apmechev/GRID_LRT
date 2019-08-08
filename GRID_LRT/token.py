@@ -136,6 +136,7 @@ class Token(dict):
             self.__setitem__("_id", token_type)
         else:
             self.__setitem__("_id", token_id)
+        self.__setitem__("PICAS_API_VERSION", GRID_LRT.__version__)
         self.__setitem__("lock", 0)
         self.__setitem__("done", 0)
 

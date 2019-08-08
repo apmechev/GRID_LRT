@@ -12,15 +12,17 @@
 #                                                                                               #
 # ============================================================================================  #
 
-set -x
 
 #Clones the picas tools repository which interfaces with the token pool
 #uses wget if no git
 
+export PICAS_API_VERSION=$(curl -X GET https://"$2":"$3"@picas-lofar.grid.surfsara.nl:6984/"$1"/"$4" 2>/dev/null | jq -r '.PICAS_API_VERSION')
+set -x
 if type git &> /dev/null
 then
  git clone https://github.com/apmechev/GRID_PiCaS_Launcher.git p_tools_git
  cd p_tools_git || exit -100 
+ git checkout v$(PICAS_API_VERSION)
  cd ../ || exit -100
 else  #move this to testpy3
  wget -O master.zip https://github.com/apmechev/GRID_PiCas_Launcher/archive/master.zip
