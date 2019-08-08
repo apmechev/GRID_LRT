@@ -5,7 +5,7 @@ from GRID_LRT.storage.gsifile  import GSIFile
 
 to_delete = []
 
-def get_files_in_dir(base_dir='gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/SKSP/pref_targ1/'):
+def get_files_in_dir(base_dir='gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly/pipelines/SKSP/prefactor_v1.0/pref_targ1/'):
     b_dir = GSIFile(base_dir)
     files = b_dir.list_dir()
     return files

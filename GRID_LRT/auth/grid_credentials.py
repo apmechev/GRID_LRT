@@ -27,7 +27,7 @@ def grid_credentials_enabled():
         return False
     process = subprocess.Popen([
         'uberftp', '-ls',
-        'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox'
+        'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly'
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     res = process.communicate()
     if type(res[1])==bytes:
