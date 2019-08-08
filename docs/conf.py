@@ -53,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'GRID_LRT'
-copyright = u'2018, Alexandar Mechev'
+copyright = u'2019, Alexandar Mechev'
 author = u'Alexandar Mechev'
 
 # The version info for the project you're documenting, acts as replacement for
