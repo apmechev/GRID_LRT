@@ -79,11 +79,18 @@ before_install:
       #    - dpkg -i globus-toolkit-repo_latest_all.deb
       #    - apt-get install globus-data-management-client
     - pip install codecov
+    - export LRT_Version=$( python -c "import GRID_LRT;print(GRID_LRT.__version__)"   )
+    - git clone https://github.com/apmechev/GRID_PiCaS_Launcher.git
+    - cd GRID_PiCaS_Launcher
+    - if [[ -z $( git tag -l |grep "v$LRT_Version"$  )  ]]; then  echo 'Cannot Find GRID_PiCaS_Launcher, v$LRT_Version!'; exit -10; fi
+    - git checkout "v$LRT_Version"
+    - cd ../
     - curl -X PUT localhost:5984/test_db
 
 script:
     - nosetests --with-coverage
-
+    - export LRT_Version=$( python -c "import GRID_LRT;print(GRID_LRT.__version__)"  )
+    - echo "Testing integration with PiCaS_Launcher, v"$LRT_Version
 after_success:
   - codecov
 
