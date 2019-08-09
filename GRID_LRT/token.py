@@ -316,6 +316,8 @@ class TokenList(list):
         if design_doc_name not in self._database:
             self._design_doc.save()
         self._design_doc.fetch()
+        self._design_doc.__setitem__("PICAS_API_VERSION", GRID_LRT.__version__)
+        self._design_doc.save()
 
     def add_attachment(self, filename, attachment_name):
         for token in self:
