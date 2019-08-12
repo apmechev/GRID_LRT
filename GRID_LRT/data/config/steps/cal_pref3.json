@@ -1,5 +1,4 @@
 {
-    "PicasApiVersion": 0.5,
     "Job": {
         "NCPU": 6,
         "parameter_step": 1,
@@ -18,7 +17,7 @@
         "times": {},
         "upload": {
             "add_date": true,
-            "date_granularity":"hour",
+            "date_granularity": "hour",
             "gzip": false,
             "location": "$RESULTS_DIR",
             "overwrite": false,
