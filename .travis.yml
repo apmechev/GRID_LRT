@@ -82,6 +82,7 @@ before_install:
     - export LRT_Version=$( python -c "import GRID_LRT;print(GRID_LRT.__version__)"   )
     - git clone https://github.com/apmechev/GRID_PiCaS_Launcher.git
     - cd GRID_PiCaS_Launcher
+    - export PiCaS_Launcher_dir=$PWD
     - if [[ -z $( git tag -l |grep "v$LRT_Version"$  )  ]]; then  echo 'Cannot Find GRID_PiCaS_Launcher, v$LRT_Version!'; exit -10; fi
     - git checkout "v$LRT_Version"
     - cd ../
@@ -89,8 +90,8 @@ before_install:
 
 script:
     - nosetests --with-coverage
-    - export LRT_Version=$( python -c "import GRID_LRT;print(GRID_LRT.__version__)"  )
     - echo "Testing integration with PiCaS_Launcher, v"$LRT_Version
+
 after_success:
   - codecov
 
