@@ -424,6 +424,10 @@ class TokenList(list):
             self._design_doc.delete_view(view)
         self._design_doc.save()
 
+    def delete_ddoc(self):
+        ddoc = self._database.get_design_document(self.token_type)
+        ddoc.delete()
+
     def archive(self, compress=False, delete=False):
         """Archives all tokens in the tokenlist"""
         curr_dir = os.getcwd()
@@ -437,8 +441,7 @@ class TokenList(list):
             with tarfile.open("{0}.tar.gz".format(save_dir), "w:gz") as tf:
                 for savefile in os.listdir(os.getcwd()):
                     tf.add(savefile)
-        ddoc = self._database.get_design_document(save_dir)
-        ddoc.delete()
+        self.delete_ddoc()
         os.chdir(curr_dir)
 
     def add_token_views(self):
