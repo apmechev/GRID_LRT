@@ -4,7 +4,7 @@
 #from distutils.core import setup
 from setuptools import setup
 import GRID_LRT
-
+ 
 setup(name='GRID_LRT',
       packages=['GRID_LRT', 'GRID_LRT/Staging', 'GRID_LRT/application','GRID_LRT/storage', 'GRID_LRT/auth'],
       version=GRID_LRT.__version__,
@@ -37,7 +37,7 @@ setup(name='GRID_LRT',
       author='Alexandar Mechev',
       author_email='apmechev+LOFAR@gmail.com',
       url='https://www.github.com/apmechev/GRID_LRT/',
-      download_url='https://github.com/apmechev/GRID_LRT/archive/v1.0.0.tar.gz',
+      download_url='https://github.com/apmechev/GRID_LRT/archive/v{}.tar.gz'.format(GRID_LRT.__version__),
       keywords=['surfsara', 'distributed-computing', 'LOFAR'],
       classifiers=['Development Status :: 5 - Production/Stable',
                    'Intended Audience :: Developers',

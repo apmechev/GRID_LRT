@@ -376,17 +376,23 @@ class TokenList(list):
         self.upload_all()
 
     def delete_all(self):
+        "Deletes all tokens inside the token list, including recursive lists"
         for token in self:
             token.delete()
 
     def reset(self):
+        """Calls the reset method of all objects in the TokenList (either Tokens
+        or sub-lists)"""
         for token in self:
             token.reset()
 
     def delete(self):
+        """Just a wrapper around delete_all to standardize the token.delete() interface"""
         self.delete_all(self)
 
     def add_view(self, view):
+        """Adds a view to the tokenList, and its respective design document. 
+        the View object needs to return a map code and reduce code"""
         map_code = view.get_codes(self.token_type)[0]
         reduce_code = view.get_codes(self.token_type)[1]
         if self._design_doc:
@@ -398,6 +404,7 @@ class TokenList(list):
             self._design_doc.save()
 
     def fetch(self):
+        """For each item in the TokeList, we call 'fetch' """
         for token in self:
             token.fetch()
 
@@ -415,16 +422,19 @@ class TokenList(list):
         return view_list
 
     def get_views(self):
+        """Returns all the views in the token's Design_doc"""
         if self._design_doc:
             self._design_doc.fetch()
             return self._design_doc.list_views()
 
     def delete_views(self):
+        """Deletes all views listed in the token's DesignDocument"""
         for view in self.get_views():
             self._design_doc.delete_view(view)
         self._design_doc.save()
 
     def delete_ddoc(self):
+        """Deletes the tokenList's designdocument from the database"""
         ddoc = self._database.get_design_document(self.token_type)
         ddoc.delete()
 
