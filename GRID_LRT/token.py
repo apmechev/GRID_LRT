@@ -402,6 +402,7 @@ class TokenList(list):
                 self._design_doc.delete_view(view.name)
                 self._design_doc.add_view(view.name, map_code, reduce_code)
             self._design_doc.save()
+        self._design_doc.fetch()
 
     def fetch(self):
         """For each item in the TokeList, we call 'fetch' """
