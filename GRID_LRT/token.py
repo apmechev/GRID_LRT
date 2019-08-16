@@ -407,6 +407,7 @@ class TokenList(list):
         """For each item in the TokeList, we call 'fetch' """
         for token in self:
             token.fetch()
+        self._design_doc.fetch()
 
     def list_view_tokens(self, view_name):
         view = self._design_doc.get_view(view_name)
