@@ -395,14 +395,14 @@ class TokenList(list):
         the View object needs to return a map code and reduce code"""
         map_code = view.get_codes(self.token_type)[0]
         reduce_code = view.get_codes(self.token_type)[1]
+        self._design_doc.fetch()
         if self._design_doc:
             try:
                 self._design_doc.add_view(view.name, map_code, reduce_code)
             except CloudantArgumentError:
                 self._design_doc.delete_view(view.name)
                 self._design_doc.add_view(view.name, map_code, reduce_code)
-            self._design_doc.save()
-        self._design_doc.fetch()
+        self._design_doc.save()
 
     def fetch(self):
         """For each item in the TokeList, we call 'fetch' """
