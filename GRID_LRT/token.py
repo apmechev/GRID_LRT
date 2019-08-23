@@ -311,6 +311,10 @@ class TokenList(list):
         self._database = database
 
     def __set_design_doc(self):
+        """This sets the internal variable _design_doc, so that we can reference
+        the tokenList's design document for updates such as views. Also, we
+        include the GRID_LRT version inside the ddoc, since we'll use the same version
+        of the PiCaS_Launcher to process our jobs"""
         design_doc_name = "_design/{0}".format(self.token_type)
         self._design_doc = DesignDocument(self._database, design_doc_name)
         if design_doc_name not in self._database:

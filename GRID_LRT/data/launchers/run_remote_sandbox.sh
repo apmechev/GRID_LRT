@@ -23,6 +23,7 @@ then
  git clone https://github.com/apmechev/GRID_PiCaS_Launcher.git p_tools_git
  cd p_tools_git || exit -100 
  git checkout v"$PICAS_API_VERSION"
+ git describe
  cd ../ || exit -100
 else  #move this to testpy3
     wget -O GRID_PiCaS_Launcher.zip https://github.com/apmechev/GRID_PiCas_Launcher/archive/v"$PICAS_API_VERSION".zip
