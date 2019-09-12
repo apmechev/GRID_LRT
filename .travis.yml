@@ -67,7 +67,7 @@ before_install:
           sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py37.so;
      fi
     #    - sudo apt-get install gfal2-plugin-mock
-    - pip install --verbose git+https://gitlab.cern.ch/dmc/gfal2-bindings.git
+    - pip install --verbose git+https://gitlab.cern.ch/dmc/gfal2-bindings.git@4550a3719de3c1831232f73f3a075a42a4cbbdfa
     - which -a python 
       #    - sudo apt-get install globus-gass-copy-progs voms-clients -y
       #    - sudo add-apt-repository -y 'deb http://repository.egi.eu/sw/production/cas/1/current egi-igtf core' 
