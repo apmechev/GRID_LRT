@@ -140,6 +140,14 @@ class Token(dict):
         self.__setitem__("lock", 0)
         self.__setitem__("done", 0)
 
+    @property
+    def database(self):
+        return self._database
+
+    @database.setter
+    def database(self, db):
+        self._database = db
+    
     def synchronize(self, db, prefer_local=False, upload=False):
         """Synchronizes the token with the database. This method requires
         the child class of Token to have a .upload(database) interface available
@@ -182,13 +190,8 @@ class Token(dict):
         self.get_all_attachments()
         json.dump(self, open(self._filename() + ".json", "wb"))
         if delete:
-            db = self.get_database()
+            db = self.database
             del db[self["_id"]]
-
-    def get_database():
-        raise NotImplementedError(
-            "You cannot use a Token without having a database attached to it"
-        )
 
     def _filename(self):
         filename = self["_id"]
@@ -203,9 +206,6 @@ class caToken(Token, Document):
         Token.__init__(self, token_type=token_type, **kwargs)
         Document.__init__(self, database=database, **kwargs)
         self._document_id = self["_id"]
-
-    def get_database(self):
-        return self.__database
 
     def add_attachment(self, filename, attachment_name):
         file_type = mimetypes.guess_type(filename)[0]
@@ -299,16 +299,24 @@ class TokenList(list):
     def __init__(self, token_type=None, database=None):
         self._token_ids = []
         self._design_doc = None
-        self.__set_database(database)
+        self.database = database
         self.__set_token_type(token_type)
+
+    @property
+    def database(self):
+        return self._database
+        
 
     def __set_token_type(self, token_type):
         self.token_type = token_type
         if token_type and self._database != None:
             self.__set_design_doc()
 
-    def __set_database(self, database):
-        self._database = database
+    @database.setter
+    def database(self, database):
+        if not hasattr(self, 'database'):
+            self._database = database
+
 
     def __set_design_doc(self):
         """This sets the internal variable _design_doc, so that we can reference
@@ -316,8 +324,8 @@ class TokenList(list):
         include the GRID_LRT version inside the ddoc, since we'll use the same version
         of the PiCaS_Launcher to process our jobs"""
         design_doc_name = "_design/{0}".format(self.token_type)
-        self._design_doc = DesignDocument(self._database, design_doc_name)
-        if design_doc_name not in self._database:
+        self._design_doc = DesignDocument(self.database, design_doc_name)
+        if design_doc_name not in self.database:
             self._design_doc.save()
         self._design_doc.fetch()
         self._design_doc.__setitem__("PICAS_API_VERSION", GRID_LRT.__version__)
@@ -335,9 +343,9 @@ class TokenList(list):
 
     def append(self, item):
         if isinstance(item, Token):
-            if not self._database:
-                self.__set_database(item._database)  # Does this have a getter?
-            if not self.token_type:
+            if not hasattr(self, 'database'):
+                self.database=item.database  
+            if not hasattr(self, 'token_type'):
                 self.__set_token_type(item["type"])
             elif item["type"] != self.token_type:
                 raise TypeError(
@@ -418,10 +426,10 @@ class TokenList(list):
         view = self._design_doc.get_view(view_name)
         if not view or "reduce" in view:
             return self
-        view_list = TokenList(token_type=self.token_type, database=self._database)
+        view_list = TokenList(token_type=self.token_type, database=self.database)
         for i in view.result:
             tok = caToken(
-                database=self._database, token_type=self.token_type, token_id=i["id"]
+                database=self.database, token_type=self.token_type, token_id=i["id"]
             )
             view_list.append(tok)
         view_list.fetch()
@@ -441,7 +449,7 @@ class TokenList(list):
 
     def delete_ddoc(self):
         """Deletes the tokenList's designdocument from the database"""
-        ddoc = self._database.get_design_document(self.token_type)
+        ddoc = self.database.get_design_document(self.token_type)
         ddoc.delete()
 
     def archive(self, compress=False, delete=False):

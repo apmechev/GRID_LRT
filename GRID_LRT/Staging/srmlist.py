@@ -5,6 +5,11 @@ from math import ceil
 import logging
 import subprocess
 
+GSI_FQDNs={
+        'grid.sara.nl':'sara',
+        'fz-juelich.de':'juelich',
+        'lofar.psnc.pl':'poznan'
+        }
 
 class srmlist(list):
     """
@@ -35,6 +40,7 @@ class srmlist(list):
             self.append(link)
 
     def check_link_location(self, item):
+        """Checks the location of the item"""
         tmp_loc = ""
         if isinstance(item, str):
             tmp_loc = self.check_str_location(item)
@@ -42,16 +48,25 @@ class srmlist(list):
             for i in item:
                 tmp_loc = self.check_str_location(i)
         return tmp_loc
+    
+    def from_file(self, filename):
+        """You can automatically load a file into the srmlist using
+        s = srmlist().from_file(filename)"""
+        for line in open(filename,'r').readlines():
+            self.append(line.strip('\n'))
+        return self
 
+    @property
+    def LTA_location(self):
+        if len(self)>0:
+            return self.check_str_location(self[0])
+    
     def check_str_location(self, item):
-        loc = ''
-        if 'grid.sara.nl' in item:
-            loc = 'sara'
-        if 'fz-juelich.de' in item:
-            loc = 'juelich'
-        if 'lofar.psnc.pl' in item:
-            loc = 'poznan'
-        return loc
+        """searches the item for an FQDN and returns the location
+        of the data using the list below. Returns the data location or None"""
+        for fqdn in GSI_FQDNs:
+            if fqdn in item:
+                return GSI_FQDNs[fqdn] 
 
     def stringify_item(self, item):
         if isinstance(item, str):

@@ -95,7 +95,7 @@ pipeline.pluginpath         =  {{ prefactor_directory }}/plugins
 ! skymodel_source           =  TGSS                                   ## use GSM if you want to use the experimental (!) GSM SkyModel creator using TGSS, NVSS, WENSS and VLSS
 
 ## result directories
-! results_directory         =  $RUNDIR/Output                         ## @NO_OVERWRITE@
+! results_directory         =  $RUNDIR/Output/results                 ## @NO_OVERWRITE@
 ! inspection_directory      =  {{ results_directory }}/inspection     ## directory where the inspection plots will be stored
 ! cal_values_directory      =  {{ results_directory }}/cal_values     ## directory where the final h5parm solution set will be stored
 

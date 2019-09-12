@@ -91,7 +91,7 @@ pipeline.pluginpath        =  {{ prefactor_directory }}/plugins
 ! A-team_skymodel          =  {{ calibrator_path_skymodel }}/Ateam_LBA_CC.skymodel
 
 ## result directories
-! results_directory        =  $RUNDIR/Output
+! results_directory        =  $RUNDIR/Output/results
 ! inspection_directory     =  {{ results_directory }}/inspection                                  ## directory where the inspection plots will be stored
 ! cal_values_directory     =  {{ results_directory }}/cal_values                                  ## directory where the final h5parm solution set will be stored
 
