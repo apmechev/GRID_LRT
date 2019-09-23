@@ -305,7 +305,11 @@ class TokenList(list):
     @property
     def database(self):
         return self._database
-        
+
+    def __setitem__(self,key, val):
+        for item in self:
+            item.__setitem__(key,val)
+            item.save()
 
     def __set_token_type(self, token_type):
         self.token_type = token_type
