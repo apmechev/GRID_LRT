@@ -7,22 +7,22 @@
         "variables": {
             "OBSID": "L229587",
             "PIPELINE_STEP": "pref3_targ2_CI",
-            "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/pipelines/test/",
+            "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/SKSP/",
             "STARTSB": "000"
         },
         "wholenode": false
     },
     "Token": {
-        "_id":"CI_targ2_",
+        "_id":"targ2_",
         "status": "queued",
         "times": {},
         "upload": {
-            "add_date": true,
+            "add_date": false,
             "date_granularity":"hour",
             "gzip": false,
             "location": "$RESULTS_DIR",
             "overwrite": false,
-            "template": "CI_pref3_targ2_$STARTSB_$DATE"
+            "template": "pref3_targ2_$STARTSB_$DATE"
         },
         "variables": {
             "_attachments": {

@@ -7,7 +7,7 @@
         "variables": {
             "OBSID": "L229585",
             "PIPELINE_STEP": "pref3_cal_CI",
-            "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly/pipelines/CI/prefactor_3.0/CI_pref3_cal",
+            "RESULTS_DIR": "gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly/pipelines/SKSP/prefactor_v3.0/pref_cal",
             "STARTSB": "000"
         },
         "wholenode": false
