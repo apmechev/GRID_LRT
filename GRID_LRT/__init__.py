@@ -8,13 +8,13 @@ if sys.version_info[0:2] != (2, 6):
 
 
 __all__ = ["storage", 'auth', "application", "Staging", 'token']
-__version__ = "1.0.0rc1"
+__version__ = "1.0.0"
 __author__ = "Alexandar P. Mechev"
 __copyright__ = "2019 Alexandar P. Mechev"
 __credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
 __bibtex__ = """@misc{apmechev:2019,
       author       = {Alexandar P. Mechev} 
-      title        = {apmechev/GRID_LRT: v0.5.1},
+      title        = {apmechev/GRID_LRT: v1.0.0},
       month        = sep,
       year         = 2019,
       doi          = {10.5281/zenodo.1438833},
@@ -24,6 +24,6 @@ __license__ = "GPL 3.0"
 __maintainer__ = "Alexandar P. Mechev"
 __email__ = "apmechev+LOFAR@gmail.com"
 __status__ = "Production"
-__date__ = "2019-08-08"
+__date__ = "2019-10-22"
 
 
