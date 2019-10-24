@@ -4,15 +4,14 @@ activated
 """
 import subprocess
 from functools import wraps
-
+from GRID_LRT import SafePopen
 
 def check_uberftp():
     """Checks if the gfal-ls executable
     exists on the system. Returns True if it exists
 
     :returns: bool"""
-    process = subprocess.Popen(['which', 'gfal-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            encoding='utf8')
+    process = SafePopen(['which', 'gfal-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
     output = process.communicate()
     if output[0] == '' and output[1] == '':
         return False
@@ -26,11 +25,10 @@ def grid_credentials_enabled():
     This requires gfal-ls!"""
     if not check_uberftp():
         return False
-    process = subprocess.Popen([
+    process = SafePopen([
         'gfal-ls', '-l',
         'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly'
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        encoding='utf8')
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     res = process.communicate()
     if type(res[1])==bytes:
         error = res[1].decode('utf8')

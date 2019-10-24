@@ -5,6 +5,13 @@ import socket
 from subprocess import call, Popen, PIPE, STDOUT
 if sys.version_info[0:2] != (2, 6):
     from subprocess import check_output
+from subprocess import Popen
+
+class SafePopen(Popen):
+    def __init__(self, *args, **kwargs):
+        if sys.version_info.major == 3 :
+            kwargs['encoding'] = 'utf8'
+        return super(SafePopen, self).__init__(*args, **kwargs)
 
 
 __all__ = ["storage", 'auth', "application", "Staging", 'token']
