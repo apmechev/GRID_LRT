@@ -221,7 +221,7 @@ class GSIFile(object):
             return []
         if results == '':
             return []
-        results = results.strip().split("\r\n")
+        results = results.strip().split("\n")
         file_locs = [self.location +"/"+str(i.split()[-1])
                 for i in results if i]
         self._subfiles, _ = self._uberftpls(self.location)

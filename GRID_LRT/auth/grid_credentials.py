@@ -7,7 +7,7 @@ from functools import wraps
 
 
 def check_uberftp():
-    """Checks if the uberftp executable
+    """Checks if the gfal-ls executable
     exists on the system. Returns True if it exists
 
     :returns: bool"""
@@ -23,7 +23,7 @@ def grid_credentials_enabled():
     the GRID credentials have been enabled or expired
     Returns True if they are currenctly active
 
-    This requires uberftp!"""
+    This requires gfal-ls!"""
     if not check_uberftp():
         return False
     process = subprocess.Popen([

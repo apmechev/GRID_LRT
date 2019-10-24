@@ -10,22 +10,18 @@ setup(name='GRID_LRT',
       version=GRID_LRT.__version__,
       setup_requires=[],
       tests_require=[
-          'pytest',
+          'pytest'
           ],
       install_requires=[
           'retrying',
           'cloudant',
-          'humanfriendly',
-          'gitpython'
+          'humanfriendly' 
           ],
       include_package_data=True,
       data_files=[("GRID_LRT/data/config",
-                   ['GRID_LRT/data/config/bash_file.cfg',
-                    'GRID_LRT/data/config/NDPPP_parset.cfg',
-                    "GRID_LRT/data/config/tutorial.cfg",
-                    "GRID_LRT/data/config/steps/pref_cal1.cfg",
-                    "GRID_LRT/data/config/steps/pref_cal2.cfg",
-                    "GRID_LRT/data/config/steps/pref_targ1.cfg",
+                   ["GRID_LRT/data/config/steps/cal_pref3.json",
+                    "GRID_LRT/data/config/steps/targ1_pref3.json",
+                    "GRID_LRT/data/config/steps/targ2_pref3.json",
                     "GRID_LRT/data/config/steps/pref_targ2.cfg"]),
                   ("GRID_LRT/data/launchers/",
                    ["GRID_LRT/data/launchers/run_remote_sandbox.sh"])
@@ -49,7 +45,7 @@ setup(name='GRID_LRT',
                    'Programming Language :: Python :: 2.7',
                    'Programming Language :: Python :: 3.3',
                    'Programming Language :: Python :: 3.4', 
-                   'Programming Language :: Python :: 3.5']
+                   'Programming Language :: Python :: 3.5',
                    'Programming Language :: Python :: 3.6']
      )
 
