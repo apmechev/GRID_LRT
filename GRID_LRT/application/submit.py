@@ -18,14 +18,7 @@ import tempfile
 from GRID_LRT.auth.get_picas_credentials import picas_cred as pc
 import GRID_LRT
 from GRID_LRT.auth import grid_credentials
-
-class SafePopen(Popen):
-    def __init__(self, *args, **kwargs):
-        if sys.version_info.major == 3 :
-            kwargs['encoding'] = 'utf8'
-        return super(SafePopen, self).__init__(*args, **kwargs)
-
- 
+from GRID_LRT import SafePopen
 
 #class job_launcher(object):
 #    """Generic Job Launcher
