@@ -41,7 +41,7 @@ class GSIFile(object):
             self.is_dir = False
 
     def _get_size(self):
-        self._bytesize = self._internal[4].decode('utf-8')
+        self._bytesize = self._internal[4]
         human_size = humanfriendly.parse_size(self._bytesize)
         return humanfriendly.format_size(human_size)
 
@@ -125,7 +125,10 @@ class GSIFile(object):
             else:
                 year = this_year
             date = month + " " + day + " " + str(year)
-            time = data[-2].decode('ascii')
+            if isinstance(data[-2], bytes):
+                time = data[-2].decode('ascii')
+            else:
+                time = data[-2]
         else:
             date = month + " " + day + " " + year
             time = "00:00"
