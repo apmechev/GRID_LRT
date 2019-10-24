@@ -10,7 +10,7 @@ import logging
 import warnings
 import random, string
 from shutil import copyfile, rmtree
-
+from GRID_LRT.storage.utils import SafePopen
 
 import tempfile
 from GRID_LRT.auth.get_picas_credentials import picas_cred as pc
@@ -50,7 +50,7 @@ class RunningJob(object):
         return self.job_status
 
     def __check_status(self):
-        glite_process = subprocess.Popen(['glite-wms-job-status', self.glite_url],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        glite_process = SafePopen(['glite-wms-job-status', self.glite_url],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         result, err = glite_process.communicate()
         try:
             self.job_status=result.split('Current Status:')[1].split()[0]
@@ -229,7 +229,7 @@ class JdlLauncher(object):
 	        self._check_authorized()
         if not self.temp_file:
             self.temp_file = self.make_temp_jdlfile(database = database)
-        sub = subprocess.Popen(['glite-wms-job-submit', '-d', os.environ["USER"],
+        sub = safePopen(['glite-wms-job-submit', '-d', os.environ["USER"],
                                 self.temp_file.name], stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
         out = sub.communicate()
@@ -277,7 +277,7 @@ class LouiLauncher(JdlLauncher):
         print(self.run_directory)
         with open(self.run_directory+"/stdout.txt","wb") as out:
             with open(self.run_directory+"/stderr.txt","wb") as err:
-                launcher = subprocess.Popen(command.split(), stdout=out, stderr=err)
+                launcher = SafePopen(command.split(), stdout=out, stderr=err)
                 self.pid = launcher.pid
                 launcher.wait()
         return {'output':self.run_directory+"/stdout.txt",

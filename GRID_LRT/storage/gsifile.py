@@ -7,6 +7,7 @@ import re
 import GRID_LRT.auth.grid_credentials as grid_creds
 from GRID_LRT.auth.get_picas_credentials import picas_cred
 from GRID_LRT.Staging.srmlist import srmlist
+from GRID_LRT.storage.utils import SafePopen
 import humanfriendly
 
 import pdb
@@ -170,9 +171,8 @@ class GSIFile(object):
         self._donotdelete(parent_dir)
         if self.is_dir and not self.is_empty():
             raise Exception("Not allowed to delete a folder that isn't empty yet" )
-        del_proc = subprocess.Popen(['uberftp', '-rm', self.location],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                encoding='utf8')
+        del_proc = SafePopen(['uberftp', '-rm', self.location],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         res, err = del_proc.communicate()
         if not err:
             return
@@ -182,9 +182,8 @@ class GSIFile(object):
     def copy(self, other_location):
         if self.is_dir:
             raise Exception("We cannot copy an entire folder, loop over its contents instead")
-        copy = subprocess.Popen(['globus-url-copy',self.location, other_location.location+"/"], 
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                encoding='utf8')
+        copy = SafePopen(['globus-url-copy',self.location, other_location.location+"/"], 
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
         res, err = copy.communicate()
         if not err:
             return
@@ -206,9 +205,8 @@ class GSIFile(object):
         return num_files
 
     def _uberftpls(self, location):
-        sub = subprocess.Popen(['gfal-ls','-l', location],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                encoding='utf8')
+        sub = SafePopen(['gfal-ls','-l', location],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         res, err = sub.communicate()
         if err:
             warnings.warn("gfal-ls gave us an error for location {0}: {1}".format(location, err))
@@ -238,9 +236,8 @@ class GSIFile(object):
 
 
 def gsi_mkdir(location):
-    mkdir = subprocess.Popen(['gfal-mkdir',location],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            encoding='utf8')
+    mkdir = SafePopen(['gfal-mkdir',location],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
     out, err = mkdir.communicate()
     if err:
         warnings.warn('mkdir {0} failed: {1}'.format(location, err))
