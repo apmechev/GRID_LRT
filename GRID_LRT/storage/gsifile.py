@@ -196,7 +196,7 @@ class GSIFile(object):
         return num_files
 
     def _uberftpls(self, location):
-        sub = subprocess.Popen(['uberftp','-ls', location],
+        sub = subprocess.Popen(['gfal-ls','-l', location],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         res, err = sub.communicate()
         if err:
@@ -218,7 +218,7 @@ class GSIFile(object):
             return []
         if results == '':
             return []
-        results = results.strip().split("\r\n")
+        results = results.strip().split("\n")
         file_locs = [self.location +"/"+str(i.split()[-1])
                 for i in results if i]
         self._subfiles, _ = self._uberftpls(self.location)
@@ -227,7 +227,7 @@ class GSIFile(object):
 
 
 def gsi_mkdir(location):
-    mkdir = subprocess.Popen(['uberftp','-mkdir',location],
+    mkdir = subprocess.Popen(['gfal-mkdir',location],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = mkdir.communicate()
     if err:

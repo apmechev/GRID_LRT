@@ -7,11 +7,11 @@ from functools import wraps
 
 
 def check_uberftp():
-    """Checks if the uberftp executable
+    """Checks if the gfal-ls executable
     exists on the system. Returns True if it exists
 
     :returns: bool"""
-    process = subprocess.Popen(['which', 'uberftp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(['which', 'gfal-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = process.communicate()
     if output[0] == '' and output[1] == '':
         return False
@@ -22,11 +22,11 @@ def grid_credentials_enabled():
     the GRID credentials have been enabled or expired
     Returns True if they are currenctly active
 
-    This requires uberftp!"""
+    This requires gfal-ls!"""
     if not check_uberftp():
         return False
     process = subprocess.Popen([
-        'uberftp', '-ls',
+        'gfal-ls', '-l',
         'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly'
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     res = process.communicate()
