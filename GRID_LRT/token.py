@@ -52,8 +52,6 @@ import pdb
 
 import mimetypes
 import GRID_LRT
-from couchdb.design import ViewDefinition
-import couchdb
 from cloudant import couchdb as cloudant_couchdb
 from cloudant.design_document import DesignDocument
 from cloudant import couchdb_admin_party
