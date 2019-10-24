@@ -40,7 +40,7 @@ class GSIFileTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @mock.patch('subprocess.Popen', autospec=True)
+    @mock.patch('GRID_LRT.SafePopen', autospec=True)
     def test_1(self, mock_subproc_popen):
         ''' Tests creating folders on the FS in the appropriate locations
         '''
@@ -55,7 +55,7 @@ class GSIFileTest(unittest.TestCase):
     def test_autobuild(self):
         pass
 
-    @mock.patch('subprocess.Popen', autospec=True)
+    @mock.patch('GRID_LRT.SafePopen', autospec=True)
     def test_parent_dir(self, mock_subproc_popen):
         """test looking at parent directory when target if a file"""
         from GRID_LRT.auth import grid_credentials

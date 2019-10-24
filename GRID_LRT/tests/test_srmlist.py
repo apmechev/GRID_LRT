@@ -183,7 +183,7 @@ class SrmlistTest(unittest.TestCase):
         self.assertTrue('https://' in http_links[0])
         self.assertTrue(len(http_links[0])==186)
 
-    @mock.patch('subprocess.Popen', autospec=True)
+    @mock.patch('GRID_LRT.SafePopen', autospec=True)
     def test_count_files(self,  mock_subproc_popen):
         from GRID_LRT.auth import grid_credentials
         process_mock = mock.Mock()
