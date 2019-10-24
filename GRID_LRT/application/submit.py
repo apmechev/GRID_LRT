@@ -404,7 +404,7 @@ cd $JOBDIR
 	        self._check_authorized()
         if not self.temp_file:
             self.temp_file = self.make_temp_slurmfile(database = database)
-        sub = subprocess.Popen(['sbatch', self.temp_file.name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        sub = SafePopen(['sbatch', self.temp_file.name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out = sub.communicate()
         if out[1] == "":
             return out[0]
