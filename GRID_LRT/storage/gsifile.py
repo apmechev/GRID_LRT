@@ -109,9 +109,14 @@ class GSIFile(object):
 
     @staticmethod
     def _extract_date(data):
-        year = str(data[-2].decode('ascii'))
-        month = data[-4].decode('ascii')
-        day = data[-3].decode('ascii')
+        if isinstance(data[-2], bytes):
+            year = str(data[-2].decode('ascii'))
+            month = data[-4].decode('ascii')
+            day = data[-3].decode('ascii')
+        else:
+            year = str(data[-2])
+            month = data[-4]
+            day = data[-3]
         if year not in ['2021','2020','2019', '2018', '2017', '2016', '2015']:
             ## In this case the year is not specified.
             this_year = datetime.now().year
