@@ -8,7 +8,7 @@ if sys.version_info[0:2] != (2, 6):
 
 
 __all__ = ["storage", 'auth', "application", "Staging", 'token']
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 __author__ = "Alexandar P. Mechev"
 __copyright__ = "2019 Alexandar P. Mechev"
 __credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
