@@ -1,4 +1,5 @@
 from GRID_LRT.application import submit
+import GRID_LRT
 import os 
 import glob
 import unittest
@@ -7,7 +8,7 @@ import subprocess
 
 
 def mocked_import(*args, **kwargs):
-    with mock.patch.object(subprocess, 'Popen') as mocked_popen:
+    with mock.patch.object(GRID_LRT, 'SafePopen') as mocked_popen:
         mocked_popen.return_value.returncode = 0
         mocked_popen.return_value.communicate.return_value = ("the file really exists".encode(), "".encode())                                                
         launcher = submit.JdlLauncher(*args, **kwargs)
