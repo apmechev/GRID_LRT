@@ -163,7 +163,8 @@ class GSIFile(object):
         if self.is_dir and not self.is_empty():
             raise Exception("Not allowed to delete a folder that isn't empty yet" )
         del_proc = subprocess.Popen(['uberftp', '-rm', self.location],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                encoding='utf8')
         res, err = del_proc.communicate()
         if not err:
             return
@@ -174,7 +175,8 @@ class GSIFile(object):
         if self.is_dir:
             raise Exception("We cannot copy an entire folder, loop over its contents instead")
         copy = subprocess.Popen(['globus-url-copy',self.location, other_location.location+"/"], 
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                encoding='utf8')
         res, err = copy.communicate()
         if not err:
             return
@@ -196,11 +198,12 @@ class GSIFile(object):
         return num_files
 
     def _uberftpls(self, location):
-        sub = subprocess.Popen(['uberftp','-ls', location],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        sub = subprocess.Popen(['gfal-ls','-l', location],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                encoding='utf8')
         res, err = sub.communicate()
         if err:
-            warnings.warn("Uberftp -ls gave us an error for location {0}: {1}".format(location, err))
+            warnings.warn("gfal-ls gave us an error for location {0}: {1}".format(location, err))
         return res, err
 
     def is_empty(self):
@@ -227,8 +230,9 @@ class GSIFile(object):
 
 
 def gsi_mkdir(location):
-    mkdir = subprocess.Popen(['uberftp','-mkdir',location],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    mkdir = subprocess.Popen(['gfal-mkdir',location],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            encoding='utf8')
     out, err = mkdir.communicate()
     if err:
         warnings.warn('mkdir {0} failed: {1}'.format(location, err))

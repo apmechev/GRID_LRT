@@ -11,7 +11,8 @@ def check_uberftp():
     exists on the system. Returns True if it exists
 
     :returns: bool"""
-    process = subprocess.Popen(['which', 'uberftp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(['which', 'gfal-ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            encoding='utf8')
     output = process.communicate()
     if output[0] == '' and output[1] == '':
         return False
@@ -26,9 +27,10 @@ def grid_credentials_enabled():
     if not check_uberftp():
         return False
     process = subprocess.Popen([
-        'uberftp', '-ls',
+        'gfal-ls', '-l',
         'gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/diskonly'
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        encoding='utf8')
     res = process.communicate()
     if type(res[1])==bytes:
         error = res[1].decode('utf8')

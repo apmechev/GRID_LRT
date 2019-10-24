@@ -10,6 +10,7 @@ from GRID_LRT.storage.gsifile import GSIFile
 
 
 def get_srmdir_from_token_task(token_type, view, key = 'RESULTS_DIR'):
+    """Creates a list of files from a set of tokens. Returns a GSIFile object"""
     pc=get_picas_cred()
     th=Token.Token_Handler(t_type=token_type, uname=pc.user, pwd=pc.password, dbn=pc.database)
     tokens=th.list_tokens_from_view(view)
