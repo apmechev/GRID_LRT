@@ -10,12 +10,6 @@ from GRID_LRT.Staging.srmlist import srmlist
 from GRID_LRT.storage.gsifile import GSIFile
 
 
-class SafePopen(Popen):
-    def __init__(self, *args, **kwargs):
-        if sys.version_info.major == 3 :
-            kwargs['encoding'] = 'utf8'
-        return super(SafePopen, self).__init__(*args, **kwargs)
-
 def get_srmdir_from_token_task(token_type, view, key = 'RESULTS_DIR'):
     """Creates a list of files from a set of tokens. Returns a GSIFile object"""
     pc=get_picas_cred()

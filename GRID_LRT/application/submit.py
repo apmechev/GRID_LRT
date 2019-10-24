@@ -6,17 +6,26 @@ Options include the number of cores and the queue type."""
 import os
 import signal
 import subprocess
+import sys
+from subprocess import Popen
 import logging
 import warnings
 import random, string
 from shutil import copyfile, rmtree
-from GRID_LRT.storage.utils import SafePopen
+
 
 import tempfile
 from GRID_LRT.auth.get_picas_credentials import picas_cred as pc
 import GRID_LRT
 from GRID_LRT.auth import grid_credentials
 
+class SafePopen(Popen):
+    def __init__(self, *args, **kwargs):
+        if sys.version_info.major == 3 :
+            kwargs['encoding'] = 'utf8'
+        return super(SafePopen, self).__init__(*args, **kwargs)
+
+ 
 
 #class job_launcher(object):
 #    """Generic Job Launcher

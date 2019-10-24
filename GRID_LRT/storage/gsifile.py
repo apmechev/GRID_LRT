@@ -2,13 +2,20 @@ from datetime import datetime
 from datetime import timedelta
 from time import strptime
 import warnings
+import sys
 import subprocess
+from subprocess import Popen
 import re
 import GRID_LRT.auth.grid_credentials as grid_creds
 from GRID_LRT.auth.get_picas_credentials import picas_cred
 from GRID_LRT.Staging.srmlist import srmlist
-from GRID_LRT.storage.utils import SafePopen
 import humanfriendly
+
+class SafePopen(Popen):
+    def __init__(self, *args, **kwargs):
+        if sys.version_info.major == 3 :
+            kwargs['encoding'] = 'utf8'
+        return super(SafePopen, self).__init__(*args, **kwargs)
 
 import pdb
 class GSIFile(object):
@@ -118,7 +125,7 @@ class GSIFile(object):
             year = str(data[-2])
             month = data[-4]
             day = data[-3]
-        if year not in ['2021','2020','2019', '2018', '2017', '2016', '2015']:
+        if year not in ['2021','2020','2019', '2018', '2017', '2016', '2015', '2014','2013']:
             ## In this case the year is not specified.
             this_year = datetime.now().year
             if strptime(month,'%b').tm_mon > datetime.now().month:
