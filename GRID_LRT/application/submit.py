@@ -301,3 +301,54 @@ class LouiLauncher(JdlLauncher):
 
     def __exit__(self, exc_type, exc_value, traceback):
         return None
+
+class SpiderLauncher(JdlLauncher):
+    """ Grants users the power of a SPIDER. The SpiderLauncher creates a launch file to be passed to Slurm. It is made for the SPIDER platform offered by Surf and has some (possibly) specific options for that.
+    """
+    
+    def __init__(self, numjobs=1, token_type='t_test',
+                 parameter_step=4, **kwargs):
+        """The jdl_launcher class is initialized with the number of jobs,
+        the name of the PiCaS token type to run, and a flag to use the whole node.
+
+
+         Args:
+            numjobs (int): The number of jobs to launch on the cluster
+            token_type (str): The name of the token_type to launch from the
+                PiCaS database. this uses the get_picas_credentials module to
+                get the PiCaS database name, uname, passw
+            wholenodes(Boolean): Whether to reserve the entire node. Default is F
+            NCPU (int, optional): Number of CPUs to use for each job. Default is 1
+        """
+
+        super(SpiderLauncher,self).__init__(**kwargs)
+        self.authorized = False
+        if 'authorize' in kwargs.keys() and kwargs['authorize'] == False:
+                warnings.warn("Skipping Grid Autorization")
+        else: 
+	        self.__check_authorized()
+        if numjobs < 1:
+            logging.warn("jdl_file with zero jobs!")
+            numjobs = 1
+        self.numjobs = numjobs
+        self.parameter_step = parameter_step
+        self.token_type = token_type
+        self.wholenodes = 'false'
+
+        if 'wholenode' in kwargs:
+            self.wholenodes = kwargs['wholenode']
+        if "NCPU" in kwargs:
+            self.ncpu = kwargs["NCPU"]
+        else:
+            self.ncpu = 1
+        if self.ncpu == 0:
+            self.wholenodes = 'true'
+        if "queue" in kwargs:
+            self.queue = kwargs['queue']
+        else:
+            self.queue = "medium"
+        self.temp_file = None
+        self.launch_file = str("/".join((GRID_LRT.__file__.split("/")[:-1])) +
+                               "/data/launchers/run_remote_sandbox.sh")
+
+    def __check_authorized(self):
