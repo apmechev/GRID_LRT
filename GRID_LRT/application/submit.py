@@ -352,3 +352,61 @@ class SpiderLauncher(JdlLauncher):
                                "/data/launchers/run_remote_sandbox.sh")
 
     def __check_authorized(self):
+        grid_credentials.grid_credentials_enabled()
+        self.authorized = True
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        os.remove(self.temp_file.name)
+    ### not finished below this line ###
+    def build_slurm_file(self, database=None):
+        """Uses a template to build the slurm file and place it in a
+        temporary file object stored internally.
+            """
+        creds = pc()  # Get credentials, get launch file to send to workers
+        if not database:
+            database = creds.database
+        if not os.path.exists(self.launch_file):
+            raise IOError("Launch file doesn't exist! "+self.launch_file)
+        slurmfile = """#!/usr/bin/env bash
+#SBATCH --job-name=prefactor --nodes=1 --cpus-per-task=%d
+echo Job landed on $(hostname)
+JOBDIR=$(mktemp -d -p $TMPDIR)
+cd $TMPDIR
+#mkdir $PWD/prefactor
+#JOBDIR=$PWD/prefactor
+export JOBDIR
+echo Created job directory $JOBDIR
+cd $JOBDIR
+%s %s %s %s %s
+"""% (int(self.ncpu),
+        str(self.launch_file),
+        str(database),
+        str(creds.user),
+        str(creds.password),
+        str(self.token_type))
+        return slurmfile
+
+    def make_temp_slurmfile(self, database=None):
+        """ Makes a temporary file to store the Slurm
+        document that is only visible to the user"""
+        self.temp_file = tempfile.NamedTemporaryFile(delete=False)
+        with open(self.temp_file.name, 'w') as t_file_obj:
+            for i in self.build_slurm_file(database):
+                t_file_obj.write(i)
+        return self.temp_file
+
+    def launch(self, database=None):
+        """Launch the slurm-job and return the job identification"""
+        if not self.authorized:
+	        self._check_authorized()
+        if not self.temp_file:
+            self.temp_file = self.make_temp_slurmfile(database = database)
+        sub = subprocess.Popen(['sbatch', self.temp_file.name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out = sub.communicate()
+        if out[1] == "":
+            return out[0]
+        raise RuntimeError("Launching of Slurm job failed because: "+out[1])
+
