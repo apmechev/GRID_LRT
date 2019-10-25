@@ -353,7 +353,7 @@ class SpiderLauncher(JdlLauncher):
         if "queue" in kwargs:
             self.queue = kwargs['queue']
         else:
-            self.queue = "medium"
+            self.queue = "normal"
         self.temp_file = None
         self.launch_file = str("/".join((GRID_LRT.__file__.split("/")[:-1])) +
                                "/data/launchers/run_remote_sandbox.sh")
@@ -377,23 +377,26 @@ class SpiderLauncher(JdlLauncher):
             database = creds.database
         if not os.path.exists(self.launch_file):
             raise IOError("Launch file doesn't exist! "+self.launch_file)
-        slurmfile = """#!/usr/bin/env bash
-#SBATCH --job-name=prefactor --nodes=1 --cpus-per-task=%d
+        slurmfile = '#!/usr/bin/env bash'
+        if self.wholenodes:
+            slurmfile += '#SBATCH --exclusive --job-name=prefactor --nodes=1 --cpus-per-task={ncpu:d} -p {queue:s}'
+        else:
+            slurmfile += '#SBATCH --job-name=prefactor --nodes=1 --cpus-per-task={ncpu:d} -p {queue:s}'
+        slurmfile += """
 echo Job landed on $(hostname)
 JOBDIR=$(mktemp -d -p $TMPDIR)
 cd $TMPDIR
-#mkdir $PWD/prefactor
-#JOBDIR=$PWD/prefactor
 export JOBDIR
 echo Created job directory $JOBDIR
 cd $JOBDIR
-%s %s %s %s %s
-"""% (int(self.ncpu),
-        str(self.launch_file),
-        str(database),
-        str(creds.user),
-        str(creds.password),
-        str(self.token_type))
+{launcher:s} {db:s} {usr:s} {pw:s} {tt:s}
+""".format(ncpu=int(self.ncpu),
+        queueu=str(self.queue)
+        launcher=str(self.launch_file),
+        db=str(database),
+        usr=str(creds.user),
+        pw=str(creds.password),
+        tt=str(self.token_type))
         return slurmfile
 
     def make_temp_slurmfile(self, database=None):
