@@ -335,7 +335,7 @@ class SpiderLauncher(JdlLauncher):
         else: 
 	        self.__check_authorized()
         if numjobs < 1:
-            logging.warn("jdl_file with zero jobs!")
+            logging.warn("Slurm file with zero jobs!")
             numjobs = 1
         self.numjobs = numjobs
         self.parameter_step = parameter_step
@@ -379,9 +379,9 @@ class SpiderLauncher(JdlLauncher):
             raise IOError("Launch file doesn't exist! "+self.launch_file)
         slurmfile = '#!/usr/bin/env bash'
         if self.wholenodes:
-            slurmfile += '#SBATCH --exclusive --nodes=1 --cpus-per-task={ncpu:d} -p {queue:s}'
+            slurmfile += '#SBATCH --exclusive --nodes=1 --cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d}'
         else:
-            slurmfile += '#SBATCH --nodes=1 --cpus-per-task={ncpu:d} -p {queue:s}'
+            slurmfile += '#SBATCH --nodes=1 --cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d}'
         slurmfile += """
 echo Job landed on $(hostname)
 JOBDIR=$(mktemp -d -p $TMPDIR)
@@ -391,7 +391,9 @@ echo Created job directory $JOBDIR
 cd $JOBDIR
 {launcher:s} {db:s} {usr:s} {pw:s} {tt:s}
 """.format(ncpu=int(self.ncpu),
-        queueu=str(self.queue)
+        queueu=str(self.queue),
+        njobs=self.numjobs,
+        concurrent=self.parameter_step,
         launcher=str(self.launch_file),
         db=str(database),
         usr=str(creds.user),
