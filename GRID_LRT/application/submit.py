@@ -379,9 +379,9 @@ class SpiderLauncher(JdlLauncher):
             raise IOError("Launch file doesn't exist! "+self.launch_file)
         slurmfile = '#!/usr/bin/env bash\n'
         if self.wholenodes:
-            slurmfile += '#SBATCH --exclusive --nodes=1 --ntasks 1--cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d}\n'
+            slurmfile += '#SBATCH --exclusive --nodes=1 --ntasks 1--cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d} --output=spiderjob-%A_%a.out --error=spiderjob-%A_%a.err\n'
         else:
-            slurmfile += '#SBATCH --nodes=1 --ntasks 1 --cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d}\n'
+            slurmfile += '#SBATCH --nodes=1 --ntasks 1 --cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d} --output=spiderjob-%A_%a.out --error=spiderjob-%A_%a.err\n'
         slurmfile += """
 echo Job landed on $(hostname)
 JOBDIR=$(mktemp -d -p $TMPDIR)
