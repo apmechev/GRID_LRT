@@ -22,7 +22,7 @@ class JdlsubmitTest(unittest.TestCase):
         pass
 
     @mock.patch('subprocess.Popen')
-    def test_make_tempfile(self):
+    def test_make_tempfile(self, mock_subproc_popen):
         process_mock = mock.Mock()
         attrs = {'communicate.return_value': ("the file really exists".encode(), "".encode())}
         process_mock.configure_mock(**attrs)
