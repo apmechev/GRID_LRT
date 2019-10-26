@@ -1,0 +1,7 @@
+exclude:
+ - /GRID_LRT/couchdb/.*
+ - /GRID_LRT/couchdb/tools/.*
+ - /docs/.*
+component_depth: 2
+
+

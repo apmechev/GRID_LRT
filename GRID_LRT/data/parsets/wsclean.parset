@@ -1,0 +1,16 @@
+-size 2560 1080
+-maxuv-l 7000 
+-baseline-averaging 5.34930608721 
+-local-rms-method rms-with-min 
+-mgain 0.8 
+-auto-mask 3.3 
+-pol I 
+-weighting-rank-filter 3 
+-auto-threshold 0.5 
+-j 5 
+-local-rms-window 50 
+-mem 10 
+-weight briggs 0.0 
+-scale 0.00208 
+-niter 5000 
+-no-update-model-required

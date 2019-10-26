@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+"""
+Python module to check the state of files using gfal and return their locality
 # ===================================================================== #
 # author: Ron Trompert <ron.trompert@surfsara.nl>	--  SURFsara    #
 # helpdesk: Grid Services <grid.support@surfsara.nl>    --  SURFsara	#
@@ -11,104 +14,123 @@
 #		ONLINE_AND_NEARLINE: means that the file is on disk	#
 #				     and tape				#
 # ===================================================================== #
+"""
 
-#!/usr/bin/env python
-
-import pythonpath
-import gfal
-import time
-import re
+from __future__ import print_function
 import sys
-from string import strip
-import pdb
-
-def main(filename):
-	file_loc=location(filename)
-        rs,m=replace(file_loc)
-        f=open(filename,'r')
-        urls=f.readlines()
-        f.close()
-        return (process(urls,rs,m,True))
+from collections import Counter
 
 
-def state_dict(srm_dict,printout=True):
-        locs_options=['s','j','p']
+try:
+    import gfal2 as gfal  # pylint: disable=import-error
+    gfal.set_verbose(gfal.verbose_level.warning)
+except ImportError:
+    print("GFAL CANNOT BE IMPORTED")
+from GRID_LRT.Staging.srmlist import srmlist
+from GRID_LRT.auth import grid_credentials
 
-        line=srm_dict.itervalues().next() 
-        file_loc=[locs_options[i] for i in range(len(locs_options)) if ["sara" in line,"juelich" in line, not "sara" in line and not "juelich" in line][i] ==True][0]
-        print file_loc
-        rs,m=replace(file_loc)
-        
-        urls=[]
-        for key, value in srm_dict.iteritems():
-            urls.append(value)
-        return process(urls,rs,m,printout)
 
-def location(filename):
-	locs_options=['s','j','p']
-	with open(filename,'r') as f:
-		line=f.readline()
-	 
-	file_loc=[locs_options[i] for i in range(len(locs_options)) if ["sara" in line,"juelich" in line, not "sara" in line and not "juelich" in line][i] ==True]
-	return file_loc[0]
 
-def replace(file_loc):
-	if file_loc=='p':
-		m=re.compile('/lofar')
-		repl_string="srm://lta-head.lofar.psnc.pl:8443/srm/managerv2?SFN=/lofar"
-		print("Files are in Poznan")
-	else:
-		m=re.compile('/pnfs')
-		if file_loc=='j':
-			repl_string="srm://lofar-srm.fz-juelich.de:8443/srm/managerv2?SFN=/pnfs/"
-			print("Files are in Juleich")
-		elif file_loc=='s':
-			repl_string="srm://srm.grid.sara.nl:8443/srm/managerv2?SFN=/pnfs"
-			print("files are on SARA")
-		else:
-			sys.exit()
-        return repl_string,m
-   
-def process(urls,repl_string,m,printout=True): 
-	nf=100
-	surls=[]
-	for u in urls:
-	    surls.append(m.sub(repl_string,strip(u)))
-	#    surls.append(m.sub('srm://lofar-srm.fz-juelich.de:8443/srm/managerv2?SFN=/pnfs/',strip(u)))
-	
-	mx=len(surls)
-	locality=[]
+def main(filename, verbose=True):
+    """Main function that takes in a file name and returns a list of tuples of
+    filenames and staging statuses. The input file can be both srm:// and gsiftp:// links.
 
-	i=0
-	while i<mx:
-	    req={}
-	    mxi=min(i+nf,mx)
-	    s=surls[i:mxi]
-	    req.update({'surls':s})
-	    req.update({'setype':'srmv2'})
-	    req.update({'no_bdii_check':1})
-	    req.update({'srmv2_lslevels':1})
-	    req.update({'protocols':['gsiftp']})
-	    a,b,c=gfal.gfal_init(req)
-	    a,b,c=gfal.gfal_ls(b)
-	    a,b,c=gfal.gfal_get_results(b)
-	    for j in range(0,len(c)):
-	       if c[j]['status']!=0:
-                        print "\033[31mSURL "+c[j]['surl']+" not OK! Will Skip this one "+"\033[0m"
-                        continue
-               if c[j]['locality']=='NEARLINE':
-			colour="\033[31m"
-	       else:
-			colour="\033[32m"
-               if printout:
-	                print str(j)+c[j]['surl']+" "+colour+c[j]['locality']+"\033[0m"
-	       locality.append([c[j]['surl'],c[j]['locality']])
-	    i=i+nf
-	    time.sleep(1)	
-        return locality
+    Args:
+        :param filename: The filename holding the links whose have to be checked
+        :type filename: str
+        :param verbose: A toggle to turn off printing out the status of each file.
+        True by default will print everything out
+        :type verbose: bool
 
-if __name__=='__main__':
-	if len(sys.argv)==2:
-		sys.exit(main(sys.argv[1]))
-	else: 
-		sys.exit(main('files'))
+    Returns:
+        :ret results: A list of tuples containing the file_name and the State
+
+    Usage:
+
+    >>> from GRID_LRT.Staging import state_all
+    >>> filename='/home/apmechev/GRIDTOOLS/GRID_LRT/GRID_LRT/tests/srm_50_sara.txt'
+    >>> results=state_all.main(filename)
+    >>> results=state_all.main(filename, verbose=False)
+    >>> results[0]
+    ('L229507_SB150_uv.dppp.MS_f6fc7fc5.tar', 'ONLINE_AND_NEARLINE')
+
+    """
+    grid_credentials.grid_credentials_enabled()  # Check if credenitals enabled
+    s_list = load_file_into_srmlist(filename)
+    print("files are at "+s_list.lta_location)
+    results = []
+    for i in s_list.gfal_links():
+        results.append(check_status(i, verbose))
+    return results
+
+
+def load_file_into_srmlist(filename):
+    """Helper function that loads a file into an srmlist object (will be
+    added to the actual srmlist class later)
+
+    """
+    s_list = srmlist()
+    for i in open(filename, 'r').read().split():
+        s_list.append(i)
+    return s_list
+
+
+def check_status(surl_link, verbose=True):
+    """ Obtain the status of a file from the given surl.
+
+    Args:
+        :param surl: the SURL pointing to the file.
+        :type surl: str
+        :parame verbose: print the status to the terminal.
+        :type verbose: bool
+
+    Returns:
+        :(filename, status): a tuple containing the file  and status as
+            stored in the 'user.status' attribute.
+    """
+    context = gfal.creat_context()
+    status = context.getxattr(surl_link, 'user.status')
+    filename = surl_link.split('/')[-1]
+    if status == 'ONLINE_AND_NEARLINE' or status == 'ONLINE':
+        color = "\033[32m"
+    else:
+        color = "\033[31m"
+    if verbose:
+        print('{:s} is {:s}{:s}\033[0m'.format(filename, color, status))
+    return (filename, status.strip())
+
+
+def percent_staged(results):
+    """Takes list of tuples of (srm, status) and counts the percentage of files
+    that are staged (0->1) and retunrs this percentage as float
+
+    Usage:
+
+    >>> from GRID_LRT.Staging import state_all
+    >>> filename='/home/apmechev/GRIDTOOLS/GRID_LRT/GRID_LRT/tests/srm_50_sara.txt'
+    >>> results=state_all.main(filename, verbose=False)
+    >>> state_all.percent_staged(results)
+
+    """
+    total_files = len(results)
+    counts = Counter(x[1] for x in results)
+    staged = dict(counts).get('ONLINE_AND_NEARLINE', 0)+dict(counts).get('ONLINE', 0)
+    unstaged = dict(counts).get('NEARLINE', 0)
+#    assert staged + unstaged == total_files
+    print(str(float(staged/(staged + unstaged))*100)+" percent of files staged")
+    return float(staged/total_files)
+
+
+def check_status_file(surl_list):  # TODO: implement
+    """Unimplemented task"""
+    print(surl_list)
+
+
+if __name__ == '__main__':
+    INPUT = sys.argv[1]
+    if (INPUT.lower()).startswith('srm://'):
+        # Single file.
+        check_status(INPUT)
+    else:
+        # Assume a file list.
+        check_status_file(INPUT)

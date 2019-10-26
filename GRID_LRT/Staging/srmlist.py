@@ -1,6 +1,8 @@
 import sys
 import re
-import os
+from collections import deque
+from math import ceil
+import logging
 import subprocess
 from GRID_LRT.Staging import surl_chunks
 import GRID_LRT.Staging.stage_all_LTA as stage_all
@@ -33,68 +35,118 @@ class srm_manager(object):
         self.loc=0
         return self
 
-    def next(self):
-        if self.loc < len(self.keys):
-            tmp=self.keys[self.loc]
-            self.loc+=1
-            return self.srms[tmp]
-        raise StopIteration
+    @property
+    def LTA_location(self):
+        if len(self)>0:
+            return self.check_str_location(self[0])
+    
+    def check_str_location(self, item):
+        """searches the item for an FQDN and returns the location
+        of the data using the list below. Returns the data location or None"""
+        for fqdn in GSI_FQDNs:
+            if fqdn in item:
+                return GSI_FQDNs[fqdn] 
 
-    __next__=next
+    def stringify_item(self, item):
+        if isinstance(item, str):
+            link = item.strip('\n')
+            link = item.strip('\r')
+        elif isinstance(item, srmlist):
+            link = "".join(str(v) for v in item)
+        else:
+            return ""
+        return link
 
+    def _check_obsid(self, item):
+        link = self.stringify_item(item)
+        tmp_obsid = re.search('L[0-9][0-9]*',
+                              link).group(0)
+        if not self.obsid:
+            self.obsid = tmp_obsid
+        if self.checkobsid and tmp_obsid != self.obsid:
+            raise AttributeError("Different OBSID than previous items")
 
-    def file_load(self,filename,OBSID=""):
-        """Loads a list of srms from a file by searching the file for 
-            1. The OBSID class is initiated with
-            2. The OBSID given by this function
-            3. The first OBSID encountered in the file
-            After, the script only loads the lines that contain the OBSID
-            into the dict srms
+    def append(self, item):
+        if not item or item == "":
+            return
+        if self.checkobsid:
+            self._check_obsid(item)
+        tmp_loc = self.check_link_location(item)
+        item = self.trim_spaces(self.stringify_item(item))
+        if not self.lta_location:
+            self.lta_location = tmp_loc
+        elif self.lta_location != tmp_loc  and self._check_location :
+            raise AttributeError(
+                "Appended srm link not the same location as previous links!")
+        if item in self:
+            return  # don't add duplicate srms
+        # append the item to itself (the list)
+        super(srmlist, self).append(item)
+
+    def trim_spaces(self, item):
+        """Sometimes there are two fields in the incoming list. Only take the first
+        as long as it's fromatted properly
         """
-        self.filename=filename
-        if self.OBSID=="" and OBSID!="":
-            self.OBSID=OBSID
-        self.check_OBSID()
-        
-        self.srms=surl_chunks.make_list_of_surls(self.filename,self.stride) 
+        item = re.sub('//pnfs', '/pnfs', "".join(item))
+        if self.lta_location == 'poznan':
+            item = re.sub('//lofar', '/lofar', "".join(item))
+        if " " in item:
+            for potential_link in item.split(" "):
+                if 'srm://' in potential_link:
+                    return potential_link
+        else:
+            return item
 
-        f1=open(self.filename,'r').read()
-        #TODO: make a srmlist class where fixsrms is builtin
-        if "fz-juelich.de" in f1:
-            self.fix_srms('srm:\/\/lofar-srm.fz-juelich.de:8443')
-        elif "srm.grid.sara.nl" in f1:
-            self.fix_srms('srm:\/\/srm.grid.sara.nl:8443')
-        elif "lofar.psnc.pl" in f1:
-            self.fix_srms('srm:\/\/lta-head.lofar.psnc.pl:8443')
-        
+    def gfal_replace(self, item):
+        """
+        For each item, it creates a valid link for the gfal staging scripts
+        """
+        if 'srm://' in item:
+            return re.sub(':8443', ':8443/srm/managerv2?SFN=', item)
+        elif 'gsiftp://' in item:
+            return self.srm_replace(item)
 
-    def make_abndict_from_tokens(self,token_type,location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/"):
-        '''Makes a Dictionary of ABNs taken from the completed tokens 
-        '''
-        self.location=location
-        s_ABN=self.get_ABN_list_from_token(token_type)
-        ABN_files=self.make_url_list(location)
-        return self.make_list(s_ABN,ABN_files,"AB")
+    def srm_replace(self, item):
+        if self.lta_location == 'sara':
+            return re.sub('gsiftp://gridftp.grid.sara.nl:2811',
+                          'srm://srm.grid.sara.nl:8443',
+                          item)
+        if self.lta_location == 'juelich':
+            return re.sub("gsiftp://lofar-gridftp.fz-juelich.de:2811",
+                          "srm://lofar-srm.fz-juelich.de:8443",
+                          item)
+        if self.lta_location == 'poznan':
+            return re.sub("gsiftp://gridftp.lofar.psnc.pl:2811",
+                          "srm://lta-head.lofar.psnc.pl:8443",
+                          item)
 
-    def make_sbndict_from_gsidir(self,location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP/"):
-        self.location=location
-        gsi_files=self.make_gsi_list(location)
-        files=[]
-        for i in gsi_files:
-            files.append(i.split(location)[1])
-        return self.make_list([[1],[244]],files,"_")
+    def gsi_replace(self, item):
+        if self.lta_location == 'sara':
+            return re.sub('srm://srm.grid.sara.nl:8443',
+                          'gsiftp://gridftp.grid.sara.nl:2811',
+                          item)
+        if self.lta_location == 'juelich':
+            return re.sub("srm://lofar-srm.fz-juelich.de:8443",
+                    "gsiftp://lofar-gridftp.fz-juelich.de:2811", item)
+        if self.lta_location == 'poznan':
+            return re.sub("srm://lta-head.lofar.psnc.pl:8443",
+                          "gsiftp://gridftp.lofar.psnc.pl:2811",
+                          item)
 
-    def make_sbndict_from_file(self,filename):
-        '''Makes a Dictionary of ABNs taken from the completed tokens 
-        '''
-        self.srms=surl_chunks.make_list_of_surls(filename,1)
-        SBN_files=[]
-        for key, value in self.srms.iteritems():
-            SBN_files.append(os.path.basename(value))
-        s_SBN=sorted(self.srms.keys())
-        self.location=os.path.dirname(value)
-        return self.make_list(s_SBN,SBN_files,'SB')
-
+    def http_replace(self, item):
+        if self.lta_location == 'sara':
+            return re.sub('srm://',
+                          'https://lofar-download.grid.sara.nl/lofigrid/SRMFifoGet.py?surl=srm://',
+                          item)
+        if self.lta_location == 'juelich':
+            return re.sub(
+                "srm://",
+                "https://lofar-download.fz-juelich.de/webserver-lofar/SRMFifoGet.py?surl=srm://",
+                item)
+        if self.lta_location == 'poznan':
+            return re.sub("srm://",
+                          "https://lta-download.lofar.psnc.pl/lofigrid/SRMFifoGet.py?surl=srm://",
+                          item)
 
     def make_list(self,SBs,files,append='SB'):
         """Makes a dictionary of links keyed with the starting SBN, ABN
@@ -210,4 +262,52 @@ class srm_manager(object):
                 self.srms[key]=re.sub("//lofar","/lofar",self.srms[key])
             self.srms[key]=re.sub(path,'',self.srms[key].split()[0])
 
- 
+    def sbn_dict(self, pref="SB", suff="_"):
+        """
+        Returns a generator that creates a pair of SBN and link. Can be used to create dictionaries
+        """
+        for i in self:
+            match = None
+            surl = srmlist()
+            surl.append(i)
+            match = re.search(pref+'(.+?)'+suff, i)
+            try:
+                yield match.group(1), surl
+            except AttributeError as exc:
+                sys.stderr.write("Are you using pref='SB' and suff='_'"+
+                                 "to match ...SB000_... ?")
+                raise exc
+
+
+def slice_dicts(srmdict, slice_size=10):
+    """
+    Returns a dict of lists that hold 10 SBNs (by default).
+    Missing Subbands are treated as empty spaces, if you miss SB009,
+    the list will include  9 items from SB000 to SB008, and next will start at SB010"""
+    srmdict = dict(srmdict)
+
+    keys = sorted(srmdict.keys())
+    start = int(keys[0])
+    sliced = {}
+    for chunk in range(0, 1 + int(ceil((int(keys[-1])-int(keys[0]))/float(slice_size)))):
+        chunk_name = format(start+chunk*slice_size, '03')
+        sliced[chunk_name] = srmlist()
+        for i in range(slice_size):
+            if format(start+chunk*slice_size+i, '03') in srmdict.keys():
+                sliced[chunk_name].append(
+                    srmdict[format(start+chunk*slice_size+i, '03')])
+    sliced = dict((k, v) for k, v in sliced.items() if v) #Removing empty items
+    return sliced
+
+def make_srmlist_from_gsiftpdir(gsiftpdir):
+    from GRID_LRT.storage import gsifile
+    srml = srmlist()
+    grid_dir = gsifile.GSIFile(gsiftpdir)
+    for i in [f.loc for f in grid_dir.list_dir()]:
+        srml.append(i)
+    return srml
+
+def count_files_uberftp(directory):
+    from GRID_LRT.storage import gsifile
+    grid_dir = gsifile.GSIFile(directory)
+    return [f.location for f in grid_dir.list_dir()]
