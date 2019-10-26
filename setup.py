@@ -6,7 +6,7 @@ from setuptools import setup
 import GRID_LRT
  
 setup(name='GRID_LRT',
-      packages=['GRID_LRT', 'GRID_LRT/Staging', 'GRID_LRT/application','GRID_LRT/storage', 'GRID_LRT/auth'],
+      packages=['GRID_LRT', 'GRID_LRT/staging', 'GRID_LRT/application','GRID_LRT/storage', 'GRID_LRT/auth'],
       version=GRID_LRT.__version__,
       setup_requires=[],
       tests_require=[

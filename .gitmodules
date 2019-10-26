@@ -1,0 +1,3 @@
+[submodule "GRID_LRT/staging/lofar_stager_api"]
+	path = GRID_LRT/staging/lofar_stager_api
+	url = https://git.astron.nl/ro/lofar_stager_api.git

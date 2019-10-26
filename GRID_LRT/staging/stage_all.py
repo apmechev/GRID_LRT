@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" Staging script using the gfal API
+""" staging script using the gfal API
 
 # ===================================================================== #
 # author: Ron Trompert <ron.trompert@surfsara.nl>	--  SURFsara    #
@@ -19,7 +19,7 @@ from __future__ import print_function
 import re
 import sys
 import gfal2 as gfal  # pylint: disable=import-error
-from GRID_LRT.Staging import srmlist as srmlist_module
+from GRID_LRT.staging import srmlist as srmlist_module
 
 
 ##>>> ctx = gfal2.creat_context()
@@ -90,12 +90,12 @@ def replace(file_loc):
     if file_loc == 'p':
         match = re.compile('/lofar')
         repl_string = "srm://lta-head.lofar.psnc.pl:8443/srm/managerv2?SFN=/lofar"
-        print("Staging in Poznan")
+        print("staging in Poznan")
     else:
         match = re.compile('/pnfs')
         if file_loc == 'j':
             repl_string = "srm://lofar-srm.fz-juelich.de:8443/srm/managerv2?SFN=/pnfs/"
-            print("Staging in Juleich")
+            print("staging in Juleich")
         elif file_loc == 's':
             repl_string = "srm://srm.grid.sara.nl:8443/srm/managerv2?SFN=/pnfs"
             print("files are on SARA")
