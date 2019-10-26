@@ -11,8 +11,6 @@ def mocked_import(*args, **kwargs):
     with mock.patch.object(subprocess, 'Popen') as mocked_popen:
         mocked_popen.return_value.returncode = 0
         mocked_popen.return_value.communicate.return_value = ("the file really exists".encode(), "".encode())
-        if 'encoding' in kwargs:
-            del kwargs['encoding']
         launcher = submit.JdlLauncher(*args, **kwargs)
     return launcher
 
@@ -23,9 +21,13 @@ class JdlsubmitTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-
+    @mock.patch('subprocess.Popen')
     def test_make_tempfile(self):
-        launcher = mocked_import() 
+        process_mock = mock.Mock()
+        attrs = {'communicate.return_value': ("the file really exists".encode(), "".encode())}
+        process_mock.configure_mock(**attrs)
+        mock_subproc_popen.return_value = process_mock 
+        launcher = submit.JdlLauncher() 
         file_path = launcher.make_temp_jdlfile()
         self.assertTrue(os.path.exists(file_path.name))
 
