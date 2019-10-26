@@ -8,12 +8,12 @@ if sys.version_info[0:2] != (2, 6):
 from subprocess import Popen
 
 class SafePopen(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *popen_args, **popen_kwargs):
         if sys.version_info.major ==2:
-            return Popen.__init__(*args, **kwargs)
+            return Popen.__init__(*popen_args, **popen_kwargs)
         if sys.version_info.major == 3 :
-            kwargs['encoding'] = 'utf8'
-        return Popen.__init__(*args, **kwargs)
+            popen_kwargs['encoding'] = 'utf8'
+        return Popen.__init__(*popen_args, **popen_kwargs)
 
 
 __all__ = ["storage", 'auth', "application", "Staging", 'token']
