@@ -4,35 +4,56 @@ from collections import deque
 from math import ceil
 import logging
 import subprocess
-from GRID_LRT.Staging import surl_chunks
-import GRID_LRT.Staging.stage_all_LTA as stage_all
-import GRID_LRT.Staging.state_all as state_all
-import GRID_LRT.Staging.stager_access as sa
 
-import pdb
+GSI_FQDNs={
+        'grid.sara.nl':'sara',
+        'fz-juelich.de':'juelich',
+        'lofar.psnc.pl':'poznan'
+        }
 
+class srmlist(list):
+    """
+    The srmlist class is an extension of Python lists that can hold a list of
+    srm links to data on GRID Storage (LOFAR Archive, Intermediate Storage, etc).
 
-class srm_manager(object):
-    def __init__(self,OBSID="",filename="",stride=1):
-        """Initializes the srmlist object. The stride is how many tokens to make
-            stride=1 makes token for each link, stride 10 groups by 10, etc
-            The self.srms dictionary is what is used later by the default_LRT
-            to make the tokens and possibly to rearrange the links by real frequency
+    In addition to the regular list capabilities, it also has internal checks for the
+    location and the OBSID of the data. When a new item is appended, these checks are
+    done automatically. Checking OBSID is an optional argument set to True by default.
+    """
+
+    def __init__(self, check_OBSID=True, check_location=True, link=None):
+        """__init__: Initializes the srmlist object. 
+
+        :param check_OBSID: Boolean flag to check if each added link has the same OBSID
+        :type check_OBSID: Boolean
+        :param check_location: Boolean flag to check if all files are in the same location (for staging purposes)
+        :type check_location: Boolean
+        :param link: append a link to the srmlist at creation
+        :type link: str
         """
-        self.OBSID = OBSID
-        self.filename = filename
-        self.stride = stride
-        self.srms = {} #A dictionary of {SBN,surl} TODO: Maybe use ABN_list for all srms: tokens will be made with key:value
-        self.ABN_list = {} #A dictionary of {SBN:[srm1,srm2,srm3]} 
-        self.stageIS=None
-        if filename and OBSID: #With arbitrary # of srms per token
-            self.file_load(filename, OBSID)
-        elif filename:
-            self.file_load(filename)
+        super(srmlist, self).__init__()
+        self._check_location = check_location
+        self.lta_location = None
+        self.obsid = None
+        self.checkobsid = check_OBSID
+        if link:
+            self.append(link)
 
-    def __iter__(self):
-        self.keys=self.srms.keys()
-        self.loc=0
+    def check_link_location(self, item):
+        """Checks the location of the item"""
+        tmp_loc = ""
+        if isinstance(item, str):
+            tmp_loc = self.check_str_location(item)
+        elif isinstance(item, srmlist):
+            for i in item:
+                tmp_loc = self.check_str_location(i)
+        return tmp_loc
+    
+    def from_file(self, filename):
+        """You can automatically load a file into the srmlist using
+        s = srmlist().from_file(filename)"""
+        for line in open(filename,'r').readlines():
+            self.append(line.strip('\n'))
         return self
 
     @property
@@ -148,119 +169,37 @@ class srm_manager(object):
                           "https://lta-download.lofar.psnc.pl/lofigrid/SRMFifoGet.py?surl=srm://",
                           item)
 
-    def make_list(self,SBs,files,append='SB'):
-        """Makes a dictionary of links keyed with the starting SBN, ABN
+    def gsi_links(self):
         """
-        for chunk in range(0,(SBs[-1][0]-SBs[0][0])/self.stride+1):
-            try:
-                abn=SBs[0][0]+chunk*self.stride
-            except IndexError:
-                continue # Not sure why this happens
-            abn_files=[]
-        
-            for abnum in range(self.stride):
-                try:
-                    abn_files.append(self.location+"/"+str([x for x in files if append+str("%03d" % (abn+abnum)) in x][0]))
-                except IndexError:
-                    continue
-            ##TODO: SB021 has zero padding!
-            self.ABN_list["%03d" % abn]=abn_files
-        return self.ABN_list
-
-
-
-    def get_ABN_list_from_token(self,token_type):
-        '''Takes all the done tokens and makes a list of ABNs (Absolute Subband Num)
-            That are available. Sorts them 
-        '''
-        import Token
-        th=Token.Token_Handler(uname=os.environ["PICAS_USR"],pwd=os.environ["PICAS_USR_PWD"],
-                                dbn=os.environ["PICAS_DB"],t_type=token_type)
-        print(th.t_type)
-        v=th.db.view(th.t_type+"/"+"done")
-        sbns=[]
-        for x in v:
-            if th.db[x["id"]]["pipeline"]=='pref_targ1':
-                if th.db[x["id"]]["ABN"]=="":
-                    continue
-                sbns.append((int(th.db[x["id"]]["ABN"]),th.db[x["id"]]["start_SB"]))
-        sorted_ABNs=sorted(sbns, key=lambda x: x[0])
-        return sorted_ABNs
-
-
-    def make_url_list(self,location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP"):
-        self.location=location+"/"+self.OBSID
-        urls=subprocess.Popen(["uberftp","-ls",location+"/"+self.OBSID+"/t1_"+self.OBSID+"_AB*"],
-                                stdout=subprocess.PIPE)
-        tmp_urls=urls.communicate()[0].split('\n')[:-1]
-        filenames=[]
-        for url in tmp_urls:
-            filenames.append(url.split()[-1].split(self.OBSID+"/")[1])    
-        return sorted(filenames) 
-
-    def make_gsi_list(self,location="gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/spectroscopy-migrated/prefactor/SKSP"):
-        self.location=location
-        urls=subprocess.Popen(["uberftp","-ls",location+"/*"],
-                                stdout=subprocess.PIPE)
-        tmp_urls=urls.communicate()[0].split('\n')[:-1]
-        filenames=[]
-        for url in tmp_urls:
-            filenames.append(location+url.split()[-1].split("/")[-1])
-        return sorted(filenames)
-
-
-    def check_OBSID(self):
-        """If the OBSID is empty, it takes the first OBSID from the file
-            Otherwise it checks if the OBSID exists in the file
-            If more than one OBSIDs in the file, it makes a new one and
-            sets self.filename to that
+        Returns a generator which can be iterated over, this generator will return
+        a set of gsiftp:// links which can be used with globus-url-copy and uberftp
         """
-        if self.OBSID=="":
-            with open(self.filename,'r') as txtfile:
-                line=txtfile.readline()
-                self.OBSID='L'+str(re.search("L(.+?)_",line).group(1))
-            if self.OBSID=="":
-                print("Sorry. could not get OBSID")
-                raise KeyError
-        found=False
+        queue = deque(self)
+        while queue:
+            item = queue.pop()
+            if item:
+                yield self.gsi_replace(item)
 
-        #Tests if only one OBSID in file 
-        with open(self.filename,'rt') as f:
-            for line in f:
-                if self.OBSID in line:
-                    found=True
-                else:
-                    lines=open(self.filename,'r').readlines()
-                    with open(self.OBSID+".txt",'w') as file1:
-                        [file1.write(x) for x in lines if self.OBSID in x]
-                    self.filename=self.OBSID+".txt"
-        if not found:
-            print("\033[31mOBSID not found in SRM file!\033[0m")
-            sys.exit()
+    def http_links(self):
+        """
+        Returns a generator that can be used to generate http:// links that can be downloaded
+        using wget
+        """
+        queue = deque(self)
+        while queue:
+            item = queue.pop()
+            if item:
+                yield self.http_replace(item)
 
-
-    def state(self,printout=True): 
-        self.states=state_all.state_dict(self.srms,printout=printout)
-        return self.states
-
-
-    def stage(self):
-        self.stageID=stage_all.state_dict(self.srms)
-
-
-    def get_stage_status(self):
-        if not self.stageID:
-            self.stage()
-        print(str(sa.get_progress().get(str(self.stageID))['Percent done'])+" Percent Done")
-        self.percent_done=float(sa.get_progress().get(str(self.stageID))['Percent done'])
-        return stage_all.get_stage_status(self.stageID)       
- 
-    def fix_srms(self,path='srm:\/\/lofar-srm.fz-juelich.de:8443'):
-        for key in self.srms:
-            self.srms[key]=re.sub("//pnfs","/pnfs",self.srms[key])
-            if "poznan" in self.srms[key]:
-                self.srms[key]=re.sub("//lofar","/lofar",self.srms[key])
-            self.srms[key]=re.sub(path,'',self.srms[key].split()[0])
+    def gfal_links(self):
+        """
+        Returns a generator that can be used to generate links that can be staged/stated with gfal
+        """
+        queue = deque(self)
+        while queue:
+            item = queue.pop()
+            if item:
+                yield self.gfal_replace(item)
 
     def sbn_dict(self, pref="SB", suff="_"):
         """
