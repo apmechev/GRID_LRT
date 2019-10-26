@@ -1,5 +1,5 @@
-from GRID_LRT.Staging.srmlist import srmlist, count_files_uberftp
-from GRID_LRT.Staging.srmlist import slice_dicts
+from GRID_LRT.staging.srmlist import srmlist, count_files_uberftp
+from GRID_LRT.staging.srmlist import slice_dicts
 
 import os 
 import glob

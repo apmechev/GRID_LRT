@@ -1,5 +1,5 @@
-from GRID_LRT.Staging import stage_all_LTA 
-from GRID_LRT.Staging import stager_access
+from GRID_LRT.staging import stage_all_LTA 
+from GRID_LRT.staging.lofar_stager_api import stager_access
 import os
 import glob
 import unittest
@@ -17,7 +17,7 @@ try:
 except ImportError:
     from xmlrpc.client import ProtocolError
 
-from GRID_LRT.Staging.stager_access import handle_xmlrpc_exception
+from GRID_LRT.staging.stager_access import handle_xmlrpc_exception
 stager_access.PASSW = 'PASSWORD'
 
 @handle_xmlrpc_exception

@@ -14,7 +14,7 @@
 #import gfal2 as gfal
 import re
 import sys
-from GRID_LRT.Staging import stager_access 
+from GRID_LRT.staging.lofar_stager_api import stager_access 
 
 
 def strip(item):

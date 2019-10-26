@@ -26,7 +26,7 @@ try:
     gfal.set_verbose(gfal.verbose_level.warning)
 except ImportError:
     print("GFAL CANNOT BE IMPORTED")
-from GRID_LRT.Staging.srmlist import srmlist
+from GRID_LRT.staging.srmlist import srmlist
 from GRID_LRT.auth import grid_credentials
 
 
@@ -47,7 +47,7 @@ def main(filename, verbose=True):
 
     Usage:
 
-    >>> from GRID_LRT.Staging import state_all
+    >>> from GRID_LRT.staging import state_all
     >>> filename='/home/apmechev/GRIDTOOLS/GRID_LRT/GRID_LRT/tests/srm_50_sara.txt'
     >>> results=state_all.main(filename)
     >>> results=state_all.main(filename, verbose=False)
@@ -106,7 +106,7 @@ def percent_staged(results):
 
     Usage:
 
-    >>> from GRID_LRT.Staging import state_all
+    >>> from GRID_LRT.staging import state_all
     >>> filename='/home/apmechev/GRIDTOOLS/GRID_LRT/GRID_LRT/tests/srm_50_sara.txt'
     >>> results=state_all.main(filename, verbose=False)
     >>> state_all.percent_staged(results)

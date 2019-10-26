@@ -16,14 +16,14 @@ class SafePopen(object):
         return Popen.__init__(*popen_args, **popen_kwargs)
 
 
-__all__ = ["storage", 'auth', "application", "Staging", 'token']
+__all__ = ["storage", 'auth', "application", "staging", 'token']
 __version__ = "1.0.7"
 __author__ = "Alexandar P. Mechev"
 __copyright__ = "2019 Alexandar P. Mechev"
 __credits__ = ["Alexandar P. Mechev", "Natalie Danezi", "J.B.R. Oonk"]
 __bibtex__ = """@misc{apmechev:2019,
       author       = {Alexandar P. Mechev} 
-      title        = {apmechev/GRID_LRT: v1.0.0},
+      title        = {apmechev/GRID_LRT: v1.0.7},
       month        = sep,
       year         = 2019,
       doi          = {10.5281/zenodo.1438833},
