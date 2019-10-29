@@ -231,7 +231,7 @@ class JdlLauncher(object):
 	        self._check_authorized()
         if not self.temp_file:
             self.temp_file = self.make_temp_jdlfile(database = database)
-        sub = safePopen(['glite-wms-job-submit', '-d', os.environ["USER"],
+        sub = SafePopen(['glite-wms-job-submit', '-d', os.environ["USER"],
                                 self.temp_file.name], stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
         out = sub.communicate()
