@@ -8,12 +8,6 @@ if sys.version_info[0:2] != (2, 6):
 from subprocess import Popen
 
 class SafePopen(Popen):
-    def __init__(self, *popen_args, **popen_kwargs):
-        if sys.version_info.major ==2:
-            return super(SafePopen, self).__init__(*popen_args, **popen_kwargs)
-        if sys.version_info.major == 3 :
-            return super(SafePopen,self).__init__(*popen_args, **popen_kwargs)
-
     def communicate(self, *args, **kwargs):
         if sys.version_info.major ==2:
             return super(SafePopen, self).communicate(*args, **kwargs)
