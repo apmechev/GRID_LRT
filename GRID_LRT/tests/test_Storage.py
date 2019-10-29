@@ -30,7 +30,7 @@ output_one_file=bytes("""-r--------  1 lofsksp    lofsksp        80445440 Nov 17
 from mock import MagicMock
 import mock
 from GRID_LRT.auth import grid_credentials
-subprocess = grid_credentials.subprocess
+import subprocess
 
 class GSIFileTest(unittest.TestCase):
 
@@ -40,7 +40,7 @@ class GSIFileTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @mock.patch('GRID_LRT.SafePopen', autospec=True)
+    @mock.patch('subprocess.Popen', autospec=True)
     def test_1(self, mock_subproc_popen):
         ''' Tests creating folders on the FS in the appropriate locations
         '''
@@ -55,7 +55,7 @@ class GSIFileTest(unittest.TestCase):
     def test_autobuild(self):
         pass
 
-    @mock.patch('GRID_LRT.SafePopen', autospec=True)
+    @mock.patch('subprocess.Popen', autospec=True)
     def test_parent_dir(self, mock_subproc_popen):
         """test looking at parent directory when target if a file"""
         from GRID_LRT.auth import grid_credentials
@@ -63,7 +63,7 @@ class GSIFileTest(unittest.TestCase):
         attrs = {'communicate.return_value': (output_sbx_test, '')}
         process_mock.configure_mock(**attrs) 
         mock_subproc_popen.return_value = process_mock
-        gf = gsifile.GSIFile('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/test/airflowtest1.tar')
+        gf = gsifile.GSIFile('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/distrib/test.txt')
         gf_parent = gsifile.GSIFile('gsiftp://gridftp.grid.sara.nl:2811/pnfs/grid.sara.nl/data/lofar/user/sksp/sandbox/test/')
         gf_parent._subfiles = output_one_file
         gf._build_from_parent_dir(gf_parent)

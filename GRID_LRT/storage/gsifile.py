@@ -7,15 +7,10 @@ import subprocess
 from subprocess import Popen
 import re
 import GRID_LRT.auth.grid_credentials as grid_creds
+from GRID_LRT import SafePopen
 from GRID_LRT.auth.get_picas_credentials import picas_cred
 from GRID_LRT.staging.srmlist import srmlist
 import humanfriendly
-
-class SafePopen(Popen):
-    def __init__(self, *args, **kwargs):
-        if sys.version_info.major == 3 :
-            kwargs['encoding'] = 'utf8'
-        return super(SafePopen, self).__init__(*args, **kwargs)
 
 import pdb
 class GSIFile(object):

@@ -5,6 +5,8 @@ from math import ceil
 import logging
 import subprocess
 
+
+
 GSI_FQDNs={
         'grid.sara.nl':'sara',
         'fz-juelich.de':'juelich',
@@ -247,6 +249,6 @@ def make_srmlist_from_gsiftpdir(gsiftpdir):
     return srml
 
 def count_files_uberftp(directory):
-    from GRID_LRT.storage import gsifile
+    from GRID_LRT.storage import gsifile 
     grid_dir = gsifile.GSIFile(directory)
     return [f.location for f in grid_dir.list_dir()]
