@@ -9,7 +9,7 @@ from subprocess import Popen
 
 class SafePopen(Popen):
     def communicate(self, *args, **kwargs):
-        if sys.version_info.major ==2:
+        if sys.version_info.major == 2:
             return super(SafePopen, self).communicate(*args, **kwargs)
         else:
             out, err = super(SafePopen, self).communicate(*args, **kwargs)
