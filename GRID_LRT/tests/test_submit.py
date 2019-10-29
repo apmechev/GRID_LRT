@@ -4,11 +4,11 @@ import os
 import glob
 import unittest
 import mock
+from subprocess import Popen
 import subprocess
 
-
 def mocked_import(*args, **kwargs):
-    with mock.patch.object(subprocess, 'Popen') as mocked_popen:
+    with mock.patch.object(subprocess, 'Popen', spec=subprocess.Popen) as mocked_popen:
         mocked_popen.return_value.returncode = 0
         mocked_popen.return_value.communicate.return_value = ("the file really exists".encode(), "".encode())
         launcher = submit.JdlLauncher(*args, **kwargs)
