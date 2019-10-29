@@ -12,8 +12,7 @@ class SafePopen(Popen):
         if sys.version_info.major ==2:
             return super(SafePopen, self).__init__(*popen_args, **popen_kwargs)
         if sys.version_info.major == 3 :
-#            popen_kwargs['encoding'] = 'utf8' #This doesn't work for all Py3 versions anyways
-        return super(SafePopen,self).__init__(*popen_args, **popen_kwargs)
+            return super(SafePopen,self).__init__(*popen_args, **popen_kwargs)
 
     def communicate(self, *args, **kwargs):
         if sys.version_info.major ==2:
