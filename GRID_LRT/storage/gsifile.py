@@ -8,7 +8,7 @@ from subprocess import Popen
 import re
 import GRID_LRT.auth.grid_credentials as grid_creds
 from GRID_LRT.auth.get_picas_credentials import picas_cred
-from GRID_LRT.Staging.srmlist import srmlist
+from GRID_LRT.staging.srmlist import srmlist
 import humanfriendly
 
 class SafePopen(Popen):
