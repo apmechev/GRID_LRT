@@ -340,7 +340,7 @@ class SpiderLauncher(JdlLauncher):
         self.numjobs = numjobs
         self.parameter_step = parameter_step
         self.token_type = token_type
-        self.wholenodes = 'false'
+        self.wholenodes = False
 
         if 'wholenode' in kwargs:
             self.wholenodes = kwargs['wholenode']
@@ -349,7 +349,7 @@ class SpiderLauncher(JdlLauncher):
         else:
             self.ncpu = 1
         if self.ncpu == 0:
-            self.wholenodes = 'true'
+            self.wholenodes = True
         if "queue" in kwargs:
             self.queue = kwargs['queue']
         else:
@@ -377,11 +377,11 @@ class SpiderLauncher(JdlLauncher):
             database = creds.database
         if not os.path.exists(self.launch_file):
             raise IOError("Launch file doesn't exist! "+self.launch_file)
-        slurmfile = '#!/usr/bin/env bash'
+        slurmfile = '#!/usr/bin/env bash\n'
         if self.wholenodes:
-            slurmfile += '#SBATCH --exclusive --nodes=1 --cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d}'
+            slurmfile += '#SBATCH --exclusive --nodes=1 --ntasks 1--cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d} --output=spiderjob-%A_%a.out --error=spiderjob-%A_%a.err\n'
         else:
-            slurmfile += '#SBATCH --nodes=1 --cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d}'
+            slurmfile += '#SBATCH --nodes=1 --ntasks 1 --cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d} --output=spiderjob-%A_%a.out --error=spiderjob-%A_%a.err\n'
         slurmfile += """
 echo Job landed on $(hostname)
 JOBDIR=$TMPDIR
@@ -389,7 +389,8 @@ export JOBDIR
 echo Created job directory $JOBDIR
 cd $JOBDIR
 {launcher:s} {db:s} {usr:s} {pw:s} {tt:s}
-""".format(ncpu=int(self.ncpu),
+"""
+	slurmfile = slurmfile.format(ncpu=int(self.ncpu),
         queueu=str(self.queue),
         njobs=self.numjobs,
         concurrent=self.parameter_step,
