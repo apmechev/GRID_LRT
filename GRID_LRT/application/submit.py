@@ -384,8 +384,7 @@ class SpiderLauncher(JdlLauncher):
             slurmfile += '#SBATCH --nodes=1 --cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d}'
         slurmfile += """
 echo Job landed on $(hostname)
-JOBDIR=$(mktemp -d -p $TMPDIR)
-cd $TMPDIR
+JOBDIR=$TMPDIR
 export JOBDIR
 echo Created job directory $JOBDIR
 cd $JOBDIR
