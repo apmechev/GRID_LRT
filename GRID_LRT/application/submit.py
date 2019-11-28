@@ -379,7 +379,7 @@ class SpiderLauncher(JdlLauncher):
             raise IOError("Launch file doesn't exist! "+self.launch_file)
         slurmfile = '#!/usr/bin/env bash\n'
         if self.wholenodes:
-            slurmfile += '#SBATCH --exclusive --nodes=1 --ntasks 1--cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d} --output=spiderjob-%A_%a.out --error=spiderjob-%A_%a.err\n'
+            slurmfile += '#SBATCH --exclusive --nodes=1 --ntasks 1 --cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d} --output=spiderjob-%A_%a.out --error=spiderjob-%A_%a.err\n'
         else:
             slurmfile += '#SBATCH --nodes=1 --ntasks 1 --cpus-per-task={ncpu:d} -p {queue:s} --array 1-{njobs:d}%{concurrent:d} --output=spiderjob-%A_%a.out --error=spiderjob-%A_%a.err\n'
         slurmfile += """
@@ -391,7 +391,7 @@ cd $JOBDIR
 {launcher:s} {db:s} {usr:s} {pw:s} {tt:s}
 """
 	slurmfile = slurmfile.format(ncpu=int(self.ncpu),
-        queueu=str(self.queue),
+        queue=str(self.queue),
         njobs=self.numjobs,
         concurrent=self.parameter_step,
         launcher=str(self.launch_file),
