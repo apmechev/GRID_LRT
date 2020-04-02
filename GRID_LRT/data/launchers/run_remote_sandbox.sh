@@ -22,7 +22,8 @@ if type git &> /dev/null
 then
  git clone https://github.com/apmechev/GRID_PiCaS_Launcher.git p_tools_git
  cd p_tools_git || exit -100 
- git checkout v"$PICAS_API_VERSION"
+ #git checkout v"$PICAS_API_VERSION"
+ git checkout spider
  git describe
  cd ../ || exit -100
 else  #move this to testpy3
