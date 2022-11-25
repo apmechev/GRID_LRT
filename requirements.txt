@@ -1,4 +1,4 @@
-retrying
+retrying==1.3.4
 humanfriendly>=4.17
 CouchDB
 cloudant==2.15.0
